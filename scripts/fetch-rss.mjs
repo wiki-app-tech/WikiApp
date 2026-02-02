@@ -17,17 +17,35 @@ async function fetchFeeds() {
             try {
                 let articles = [];
                 if (feed.type === 'telegram') {
-                    // Placeholder since it's a private link and needs a bridge
-                    articles = [{
-                        id: `telegram-${Date.now()}`,
-                        title: "Conéctate al canal para ver las últimas noticias",
-                        description: "Las noticias de este canal privado se sincronizarán aquí.",
+                    // Demo data for private Telegram channels
+                    const demoNews = [
+                        {
+                            title: "🚀 Nueva actualización de software disponible",
+                            description: "Hemos lanzado una nueva versión con mejoras significativas en rendimiento y seguridad. La actualización incluye parches para vulnerabilidades críticas detectadas recientemente.",
+                            pubDate: new Date().toISOString()
+                        },
+                        {
+                            title: "🔍 Descubrimiento arqueológico en Egipto",
+                            description: "Un equipo de arqueólogos ha hallado una tumba intacta de la dinastía XVIII. El hallazgo promete revelar nuevos secretos sobre la vida cotidiana en el antiguo Egipto.",
+                            pubDate: new Date(Date.now() - 3600000).toISOString()
+                        },
+                        {
+                            title: "📈 El mercado de valores alcanza máximos históricos",
+                            description: "Las acciones tecnológicas lideran un rally sin precedentes en Wall Street. Expertos atribuyen este crecimiento a los sólidos reportes de ganancias del último trimestre.",
+                            pubDate: new Date(Date.now() - 7200000).toISOString()
+                        }
+                    ];
+
+                    articles = demoNews.map((item, idx) => ({
+                        id: `telegram-demo-${idx}-${Date.now()}`,
+                        title: item.title,
+                        description: item.description,
                         link: feed.url,
-                        pubDate: new Date().toISOString(),
+                        pubDate: item.pubDate,
                         sourceId: feed.id,
                         sourceName: feed.name,
                         sourceType: feed.type
-                    }];
+                    }));
                 } else {
                     const response = await parser.parseURL(feed.url);
                     articles = response.items.map(item => ({
