@@ -13,6 +13,21 @@ export default function Dashboard({
     const [search, setSearch] = useState('');
     const [selectedFeed, setSelectedFeed] = useState<string | null>(null);
     const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
+    const [currentTelegramIndex, setCurrentTelegramIndex] = useState(0);
+
+    const telegramArticles = useMemo(() =>
+        initialArticles.filter(a => a.sourceType === 'telegram'),
+        [initialArticles]);
+
+    useEffect(() => {
+        if (telegramArticles.length <= 1) return;
+
+        const interval = setInterval(() => {
+            setCurrentTelegramIndex(prev => (prev + 1) % telegramArticles.length);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [telegramArticles.length]);
 
     const toggleCategory = (category: string) => {
         setCollapsedCategories(prev => ({
@@ -100,8 +115,32 @@ export default function Dashboard({
                             className="w-full bg-zinc-900 border-none rounded-full px-4 py-1.5 text-sm focus:ring-1 focus:ring-blue-500"
                         />
                     </div>
-                    <div className="text-xs text-zinc-500">
-                        {filteredArticles.length} artículos encontrados
+                    {telegramArticles.length > 0 && (
+                        <div className="hidden lg:flex items-center flex-1 max-w-md bg-zinc-900 rounded-lg px-3 py-1.5 overflow-hidden border border-zinc-800 relative">
+                            <div className="flex items-center gap-2 mr-3 shrink-0">
+                                <FeedIcon type="telegram" />
+                                <span className="text-[10px] font-bold text-blue-500 uppercase tracking-tighter">LIVE</span>
+                            </div>
+                            <div className="relative flex-1 h-5 overflow-hidden">
+                                {telegramArticles.map((article, idx) => (
+                                    <a
+                                        key={article.id}
+                                        href={article.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`absolute inset-0 text-xs truncate transition-all duration-500 ease-in-out ${idx === currentTelegramIndex
+                                                ? 'opacity-100 translate-y-0'
+                                                : 'opacity-0 translate-y-4'
+                                            }`}
+                                    >
+                                        {article.title}
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    <div className="text-xs text-zinc-500 ml-auto">
+                        {filteredArticles.length} artículos
                     </div>
                 </header>
 
@@ -165,6 +204,13 @@ function FeedIcon({ type }: { type: FeedSource['type'] }) {
             return (
                 <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="white" strokeWidth="0">
                     <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"></path>
+                </svg>
+            );
+        case 'telegram':
+            return (
+                <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
             );
         default:

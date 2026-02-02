@@ -15,18 +15,32 @@ async function fetchFeeds() {
         for (const feed of feedsData) {
             console.log(`Fetching ${feed.name}...`);
             try {
-                const response = await parser.parseURL(feed.url);
-
-                const articles = response.items.map(item => ({
-                    id: item.guid || item.link || Math.random().toString(36).substr(2, 9),
-                    title: item.title,
-                    description: item.contentSnippet || item.content || '',
-                    link: item.link,
-                    pubDate: item.pubDate || item.isoDate || new Date().toISOString(),
-                    sourceId: feed.id,
-                    sourceName: feed.name,
-                    sourceType: feed.type
-                })).slice(0, 10); // Limitar a 10 por fuente para liviandad
+                let articles = [];
+                if (feed.type === 'telegram') {
+                    // Placeholder since it's a private link and needs a bridge
+                    articles = [{
+                        id: `telegram-${Date.now()}`,
+                        title: "Conéctate al canal para ver las últimas noticias",
+                        description: "Las noticias de este canal privado se sincronizarán aquí.",
+                        link: feed.url,
+                        pubDate: new Date().toISOString(),
+                        sourceId: feed.id,
+                        sourceName: feed.name,
+                        sourceType: feed.type
+                    }];
+                } else {
+                    const response = await parser.parseURL(feed.url);
+                    articles = response.items.map(item => ({
+                        id: item.guid || item.link || Math.random().toString(36).substr(2, 9),
+                        title: item.title,
+                        description: item.contentSnippet || item.content || '',
+                        link: item.link,
+                        pubDate: item.pubDate || item.isoDate || new Date().toISOString(),
+                        sourceId: feed.id,
+                        sourceName: feed.name,
+                        sourceType: feed.type
+                    })).slice(0, 10);
+                }
 
                 allArticles.push(...articles);
             } catch (err) {
