@@ -14,6 +14,8 @@ export default function Dashboard({
     const [selectedFeed, setSelectedFeed] = useState<string | null>(null);
     const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
     const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState<'home' | 'search' | 'folders'>('home');
     const [currentTelegramIndex, setCurrentTelegramIndex] = useState(0);
 
     const telegramArticles = useMemo(() =>
@@ -64,10 +66,26 @@ export default function Dashboard({
     const categories = useMemo(() => Array.from(new Set(feeds.map(f => f.category))), [feeds]);
 
     return (
-        <div className="flex h-screen bg-black text-white font-sans overflow-hidden">
-            {/* Sidebar */}
-            <aside className={`w-64 border-r border-zinc-800 flex flex-col p-4 shrink-0 bg-zinc-950 transition-all duration-300 ${selectedArticleId ? 'hidden lg:flex' : 'flex'}`}>
-                <h1 className="text-xl font-bold mb-8 tracking-tighter text-blue-500">RSS DASH</h1>
+        <div className="flex flex-col lg:flex-row h-screen bg-black text-white font-sans overflow-hidden">
+            {/* Sidebar (Tablet/Desktop) / Hamburger Menu (Mobile) */}
+            <aside className={`
+                fixed inset-0 z-40 lg:relative lg:inset-auto lg:z-auto
+                w-full lg:w-64 border-r border-zinc-800 flex flex-col p-4 bg-zinc-950/95 lg:bg-zinc-950 backdrop-blur-xl lg:backdrop-blur-none
+                transition-all duration-300 ease-in-out
+                ${isMobileMenuOpen || (!selectedArticleId && activeTab === 'folders')
+                    ? 'translate-x-0 opacity-100'
+                    : '-translate-x-full opacity-0 lg:translate-x-0 lg:opacity-100'}
+                ${selectedArticleId ? 'hidden lg:flex' : ''}
+            `}>
+                <div className="flex items-center justify-between mb-8">
+                    <h1 className="text-xl font-bold tracking-tighter text-blue-500">RSS DASH</h1>
+                    <button
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="lg:hidden p-3 -mr-3 text-zinc-400 hover:text-white min-w-[44px] min-h-[44px]"
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                    </button>
+                </div>
 
                 <nav className="flex-1 space-y-1 overflow-y-auto scrollbar-hide">
                     <button
