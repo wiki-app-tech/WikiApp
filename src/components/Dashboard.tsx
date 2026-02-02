@@ -12,6 +12,14 @@ export default function Dashboard({
 }) {
     const [search, setSearch] = useState('');
     const [selectedFeed, setSelectedFeed] = useState<string | null>(null);
+    const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
+
+    const toggleCategory = (category: string) => {
+        setCollapsedCategories(prev => ({
+            ...prev,
+            [category]: !prev[category]
+        }));
+    };
 
     const filteredArticles = useMemo(() => {
         return initialArticles.filter(a => {
@@ -22,37 +30,58 @@ export default function Dashboard({
         });
     }, [initialArticles, search, selectedFeed]);
 
+    const categories = useMemo(() => Array.from(new Set(feeds.map(f => f.category))), [feeds]);
+
     return (
         <div className="flex h-screen bg-black text-white font-sans overflow-hidden">
             {/* Sidebar */}
             <aside className="w-64 border-r border-zinc-800 flex flex-col p-4 shrink-0 bg-zinc-950">
                 <h1 className="text-xl font-bold mb-8 tracking-tighter text-blue-500">RSS DASH</h1>
 
-                <nav className="flex-1 space-y-1 overflow-y-auto">
+                <nav className="flex-1 space-y-1 overflow-y-auto scrollbar-hide">
                     <button
                         onClick={() => setSelectedFeed(null)}
-                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${!selectedFeed ? 'bg-zinc-800 text-white' : 'hover:bg-zinc-900 text-zinc-400'}`}
+                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors mb-4 ${!selectedFeed ? 'bg-zinc-800 text-white' : 'hover:bg-zinc-900 text-zinc-400'}`}
                     >
                         Todos los feeds
                     </button>
 
-                    {Array.from(new Set(feeds.map(f => f.category))).map(category => (
-                        <div key={category} className="mt-6">
-                            <div className="px-3 mb-2">
-                                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{category}</span>
-                            </div>
-                            <div className="space-y-0.5">
-                                {feeds.filter(f => f.category === category).map(feed => (
-                                    <button
-                                        key={feed.id}
-                                        onClick={() => setSelectedFeed(feed.id)}
-                                        className={`w-full text-left px-3 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${selectedFeed === feed.id ? 'bg-zinc-800 text-white' : 'hover:bg-zinc-900 text-zinc-400'}`}
-                                    >
-                                        <FeedIcon type={feed.type} />
-                                        <span className="truncate">{feed.name}</span>
-                                    </button>
-                                ))}
-                            </div>
+                    {categories.map(category => (
+                        <div key={category} className="mb-2">
+                            <button
+                                onClick={() => toggleCategory(category)}
+                                className="w-full flex items-center justify-between px-3 py-2 hover:bg-zinc-900 rounded-md group transition-colors"
+                            >
+                                <span className="text-[10px] font-bold text-zinc-500 group-hover:text-zinc-300 uppercase tracking-widest">{category}</span>
+                                <svg
+                                    width="10"
+                                    height="10"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className={`text-zinc-600 transition-transform duration-200 ${collapsedCategories[category] ? '-rotate-90' : ''}`}
+                                >
+                                    <path d="m6 9 6 6 6-6" />
+                                </svg>
+                            </button>
+
+                            {!collapsedCategories[category] && (
+                                <div className="mt-1 space-y-0.5">
+                                    {feeds.filter(f => f.category === category).map(feed => (
+                                        <button
+                                            key={feed.id}
+                                            onClick={() => setSelectedFeed(feed.id)}
+                                            className={`w-full text-left px-3 py-1.5 ml-1 rounded-md text-sm flex items-center gap-2 transition-colors ${selectedFeed === feed.id ? 'bg-zinc-800 text-white' : 'hover:bg-zinc-900 text-zinc-400'}`}
+                                        >
+                                            <FeedIcon type={feed.type} />
+                                            <span className="truncate">{feed.name}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </nav>
