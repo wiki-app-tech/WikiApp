@@ -12,6 +12,7 @@ export default function Dashboard({
 }) {
     const [search, setSearch] = useState('');
     const [selectedFeed, setSelectedFeed] = useState<string | null>(null);
+    const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
     const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
     const [currentTelegramIndex, setCurrentTelegramIndex] = useState(0);
 
@@ -45,12 +46,27 @@ export default function Dashboard({
         });
     }, [initialArticles, search, selectedFeed]);
 
+    const selectedArticle = useMemo(() =>
+        initialArticles.find(a => a.id === selectedArticleId) || null
+        , [initialArticles, selectedArticleId]);
+
+    const handleNavigate = (direction: 'next' | 'prev') => {
+        const currentIndex = filteredArticles.findIndex(a => a.id === selectedArticleId);
+        if (currentIndex === -1) return;
+
+        let nextIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
+        if (nextIndex < 0) nextIndex = filteredArticles.length - 1;
+        if (nextIndex >= filteredArticles.length) nextIndex = 0;
+
+        setSelectedArticleId(filteredArticles[nextIndex].id);
+    };
+
     const categories = useMemo(() => Array.from(new Set(feeds.map(f => f.category))), [feeds]);
 
     return (
         <div className="flex h-screen bg-black text-white font-sans overflow-hidden">
             {/* Sidebar */}
-            <aside className="w-64 border-r border-zinc-800 flex flex-col p-4 shrink-0 bg-zinc-950">
+            <aside className={`w-64 border-r border-zinc-800 flex flex-col p-4 shrink-0 bg-zinc-950 transition-all duration-300 ${selectedArticleId ? 'hidden lg:flex' : 'flex'}`}>
                 <h1 className="text-xl font-bold mb-8 tracking-tighter text-blue-500">RSS DASH</h1>
 
                 <nav className="flex-1 space-y-1 overflow-y-auto scrollbar-hide">
@@ -129,8 +145,8 @@ export default function Dashboard({
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className={`absolute inset-0 text-xs truncate transition-all duration-500 ease-in-out ${idx === currentTelegramIndex
-                                                ? 'opacity-100 translate-y-0'
-                                                : 'opacity-0 translate-y-4'
+                                            ? 'opacity-100 translate-y-0'
+                                            : 'opacity-0 translate-y-4'
                                             }`}
                                     >
                                         {article.title}
@@ -144,41 +160,141 @@ export default function Dashboard({
                     </div>
                 </header>
 
-                {/* Article Grid */}
-                <div className="flex-1 overflow-y-auto p-6 scroll-smooth">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredArticles.map(article => (
-                            <a
-                                key={article.id}
-                                href={article.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="group p-4 rounded-xl border border-zinc-800 hover:border-zinc-700 bg-zinc-950 transition-all duration-200"
-                            >
-                                <div className="flex items-center gap-2 mb-3">
-                                    <FeedIcon type={article.sourceType} />
-                                    <span className="text-[10px] font-medium text-zinc-500 uppercase">{article.sourceName}</span>
-                                </div>
-                                <h2 className="text-base font-semibold mb-2 group-hover:text-blue-400 transition-colors line-clamp-2 leading-tight">
-                                    {article.title}
-                                </h2>
-                                <p className="text-sm text-zinc-400 line-clamp-3 leading-relaxed">
-                                    {article.description}
-                                </p>
-                                <div className="mt-4 text-[10px] text-zinc-600">
-                                    {new Date(article.pubDate).toLocaleDateString('es-AR')}
-                                </div>
-                            </a>
-                        ))}
+                {/* Article Grid / Master-Detail */}
+                <div className="flex-1 flex overflow-hidden">
+                    {/* List (Master) */}
+                    <div className={`flex-1 overflow-y-auto p-6 scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-1/3 border-r border-zinc-800' : 'w-full'}`}>
+                        <div className={`grid gap-6 ${selectedArticleId ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+                            {filteredArticles.map(article => (
+                                <button
+                                    key={article.id}
+                                    onClick={() => setSelectedArticleId(article.id)}
+                                    className={`group text-left p-4 rounded-xl border transition-all duration-200 ${selectedArticleId === article.id
+                                        ? 'bg-blue-500/10 border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.1)]'
+                                        : 'bg-zinc-950 border-zinc-800 hover:border-zinc-700'
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <FeedIcon type={article.sourceType} />
+                                        <span className="text-[10px] font-medium text-zinc-500 uppercase">{article.sourceName}</span>
+                                    </div>
+                                    <h2 className={`text-base font-semibold mb-2 transition-colors line-clamp-2 leading-tight ${selectedArticleId === article.id ? 'text-blue-400' : 'group-hover:text-blue-400'}`}>
+                                        {article.title}
+                                    </h2>
+                                    <p className="text-sm text-zinc-400 line-clamp-3 leading-relaxed">
+                                        {article.description}
+                                    </p>
+                                    <div className="mt-4 text-[10px] text-zinc-600">
+                                        {new Date(article.pubDate).toLocaleDateString('es-AR')}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+
+                        {filteredArticles.length === 0 && (
+                            <div className="h-full flex flex-col items-center justify-center text-zinc-500">
+                                <p>No se encontraron resultados</p>
+                            </div>
+                        )}
                     </div>
 
-                    {filteredArticles.length === 0 && (
-                        <div className="h-full flex flex-col items-center justify-center text-zinc-500">
-                            <p>No se encontraron resultados</p>
-                        </div>
+                    {/* Reader (Detail) */}
+                    {selectedArticle && (
+                        <ArticleReader
+                            article={selectedArticle}
+                            onClose={() => setSelectedArticleId(null)}
+                            onNavigate={handleNavigate}
+                        />
                     )}
                 </div>
             </main>
+        </div>
+    );
+}
+
+function ArticleReader({
+    article,
+    onClose,
+    onNavigate
+}: {
+    article: Article,
+    onClose: () => void,
+    onNavigate: (dir: 'next' | 'prev') => void
+}) {
+    const [touchStart, setTouchStart] = useState<number | null>(null);
+    const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        setTouchEnd(null);
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX);
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        if (isLeftSwipe) onNavigate('next');
+        if (isRightSwipe) onNavigate('prev');
+    };
+
+    return (
+        <div
+            className="fixed inset-0 z-50 bg-black md:relative md:flex-[2] md:inset-auto md:bg-zinc-950 flex flex-col border-l border-zinc-800 animate-in slide-in-from-right duration-300"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+        >
+            <header className="h-14 border-b border-zinc-800 flex items-center px-4 justify-between bg-zinc-950/80 backdrop-blur-md sticky top-0 z-10">
+                <button onClick={onClose} className="p-2 hover:bg-zinc-900 rounded-full text-zinc-400 transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m15 18-6-6 6-6" />
+                    </svg>
+                </button>
+                <div className="flex items-center gap-2">
+                    <button onClick={() => onNavigate('prev')} className="p-2 hover:bg-zinc-900 rounded-full text-zinc-400">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                    </button>
+                    <button onClick={() => onNavigate('next')} className="p-2 hover:bg-zinc-900 rounded-full text-zinc-400">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                    </button>
+                    <a
+                        href={article.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full transition-all uppercase tracking-wider"
+                    >
+                        Abrir Original
+                    </a>
+                </div>
+            </header>
+
+            <article className="flex-1 overflow-y-auto p-6 md:p-12 scroll-smooth">
+                <div className="max-w-3xl mx-auto space-y-8">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2">
+                            <FeedIcon type={article.sourceType} />
+                            <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{article.sourceName}</span>
+                            <span className="text-zinc-700">•</span>
+                            <span className="text-xs text-zinc-500">{new Date(article.pubDate).toLocaleString('es-AR')}</span>
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-bold leading-tight tracking-tight text-white">
+                            {article.title}
+                        </h1>
+                    </div>
+
+                    <div className="h-px bg-zinc-800 w-full" />
+
+                    <div className="text-zinc-300 text-lg leading-relaxed space-y-4 whitespace-pre-wrap font-serif">
+                        {article.description}
+                    </div>
+                </div>
+            </article>
         </div>
     );
 }
