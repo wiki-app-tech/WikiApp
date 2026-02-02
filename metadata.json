@@ -1,5 +1,0 @@
-{
-  "name": "Wiki noticias App",
-  "description": "Una aplicación web interactiva que simula un bot de noticias, proporcionando acceso a tapas de diarios, sitios de noticias, estadísticas y un resumen electoral generado por IA.",
-  "requestFramePermissions": []
-}

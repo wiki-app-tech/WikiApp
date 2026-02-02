@@ -1,0 +1,32 @@
+name: Update RSS Feeds
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Cada hora
+  workflow_dispatch: # Permite ejecutarlo manualmente
+
+jobs:
+  update-feeds:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm install rss-parser
+        
+      - name: Fetch RSS Feeds
+        run: node scripts/fetch-rss.mjs
+        
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add public/data/articles.json
+          git commit -m "Update RSS feeds [skip ci]" || echo "No changes to commit"
+          git push

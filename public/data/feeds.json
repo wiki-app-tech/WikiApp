@@ -1,0 +1,37 @@
+[
+    {
+        "id": "clarin",
+        "name": "Clarín",
+        "url": "https://www.clarin.com/rss/lo-ultimo/",
+        "type": "rss",
+        "category": "Nacional"
+    },
+    {
+        "id": "infobae",
+        "name": "Infobae",
+        "url": "https://www.infobae.com/argentina/rss/ultimas-noticias/",
+        "type": "rss",
+        "category": "Nacional"
+    },
+    {
+        "id": "lanacion",
+        "name": "La Nación",
+        "url": "https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml",
+        "type": "rss",
+        "category": "Nacional"
+    },
+    {
+        "id": "instagram-example",
+        "name": "Instagram Example",
+        "url": "https://rss.app/feeds/v1/zX6Wp98m7S4L9J6W.xml",
+        "type": "instagram",
+        "category": "Social"
+    },
+    {
+        "id": "x-example",
+        "name": "X (Twitter) Example",
+        "url": "https://rss.app/feeds/v1/fR9Dq3L8P2M5T7Y1.xml",
+        "type": "x",
+        "category": "Social"
+    }
+]
