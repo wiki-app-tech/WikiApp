@@ -36,19 +36,24 @@ export default function Dashboard({
                         Todos los feeds
                     </button>
 
-                    <div className="pt-4 pb-2">
-                        <span className="px-3 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Fuentes</span>
-                    </div>
-
-                    {feeds.map(feed => (
-                        <button
-                            key={feed.id}
-                            onClick={() => setSelectedFeed(feed.id)}
-                            className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center gap-2 transition-colors ${selectedFeed === feed.id ? 'bg-zinc-800 text-white' : 'hover:bg-zinc-900 text-zinc-400'}`}
-                        >
-                            <FeedIcon type={feed.type} />
-                            <span className="truncate">{feed.name}</span>
-                        </button>
+                    {Array.from(new Set(feeds.map(f => f.category))).map(category => (
+                        <div key={category} className="mt-6">
+                            <div className="px-3 mb-2">
+                                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{category}</span>
+                            </div>
+                            <div className="space-y-0.5">
+                                {feeds.filter(f => f.category === category).map(feed => (
+                                    <button
+                                        key={feed.id}
+                                        onClick={() => setSelectedFeed(feed.id)}
+                                        className={`w-full text-left px-3 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${selectedFeed === feed.id ? 'bg-zinc-800 text-white' : 'hover:bg-zinc-900 text-zinc-400'}`}
+                                    >
+                                        <FeedIcon type={feed.type} />
+                                        <span className="truncate">{feed.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     ))}
                 </nav>
             </aside>

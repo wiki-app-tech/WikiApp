@@ -1,37 +1,72 @@
 [
     {
+        "id": "cnn-intl",
+        "name": "CNN International",
+        "url": "http://rss.cnn.com/rss/edition.rss",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "elmundo",
+        "name": "El Mundo",
+        "url": "https://e00-elmundo.uecdn.es/elmundo/rss/portada.xml",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
         "id": "clarin",
         "name": "Clarín",
         "url": "https://www.clarin.com/rss/lo-ultimo/",
         "type": "rss",
-        "category": "Nacional"
+        "category": "nacionales"
     },
     {
         "id": "infobae",
         "name": "Infobae",
         "url": "https://www.infobae.com/argentina/rss/ultimas-noticias/",
         "type": "rss",
-        "category": "Nacional"
+        "category": "nacionales"
     },
     {
         "id": "lanacion",
         "name": "La Nación",
         "url": "https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml",
         "type": "rss",
-        "category": "Nacional"
+        "category": "nacionales"
     },
     {
-        "id": "instagram-example",
-        "name": "Instagram Example",
-        "url": "https://rss.app/feeds/v1/zX6Wp98m7S4L9J6W.xml",
-        "type": "instagram",
-        "category": "Social"
+        "id": "el-diario-fin-mundo",
+        "name": "El Diario del Fin del Mundo",
+        "url": "https://www.eldiariodelfindelmundo.com/rss/",
+        "type": "rss",
+        "category": "provinciales"
     },
     {
-        "id": "x-example",
-        "name": "X (Twitter) Example",
-        "url": "https://rss.app/feeds/v1/fR9Dq3L8P2M5T7Y1.xml",
-        "type": "x",
-        "category": "Social"
+        "id": "tdf-al-dia",
+        "name": "TDF al Día",
+        "url": "https://www.tdfaldia.com.ar/feed/",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "ole",
+        "name": "Diario Olé",
+        "url": "https://www.ole.com.ar/rss/lo-ultimo/",
+        "type": "rss",
+        "category": "deporte"
+    },
+    {
+        "id": "tyc-sports",
+        "name": "TyC Sports",
+        "url": "https://www.tycsports.com/rss/ultimas-noticias.xml",
+        "type": "rss",
+        "category": "deporte"
+    },
+    {
+        "id": "espn",
+        "name": "ESPN",
+        "url": "https://www.espn.com.ar/espn/rss/news",
+        "type": "rss",
+        "category": "deporte"
     }
 ]
