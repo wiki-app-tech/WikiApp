@@ -1,4 +1,4 @@
-export type FeedType = 'rss' | 'instagram' | 'facebook' | 'x';
+export type FeedType = 'rss' | 'instagram' | 'facebook' | 'x' | 'telegram';
 
 export interface FeedSource {
   id: string;
