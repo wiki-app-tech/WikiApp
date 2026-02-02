@@ -68,5 +68,12 @@
         "url": "https://www.espn.com.ar/espn/rss/news",
         "type": "rss",
         "category": "deporte"
+    },
+    {
+        "id": "telegram-news",
+        "name": "Últimas Noticias (Telegram)",
+        "url": "https://t.me/+rkKMfpVR3G0yMDBh",
+        "type": "telegram",
+        "category": "social"
     }
 ]
