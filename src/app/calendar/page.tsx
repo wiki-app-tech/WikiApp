@@ -91,7 +91,7 @@ export default function CalendarPage() {
                             <div
                                 key={i}
                                 className={`absolute inset-0 flex items-center transition-all duration-1000 transform ${i === activeEphemerisIndex ? 'translate-y-0 opacity-100' :
-                                        i < activeEphemerisIndex ? '-translate-y-full opacity-0' : 'translate-y-full opacity-0'
+                                    i < activeEphemerisIndex ? '-translate-y-full opacity-0' : 'translate-y-full opacity-0'
                                     }`}
                             >
                                 <p className="text-sm font-medium tracking-tight whitespace-nowrap overflow-hidden text-ellipsis w-full">
@@ -158,12 +158,18 @@ function MonthGrid({ monthIndex, year, monthName, holidayMap }: { monthIndex: nu
                     let textColor = "text-zinc-600";
                     let fontWeight = "font-medium";
 
+                    // Day of week (0=Sunday, 1=Monday, ..., 6=Saturday)
+                    const dayOfWeek = day ? new Date(year, monthIndex, day).getDay() : null;
+                    const isWorkday = dayOfWeek !== null && dayOfWeek >= 1 && dayOfWeek <= 5;
+
                     if (holiday) {
                         fontWeight = "font-black";
                         textColor = "text-white";
                         if (holiday.type === 'inamovible') bgColor = "bg-blue-600 shadow-lg shadow-blue-600/30";
                         else if (holiday.type === 'trasladable') bgColor = "bg-amber-500 shadow-lg shadow-amber-500/30";
                         else if (holiday.type === 'turistico') bgColor = "bg-emerald-500 shadow-lg shadow-emerald-500/30";
+                    } else if (isWorkday) {
+                        bgColor = "bg-zinc-50/80 hover:bg-zinc-100";
                     }
 
                     return (
@@ -183,7 +189,7 @@ function MonthGrid({ monthIndex, year, monthName, holidayMap }: { monthIndex: nu
                     monthHolidays.map(([date, h]: any) => (
                         <div key={date} className="flex gap-3 items-start group">
                             <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${h.type === 'inamovible' ? 'bg-blue-600' :
-                                    h.type === 'trasladable' ? 'bg-amber-500' : 'bg-emerald-500'
+                                h.type === 'trasladable' ? 'bg-amber-500' : 'bg-emerald-500'
                                 }`} />
                             <p className="text-[11px] font-bold text-zinc-500 leading-tight group-hover:text-zinc-900 transition-colors">
                                 <span className="font-black tabular-nums mr-1">{new Date(date + "T00:00:00").getDate()}</span>
