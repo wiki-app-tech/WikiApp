@@ -21,6 +21,9 @@ export default function Dashboard({
     const [currentTime, setCurrentTime] = useState(new Date());
     const [selectedCity, setSelectedCity] = useState('Ushuaia');
     const [weatherData, setWeatherData] = useState<any>(null);
+    const [viewDensity, setViewDensity] = useState<'comfortable' | 'compact' | 'list'>('comfortable');
+    const [isSummarizing, setIsSummarizing] = useState(false);
+    const [mockSummary, setMockSummary] = useState<string | null>(null);
 
     const cities = useMemo(() => ({
         "Ushuaia": { lat: -54.8019, lon: -68.303 },
@@ -86,6 +89,15 @@ export default function Dashboard({
         if (nextIndex >= filteredArticles.length) nextIndex = 0;
 
         setSelectedArticleId(filteredArticles[nextIndex].id);
+        setMockSummary(null); // Clear summary when navigating
+    };
+
+    const handleSummarize = () => {
+        setIsSummarizing(true);
+        setTimeout(() => {
+            setMockSummary("Este artículo analiza las tendencias clave en la industria, destacando el impacto de la tecnología en los procesos actuales. Se recomienda prestar especial atención a las secciones de innovación y escalabilidad.");
+            setIsSummarizing(false);
+        }, 1500);
     };
 
     const categories = useMemo(() => Array.from(new Set(feeds.map(f => f.category))), [feeds]);
@@ -108,14 +120,14 @@ export default function Dashboard({
             {/* Sidebar 2: Categories Panel */}
             <aside className={`
                 fixed inset-0 z-40 lg:relative lg:inset-auto lg:z-auto
-                w-full lg:w-72 border-r border-zinc-200 flex flex-col bg-zinc-50 transition-all duration-300
+                w-full lg:w-72 border-r border-zinc-200 flex flex-col bg-[#f8fafc] transition-all duration-300
                 ${isMobileMenuOpen || (!selectedArticleId && activeTab === 'folders')
                     ? 'translate-x-0 opacity-100'
                     : '-translate-x-full opacity-0 lg:translate-x-0 lg:opacity-100'}
                 ${selectedArticleId ? 'hidden lg:flex' : ''}
             `}>
-                <div className="p-6">
-                    <h2 className="text-xl font-bold mb-6 tracking-tight text-zinc-800">Preferencias</h2>
+                <div className="p-6 flex flex-col h-full">
+                    <h2 className="text-sm font-black mb-4 tracking-[0.2em] text-zinc-400 uppercase">Biblioteca</h2>
 
                     <div className="relative mb-8">
                         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
@@ -153,7 +165,7 @@ export default function Dashboard({
                                             <button
                                                 key={feed.id}
                                                 onClick={() => { setSelectedFeed(feed.id); setIsMobileMenuOpen(false); }}
-                                                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedFeed === feed.id ? 'bg-white text-blue-600 shadow-sm' : 'text-zinc-500 hover:text-zinc-900'}`}
+                                                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedFeed === feed.id ? 'bg-white text-blue-600 shadow-sm font-bold' : 'text-zinc-500 hover:text-zinc-900'}`}
                                             >
                                                 {feed.name}
                                             </button>
@@ -163,6 +175,18 @@ export default function Dashboard({
                             </div>
                         ))}
                     </nav>
+
+                    <div className="mt-8 pt-8 border-t border-zinc-200">
+                        <h2 className="text-[10px] font-black mb-4 tracking-[0.2em] text-zinc-400 uppercase">Administración</h2>
+                        <button className="w-full flex items-center gap-3 px-3 py-2 text-zinc-600 hover:text-zinc-900 rounded-lg group transition-colors">
+                            <ZapIcon className="w-4 h-4 text-orange-500" />
+                            <span className="text-sm font-bold">Inoreader Pro+</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-3 py-2 text-zinc-600 hover:text-zinc-900 rounded-lg group transition-colors">
+                            <BookmarkIcon className="w-4 h-4 text-blue-500" />
+                            <span className="text-sm font-bold">Broadcasts</span>
+                        </button>
+                    </div>
                 </div>
             </aside>
 
@@ -210,9 +234,16 @@ export default function Dashboard({
                                 </div>
                             </div>
                         )}
-                        <span className="text-[10px] md:text-xs font-bold text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full">
-                            {filteredArticles.length}
-                        </span>
+                        <div className="flex items-center gap-4 border-l border-zinc-200 pl-4">
+                            <div className="flex items-center bg-zinc-100 rounded-lg p-1">
+                                <button onClick={() => setViewDensity('comfortable')} className={`p-1.5 rounded ${viewDensity === 'comfortable' ? 'bg-white shadow-sm text-blue-600' : 'text-zinc-400'}`}><LayoutIcon className="w-4 h-4" /></button>
+                                <button onClick={() => setViewDensity('compact')} className={`p-1.5 rounded ${viewDensity === 'compact' ? 'bg-white shadow-sm text-blue-600' : 'text-zinc-400'}`}><LayoutIcon className="w-4 h-4 opacity-70" /></button>
+                                <button onClick={() => setViewDensity('list')} className={`p-1.5 rounded ${viewDensity === 'list' ? 'bg-white shadow-sm text-blue-600' : 'text-zinc-400'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg></button>
+                            </div>
+                            <span className="text-[10px] md:text-xs font-bold text-white bg-zinc-900 px-3 py-1 rounded-full">
+                                {filteredArticles.length}
+                            </span>
+                        </div>
                     </div>
                 </header>
 
@@ -325,33 +356,43 @@ export default function Dashboard({
                                     )}
                                 </div>
 
-                                <div className="space-y-6">
+                                <div className={`grid gap-6 ${viewDensity === 'list' ? 'grid-cols-1' : 'grid-cols-1'}`}>
                                     {filteredArticles.map(article => (
                                         <button
                                             key={article.id}
                                             onClick={() => setSelectedArticleId(article.id)}
-                                            className={`w-full group text-left flex items-start gap-4 p-5 rounded-3xl transition-all ${selectedArticleId === article.id
-                                                ? 'bg-blue-600/5 shadow-xl shadow-blue-600/5 ring-1 ring-blue-600/10'
-                                                : 'hover:bg-zinc-50'
-                                                }`}
+                                            className={`w-full group text-left flex items-start gap-4 transition-all ${viewDensity === 'list' ? 'p-2 border-b border-zinc-50 hover:bg-zinc-50/50' :
+                                                    viewDensity === 'compact' ? 'p-3 rounded-xl border border-zinc-100 hover:shadow-md' :
+                                                        'p-5 rounded-3xl hover:bg-zinc-50'
+                                                } ${selectedArticleId === article.id ? 'bg-blue-600/5 ring-1 ring-blue-600/10' : ''}`}
                                         >
-                                            <div className="pt-1 select-none">
+                                            <div className={`pt-1 select-none ${viewDensity === 'list' ? 'hidden' : ''}`}>
                                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedArticleId === article.id ? 'bg-blue-600 border-blue-600' : 'border-zinc-300 bg-white'}`}>
                                                     {selectedArticleId === article.id && <CheckIcon className="w-3 h-3 text-white" />}
                                                 </div>
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h3 className={`text-lg md:text-xl font-black mb-2 leading-tight transition-colors ${selectedArticleId === article.id ? 'text-blue-700' : 'text-zinc-900 group-hover:text-blue-600'}`}>
+                                                <div className="flex items-center gap-3 mb-1">
+                                                    <span className={`text-[10px] font-black uppercase tracking-wider ${selectedArticleId === article.id ? 'text-blue-600' : 'text-zinc-400'}`}>{article.sourceName}</span>
+                                                    {viewDensity === 'list' && <span className="text-[10px] text-zinc-300">•</span>}
+                                                    {viewDensity === 'list' && <span className="text-[10px] text-zinc-400 font-bold">{new Date(article.pubDate).toLocaleDateString()}</span>}
+                                                </div>
+                                                <h3 className={`font-black tracking-tight leading-tight transition-colors ${viewDensity === 'list' ? 'text-sm' : 'text-lg md:text-xl mb-2'
+                                                    } ${selectedArticleId === article.id ? 'text-blue-700' : 'text-zinc-900 group-hover:text-blue-600'}`}>
                                                     {article.title}
                                                 </h3>
-                                                <p className="text-sm md:text-base text-zinc-500 line-clamp-3 leading-relaxed mb-4">
-                                                    {article.description}
-                                                </p>
-                                                <div className="flex items-center gap-3 text-xs font-black text-zinc-400">
-                                                    <span className="bg-zinc-100 text-zinc-500 px-2.5 py-1 rounded-lg uppercase tracking-wider">{article.sourceName}</span>
-                                                    <span className="w-1 h-1 bg-zinc-300 rounded-full" />
-                                                    <span>{new Date(article.pubDate).toLocaleDateString()}</span>
-                                                </div>
+                                                {viewDensity !== 'list' && (
+                                                    <p className={`text-zinc-500 leading-relaxed mb-4 line-clamp-2 ${viewDensity === 'compact' ? 'text-xs' : 'text-sm md:text-base'}`}>
+                                                        {article.description}
+                                                    </p>
+                                                )}
+                                                {viewDensity !== 'list' && (viewDensity === 'comfortable') && (
+                                                    <div className="flex items-center gap-3 text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                                                        <span>{new Date(article.pubDate).toLocaleDateString()}</span>
+                                                        <span className="w-1 h-1 bg-zinc-300 rounded-full" />
+                                                        <span className="text-blue-600/50">#Intelligente</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </button>
                                     ))}
@@ -412,7 +453,14 @@ function MobileTab({ active, label, icon, onClick }: { active: boolean, label: s
     );
 }
 
-function ArticleReader({ article, onClose, onNavigate }: { article: Article, onClose: () => void, onNavigate: (dir: 'next' | 'prev') => void }) {
+function ArticleReader({ article, onClose, onNavigate, onSummarize, isSummarizing, summary }: {
+    article: Article,
+    onClose: () => void,
+    onNavigate: (dir: 'next' | 'prev') => void,
+    onSummarize: () => void,
+    isSummarizing: boolean,
+    summary: string | null
+}) {
     const [touchStart, setTouchStart] = useState<number | null>(null);
     const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
@@ -434,7 +482,16 @@ function ArticleReader({ article, onClose, onNavigate }: { article: Article, onC
                 <button onClick={onClose} className="p-2 -ml-2 text-zinc-400 hover:text-zinc-900 transition-colors">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                 </button>
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={onSummarize}
+                        disabled={isSummarizing || !!summary}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black transition-all ${summary ? 'bg-orange-50 text-orange-600' : 'bg-zinc-900 text-white hover:bg-zinc-800'
+                            } disabled:opacity-50`}
+                    >
+                        <ZapIcon className="w-3 h-3" />
+                        {isSummarizing ? 'GENERANDO...' : summary ? 'RESUMEN IA' : 'SOLICITAR RESUMEN'}
+                    </button>
                     <div className="flex items-center gap-2">
                         <button onClick={() => onNavigate('prev')} className="p-2 text-zinc-400 hover:text-zinc-900">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
@@ -443,12 +500,29 @@ function ArticleReader({ article, onClose, onNavigate }: { article: Article, onC
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
                         </button>
                     </div>
-                    <a href={article.link} target="_blank" rel="noopener noreferrer" className="bg-[#1a73e8] text-white text-[11px] font-black px-8 py-3.5 rounded-full uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-95 transition-all">IR A WEB</a>
+                    <a href={article.link} target="_blank" rel="noopener noreferrer" className="hidden md:block bg-[#1a73e8] text-white text-[11px] font-black px-8 py-3.5 rounded-full uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-95 transition-all">VISITAR WEB</a>
                 </div>
             </header>
 
             <article className="flex-1 overflow-y-auto p-8 md:p-16 scroll-smooth">
                 <div className="max-w-3xl mx-auto space-y-12">
+                    {summary && (
+                        <div className="bg-orange-50/50 border border-orange-100 rounded-[2rem] p-8 md:p-10 animate-in fade-in slide-in-from-top-4 duration-700">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
+                                    <ZapIcon className="w-4 h-4" />
+                                </div>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-600">Inoreader Intelligence</span>
+                            </div>
+                            <p className="text-orange-900 text-lg md:text-xl font-bold leading-relaxed">
+                                {summary}
+                            </p>
+                            <div className="mt-6 flex gap-4">
+                                <button className="text-[10px] font-black text-orange-600 uppercase tracking-widest hover:underline">Copiar Resumen</button>
+                                <button className="text-[10px] font-black text-orange-600 uppercase tracking-widest hover:underline">Más información</button>
+                            </div>
+                        </div>
+                    )}
                     <div className="space-y-6">
                         <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest">
                             <span className="text-[#1a73e8]">{article.sourceName}</span>
