@@ -17,6 +17,14 @@ export default function Dashboard({
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'home' | 'search' | 'folders'>('home');
     const [currentTelegramIndex, setCurrentTelegramIndex] = useState(0);
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
 
     const telegramArticles = useMemo(() =>
         initialArticles.filter(a => a.sourceType === 'telegram'),
@@ -136,31 +144,46 @@ export default function Dashboard({
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col min-w-0 bg-white relative">
-                <header className="h-16 glass-header flex items-center px-4 justify-between sticky top-0 z-30">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setIsMobileMenuOpen(true)}
-                            className="lg:hidden p-2 -ml-2 text-zinc-600 active:bg-zinc-100 rounded-full"
-                            aria-label="Open Menu"
-                        >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
-                        </button>
-                        <div>
-                            <h1 className="text-lg md:text-2xl font-black tracking-tight text-zinc-900 leading-tight">WikiApp</h1>
-                            <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest hidden md:block">Dashboard Premium</p>
+                <header className="h-20 glass-header flex flex-col md:flex-row items-center px-4 justify-between sticky top-0 z-30 py-2 md:py-0">
+                    <div className="flex items-center justify-between w-full md:w-auto gap-3">
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setIsMobileMenuOpen(true)}
+                                className="lg:hidden p-2 -ml-2 text-zinc-600 active:bg-zinc-100 rounded-full"
+                                aria-label="Open Menu"
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
+                            </button>
+                            <div>
+                                <h1 className="text-xl md:text-3xl font-black tracking-tighter text-zinc-900 leading-none">WikiApp</h1>
+                                <p className="text-[9px] md:text-[11px] font-black text-blue-600 uppercase tracking-[0.2em] mt-1">Dashboard Premium</p>
+                            </div>
+                        </div>
+
+                        {/* Date and Time (Mobile and Tablet/Desktop) */}
+                        <div className="flex flex-col items-end md:items-start md:ml-10 border-l border-zinc-200 pl-4 md:pl-10">
+                            <span className="text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-[0.15em] leading-none mb-1.5">
+                                {currentTime.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                            </span>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-sm md:text-xl font-black text-zinc-900 tabular-nums leading-none tracking-tight">
+                                    {currentTime.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'America/Argentina/Ushuaia' })}
+                                </span>
+                                <span className="text-[9px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase tracking-tighter">TDF</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 mt-1 md:mt-0">
                         {telegramArticles.length > 0 && (
-                            <div className="hidden sm:flex items-center gap-3 bg-blue-50/50 backdrop-blur-sm px-4 py-2 rounded-full border border-blue-100/50">
+                            <div className="flex items-center gap-3 bg-blue-50/50 backdrop-blur-sm px-4 py-1.5 rounded-full border border-blue-100/50">
                                 <span className="text-[10px] font-bold text-blue-600 animate-pulse">LIVE</span>
-                                <div className="text-xs text-blue-800 font-semibold max-w-[120px] md:max-w-[200px] truncate">
+                                <div className="text-[10px] md:text-xs text-blue-800 font-semibold max-w-[150px] md:max-w-[200px] truncate">
                                     {telegramArticles[currentTelegramIndex]?.title}
                                 </div>
                             </div>
                         )}
-                        <span className="text-xs font-bold text-zinc-500 bg-zinc-100 px-3 py-1.5 rounded-full">
+                        <span className="text-[10px] md:text-xs font-bold text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full">
                             {filteredArticles.length}
                         </span>
                     </div>
@@ -188,9 +211,9 @@ export default function Dashboard({
 
                             <section>
                                 <div className="flex items-center justify-between mb-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2.5 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-600/20"><LayoutIcon className="w-5 h-5" /></div>
-                                        <h2 className="text-xl font-black text-zinc-900 tracking-tight">Recientes</h2>
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white rounded-2xl shadow-xl shadow-blue-600/30 ring-4 ring-blue-50"><LayoutIcon className="w-6 h-6" /></div>
+                                        <h2 className="text-2xl font-black text-zinc-900 tracking-tight">Recientes</h2>
                                     </div>
                                     {selectedFeed && (
                                         <button
