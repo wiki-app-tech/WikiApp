@@ -9,6 +9,25 @@
   --foreground: #09090b;
 }
 
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e4e4e7;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d4d4d8;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -56,11 +75,11 @@ body {
 
 /* Premium UI Utilities */
 .glass-header {
-  @apply bg-white/80 backdrop-blur-xl border-b border-zinc-200/50;
+  @apply bg-white/90 backdrop-blur-2xl border-b border-zinc-200/50;
 }
 
 .glass-card {
-  @apply bg-white border border-zinc-100 shadow-sm hover:shadow-md transition-shadow;
+  @apply bg-white border border-zinc-100/80 shadow-[0_8px_30px_rgb(0, 0, 0, 0.04)] hover:shadow-[0_8px_30px_rgb(0, 0, 0, 0.08)] transition-all duration-300;
 }
 
 /* Standardized Hit Targets */

@@ -13,6 +13,7 @@ export interface Article {
   title: string;
   description: string;
   link: string;
+  thumbnail?: string;
   pubDate: string;
   sourceId: string;
   sourceName: string;

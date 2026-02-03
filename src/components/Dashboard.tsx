@@ -1,8 +1,8 @@
-'use client';
-
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import type { Article, FeedSource } from '@/types';
+import ArticleCard from '@/components/ArticleCard';
+import LayoutSwitcher from '@/components/LayoutSwitcher';
 
 export default function Dashboard({
     initialArticles,
@@ -21,9 +21,20 @@ export default function Dashboard({
     const [currentTime, setCurrentTime] = useState(new Date());
     const [selectedCity, setSelectedCity] = useState('Ushuaia');
     const [weatherData, setWeatherData] = useState<any>(null);
-    const [viewDensity, setViewDensity] = useState<'comfortable' | 'compact' | 'list'>('comfortable');
+    const [viewMode, setViewMode] = useState<'list' | 'card' | 'magazine'>('card');
     const [isSummarizing, setIsSummarizing] = useState(false);
     const [mockSummary, setMockSummary] = useState<string | null>(null);
+
+    // Persistence
+    useEffect(() => {
+        const savedMode = localStorage.getItem('wikiAppViewMode') as 'list' | 'card' | 'magazine';
+        if (savedMode) setViewMode(savedMode);
+    }, []);
+
+    const handleViewModeChange = (mode: 'list' | 'card' | 'magazine') => {
+        setViewMode(mode);
+        localStorage.setItem('wikiAppViewMode', mode);
+    };
 
     const cities = useMemo(() => ({
         "Ushuaia": { lat: -54.8019, lon: -68.303 },
@@ -127,7 +138,12 @@ export default function Dashboard({
                 ${selectedArticleId ? 'hidden lg:flex' : ''}
             `}>
                 <div className="p-6 flex flex-col h-full">
-                    <h2 className="text-sm font-black mb-4 tracking-[0.2em] text-zinc-400 uppercase">Biblioteca</h2>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-sm font-black tracking-[0.2em] text-zinc-400 uppercase">Biblioteca</h2>
+                        <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden p-1 text-zinc-400">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
 
                     <div className="relative mb-8">
                         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
@@ -176,15 +192,10 @@ export default function Dashboard({
                         ))}
                     </nav>
 
-                    <div className="mt-8 pt-8 border-t border-zinc-200">
-                        <h2 className="text-[10px] font-black mb-4 tracking-[0.2em] text-zinc-400 uppercase">Administración</h2>
+                    <div className="mt-auto pt-8 border-t border-zinc-200">
                         <button className="w-full flex items-center gap-3 px-3 py-2 text-zinc-600 hover:text-zinc-900 rounded-lg group transition-colors">
                             <ZapIcon className="w-4 h-4 text-orange-500" />
                             <span className="text-sm font-bold">Inoreader Pro+</span>
-                        </button>
-                        <button className="w-full flex items-center gap-3 px-3 py-2 text-zinc-600 hover:text-zinc-900 rounded-lg group transition-colors">
-                            <BookmarkIcon className="w-4 h-4 text-blue-500" />
-                            <span className="text-sm font-bold">Broadcasts</span>
                         </button>
                     </div>
                 </div>
@@ -192,7 +203,7 @@ export default function Dashboard({
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col min-w-0 bg-white relative">
-                <header className="h-20 glass-header flex flex-col md:flex-row items-center px-4 justify-between sticky top-0 z-30 py-2 md:py-0">
+                <header className="h-20 glass-header flex flex-col md:flex-row items-center px-4 justify-between sticky top-0 z-30 py-2 md:py-0 border-b border-zinc-200/50">
                     <div className="flex items-center justify-between w-full md:w-auto gap-3">
                         <div className="flex items-center gap-3">
                             <button
@@ -204,219 +215,139 @@ export default function Dashboard({
                             </button>
                             <div>
                                 <h1 className="text-xl md:text-3xl font-black tracking-tighter text-zinc-900 leading-none">WikiApp</h1>
-                                <p className="text-[9px] md:text-[11px] font-black text-blue-600 uppercase tracking-[0.2em] mt-1">Dashboard Premium</p>
+                                <p className="text-[9px] md:text-[11px] font-black text-blue-600 uppercase tracking-[0.2em] mt-1">Premium News</p>
                             </div>
                         </div>
 
-                        {/* Date and Time (Mobile and Tablet/Desktop) */}
+                        {/* Date and Time */}
                         <div className="flex flex-col items-end md:items-start md:ml-10 border-l border-zinc-200 pl-4 md:pl-10">
-                            <span className="text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-[0.15em] leading-none mb-1">
+                            <span className="text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-[0.15em] leading-none mb-1 text-right md:text-left">
                                 {currentTime.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}
                             </span>
-                            <span className="text-[8px] md:text-[9px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Tierra del Fuego</span>
                             <div className="flex items-center gap-3">
                                 <span className="text-sm md:text-xl font-black text-zinc-900 tabular-nums leading-none tracking-tight">
                                     {currentTime.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'America/Argentina/Ushuaia' })}
                                 </span>
-                                <Link href="/calendar" className="text-[9px] font-black text-white bg-blue-600 px-3 py-1.5 rounded-full uppercase tracking-tighter shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-colors h-auto min-h-0 min-w-0 flex items-center justify-center">
-                                    Calendario
-                                </Link>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 mt-1 md:mt-0">
-                        {telegramArticles.length > 0 && (
-                            <div className="flex items-center gap-3 bg-blue-50/50 backdrop-blur-sm px-4 py-1.5 rounded-full border border-blue-100/50">
-                                <span className="text-[10px] font-bold text-blue-600 animate-pulse">LIVE</span>
-                                <div className="text-[10px] md:text-xs text-blue-800 font-semibold max-w-[150px] md:max-w-[200px] truncate">
-                                    {telegramArticles[currentTelegramIndex]?.title}
-                                </div>
-                            </div>
-                        )}
-                        <div className="flex items-center gap-4 border-l border-zinc-200 pl-4">
-                            <div className="flex items-center bg-zinc-100 rounded-lg p-1">
-                                <button onClick={() => setViewDensity('comfortable')} className={`p-1.5 rounded ${viewDensity === 'comfortable' ? 'bg-white shadow-sm text-blue-600' : 'text-zinc-400'}`}><LayoutIcon className="w-4 h-4" /></button>
-                                <button onClick={() => setViewDensity('compact')} className={`p-1.5 rounded ${viewDensity === 'compact' ? 'bg-white shadow-sm text-blue-600' : 'text-zinc-400'}`}><LayoutIcon className="w-4 h-4 opacity-70" /></button>
-                                <button onClick={() => setViewDensity('list')} className={`p-1.5 rounded ${viewDensity === 'list' ? 'bg-white shadow-sm text-blue-600' : 'text-zinc-400'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg></button>
-                            </div>
-                            <span className="text-[10px] md:text-xs font-bold text-white bg-zinc-900 px-3 py-1 rounded-full">
-                                {filteredArticles.length}
-                            </span>
-                        </div>
+                    <div className="flex items-center gap-4">
+                        <LayoutSwitcher currentMode={viewMode} onModeChange={handleViewModeChange} />
+                        <span className="text-[10px] md:text-xs font-bold text-white bg-zinc-900 px-3 py-1 rounded-full shrink-0">
+                            {filteredArticles.length} artículos
+                        </span>
                     </div>
                 </header>
 
                 <div className="flex-1 flex overflow-hidden">
-                    {/* Article List (Master) */}
-                    <div className={`flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-1/3 border-r border-zinc-100' : 'w-full'}`}>
-                        <div className="max-w-4xl mx-auto space-y-8">
-                            {activeTab === 'search' && (
-                                <div className="glass-card p-4 rounded-3xl mb-8 sticky top-0 z-20">
-                                    <div className="relative">
-                                        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 w-5 h-5" />
-                                        <input
-                                            type="text"
-                                            placeholder="¿Qué estás buscando?"
-                                            value={search}
-                                            onChange={(e) => setSearch(e.target.value)}
-                                            className="w-full bg-zinc-100/50 border-none rounded-2xl pl-12 pr-4 py-4 text-base font-medium focus:ring-4 focus:ring-blue-500/10 placeholder:text-zinc-400"
-                                            autoFocus
-                                        />
+                    {/* Master: Article List */}
+                    <div className={`flex-1 overflow-y-auto p-6 md:p-8 scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-1/3' : 'w-full'}`}>
+                        <div className="max-w-6xl mx-auto space-y-8 pb-32">
+                            {/* Weather Widget */}
+                            {weatherData && (
+                                <section className="glass-card overflow-hidden rounded-[2.5rem] mb-12 shadow-2xl shadow-blue-900/5">
+                                    <div className="flex p-2 bg-zinc-50/50 backdrop-blur-md border-b border-zinc-100 overflow-x-auto no-scrollbar">
+                                        {Object.keys(cities).map(city => (
+                                            <button
+                                                key={city}
+                                                onClick={() => setSelectedCity(city)}
+                                                className={`px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 ${selectedCity === city
+                                                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20'
+                                                    : 'text-zinc-400 hover:text-zinc-600'
+                                                    }`}
+                                            >
+                                                {city}
+                                            </button>
+                                        ))}
                                     </div>
-                                </div>
-                            )}
-
-                            {/* Multi-City Weather Widget */}
-                            <section className="glass-card overflow-hidden rounded-[2.5rem] mb-12 shadow-2xl shadow-blue-900/5">
-                                {/* City Selector Tabs */}
-                                <div className="flex p-2 bg-zinc-50/50 backdrop-blur-md border-b border-zinc-100 overflow-x-auto no-scrollbar">
-                                    {Object.keys(cities).map(city => (
-                                        <button
-                                            key={city}
-                                            onClick={() => setSelectedCity(city)}
-                                            className={`px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shrink-0 ${selectedCity === city
-                                                ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20'
-                                                : 'text-zinc-400 hover:text-zinc-600'
-                                                }`}
-                                        >
-                                            {city}
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <div className="p-8 md:p-10 flex flex-col lg:flex-row gap-10">
-                                    {/* Current Weather & Forecast */}
-                                    <div className="flex-1 space-y-10">
-                                        {weatherData ? (
-                                            <>
-                                                <div className="flex items-center gap-6">
-                                                    <div className="w-20 h-20 flex items-center justify-center bg-blue-50 rounded-3xl text-blue-600">
-                                                        <CloudIcon className="w-10 h-10" />
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-5xl font-black text-zinc-900 tracking-tighter tabular-nums leading-none mb-2">
-                                                            {weatherData[selectedCity]?.temp}°C
-                                                        </div>
-                                                        <div className="text-sm font-bold text-zinc-500 uppercase tracking-widest leading-none">
-                                                            {weatherData[selectedCity]?.condition}
-                                                        </div>
-                                                    </div>
+                                    <div className="p-8 flex flex-col md:flex-row gap-8">
+                                        <div className="flex-1 flex items-center gap-6">
+                                            <div className="w-16 h-16 flex items-center justify-center bg-blue-50 rounded-2xl text-blue-600">
+                                                <CloudIcon className="w-8 h-8" />
+                                            </div>
+                                            <div>
+                                                <div className="text-4xl font-black text-zinc-900 tracking-tighter tabular-nums leading-none">
+                                                    {weatherData[selectedCity]?.temp}°C
                                                 </div>
-
-                                                <div className="space-y-4">
-                                                    <h3 className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em]">Pronóstico Próximos Días</h3>
-                                                    <div className="grid grid-cols-3 gap-4">
-                                                        {weatherData[selectedCity]?.forecast.map((f: any, i: number) => (
-                                                            <div key={i} className="bg-zinc-50/80 rounded-2xl p-4 border border-zinc-100/50 text-center space-y-2">
-                                                                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{f.day}</span>
-                                                                <div className="flex justify-center text-blue-600">
-                                                                    <CloudIcon className="w-5 h-5" />
-                                                                </div>
-                                                                <div className="text-sm font-black text-zinc-900 tabular-nums">
-                                                                    {f.temp}° <span className="opacity-30">/ {f.low}°</span>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
+                                                <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1">
+                                                    {weatherData[selectedCity]?.condition}
                                                 </div>
-                                            </>
-                                        ) : (
-                                            <div className="h-40 flex items-center justify-center text-zinc-400 font-bold uppercase tracking-widest text-xs">Cargando clima...</div>
-                                        )}
-                                    </div>
-
-                                    <div className="lg:w-1/2 aspect-video lg:aspect-square rounded-[2rem] overflow-hidden border border-zinc-100 shadow-inner group relative">
-                                        <iframe
-                                            src={`https://www.windy.com/?${(cities as any)[selectedCity].lat},${(cities as any)[selectedCity].lon},8?m:eaQa8v`}
-                                            className="w-full h-full border-none"
-                                            title="Windy Radar"
-                                            loading="lazy"
-                                        />
-                                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black text-zinc-900 border border-zinc-100/50 shadow-sm uppercase tracking-widest">
-                                            Radar Meteorológico
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4 overflow-x-auto no-scrollbar py-2">
+                                            {weatherData[selectedCity]?.forecast.map((f: any, i: number) => (
+                                                <div key={i} className="bg-zinc-50/50 rounded-xl p-3 border border-zinc-100/50 text-center min-w-[80px]">
+                                                    <span className="text-[9px] font-black text-zinc-400 uppercase">{f.day}</span>
+                                                    <div className="text-xs font-black text-zinc-900 mt-1">{f.temp}°</div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
-                                </div>
-                            </section>
+                                </section>
+                            )}
 
-                            <section>
-                                <div className="flex items-center justify-between mb-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white rounded-2xl shadow-xl shadow-blue-600/30 ring-4 ring-blue-50"><LayoutIcon className="w-6 h-6" /></div>
-                                        <h2 className="text-2xl font-black text-zinc-900 tracking-tight">Recientes</h2>
+                            {/* Section Header */}
+                            <div className="flex items-center justify-between">
+                                <h1 className="text-3xl font-black text-zinc-900 tracking-tight">
+                                    {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Todo el Contenido'}
+                                </h1>
+                                {selectedFeed && (
+                                    <button onClick={() => setSelectedFeed(null)} className="text-xs font-bold text-orange-600 hover:underline">VOLVER A TODOS</button>
+                                )}
+                            </div>
+
+                            {/* Grid */}
+                            <div className={
+                                viewMode === 'list'
+                                    ? "flex flex-col border border-zinc-200/50 rounded-xl overflow-hidden divide-y divide-zinc-200/30 shadow-sm bg-white"
+                                    : viewMode === 'magazine'
+                                        ? "grid grid-cols-1 lg:grid-cols-2 gap-6"
+                                        : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                            }>
+                                {filteredArticles.map(article => (
+                                    <ArticleCard
+                                        key={article.id}
+                                        article={article}
+                                        viewMode={viewMode}
+                                        isSelected={selectedArticleId === article.id}
+                                        onClick={() => setSelectedArticleId(article.id)}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* Empty State */}
+                            {filteredArticles.length === 0 && (
+                                <div className="flex flex-col items-center justify-center py-20 text-center">
+                                    <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mb-4">
+                                        <SearchIcon className="w-8 h-8 text-zinc-300" />
                                     </div>
-                                    {selectedFeed && (
-                                        <button
-                                            onClick={() => setSelectedFeed(null)}
-                                            className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full"
-                                        >
-                                            Limpiar Filtro
-                                        </button>
-                                    )}
+                                    <h3 className="text-lg font-bold text-zinc-900">No hay artículos</h3>
+                                    <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2">Prueba con otra búsqueda o selecciona una fuente diferente.</p>
                                 </div>
-
-                                <div className={`grid gap-6 ${viewDensity === 'list' ? 'grid-cols-1' : 'grid-cols-1'}`}>
-                                    {filteredArticles.map(article => (
-                                        <button
-                                            key={article.id}
-                                            onClick={() => setSelectedArticleId(article.id)}
-                                            className={`w-full group text-left flex items-start gap-4 transition-all ${viewDensity === 'list' ? 'p-2 border-b border-zinc-50 hover:bg-zinc-50/50' :
-                                                    viewDensity === 'compact' ? 'p-3 rounded-xl border border-zinc-100 hover:shadow-md' :
-                                                        'p-5 rounded-3xl hover:bg-zinc-50'
-                                                } ${selectedArticleId === article.id ? 'bg-blue-600/5 ring-1 ring-blue-600/10' : ''}`}
-                                        >
-                                            <div className={`pt-1 select-none ${viewDensity === 'list' ? 'hidden' : ''}`}>
-                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedArticleId === article.id ? 'bg-blue-600 border-blue-600' : 'border-zinc-300 bg-white'}`}>
-                                                    {selectedArticleId === article.id && <CheckIcon className="w-3 h-3 text-white" />}
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-3 mb-1">
-                                                    <span className={`text-[10px] font-black uppercase tracking-wider ${selectedArticleId === article.id ? 'text-blue-600' : 'text-zinc-400'}`}>{article.sourceName}</span>
-                                                    {viewDensity === 'list' && <span className="text-[10px] text-zinc-300">•</span>}
-                                                    {viewDensity === 'list' && <span className="text-[10px] text-zinc-400 font-bold">{new Date(article.pubDate).toLocaleDateString()}</span>}
-                                                </div>
-                                                <h3 className={`font-black tracking-tight leading-tight transition-colors ${viewDensity === 'list' ? 'text-sm' : 'text-lg md:text-xl mb-2'
-                                                    } ${selectedArticleId === article.id ? 'text-blue-700' : 'text-zinc-900 group-hover:text-blue-600'}`}>
-                                                    {article.title}
-                                                </h3>
-                                                {viewDensity !== 'list' && (
-                                                    <p className={`text-zinc-500 leading-relaxed mb-4 line-clamp-2 ${viewDensity === 'compact' ? 'text-xs' : 'text-sm md:text-base'}`}>
-                                                        {article.description}
-                                                    </p>
-                                                )}
-                                                {viewDensity !== 'list' && (viewDensity === 'comfortable') && (
-                                                    <div className="flex items-center gap-3 text-[10px] font-black text-zinc-400 uppercase tracking-widest">
-                                                        <span>{new Date(article.pubDate).toLocaleDateString()}</span>
-                                                        <span className="w-1 h-1 bg-zinc-300 rounded-full" />
-                                                        <span className="text-blue-600/50">#Intelligente</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </button>
-                                    ))}
-                                </div>
-                            </section>
+                            )}
                         </div>
                     </div>
 
-                    {/* Reader (Detail) */}
+                    {/* Detail: Reader */}
                     {selectedArticle && (
                         <ArticleReader
                             article={selectedArticle}
                             onClose={() => setSelectedArticleId(null)}
                             onNavigate={handleNavigate}
+                            onSummarize={handleSummarize}
+                            isSummarizing={isSummarizing}
+                            summary={mockSummary}
                         />
                     )}
                 </div>
 
                 {/* Mobile Bottom Nav */}
                 <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-20 glass-header border-t border-zinc-200/50 flex items-center justify-around px-4 z-40 pb-safe shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
-                    <MobileTab active={activeTab === 'home'} onClick={() => { setActiveTab('home'); setSelectedFeed(null); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Inicio" icon={<LayoutIcon className="w-6 h-6" />} />
+                    <MobileTab active={activeTab === 'home' && !selectedArticleId} onClick={() => { setActiveTab('home'); setSelectedFeed(null); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Inicio" icon={<LayoutIcon className="w-6 h-6" />} />
                     <MobileTab active={activeTab === 'folders'} onClick={() => { setActiveTab('folders'); setIsMobileMenuOpen(true); }} label="Feeds" icon={<RssIcon className="w-6 h-6" />} />
                     <MobileTab active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Buscar" icon={<SearchIcon className="w-6 h-6" />} />
-                    <MobileTab active={false} onClick={() => { }} label="Guardado" icon={<BookmarkIcon className="w-6 h-6" />} />
+                    <MobileTab active={false} onClick={() => { }} label="Perfil" icon={<BookmarkIcon className="w-6 h-6" />} />
                 </nav>
             </main>
         </div>
