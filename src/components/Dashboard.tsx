@@ -19,6 +19,29 @@ export default function Dashboard({
     const [activeTab, setActiveTab] = useState<'home' | 'search' | 'folders'>('home');
     const [currentTelegramIndex, setCurrentTelegramIndex] = useState(0);
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [selectedCity, setSelectedCity] = useState('Ushuaia');
+    const [weatherData, setWeatherData] = useState<any>(null);
+
+    const cities = useMemo(() => ({
+        "Ushuaia": { lat: -54.8019, lon: -68.303 },
+        "Río Grande": { lat: -53.784, lon: -67.701 },
+        "Tolhuin": { lat: -54.510, lon: -67.193 },
+        "Antártida": { lat: -63.398, lon: -56.996 },
+        "Malvinas": { lat: -51.694, lon: -57.851 }
+    }), []);
+
+    useEffect(() => {
+        const fetchWeather = async () => {
+            try {
+                const res = await fetch('/data/weather.json');
+                const data = await res.json();
+                setWeatherData(data);
+            } catch (error) {
+                console.error("Error fetching weather:", error);
+            }
+        };
+        fetchWeather();
+    }, []);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -212,6 +235,79 @@ export default function Dashboard({
                                     </div>
                                 </div>
                             )}
+
+                            {/* Multi-City Weather Widget */}
+                            <section className="glass-card overflow-hidden rounded-[2.5rem] mb-12 shadow-2xl shadow-blue-900/5">
+                                {/* City Selector Tabs */}
+                                <div className="flex p-2 bg-zinc-50/50 backdrop-blur-md border-b border-zinc-100 overflow-x-auto no-scrollbar">
+                                    {Object.keys(cities).map(city => (
+                                        <button
+                                            key={city}
+                                            onClick={() => setSelectedCity(city)}
+                                            className={`px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shrink-0 ${selectedCity === city
+                                                ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20'
+                                                : 'text-zinc-400 hover:text-zinc-600'
+                                                }`}
+                                        >
+                                            {city}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="p-8 md:p-10 flex flex-col lg:flex-row gap-10">
+                                    {/* Current Weather & Forecast */}
+                                    <div className="flex-1 space-y-10">
+                                        {weatherData ? (
+                                            <>
+                                                <div className="flex items-center gap-6">
+                                                    <div className="w-20 h-20 flex items-center justify-center bg-blue-50 rounded-3xl text-blue-600">
+                                                        <CloudIcon className="w-10 h-10" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-5xl font-black text-zinc-900 tracking-tighter tabular-nums leading-none mb-2">
+                                                            {weatherData[selectedCity]?.temp}°C
+                                                        </div>
+                                                        <div className="text-sm font-bold text-zinc-500 uppercase tracking-widest leading-none">
+                                                            {weatherData[selectedCity]?.condition}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-4">
+                                                    <h3 className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em]">Pronóstico Próximos Días</h3>
+                                                    <div className="grid grid-cols-3 gap-4">
+                                                        {weatherData[selectedCity]?.forecast.map((f: any, i: number) => (
+                                                            <div key={i} className="bg-zinc-50/80 rounded-2xl p-4 border border-zinc-100/50 text-center space-y-2">
+                                                                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{f.day}</span>
+                                                                <div className="flex justify-center text-blue-600">
+                                                                    <CloudIcon className="w-5 h-5" />
+                                                                </div>
+                                                                <div className="text-sm font-black text-zinc-900 tabular-nums">
+                                                                    {f.temp}° <span className="opacity-30">/ {f.low}°</span>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="h-40 flex items-center justify-center text-zinc-400 font-bold uppercase tracking-widest text-xs">Cargando clima...</div>
+                                        )}
+                                    </div>
+
+                                    {/* Radar (Windy) */}
+                                    <div className="lg:w-1/2 aspect-video lg:aspect-square rounded-[2rem] overflow-hidden border border-zinc-100 shadow-inner group relative">
+                                        <iframe
+                                            src={`https://www.windy.com/?${(cities as any)[selectedCity].lat},${(cities as any)[selectedCity].lon},8?m:eaQa8v`}
+                                            className="w-full h-full border-none"
+                                            title="Windy Radar"
+                                        />
+                                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black text-zinc-900 border border-zinc-100/50 shadow-sm uppercase tracking-widest">
+                                            Radar Meteorológico
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
 
                             <section>
                                 <div className="flex items-center justify-between mb-6">

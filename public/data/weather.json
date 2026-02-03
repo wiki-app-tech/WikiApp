@@ -1,0 +1,132 @@
+{
+    "Ushuaia": {
+        "temp": 12,
+        "condition": "Lluvia Moderada A Intervalos",
+        "forecast": [
+            {
+                "day": "Mar",
+                "temp": 12,
+                "low": -1,
+                "condition": "rain"
+            },
+            {
+                "day": "Mié",
+                "temp": 14,
+                "low": 0,
+                "condition": "rain"
+            },
+            {
+                "day": "Jue",
+                "temp": 12,
+                "low": 1,
+                "condition": "wind"
+            }
+        ],
+        "lat": -54.8019,
+        "lon": -68.303
+    },
+    "Río Grande": {
+        "temp": 14,
+        "condition": "Parcialmente Nublado",
+        "forecast": [
+            {
+                "day": "Mar",
+                "temp": 15,
+                "low": 4,
+                "condition": "cloud"
+            },
+            {
+                "day": "Mié",
+                "temp": 13,
+                "low": 3,
+                "condition": "rain"
+            },
+            {
+                "day": "Jue",
+                "temp": 16,
+                "low": 5,
+                "condition": "sun"
+            }
+        ],
+        "lat": -53.784,
+        "lon": -67.701
+    },
+    "Tolhuin": {
+        "temp": 11,
+        "condition": "Nublado con Viento",
+        "forecast": [
+            {
+                "day": "Mar",
+                "temp": 10,
+                "low": -2,
+                "condition": "cloud"
+            },
+            {
+                "day": "Mié",
+                "temp": 12,
+                "low": 0,
+                "condition": "wind"
+            },
+            {
+                "day": "Jue",
+                "temp": 11,
+                "low": -1,
+                "condition": "rain"
+            }
+        ],
+        "lat": -54.510,
+        "lon": -67.193
+    },
+    "Antártida": {
+        "temp": -5,
+        "condition": "Nieve Ligera",
+        "forecast": [
+            {
+                "day": "Mar",
+                "temp": -6,
+                "low": -12,
+                "condition": "snow"
+            },
+            {
+                "day": "Mié",
+                "temp": -4,
+                "low": -10,
+                "condition": "cloud"
+            },
+            {
+                "day": "Jue",
+                "temp": -7,
+                "low": -15,
+                "condition": "snow"
+            }
+        ],
+        "lat": -63.398,
+        "lon": -56.996
+    },
+    "Malvinas": {
+        "temp": 9,
+        "condition": "Muy Ventoso",
+        "forecast": [
+            {
+                "day": "Mar",
+                "temp": 10,
+                "low": 2,
+                "condition": "wind"
+            },
+            {
+                "day": "Mié",
+                "temp": 8,
+                "low": 1,
+                "condition": "rain"
+            },
+            {
+                "day": "Jue",
+                "temp": 11,
+                "low": 3,
+                "condition": "cloud"
+            }
+        ],
+        "lat": -51.694,
+        "lon": -57.851
+    }
+}
