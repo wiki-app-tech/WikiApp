@@ -25,7 +25,7 @@ export default function LayoutSwitcher({ currentMode, onModeChange }: LayoutSwit
             label: 'Magazine View',
             icon: (
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1zM4 13h10a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6a1 1 0 011-1zM18 13h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6a1 1 0 011-1z" />
                 </svg>
             )
         },
@@ -41,25 +41,27 @@ export default function LayoutSwitcher({ currentMode, onModeChange }: LayoutSwit
     ];
 
     return (
-        <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-xl border border-zinc-200/50 shadow-sm">
+        <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-xl border border-zinc-200/50 shadow-inner">
             {modes.map((mode) => (
                 <button
                     key={mode.id}
                     onClick={() => onModeChange(mode.id)}
                     className={`
-                        relative p-2 rounded-lg transition-all duration-200 group
+                        relative p-2 rounded-lg transition-all duration-300 group
                         ${currentMode === mode.id
-                            ? 'bg-white text-orange-600 shadow-sm'
-                            : 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50'
+                            ? 'bg-white text-blue-600 shadow-md transform scale-105'
+                            : 'text-zinc-400 hover:text-zinc-600 hover:bg-white/50'
                         }
                     `}
-                    title={mode.label}
+                    aria-label={mode.label}
                 >
                     {mode.icon}
-                    {/* Tooltip for desktop */}
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-zinc-900 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2 py-1 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest rounded-md opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none translate-y-2 group-hover:translate-y-0 z-50">
                         {mode.label}
-                    </span>
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-900" />
+                    </div>
                 </button>
             ))}
         </div>

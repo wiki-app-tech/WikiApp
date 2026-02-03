@@ -300,10 +300,10 @@ export default function Dashboard({
                             {/* Grid */}
                             <div className={
                                 viewMode === 'list'
-                                    ? "flex flex-col border border-zinc-200/50 rounded-xl overflow-hidden divide-y divide-zinc-200/30 shadow-sm bg-white"
+                                    ? "flex flex-col border border-zinc-200/50 rounded-2xl overflow-hidden divide-y divide-zinc-200/30 shadow-xl bg-white"
                                     : viewMode === 'magazine'
-                                        ? "grid grid-cols-1 lg:grid-cols-2 gap-6"
-                                        : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                                        ? "grid grid-cols-1 lg:grid-cols-2 gap-8"
+                                        : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8"
                             }>
                                 {filteredArticles.map(article => (
                                     <ArticleCard
