@@ -289,7 +289,7 @@ function ArticleReader({ article, onClose, onNavigate }: { article: Article, onC
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
                         </button>
                     </div>
-                    <a href={article.link} target="_blank" rel="noopener noreferrer" className="bg-[#1a73e8] text-white text-[11px] font-black px-8 py-3.5 rounded-full uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-95 transition-all">ABRIR ORIGINAL</a>
+                    <a href={article.link} target="_blank" rel="noopener noreferrer" className="bg-[#1a73e8] text-white text-[11px] font-black px-8 py-3.5 rounded-full uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-95 transition-all">IR A WEB</a>
                 </div>
             </header>
 
