@@ -1,14 +1,12 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #18181b;
-  /* zinc-900 */
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #09090b;
 }
 
 body {
@@ -19,6 +17,7 @@ body {
   -webkit-font-smoothing: antialiased;
   /* Premium Typography: 16px-18px range */
   font-size: 16px;
+  line-height: 1.5;
 }
 
 @media (min-width: 768px) {
@@ -27,27 +26,47 @@ body {
   }
 }
 
+/* Safe Area / Notch Support */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Ticker Animation */
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker {
+  animation: ticker 40s linear infinite;
+}
+
+.pause {
+  animation-play-state: paused;
+}
+
+/* Premium UI Utilities */
 .glass-header {
-  @apply bg-white/70 backdrop-blur-xl border-b border-white/20;
+  @apply bg-white/80 backdrop-blur-xl border-b border-zinc-200/50;
 }
 
 .glass-card {
-  @apply bg-white/40 backdrop-blur-md border border-white/30 shadow-xl shadow-blue-900/5;
+  @apply bg-white border border-zinc-100 shadow-sm hover:shadow-md transition-shadow;
 }
 
-@layer base {
-  html {
-    -webkit-tap-highlight-color: transparent;
-    scroll-behavior: smooth;
-  }
-
-  /* Standardizing Hit Targets: Minimum 44x44px */
-  button,
-  a {
-    @apply transition-all duration-200 active:scale-95 cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center;
-  }
+/* Standardized Hit Targets */
+button,
+a,
+input,
+select {
+  @apply min-h-[44px] min-w-[44px] transition-all duration-200;
 }

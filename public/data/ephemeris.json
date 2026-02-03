@@ -1,30 +1,109 @@
 {
-    "2": {
-        "3": [
-            "Combate de San Lorenzo (1813): Victoria del Gral. San Martín y sus Granaderos.",
-            "Batalla de Caseros (1852): Caída de Juan Manuel de Rosas ante el Ejército Grande de Urquiza.",
-            "Día de San Blas: Patrono de las enfermedades de la garganta.",
-            "Nacimiento de Juan Carlos Calabró (1934): Ícono del humor argentino.",
-            "Muerte de Natalio Botana (1941): Fundador del diario Crítica."
+    "1": {
+        "1": [
+            "Año Nuevo.",
+            "1871: Comienza a regir el Código Civil Argentino."
         ],
-        "4": [
-            "Día Mundial contra el Cáncer: Jornada de concientización global.",
-            "Nacimiento de Isabel Martínez de Perón (1931): Primera mujer presidenta de Argentina.",
-            "Fundación del diario 'La Prensa' (1869) por José C. Paz."
+        "2": [
+            "1790: Se crea el Virreinato del Río de la Plata.",
+            "1905: Tropas de la Armada Argentina ocupan las Islas Orcadas."
+        ],
+        "10": [
+            "1921: Se funda el Club Atlético Lanús."
+        ],
+        "25": [
+            "1951: Se inauguran los primeros Juegos Panamericanos en Buenos Aires."
+        ],
+        "31": [
+            "1813: Se inaugura la Asamblea del Año XIII."
+        ]
+    },
+    "2": {
+        "1": [
+            "1930: Nace María Elena Walsh, poetisa y cantautora argentina.",
+            "1910: Inauguración del Túnel Transandino."
+        ],
+        "2": [
+            "1890: Fallece Guillermo Brown, almirante irlandés-argentino."
+        ],
+        "3": [
+            "Combate de San Lorenzo (1813): Los Granaderos de San Martín derrotan a los realistas.",
+            "Batalla de Caseros (1852): El Ejército Grande vence a las fuerzas de Rosas.",
+            "Día de San Blas: Festividad del patrono de la garganta.",
+            "1934: Nacimiento de Juan Carlos Calabró.",
+            "1958: Creación del Fondo Nacional de las Artes."
+        ],
+        "10": [
+            "1874: Patricio Peralta Ramos funda la ciudad de Mar del Plata."
+        ],
+        "22": [
+            "1904: Se inaugura la primera estafeta postal en la Antártida Argentina (Orcadas)."
+        ],
+        "25": [
+            "1778: Nace José de San Martín en Yapeyú, Corrientes."
+        ]
+    },
+    "3": {
+        "24": [
+            "Día de la Memoria (1976): Golpe de estado militar en Argentina."
+        ],
+        "31": [
+            "1911: Se funda el Club Atlético Nueva Chicago."
+        ]
+    },
+    "4": {
+        "2": [
+            "1982: Desembarco de tropas argentinas en las Islas Malvinas."
         ]
     },
     "5": {
+        "1": [
+            "1853: Se sanciona la Constitución Nacional."
+        ],
         "25": [
-            "Revolución de Mayo (1810): Formación del Primer Gobierno Patrio.",
-            "Fundación del Club Atlético River Plate (1901).",
-            "Fundación del Club Atlético Boca Juniors (1905).",
-            "Inauguración del Teatro Colón (1908)."
+            "1810: Revolución de Mayo."
+        ]
+    },
+    "6": {
+        "20": [
+            "1820: Fallece Manuel Belgrano, creador de la Bandera."
         ]
     },
     "7": {
         "9": [
-            "Declaración de la Independencia (1816): Congreso de Tucumán.",
-            "Fallecimiento de Juana Azurduy (1862): Heroína de las luchas por la emancipación."
+            "1816: Declaración de la Independencia en Tucumán."
+        ]
+    },
+    "8": {
+        "17": [
+            "1850: Fallece el Gral. José de San Martín en Francia."
+        ]
+    },
+    "9": {
+        "11": [
+            "1888: Fallece Domingo Faustino Sarmiento, 'Padre del Aula'."
+        ],
+        "21": [
+            "Día del Estudiante."
+        ]
+    },
+    "10": {
+        "12": [
+            "1492: Llegada de Colón a América.",
+            "1916: Hipólito Yrigoyen asume la presidencia."
+        ]
+    },
+    "11": {
+        "20": [
+            "1845: Batalla de la Vuelta de Obligado (Día de la Soberanía)."
+        ]
+    },
+    "12": {
+        "10": [
+            "Día de la Restauración de la Democracia (1983)."
+        ],
+        "15": [
+            "1983: Se crea la CONADEP."
         ]
     }
 }

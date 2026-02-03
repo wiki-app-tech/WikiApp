@@ -89,22 +89,35 @@ export default function CalendarPage() {
                 </div>
             </header>
 
-            {/* Ephemeris Carousel */}
-            <div className="bg-[#002b4e] text-white py-4 overflow-hidden relative shadow-lg">
-                <div className="max-w-6xl mx-auto px-6 flex items-center gap-4">
-                    <span className="bg-blue-500 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shrink-0 animate-pulse">Efemérides</span>
-                    <div className="flex-1 relative h-6 overflow-hidden">
+            {/* Ephemeris Ticker (Horizontal) */}
+            <div className="bg-[#002b4e] text-white py-3 overflow-hidden relative shadow-lg group">
+                <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#002b4e] to-transparent z-10"></div>
+                <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#002b4e] to-transparent z-10"></div>
+
+                <div className="flex items-center gap-6 animate-ticker hover:pause">
+                    <div className="flex items-center gap-12 shrink-0">
+                        <span className="bg-blue-500 text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                            Efemérides del Día
+                        </span>
                         {ephemeris.map((text, i) => (
-                            <div
-                                key={i}
-                                className={`absolute inset-0 flex items-center transition-all duration-1000 transform ${i === activeEphemerisIndex ? 'translate-y-0 opacity-100' :
-                                    i < activeEphemerisIndex ? '-translate-y-full opacity-0' : 'translate-y-full opacity-0'
-                                    }`}
-                            >
-                                <p className="text-sm font-medium tracking-tight whitespace-nowrap overflow-hidden text-ellipsis w-full">
-                                    {text}
-                                </p>
-                            </div>
+                            <span key={i} className="text-sm font-bold tracking-tight whitespace-nowrap opacity-90 hover:opacity-100 transition-opacity flex items-center gap-4">
+                                {text}
+                                <span className="text-blue-400 opacity-30">•</span>
+                            </span>
+                        ))}
+                    </div>
+                    {/* Duplicate for seamless loop */}
+                    <div className="flex items-center gap-12 shrink-0">
+                        <span className="bg-blue-500 text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                            Efemérides del Día
+                        </span>
+                        {ephemeris.map((text, i) => (
+                            <span key={i} className="text-sm font-bold tracking-tight whitespace-nowrap opacity-90 hover:opacity-100 transition-opacity flex items-center gap-4">
+                                {text}
+                                <span className="text-blue-400 opacity-30">•</span>
+                            </span>
                         ))}
                     </div>
                 </div>
