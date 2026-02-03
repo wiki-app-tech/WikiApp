@@ -19,18 +19,25 @@ export default function CalendarPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // Fetch holidays
                 const resHolidays = await fetch('/data/holidays.json');
                 const dataHolidays = await resHolidays.json();
                 setHolidays(dataHolidays);
 
-                setEphemeris([
-                    "Combate de San Lorenzo (1813): San Martín y sus Granaderos derrotan a los realistas.",
-                    "Batalla de Caseros (1852): Urquiza derrota a Rosas, marcando el fin de una era.",
-                    "Día de la Antártida Argentina (22 de Feb): Conmemoración de la presencia permanente en el continente.",
-                    "Fundación de Mar del Plata (10 de Feb): Patricio Peralta Ramos funda la ciudad en 1874.",
-                    "Día del Grial Gaucho (6 de Feb): Homenaje al nacimiento de Martín Miguel de Güemes.",
-                    "Nacimiento de Guillermo Brown (22 de Jun): El almirante irlandés que fundó la Armada Argentina."
-                ]);
+                // Fetch and filter ephemeris for TODAY
+                const resEphemeris = await fetch('/data/ephemeris.json');
+                const allEphemeris = await resEphemeris.json();
+
+                const today = new Date();
+                const month = today.getMonth() + 1;
+                const day = today.getDate();
+
+                const todaysEvents = allEphemeris[month]?.[day] || [
+                    "No hay efemérides destacadas registradas para el día de hoy.",
+                    "Explora los feriados nacionales en el calendario de abajo."
+                ];
+
+                setEphemeris(todaysEvents);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching data:", error);
