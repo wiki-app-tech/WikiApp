@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
 import type { Article, FeedSource } from '@/types';
 
 export default function Dashboard({
@@ -162,14 +163,17 @@ export default function Dashboard({
 
                         {/* Date and Time (Mobile and Tablet/Desktop) */}
                         <div className="flex flex-col items-end md:items-start md:ml-10 border-l border-zinc-200 pl-4 md:pl-10">
-                            <span className="text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-[0.15em] leading-none mb-1.5">
+                            <span className="text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-[0.15em] leading-none mb-1">
                                 {currentTime.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}
                             </span>
-                            <div className="flex items-baseline gap-2">
+                            <span className="text-[8px] md:text-[9px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Tierra del Fuego</span>
+                            <div className="flex items-center gap-3">
                                 <span className="text-sm md:text-xl font-black text-zinc-900 tabular-nums leading-none tracking-tight">
                                     {currentTime.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'America/Argentina/Ushuaia' })}
                                 </span>
-                                <span className="text-[9px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase tracking-tighter">TDF</span>
+                                <Link href="/calendar" className="text-[9px] font-black text-white bg-blue-600 px-3 py-1.5 rounded-full uppercase tracking-tighter shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-colors h-auto min-h-0 min-w-0 flex items-center justify-center">
+                                    Calendario
+                                </Link>
                             </div>
                         </div>
                     </div>
