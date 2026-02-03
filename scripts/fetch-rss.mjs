@@ -48,16 +48,21 @@ async function fetchFeeds() {
                     }));
                 } else {
                     const response = await parser.parseURL(feed.url);
-                    articles = response.items.map(item => ({
-                        id: item.guid || item.link || Math.random().toString(36).substr(2, 9),
-                        title: item.title,
-                        description: item.contentSnippet || item.content || '',
-                        link: item.link,
-                        pubDate: item.pubDate || item.isoDate || new Date().toISOString(),
-                        sourceId: feed.id,
-                        sourceName: feed.name,
-                        sourceType: feed.type
-                    })).slice(0, 10);
+                    articles = response.items.map(item => {
+                        // Extract most complete content for "Automatic Summary" feel
+                        const fullContent = item['content:encoded'] || item.content || item.contentSnippet || '';
+
+                        return {
+                            id: item.guid || item.link || Math.random().toString(36).substr(2, 9),
+                            title: item.title,
+                            description: fullContent,
+                            link: item.link,
+                            pubDate: item.pubDate || item.isoDate || new Date().toISOString(),
+                            sourceId: feed.id,
+                            sourceName: feed.name,
+                            sourceType: feed.type
+                        };
+                    }).slice(0, 10);
                 }
 
                 allArticles.push(...articles);

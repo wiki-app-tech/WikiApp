@@ -17,14 +17,37 @@ body {
   font-family: Inter, system-ui, -apple-system, sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  /* Premium Typography: 16px-18px range */
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  body {
+    font-size: 18px;
+  }
 }
 
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+.glass-header {
+  @apply bg-white/70 backdrop-blur-xl border-b border-white/20;
+}
+
+.glass-card {
+  @apply bg-white/40 backdrop-blur-md border border-white/30 shadow-xl shadow-blue-900/5;
+}
+
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  /* Standardizing Hit Targets: Minimum 44x44px */
+  button,
+  a {
+    @apply transition-all duration-200 active:scale-95 cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center;
   }
 }

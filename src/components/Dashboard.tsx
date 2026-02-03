@@ -136,41 +136,70 @@ export default function Dashboard({
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col min-w-0 bg-white relative">
-                <header className="h-16 border-b border-zinc-200 flex items-center px-6 justify-between sticky top-0 bg-white/80 backdrop-blur-md z-30">
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-zinc-900">Configuración</h1>
-                        <nav className="flex gap-4 mt-1">
-                            {['GENERAL', 'BARRA LATERAL', 'LISTADO DE ARTÍCULOS', 'CONTENIDOS DEL ARTÍCULO', 'FECHAS'].map((tab, i) => (
-                                <button key={tab} className={`text-[10px] font-bold tracking-widest uppercase transition-colors ${i === 2 ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-zinc-400 hover:text-zinc-600'}`}>
-                                    {tab}
-                                </button>
-                            ))}
-                        </nav>
+                <header className="h-16 glass-header flex items-center px-4 justify-between sticky top-0 z-30">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="lg:hidden p-2 -ml-2 text-zinc-600 active:bg-zinc-100 rounded-full"
+                            aria-label="Open Menu"
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
+                        </button>
+                        <div>
+                            <h1 className="text-lg md:text-2xl font-black tracking-tight text-zinc-900 leading-tight">WikiApp</h1>
+                            <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest hidden md:block">Dashboard Premium</p>
+                        </div>
                     </div>
 
-                    <div className="hidden lg:flex items-center gap-4">
+                    <div className="flex items-center gap-2">
                         {telegramArticles.length > 0 && (
-                            <div className="flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
+                            <div className="hidden sm:flex items-center gap-3 bg-blue-50/50 backdrop-blur-sm px-4 py-2 rounded-full border border-blue-100/50">
                                 <span className="text-[10px] font-bold text-blue-600 animate-pulse">LIVE</span>
-                                <div className="text-xs text-blue-800 font-medium max-w-[200px] truncate">
+                                <div className="text-xs text-blue-800 font-semibold max-w-[120px] md:max-w-[200px] truncate">
                                     {telegramArticles[currentTelegramIndex]?.title}
                                 </div>
                             </div>
                         )}
-                        <span className="text-xs font-semibold text-zinc-400 bg-zinc-100 px-3 py-1 rounded-full">
-                            {filteredArticles.length} artículos
+                        <span className="text-xs font-bold text-zinc-500 bg-zinc-100 px-3 py-1.5 rounded-full">
+                            {filteredArticles.length}
                         </span>
                     </div>
                 </header>
 
                 <div className="flex-1 flex overflow-hidden">
                     {/* Article List (Master) */}
-                    <div className={`flex-1 overflow-y-auto p-8 scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-1/3 border-r border-zinc-100' : 'w-full'}`}>
-                        <div className="max-w-4xl mx-auto space-y-12">
+                    <div className={`flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-1/3 border-r border-zinc-100' : 'w-full'}`}>
+                        <div className="max-w-4xl mx-auto space-y-8">
+                            {activeTab === 'search' && (
+                                <div className="glass-card p-4 rounded-3xl mb-8 sticky top-0 z-20">
+                                    <div className="relative">
+                                        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 w-5 h-5" />
+                                        <input
+                                            type="text"
+                                            placeholder="¿Qué estás buscando?"
+                                            value={search}
+                                            onChange={(e) => setSearch(e.target.value)}
+                                            className="w-full bg-zinc-100/50 border-none rounded-2xl pl-12 pr-4 py-4 text-base font-medium focus:ring-4 focus:ring-blue-500/10 placeholder:text-zinc-400"
+                                            autoFocus
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
                             <section>
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-2 bg-blue-100 text-blue-600 rounded-lg"><LayoutIcon className="w-5 h-5" /></div>
-                                    <h2 className="text-xl font-bold text-zinc-800">Listado de artículos</h2>
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2.5 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-600/20"><LayoutIcon className="w-5 h-5" /></div>
+                                        <h2 className="text-xl font-black text-zinc-900 tracking-tight">Recientes</h2>
+                                    </div>
+                                    {selectedFeed && (
+                                        <button
+                                            onClick={() => setSelectedFeed(null)}
+                                            className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full"
+                                        >
+                                            Limpiar Filtro
+                                        </button>
+                                    )}
                                 </div>
 
                                 <div className="space-y-6">
@@ -178,25 +207,26 @@ export default function Dashboard({
                                         <button
                                             key={article.id}
                                             onClick={() => setSelectedArticleId(article.id)}
-                                            className={`w-full group text-left flex items-start gap-4 p-4 rounded-2xl transition-all ${selectedArticleId === article.id
-                                                ? 'bg-blue-50/50'
+                                            className={`w-full group text-left flex items-start gap-4 p-5 rounded-3xl transition-all ${selectedArticleId === article.id
+                                                ? 'bg-blue-600/5 shadow-xl shadow-blue-600/5 ring-1 ring-blue-600/10'
                                                 : 'hover:bg-zinc-50'
                                                 }`}
                                         >
-                                            <div className="pt-1">
-                                                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${selectedArticleId === article.id ? 'bg-blue-600 border-blue-600' : 'border-zinc-300 bg-white'}`}>
+                                            <div className="pt-1 select-none">
+                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedArticleId === article.id ? 'bg-blue-600 border-blue-600' : 'border-zinc-300 bg-white'}`}>
                                                     {selectedArticleId === article.id && <CheckIcon className="w-3 h-3 text-white" />}
                                                 </div>
                                             </div>
-                                            <div className="flex-1">
-                                                <h3 className={`text-[17px] font-bold mb-1 leading-snug transition-colors ${selectedArticleId === article.id ? 'text-blue-700' : 'text-zinc-900 group-hover:text-blue-600'}`}>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className={`text-lg md:text-xl font-black mb-2 leading-tight transition-colors ${selectedArticleId === article.id ? 'text-blue-700' : 'text-zinc-900 group-hover:text-blue-600'}`}>
                                                     {article.title}
                                                 </h3>
-                                                <p className="text-sm text-zinc-500 line-clamp-2 leading-relaxed">
+                                                <p className="text-sm md:text-base text-zinc-500 line-clamp-3 leading-relaxed mb-4">
                                                     {article.description}
                                                 </p>
-                                                <div className="mt-3 flex items-center gap-3 text-[11px] font-bold text-zinc-400">
-                                                    <span className="bg-zinc-100 px-2 py-0.5 rounded uppercase">{article.sourceName}</span>
+                                                <div className="flex items-center gap-3 text-xs font-black text-zinc-400">
+                                                    <span className="bg-zinc-100 text-zinc-500 px-2.5 py-1 rounded-lg uppercase tracking-wider">{article.sourceName}</span>
+                                                    <span className="w-1 h-1 bg-zinc-300 rounded-full" />
                                                     <span>{new Date(article.pubDate).toLocaleDateString()}</span>
                                                 </div>
                                             </div>
@@ -218,10 +248,11 @@ export default function Dashboard({
                 </div>
 
                 {/* Mobile Bottom Nav */}
-                <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-zinc-200 flex items-center justify-around px-6 z-40 pb-safe shadow-2xl shadow-blue-900/10">
-                    <MobileTab active={activeTab === 'home'} onClick={() => { setActiveTab('home'); setSelectedArticleId(null); }} label="Inicio" icon={<LayoutIcon />} />
-                    <MobileTab active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setSelectedArticleId(null); }} label="Buscar" icon={<SearchIcon />} />
-                    <MobileTab active={activeTab === 'folders'} onClick={() => { setActiveTab('folders'); setIsMobileMenuOpen(true); }} label="Feeds" icon={<RssIcon />} />
+                <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-20 glass-header border-t border-zinc-200/50 flex items-center justify-around px-4 z-40 pb-safe shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
+                    <MobileTab active={activeTab === 'home'} onClick={() => { setActiveTab('home'); setSelectedFeed(null); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Inicio" icon={<LayoutIcon className="w-6 h-6" />} />
+                    <MobileTab active={activeTab === 'folders'} onClick={() => { setActiveTab('folders'); setIsMobileMenuOpen(true); }} label="Feeds" icon={<RssIcon className="w-6 h-6" />} />
+                    <MobileTab active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Buscar" icon={<SearchIcon className="w-6 h-6" />} />
+                    <MobileTab active={false} onClick={() => { }} label="Guardado" icon={<BookmarkIcon className="w-6 h-6" />} />
                 </nav>
             </main>
         </div>
@@ -251,9 +282,9 @@ function CategoryButton({ active, label, icon, onClick }: { active: boolean, lab
 
 function MobileTab({ active, label, icon, onClick }: { active: boolean, label: string, icon: React.ReactNode, onClick: () => void }) {
     return (
-        <button onClick={onClick} className={`flex flex-col items-center gap-1.5 min-w-[64px] transition-all transform active:scale-90 ${active ? 'text-blue-600' : 'text-zinc-400'}`}>
-            <div className={`p-1.5 rounded-full transition-colors ${active ? 'bg-blue-50' : ''}`}>{icon}</div>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest">{label}</span>
+        <button onClick={onClick} className={`flex flex-col items-center justify-center gap-1 flex-1 min-h-[64px] transition-all transform active:scale-90 ${active ? 'text-blue-600' : 'text-zinc-400'}`}>
+            <div className={`p-2 rounded-2xl transition-all duration-300 ${active ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'bg-transparent'}`}>{icon}</div>
+            <span className="text-[9px] font-black uppercase tracking-[0.15em] mt-0.5">{label}</span>
         </button>
     );
 }
