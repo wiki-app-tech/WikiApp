@@ -295,12 +295,12 @@ export default function Dashboard({
                                         )}
                                     </div>
 
-                                    {/* Radar (Windy) */}
                                     <div className="lg:w-1/2 aspect-video lg:aspect-square rounded-[2rem] overflow-hidden border border-zinc-100 shadow-inner group relative">
                                         <iframe
                                             src={`https://www.windy.com/?${(cities as any)[selectedCity].lat},${(cities as any)[selectedCity].lon},8?m:eaQa8v`}
                                             className="w-full h-full border-none"
                                             title="Windy Radar"
+                                            loading="lazy"
                                         />
                                         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black text-zinc-900 border border-zinc-100/50 shadow-sm uppercase tracking-widest">
                                             Radar Meteorológico
