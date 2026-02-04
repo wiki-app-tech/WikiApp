@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -5,8 +7,9 @@
 }
 
 :root {
-  --background: #ffffff;
+  --background: #f8fafc;
   --foreground: #09090b;
+  --accent: #1a73e8;
 }
 
 /* Custom Scrollbars */
@@ -75,11 +78,11 @@ body {
 
 /* Premium UI Utilities */
 .glass-header {
-  @apply bg-white/90 backdrop-blur-2xl border-b border-zinc-200/50;
+  @apply bg-white/80 backdrop-blur-2xl border-b border-zinc-200/50 sticky top-0 z-50;
 }
 
 .glass-card {
-  @apply bg-white border border-zinc-100/80 shadow-[0_8px_30px_rgb(0, 0, 0, 0.04)] hover:shadow-[0_8px_30px_rgb(0, 0, 0, 0.08)] transition-all duration-300;
+  @apply bg-white/70 backdrop-blur-lg border border-zinc-100/50 shadow-[0_8px_32px_0_rgba(31, 38, 135, 0.07)] hover:shadow-[0_8px_32px_0_rgba(31, 38, 135, 0.15)] transition-all duration-500 rounded-3xl;
 }
 
 /* Standardized Hit Targets */
