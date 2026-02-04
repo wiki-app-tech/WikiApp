@@ -16,7 +16,7 @@ export default function Dashboard({
     const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
     const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'home' | 'search' | 'folders'>('home');
+    const [activeTab, setActiveTab] = useState<'home' | 'search' | 'folders' | 'saved' | 'automate' | 'settings'>('home');
     const [currentTelegramIndex, setCurrentTelegramIndex] = useState(0);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [selectedCity, setSelectedCity] = useState('Ushuaia');
@@ -410,9 +410,12 @@ export default function Dashboard({
     );
 }
 
-function NavIcon({ children, active, label }: { children: React.ReactNode, active?: boolean, label: string }) {
+function NavIcon({ children, active, label, onClick }: { children: React.ReactNode, active?: boolean, label: string, onClick?: () => void }) {
     return (
-        <button className={`w-12 h-12 flex flex-col items-center justify-center rounded-xl transition-all relative group ${active ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-zinc-400 hover:bg-white/10 hover:text-white'}`}>
+        <button
+            onClick={onClick}
+            className={`w-12 h-12 flex flex-col items-center justify-center rounded-xl transition-all relative group ${active ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-zinc-400 hover:bg-white/10 hover:text-white'}`}
+        >
             {children}
             <span className="hidden lg:group-hover:block absolute left-full ml-3 px-2 py-1 bg-zinc-900 text-white text-[10px] font-bold rounded whitespace-nowrap z-50">{label}</span>
         </button>
