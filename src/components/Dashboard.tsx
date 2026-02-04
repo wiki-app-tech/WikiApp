@@ -244,76 +244,102 @@ export default function Dashboard({
                     {/* Master: Article List */}
                     <div className={`flex-1 overflow-y-auto p-6 md:p-8 scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-1/3' : 'w-full'}`}>
                         <div className="max-w-6xl mx-auto space-y-8 pb-32">
-                            {/* Weather Widget */}
-                            {weatherData && (
-                                <section className="glass-card overflow-hidden rounded-[2.5rem] mb-12 shadow-2xl shadow-blue-900/5">
-                                    <div className="flex p-2 bg-zinc-50/50 backdrop-blur-md border-b border-zinc-100 overflow-x-auto no-scrollbar">
+                            {/* Premium Weather App Card */}
+                            <section className="bg-[#020617] rounded-[3rem] overflow-hidden shadow-2xl shadow-blue-900/40 mb-12 border border-blue-500/10 transition-all duration-500 hover:shadow-blue-900/60 ring-1 ring-white/5">
+                                {/* Navigation Superior */}
+                                <div className="p-6 bg-white/5 backdrop-blur-3xl border-b border-white/5 flex items-center justify-between overflow-x-auto no-scrollbar">
+                                    <div className="flex gap-2 p-1.5 bg-black/40 rounded-2xl border border-white/5">
                                         {Object.keys(cities).map(city => (
                                             <button
                                                 key={city}
                                                 onClick={() => setSelectedCity(city)}
-                                                className={`px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 ${selectedCity === city
-                                                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20'
-                                                    : 'text-zinc-400 hover:text-zinc-600'
+                                                className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap ${selectedCity === city
+                                                    ? 'bg-yellow-400 text-black shadow-lg shadow-yellow-400/20'
+                                                    : 'text-zinc-500 hover:text-white hover:bg-white/5'
                                                     }`}
                                             >
                                                 {city}
                                             </button>
                                         ))}
                                     </div>
-                                    <div className="p-8 flex flex-col md:flex-row gap-8">
-                                        <div className="flex-1 flex items-center gap-6">
-                                            <div className="w-16 h-16 flex items-center justify-center bg-blue-50 rounded-2xl text-blue-600">
-                                                <CloudIcon className="w-8 h-8" />
+                                    <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-yellow-400/10 rounded-xl border border-yellow-400/20 shrink-0">
+                                        <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                                        <span className="text-[10px] font-black text-yellow-400 uppercase tracking-widest leading-none">LIVE RADAR</span>
+                                    </div>
+                                </div>
+
+                                <div className="p-10 lg:p-14 flex flex-col lg:flex-row gap-16">
+                                    {/* Héroe de Datos */}
+                                    <div className="lg:w-1/3 flex flex-col justify-center">
+                                        <div className="flex items-center gap-6 mb-4">
+                                            <div className="text-8xl md:text-9xl font-black text-white tracking-tighter tabular-nums leading-none">
+                                                {weatherData?.[selectedCity]?.temp || '--'}
+                                                <span className="text-yellow-400 text-6xl md:text-7xl align-top ml-2">°</span>
                                             </div>
-                                            <div>
-                                                <div className="text-4xl font-black text-zinc-900 tracking-tighter tabular-nums leading-none">
-                                                    {weatherData[selectedCity]?.temp}°C
-                                                </div>
-                                                <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1">
-                                                    {weatherData[selectedCity]?.condition}
-                                                </div>
+                                            <div className="w-20 h-20 text-yellow-500 drop-shadow-[0_0_15px_rgba(250,204,21,0.3)]">
+                                                <CloudSunIcon />
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-4 overflow-x-auto no-scrollbar py-2">
-                                            {weatherData[selectedCity]?.forecast.map((f: any, i: number) => (
-                                                <div key={i} className="bg-zinc-50/50 rounded-xl p-3 border border-zinc-100/50 text-center min-w-[80px]">
-                                                    <span className="text-[9px] font-black text-zinc-400 uppercase">{f.day}</span>
-                                                    <div className="text-xs font-black text-zinc-900 mt-1">{f.temp}°</div>
+                                        <div className="space-y-2 mb-10">
+                                            <div className="text-2xl md:text-3xl font-black text-white capitalize tracking-tight">{weatherData?.[selectedCity]?.condition || 'Cargando...'}</div>
+                                            <div className="text-[10px] font-bold text-blue-400/80 uppercase tracking-[0.2em]">Pronóstico para {selectedCity}</div>
+                                        </div>
+
+                                        {/* Pronóstico Extendido */}
+                                        <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-10">
+                                            {weatherData?.[selectedCity]?.forecast.slice(0, 3).map((f: any, i: number) => (
+                                                <div key={i} className="bg-white/5 rounded-2xl p-4 border border-white/5 flex flex-col items-center gap-3 hover:bg-white/10 transition-all hover:-translate-y-1">
+                                                    <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">{f.day}</span>
+                                                    <div className="text-yellow-500 w-8 h-8">
+                                                        <SunSmallIcon />
+                                                    </div>
+                                                    <div className="flex flex-col items-center">
+                                                        <span className="text-sm font-black text-white">{f.temp}°</span>
+                                                        <span className="text-[9px] font-bold text-zinc-500 uppercase">Max/Min</span>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
-                                </section>
-                            )}
 
-                            {/* Windy Weather Map */}
-                            <section className="glass-card overflow-hidden rounded-[2.5rem] mb-12 shadow-2xl shadow-blue-900/5 group">
-                                <div className="p-4 bg-zinc-50/50 border-b border-zinc-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
-                                            <CloudIcon className="w-4 h-4" />
+                                    {/* Sección de Mapa / Radar */}
+                                    <div className="flex-1 flex flex-col gap-6">
+                                        <div className="flex-1 relative aspect-video lg:aspect-auto min-h-[400px] bg-[#020617] rounded-[2.5rem] overflow-hidden border border-white/10 group/map shadow-inner shadow-black/50">
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                src={`https://embed.windy.com/embed2.html?lat=${cities[selectedCity as keyof typeof cities]?.lat || -54.8019}&lon=${cities[selectedCity as keyof typeof cities]?.lon || -68.303}&detailLat=${cities[selectedCity as keyof typeof cities]?.lat || -54.8019}&detailLon=${cities[selectedCity as keyof typeof cities]?.lon || -68.303}&width=650&height=450&zoom=6&level=surface&overlay=wind&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1`}
+                                                frameBorder="0"
+                                                className="absolute inset-0 opacity-80 contrast-[1.2] brightness-[0.8] hover:opacity-100 transition-opacity duration-700"
+                                            ></iframe>
+
+                                            {/* Controles de Reproducción Simplificados */}
+                                            <div className="absolute bottom-6 left-6 right-6 bg-[#020617]/80 backdrop-blur-2xl px-6 py-4 rounded-[1.5rem] border border-white/10 flex items-center justify-between opacity-0 group-hover/map:opacity-100 transition-all duration-500 translate-y-4 group-hover/map:translate-y-0">
+                                                <div className="flex items-center gap-4">
+                                                    <button className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-black shadow-xl shadow-yellow-400/40 active:scale-95 transition-transform">
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentcolor"><path d="M8 5v14l11-7z" /></svg>
+                                                    </button>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none">Radar en tiempo real</span>
+                                                        <span className="text-[10px] text-zinc-400 mt-1">Sincronizado: ahora</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Leyenda de Intensidad */}
+                                                <div className="hidden sm:flex items-center gap-3">
+                                                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-black/60 rounded-full border border-white/10">
+                                                        <div className="flex gap-1">
+                                                            <div className="w-2.5 h-1.5 rounded-full bg-blue-500/80" />
+                                                            <div className="w-2.5 h-1.5 rounded-full bg-green-500/80" />
+                                                            <div className="w-2.5 h-1.5 rounded-full bg-yellow-500/80" />
+                                                            <div className="w-2.5 h-1.5 rounded-full bg-red-500/80" />
+                                                        </div>
+                                                        <span className="text-[9px] font-black text-white/60 uppercase tracking-widest ml-1">Precipitación</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Mapa de Vientos y Presión - Tierra del Fuego</span>
                                     </div>
-                                    <a
-                                        href="https://www.windy.com/?-54.252,-63.984,5"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-[9px] font-black text-blue-600 uppercase tracking-widest hover:underline"
-                                    >
-                                        Ver en Windy.com
-                                    </a>
-                                </div>
-                                <div className="aspect-video w-full relative bg-zinc-100">
-                                    <iframe
-                                        width="100%"
-                                        height="100%"
-                                        src="https://embed.windy.com/embed2.html?lat=-54.252&lon=-63.984&detailLat=-54.252&detailLon=-63.984&width=650&height=450&zoom=5&level=surface&overlay=wind&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
-                                        frameBorder="0"
-                                        className="absolute inset-0 grayscale-[0.2] contrast-[1.1] brightness-[1.05]"
-                                    ></iframe>
-                                    <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                                 </div>
                             </section>
 
@@ -520,3 +546,18 @@ const FeedIcon = ({ type }: { type: Article['sourceType'] }) => {
         default: return <RssIcon className="w-3 h-3 text-zinc-400" />;
     }
 };
+
+const CloudSunIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+        <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
+        <path d="M20 17.5c0 1.9-1.6 3.5-3.5 3.5H9c-2.8 0-5-2.2-5-5a5 5 0 0 1 4.5-5A7.5 7.5 0 0 1 21 13c0 .5 0 1-.1 1.5" stroke="currentColor" fill="none" />
+    </svg>
+);
+
+const SunSmallIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="#fbbf24" />
+    </svg>
+);

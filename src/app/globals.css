@@ -78,7 +78,7 @@ body {
 
 /* Premium UI Utilities */
 .glass-header {
-  @apply bg-white/80 backdrop-blur-2xl border-b border-zinc-200/50 sticky top-0 z-50;
+  @apply bg-white/90 backdrop-blur-2xl border-b border-zinc-200/50 sticky top-0 z-50;
 }
 
 .glass-card {
