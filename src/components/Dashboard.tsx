@@ -287,6 +287,36 @@ export default function Dashboard({
                                 </section>
                             )}
 
+                            {/* Windy Weather Map */}
+                            <section className="glass-card overflow-hidden rounded-[2.5rem] mb-12 shadow-2xl shadow-blue-900/5 group">
+                                <div className="p-4 bg-zinc-50/50 border-b border-zinc-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                                            <CloudIcon className="w-4 h-4" />
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Mapa de Vientos y Presión - Tierra del Fuego</span>
+                                    </div>
+                                    <a
+                                        href="https://www.windy.com/?-54.252,-63.984,5"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-[9px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+                                    >
+                                        Ver en Windy.com
+                                    </a>
+                                </div>
+                                <div className="aspect-video w-full relative bg-zinc-100">
+                                    <iframe
+                                        width="100%"
+                                        height="100%"
+                                        src="https://embed.windy.com/embed2.html?lat=-54.252&lon=-63.984&detailLat=-54.252&detailLon=-63.984&width=650&height=450&zoom=5&level=surface&overlay=wind&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
+                                        frameBorder="0"
+                                        className="absolute inset-0 grayscale-[0.2] contrast-[1.1] brightness-[1.05]"
+                                    ></iframe>
+                                    <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                                </div>
+                            </section>
+
                             {/* Section Header */}
                             <div className="flex items-center justify-between">
                                 <h1 className="text-3xl font-black text-zinc-900 tracking-tight">
