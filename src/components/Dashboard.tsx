@@ -118,24 +118,24 @@ export default function Dashboard({
             {/* Sidebar 1: Icon Bar (Narrow) */}
             <aside className="hidden lg:flex w-16 bg-[#002b4e] flex-col items-center py-6 gap-6 shrink-0 z-50">
                 <div className="w-8 h-8 rounded-full bg-blue-500 shadow-lg shadow-blue-500/20 mb-4" />
-                <NavIcon active label="Dashboard"><LayoutIcon /></NavIcon>
-                <NavIcon label="Feeds"><RssIcon /></NavIcon>
-                <NavIcon label="Saved"><BookmarkIcon /></NavIcon>
-                <NavIcon label="Automate"><ZapIcon /></NavIcon>
-                <NavIcon label="Search"><SearchIcon /></NavIcon>
+                <NavIcon active={activeTab === 'home'} onClick={() => setActiveTab('home')} label="Dashboard"><LayoutIcon /></NavIcon>
+                <NavIcon active={activeTab === 'folders'} onClick={() => setActiveTab('folders')} label="Feeds"><RssIcon /></NavIcon>
+                <NavIcon active={activeTab === 'saved'} onClick={() => setActiveTab('saved')} label="Saved"><BookmarkIcon /></NavIcon>
+                <NavIcon active={activeTab === 'automate'} onClick={() => setActiveTab('automate')} label="Automate"><ZapIcon /></NavIcon>
+                <NavIcon active={activeTab === 'search'} onClick={() => setActiveTab('search')} label="Search"><SearchIcon /></NavIcon>
                 <div className="mt-auto flex flex-col gap-6">
-                    <NavIcon label="Settings"><SettingsIcon /></NavIcon>
+                    <NavIcon active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} label="Settings"><SettingsIcon /></NavIcon>
                 </div>
             </aside>
 
             {/* Sidebar 2: Categories Panel */}
             <aside className={`
                 fixed inset-0 z-40 lg:relative lg:inset-auto lg:z-auto
-                w-full lg:w-72 border-r border-zinc-200 flex flex-col bg-[#f8fafc] transition-all duration-300
-                ${isMobileMenuOpen || (!selectedArticleId && activeTab === 'folders')
-                    ? 'translate-x-0 opacity-100'
-                    : '-translate-x-full opacity-0 lg:translate-x-0 lg:opacity-100'}
-                ${selectedArticleId ? 'hidden lg:flex' : ''}
+                h-full border-r border-zinc-200 flex flex-col bg-[#f8fafc] transition-all duration-500 ease-in-out overflow-hidden
+                ${isMobileMenuOpen || activeTab === 'folders'
+                    ? 'w-full lg:w-72 opacity-100 translate-x-0'
+                    : 'w-0 opacity-0 -translate-x-full lg:translate-x-0 pointer-events-none lg:pointer-events-auto'}
+                ${selectedArticleId && !isMobileMenuOpen ? 'hidden lg:flex' : 'flex'}
             `}>
                 <div className="p-6 flex flex-col h-full">
                     <div className="flex items-center justify-between mb-6">
