@@ -49,8 +49,11 @@ async function fetchFeeds() {
                 } else {
                     const response = await parser.parseURL(feed.url);
                     articles = response.items.map(item => {
-                        // Extract most complete content for "Automatic Summary" feel
-                        const fullContent = item['content:encoded'] || item.content || item.contentSnippet || '';
+                        // Extract most complete content
+                        let fullContent = item['content:encoded'] || item.content || item.contentSnippet || '';
+
+                        // Sanitize content minimally for the JSON but keep structure
+                        // We will handle the heavy cleaning in the UI for safety
 
                         return {
                             id: item.guid || item.link || Math.random().toString(36).substr(2, 9),
@@ -60,9 +63,10 @@ async function fetchFeeds() {
                             pubDate: item.pubDate || item.isoDate || new Date().toISOString(),
                             sourceId: feed.id,
                             sourceName: feed.name,
-                            sourceType: feed.type
+                            sourceType: feed.type,
+                            thumbnail: item.enclosure?.url || null
                         };
-                    }).slice(0, 10);
+                    }).slice(0, 15); // Increased to 15 articles per feed
                 }
 
                 allArticles.push(...articles);

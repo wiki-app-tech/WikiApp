@@ -2,6 +2,7 @@
 
 import { Article } from '@/types';
 import { useMemo } from 'react';
+import Image from 'next/image';
 
 interface ArticleCardProps {
     article: Article;
@@ -35,11 +36,13 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
         return article.description.replace(/<[^>]*>?/gm, '').trim();
     }, [article.description]);
 
+    const commonClasses = "cursor-pointer transition-all duration-300 ease-out active:scale-[0.98]";
+
     if (viewMode === 'list') {
         return (
             <div
                 onClick={onClick}
-                className={`flex items-start gap-3 p-3 cursor-pointer transition-all border-b border-zinc-100/50 hover:bg-zinc-50/80 group ${isSelected ? 'bg-blue-50/40 border-l-4 border-l-blue-600 shadow-sm' : 'bg-white'}`}
+                className={`${commonClasses} flex items-start gap-3 p-3 border-b border-zinc-100/50 hover:bg-zinc-50/80 group ${isSelected ? 'bg-blue-50/40 border-l-4 border-l-blue-600 shadow-sm' : 'bg-white'}`}
             >
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
@@ -64,14 +67,16 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
         return (
             <div
                 onClick={onClick}
-                className={`flex gap-5 p-4 cursor-pointer transition-all rounded-2xl border border-zinc-100 hover:border-blue-200/50 hover:bg-zinc-50/50 group hover:shadow-xl hover:shadow-zinc-200/30 ${isSelected ? 'ring-2 ring-blue-600/20 bg-blue-50/30 border-blue-200' : 'bg-white'}`}
+                className={`${commonClasses} flex gap-5 p-4 rounded-2xl border border-zinc-100 hover:border-blue-200/50 hover:bg-zinc-50/50 group hover:shadow-xl hover:shadow-zinc-200/30 ${isSelected ? 'ring-2 ring-blue-600/20 bg-blue-50/30 border-blue-200' : 'bg-white'}`}
             >
                 {imageUrl && (
-                    <div className="w-48 h-32 flex-shrink-0 overflow-hidden rounded-xl bg-zinc-100 shadow-md">
-                        <img
+                    <div className="w-48 h-32 flex-shrink-0 overflow-hidden rounded-xl bg-zinc-100 shadow-md relative">
+                        <Image
                             src={imageUrl}
                             alt={article.title}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            fill
+                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                            sizes="(max-width: 768px) 100vw, 192px"
                         />
                     </div>
                 )}
@@ -98,14 +103,17 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
     return (
         <div
             onClick={onClick}
-            className={`group flex flex-col cursor-pointer transition-all rounded-[2rem] border border-zinc-100 hover:border-blue-200/50 bg-white hover:shadow-2xl hover:shadow-zinc-200/50 overflow-hidden ${isSelected ? 'ring-2 ring-blue-600/20 bg-blue-50/30 border-blue-200' : ''}`}
+            className={`${commonClasses} group flex flex-col rounded-[2rem] border border-zinc-100 hover:border-blue-200/50 bg-white hover:shadow-2xl hover:shadow-zinc-200/50 overflow-hidden ${isSelected ? 'ring-2 ring-blue-600/20 bg-blue-50/30 border-blue-200' : ''}`}
         >
             {imageUrl && (
                 <div className="aspect-[16/10] w-full overflow-hidden bg-zinc-100 relative">
-                    <img
+                    <Image
                         src={imageUrl}
                         alt={article.title}
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                        fill
+                        className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                        sizes="(max-width: 1200px) 100vw, (max-width: 1536px) 50vw, 33vw"
+                        priority={isSelected}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-black text-blue-600 uppercase tracking-widest shadow-lg opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">

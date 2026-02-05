@@ -82,7 +82,7 @@ body {
 }
 
 .glass-card {
-  @apply bg-white/70 backdrop-blur-lg border border-zinc-100/50 shadow-[0_8px_32px_0_rgba(31, 38, 135, 0.07)] hover:shadow-[0_8px_32px_0_rgba(31, 38, 135, 0.15)] transition-all duration-500 rounded-3xl;
+  @apply bg-white/70 backdrop-blur-lg border border-zinc-100/50 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] transition-all duration-500 rounded-3xl;
 }
 
 /* Standardized Hit Targets */
