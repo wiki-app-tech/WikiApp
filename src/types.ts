@@ -18,6 +18,7 @@ export interface Article {
   sourceId: string;
   sourceName: string;
   sourceType: FeedType;
+  sourceCategory?: string;
 }
 
 export interface FeedData {

@@ -8,6 +8,7 @@ import Clock from '@/components/Clock';
 import WeatherCard from '@/components/WeatherCard';
 import ArticleReader from '@/components/ArticleReader';
 import RoadStatus from '@/components/RoadStatus';
+import NewsCarousel from '@/components/NewsCarousel';
 import { NavIcon, CategoryButton, MobileTab } from '@/components/DashboardUI';
 import {
     LayoutIcon,
@@ -227,24 +228,55 @@ export default function Dashboard({
                                 )}
                             </div>
 
-                            {/* Grid */}
-                            <div className={
-                                viewMode === 'list'
-                                    ? "flex flex-col border border-zinc-200/50 rounded-2xl overflow-hidden divide-y divide-zinc-200/30 shadow-xl bg-white"
-                                    : viewMode === 'magazine'
-                                        ? "grid grid-cols-1 lg:grid-cols-2 gap-8"
-                                        : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8"
-                            }>
-                                {filteredArticles.map(article => (
-                                    <ArticleCard
-                                        key={article.id}
-                                        article={article}
-                                        viewMode={viewMode}
-                                        isSelected={selectedArticleId === article.id}
-                                        onClick={() => setSelectedArticleId(article.id)}
-                                    />
-                                ))}
-                            </div>
+                            {/* Category Grouped Carousels or Single Feed Grid */}
+                            {!selectedFeed ? (
+                                <div className="space-y-16">
+                                    {categories.map(category => {
+                                        const categoryArticles = filteredArticles.filter(a => {
+                                            const feed = feeds.find(f => f.id === a.sourceId);
+                                            return feed?.category === category;
+                                        });
+                                        if (categoryArticles.length === 0) return null;
+
+                                        return (
+                                            <section key={category} className="space-y-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="h-8 w-1.5 bg-blue-600 rounded-full" />
+                                                    <h2 className="text-2xl font-black text-zinc-900 tracking-tight capitalize">
+                                                        {category}
+                                                    </h2>
+                                                    <div className="flex-1 h-px bg-zinc-100" />
+                                                </div>
+
+                                                <NewsCarousel
+                                                    articles={categoryArticles}
+                                                    viewMode={viewMode}
+                                                    selectedArticleId={selectedArticleId}
+                                                    onArticleClick={(id) => setSelectedArticleId(id)}
+                                                />
+                                            </section>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className={
+                                    viewMode === 'list'
+                                        ? "flex flex-col border border-zinc-200/50 rounded-2xl overflow-hidden divide-y divide-zinc-200/30 shadow-xl bg-white"
+                                        : viewMode === 'magazine'
+                                            ? "grid grid-cols-1 lg:grid-cols-2 gap-8"
+                                            : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8"
+                                }>
+                                    {filteredArticles.map(article => (
+                                        <ArticleCard
+                                            key={article.id}
+                                            article={article}
+                                            viewMode={viewMode}
+                                            isSelected={selectedArticleId === article.id}
+                                            onClick={() => setSelectedArticleId(article.id)}
+                                        />
+                                    ))}
+                                </div>
+                            )}
 
                             {/* Empty State */}
                             {filteredArticles.length === 0 && (
