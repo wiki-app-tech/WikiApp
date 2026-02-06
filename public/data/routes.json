@@ -1,0 +1,36 @@
+{
+    "rn3": [
+        {
+            "segment": "Ushuaia - Tolhuin",
+            "status": "Transitable con precaución",
+            "details": "Calzada húmeda. Posible presencia de hielo en sectores. Equipos de Vialidad distribuyendo sal.",
+            "severity": "warning"
+        },
+        {
+            "segment": "Tolhuin - Río Grande",
+            "status": "Transitable",
+            "details": "Calzada seca. Vientos leves.",
+            "severity": "success"
+        },
+        {
+            "segment": "Río Grande - San Sebastián",
+            "status": "Transitable con precaución",
+            "details": "Bancos de niebla matinales. Visibilidad reducida.",
+            "severity": "warning"
+        }
+    ],
+    "complementary": [
+        {
+            "segment": "Ruta J (Canal Beagle)",
+            "status": "Transitable con precaución",
+            "details": "Calzada de ripio suelto. Sectores con barro.",
+            "severity": "warning"
+        },
+        {
+            "segment": "Ruta A (Cabo San Pablo)",
+            "status": "Transitable",
+            "details": "Calzada de ripio. Despejado.",
+            "severity": "success"
+        }
+    ]
+}

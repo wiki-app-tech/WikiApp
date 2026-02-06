@@ -7,6 +7,7 @@ import LayoutSwitcher from '@/components/LayoutSwitcher';
 import Clock from '@/components/Clock';
 import WeatherCard from '@/components/WeatherCard';
 import ArticleReader from '@/components/ArticleReader';
+import RoadStatus from '@/components/RoadStatus';
 import { NavIcon, CategoryButton, MobileTab } from '@/components/DashboardUI';
 import {
     LayoutIcon,
