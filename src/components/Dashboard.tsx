@@ -215,6 +215,7 @@ export default function Dashboard({
                         <div className="max-w-6xl mx-auto space-y-8 pb-32">
                             {/* Weather section extracted to WeatherCard */}
                             <WeatherCard cities={cities} />
+                            <RoadStatus />
 
                             {/* Section Header */}
                             <div className="flex items-center justify-between">
