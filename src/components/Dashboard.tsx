@@ -125,13 +125,13 @@ export default function Dashboard({
                 <div className="mb-6">
                     <MediosWikiAppLogo className="w-12 h-12" />
                 </div>
-                <NavIcon active={activeTab === 'home'} onClick={() => setActiveTab('home')} label="Dashboard"><LayoutIcon /></NavIcon>
-                <NavIcon active={activeTab === 'folders'} onClick={() => setActiveTab('folders')} label="Library"><RssIcon /></NavIcon>
-                <NavIcon active={activeTab === 'saved'} onClick={() => setActiveTab('saved')} label="Saved"><BookmarkIcon /></NavIcon>
-                <NavIcon active={activeTab === 'automate'} onClick={() => setActiveTab('automate')} label="Automate"><ZapIcon /></NavIcon>
-                <NavIcon active={activeTab === 'search'} onClick={() => setActiveTab('search')} label="Global Search"><SearchIcon /></NavIcon>
+                <NavIcon active={activeTab === 'home'} onClick={() => setActiveTab('home')} label="Inicio"><LayoutIcon /></NavIcon>
+                <NavIcon active={activeTab === 'folders'} onClick={() => setActiveTab('folders')} label="Biblioteca"><RssIcon /></NavIcon>
+                <NavIcon active={activeTab === 'saved'} onClick={() => setActiveTab('saved')} label="Guardados"><BookmarkIcon /></NavIcon>
+                <NavIcon active={activeTab === 'automate'} onClick={() => setActiveTab('automate')} label="Automatizar"><ZapIcon /></NavIcon>
+                <NavIcon active={activeTab === 'search'} onClick={() => setActiveTab('search')} label="Buscar"><SearchIcon /></NavIcon>
                 <div className="mt-auto flex flex-col gap-8">
-                    <NavIcon active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} label="Settings"><SettingsIcon /></NavIcon>
+                    <NavIcon active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} label="Ajustes"><SettingsIcon /></NavIcon>
                 </div>
             </aside>
 
@@ -146,7 +146,7 @@ export default function Dashboard({
             `}>
                 <div className="p-8 flex flex-col h-full">
                     <div className="flex items-center justify-between mb-10">
-                        <h2 className="text-[11px] font-bold tracking-tight text-zinc-400 uppercase">Library View</h2>
+                        <h2 className="text-[11px] font-bold tracking-tight text-zinc-400 uppercase">Vista de Biblioteca</h2>
                         <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden p-2 text-zinc-400 hover:bg-zinc-50 rounded-2xl transition-colors">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
@@ -156,7 +156,7 @@ export default function Dashboard({
                         <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 w-4 h-4" />
                         <input
                             type="text"
-                            placeholder="Find in feeds..."
+                            placeholder="Buscar en feeds..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="w-full bg-zinc-50 border-zinc-100 border rounded-2xl pl-12 pr-5 py-3.5 text-sm font-medium focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all outline-none"
@@ -167,7 +167,7 @@ export default function Dashboard({
                         <CategoryButton
                             active={!selectedFeed}
                             onClick={() => { setSelectedFeed(null); setIsMobileMenuOpen(false); }}
-                            label="All Discoveries"
+                            label="Todas las Noticias"
                             icon={<LayoutIcon className="w-4 h-4" />}
                         />
 
@@ -204,7 +204,7 @@ export default function Dashboard({
                             <div className="w-8 h-8 rounded-xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
                                 <ZapIcon className="w-4 h-4" />
                             </div>
-                            <span className="text-sm font-bold tracking-tight">Upgrade to Pro+</span>
+                            <span className="text-sm font-bold tracking-tight">Actualizar a Pro+</span>
                         </button>
                     </div>
                 </div>
@@ -238,7 +238,7 @@ export default function Dashboard({
                         <div className="px-5 py-2.5 bg-zinc-900 rounded-[1.25rem] shadow-xl shadow-black/10 flex items-center gap-2.5">
                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                             <span className="text-[11px] font-bold text-white uppercase tracking-tight">
-                                {filteredArticles.length} News Available
+                                {filteredArticles.length} Noticias Disponibles
                             </span>
                         </div>
                     </div>
@@ -256,12 +256,12 @@ export default function Dashboard({
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h1 className="text-4xl font-black text-zinc-900 tracking-tight">
-                                        {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Discovery Center'}
+                                        {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Centro de Noticias'}
                                     </h1>
-                                    <p className="text-zinc-400 font-medium mt-2">Personalized stream for you</p>
+                                    <p className="text-zinc-400 font-medium mt-2">Tu feed personalizado</p>
                                 </div>
                                 {selectedFeed && (
-                                    <button onClick={() => setSelectedFeed(null)} className="px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-[11px] font-bold tracking-tight shadow-xl shadow-blue-500/30">BACK TO HOME</button>
+                                    <button onClick={() => setSelectedFeed(null)} className="px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-[11px] font-bold tracking-tight shadow-xl shadow-blue-500/30">VOLVER AL INICIO</button>
                                 )}
                             </div>
 
@@ -281,7 +281,7 @@ export default function Dashboard({
                                                             {category}
                                                         </h2>
                                                     </div>
-                                                    <button className="text-[11px] font-bold text-blue-600 tracking-tight hover:underline underline-offset-4 decoration-blue-200">VIEW ALL</button>
+                                                    <button className="text-[11px] font-bold text-blue-600 tracking-tight hover:underline underline-offset-4 decoration-blue-200">VER TODO</button>
                                                 </div>
 
                                                 <NewsCarousel
@@ -320,8 +320,8 @@ export default function Dashboard({
                                     <div className="w-20 h-20 bg-zinc-50 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
                                         <SearchIcon className="w-8 h-8 text-zinc-300" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-zinc-900 tracking-tight">No articles found</h3>
-                                    <p className="text-sm text-zinc-400 max-w-xs mx-auto mt-3 font-medium">Try a different search or refine your library filters.</p>
+                                    <h3 className="text-xl font-bold text-zinc-900 tracking-tight">No se encontraron artículos</h3>
+                                    <p className="text-sm text-zinc-400 max-w-xs mx-auto mt-3 font-medium">Probá con otra búsqueda o ajustá los filtros de la biblioteca.</p>
                                 </div>
                             )}
                         </div>
