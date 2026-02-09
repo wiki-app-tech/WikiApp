@@ -2,21 +2,21 @@
     "rn3": [
         {
             "segment": "Ushuaia - Tolhuin",
-            "status": "Transitable con precaución",
-            "details": "Calzada húmeda. Posible presencia de hielo en sectores. Equipos de Vialidad distribuyendo sal.",
-            "severity": "warning"
+            "status": "Precaución: Transporte Especial",
+            "details": "Operativo de traslado por maquinaria Cerro Martial. Circular a baja velocidad y acatar indicaciones. Vientos fuertes.",
+            "severity": "error"
         },
         {
             "segment": "Tolhuin - Río Grande",
-            "status": "Transitable",
-            "details": "Calzada seca. Vientos leves.",
-            "severity": "success"
+            "status": "Transitable con precaución",
+            "details": "Calzada húmeda en sectores. Tránsito pesado por operativo de transporte especial. Vientos fuertes.",
+            "severity": "warning"
         },
         {
             "segment": "Río Grande - San Sebastián",
-            "status": "Transitable con precaución",
-            "details": "Bancos de niebla matinales. Visibilidad reducida.",
-            "severity": "warning"
+            "status": "Transitable",
+            "details": "Calzada seca. Fuertes ráfagas de viento lateral.",
+            "severity": "success"
         }
     ],
     "complementary": [

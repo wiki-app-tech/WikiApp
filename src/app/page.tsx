@@ -17,7 +17,10 @@ async function getData() {
     const feedsData = JSON.parse(feedsFile);
 
     return {
-      articles: articlesData.articles as Article[],
+      articles: articlesData.articles.map((a: Article) => ({
+        ...a,
+        sourceCategory: feedsData.find((f: FeedSource) => f.id === a.sourceId)?.category || 'General'
+      })) as Article[],
       feeds: feedsData as FeedSource[]
     };
   } catch (error) {

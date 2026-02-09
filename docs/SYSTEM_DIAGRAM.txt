@@ -1,0 +1,171 @@
+╔═══════════════════════════════════════════════════════════════════════╗
+║                 SISTEMA DE ACTUALIZACIÓN AUTOMÁTICA RSS              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  NIVEL 1: SERVIDOR (GitHub Actions)                                │
+│  Frecuencia: Cada 15 minutos                                        │
+└─────────────────────────────────────────────────────────────────────┘
+                                 │
+                    ┌────────────┴────────────┐
+                    │   GitHub Actions        │
+                    │   Workflow Trigger      │
+                    └────────────┬────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │  Ejecutar Script        │
+                    │  update-all.mjs         │
+                    └────────────┬────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │  Descargar RSS Feeds    │
+                    │  (CNN, Clarín, etc.)    │
+                    └────────────┬────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │  Actualizar             │
+                    │  articles.json          │
+                    │  meta.json              │
+                    └────────────┬────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │  Git Commit & Push      │
+                    │  🔄 Auto-update: RSS    │
+                    └─────────────────────────┘
+                                 │
+                                 │ Deploy automático
+                                 ▼
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  NIVEL 2: CLIENTE (Navegador)                                      │
+│  Frecuencia: Cada 5 minutos                                         │
+└─────────────────────────────────────────────────────────────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │  useAutoRefresh Hook    │
+                    │  (Dashboard.tsx)        │
+                    └────────────┬────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │  fetch('/data/          │
+                    │    articles.json')      │
+                    └────────────┬────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │  Actualizar Estado      │
+                    │  setArticles(data)      │
+                    └────────────┬────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │  Re-render UI           │
+                    │  (sin recargar página)  │
+                    └─────────────────────────┘
+                                 │
+                                 ▼
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  NIVEL 3: INTERFAZ VISUAL                                          │
+│  Actualización: Tiempo real                                         │
+└─────────────────────────────────────────────────────────────────────┘
+
+    ┌───────────────────────────────────────────────────────────┐
+    │  Header Dashboard                                         │
+    │                                                           │
+    │  [Logo] WikiApp          [🕐 Reloj]                      │
+    │                                                           │
+    │  [🟢 hace 2m]  [Layout ▼]  [● 45 News Available]        │
+    │   ↑                                                       │
+    │   RefreshIndicator.tsx                                    │
+    └───────────────────────────────────────────────────────────┘
+
+    Estados del Indicador:
+    
+    🟢 Verde + "hace Xm"     →  Datos actualizados
+    🔵 Azul pulsante         →  Actualizando ahora...
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                         FLUJO DE DATOS                                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+  RSS Feeds (Internet)
+         │
+         ▼
+  GitHub Actions (cada 15min)
+         │
+         ▼
+  articles.json (repositorio)
+         │
+         ▼
+  Vercel Deploy (automático)
+         │
+         ▼
+  Cliente Browser (fetch cada 5min)
+         │
+         ▼
+  UI Dashboard (actualización visual)
+         │
+         ▼
+  Usuario ve noticias frescas ✨
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                      ARCHIVOS PRINCIPALES                             ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+📁 .github/workflows/
+   └── update-feeds.yml ..................... Workflow de actualización
+
+📁 scripts/
+   ├── fetch-rss.mjs ........................ Descarga RSS feeds
+   └── update-all.mjs ....................... Script maestro
+
+📁 src/
+   ├── hooks/
+   │   └── useAutoRefresh.ts ................ Hook de auto-refresh
+   └── components/
+       ├── Dashboard.tsx .................... Componente principal
+       └── RefreshIndicator.tsx ............. Indicador visual
+
+📁 public/data/
+   ├── articles.json ........................ Artículos (auto-actualizado)
+   ├── feeds.json ........................... Configuración de feeds
+   └── meta.json ............................ Metadatos de actualización
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                      CONFIGURACIÓN RÁPIDA                             ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+Cambiar frecuencia del servidor:
+  📝 Editar: .github/workflows/update-feeds.yml
+  🔧 Línea 5: cron: '*/15 * * * *'
+  
+  Opciones:
+    */5  * * * *  →  Cada 5 minutos
+    */10 * * * *  →  Cada 10 minutos
+    */30 * * * *  →  Cada 30 minutos
+    0    * * * *  →  Cada hora
+
+Cambiar frecuencia del cliente:
+  📝 Editar: src/components/Dashboard.tsx
+  🔧 Línea ~70: interval: 5 * 60 * 1000
+  
+  Ejemplos:
+    2 * 60 * 1000   →  Cada 2 minutos
+    10 * 60 * 1000  →  Cada 10 minutos
+    15 * 60 * 1000  →  Cada 15 minutos
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                          VENTAJAS                                     ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+✅ Actualización completamente automática
+✅ Sin intervención manual necesaria
+✅ Noticias siempre frescas (máx 15 min de antigüedad)
+✅ UI se actualiza sin recargar la página
+✅ Indicador visual del estado
+✅ Manejo robusto de errores
+✅ Fácilmente configurable
+✅ Documentación completa

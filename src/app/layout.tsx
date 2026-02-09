@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "WikiApp | Premium News & Dashboard",
+  title: "MediosWikiApp | Premium News & Dashboard",
   description: "A high-performance RSS dashboard for real-time news and highlights.",
 };
 

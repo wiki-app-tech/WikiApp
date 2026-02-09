@@ -82,10 +82,10 @@ export default function NewsCarousel({
 
             {/* Navigation Arrows */}
             {articles.length > 1 && (
-                <>
+                <div className="flex gap-3 absolute bottom-8 right-8 z-10">
                     <button
                         onClick={(e) => { e.stopPropagation(); prevSlide(); }}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-white/40 active:scale-95 z-10"
+                        className="w-12 h-12 rounded-2xl bg-white/90 backdrop-blur-xl border border-zinc-100 text-zinc-900 flex items-center justify-center shadow-xl shadow-black/5 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all active:scale-95"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
@@ -93,23 +93,23 @@ export default function NewsCarousel({
                     </button>
                     <button
                         onClick={(e) => { e.stopPropagation(); nextSlide(); }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-white/40 active:scale-95 z-10"
+                        className="w-12 h-12 rounded-2xl bg-white/90 backdrop-blur-xl border border-zinc-100 text-zinc-900 flex items-center justify-center shadow-xl shadow-black/5 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all active:scale-95"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
                         </svg>
                     </button>
-                </>
+                </div>
             )}
 
             {/* Pagination Dots */}
             {articles.length > 1 && (
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                <div className="absolute top-8 left-8 flex gap-2.5 z-10">
                     {articles.map((_, idx) => (
                         <button
                             key={idx}
                             onClick={() => setCurrentIndex(idx)}
-                            className={`h-1.5 transition-all duration-300 rounded-full ${currentIndex === idx ? 'w-8 bg-white' : 'w-1.5 bg-white/40 hover:bg-white/60'}`}
+                            className={`h-2 transition-all duration-300 rounded-full ${currentIndex === idx ? 'w-8 bg-blue-600' : 'w-2 bg-zinc-200 hover:bg-zinc-300'}`}
                         />
                     ))}
                 </div>
