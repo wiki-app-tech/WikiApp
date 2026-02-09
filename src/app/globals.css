@@ -1,80 +1,367 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   MediosWikiApp - Design System 2026
+   Implementación de estándares UX/UI modernos
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TOKENS DE DISEÑO - Paleta 2026
+   Colores sofisticados con HSL para mejor control y accesibilidad
+   ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  --background: #F1F4F9;
-  --foreground: #1D1617;
-  --color-blue-600: #3D5CFF;
-  --color-orange-500: #FFAC30;
-  --card-shadow: 0px 10px 40px rgba(29, 22, 23, 0.04);
-  --card-shadow-hover: 0px 20px 60px rgba(29, 22, 23, 0.08);
-  --radius-card: 2rem;
-  --radius-button: 1.25rem;
+  /* Fondos y superficies */
+  --surface-primary: 220 20% 97%;
+  --surface-elevated: 0 0% 100%;
+  --surface-sunken: 220 15% 94%;
+  
+  /* Textos - Jerarquía clara */
+  --text-primary: 220 20% 10%;
+  --text-secondary: 220 10% 40%;
+  --text-tertiary: 220 8% 55%;
+  --text-muted: 220 5% 65%;
+  
+  /* Colores de marca - Vibrantes pero elegantes */
+  --accent-primary: 230 85% 60%;
+  --accent-primary-hover: 230 85% 55%;
+  --accent-secondary: 35 100% 60%;
+  --accent-success: 160 70% 45%;
+  --accent-warning: 40 95% 55%;
+  --accent-error: 0 75% 55%;
+  
+  /* Bordes y separadores */
+  --border-subtle: 220 15% 92%;
+  --border-default: 220 12% 88%;
+  --border-strong: 220 10% 80%;
+  
+  /* Sistema de sombras 2026 - Multi-capa con color */
+  --shadow-xs: 0 1px 2px hsl(220 20% 10% / 0.04);
+  --shadow-sm: 0 2px 4px hsl(220 20% 10% / 0.04), 0 1px 2px hsl(220 20% 10% / 0.06);
+  --shadow-md: 0 4px 8px hsl(220 20% 10% / 0.04), 0 2px 4px hsl(220 20% 10% / 0.06), 0 1px 2px hsl(220 20% 10% / 0.08);
+  --shadow-lg: 0 12px 24px hsl(220 20% 10% / 0.06), 0 4px 8px hsl(220 20% 10% / 0.08), 0 2px 4px hsl(220 20% 10% / 0.04);
+  --shadow-xl: 0 24px 48px hsl(220 20% 10% / 0.08), 0 8px 16px hsl(220 20% 10% / 0.06), 0 4px 8px hsl(220 20% 10% / 0.04);
+  --shadow-2xl: 0 32px 64px hsl(220 20% 10% / 0.12), 0 16px 32px hsl(220 20% 10% / 0.08), 0 8px 16px hsl(220 20% 10% / 0.06);
+  
+  /* Sombras con color de acento - Tendencia 2026 */
+  --shadow-accent: 0 8px 24px hsl(230 85% 60% / 0.15), 0 4px 12px hsl(230 85% 60% / 0.10);
+  --shadow-success: 0 8px 24px hsl(160 70% 45% / 0.15);
+  --shadow-warning: 0 8px 24px hsl(40 95% 55% / 0.15);
+  --shadow-error: 0 8px 24px hsl(0 75% 55% / 0.15);
+  
+  /* Glow effects - Micro-interacciones */
+  --glow-accent: 0 0 20px hsl(230 85% 60% / 0.3);
+  --glow-subtle: 0 0 40px hsl(220 20% 10% / 0.05);
+  
+  /* Radios - Más suaves para 2026 */
+  --radius-xs: 0.5rem;
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --radius-2xl: 2.5rem;
+  --radius-full: 9999px;
+  
+  /* Variables legacy para compatibilidad */
+  --background: hsl(var(--surface-primary));
+  --foreground: hsl(var(--text-primary));
+  --color-blue-600: hsl(var(--accent-primary));
+  --color-orange-500: hsl(var(--accent-secondary));
+  --card-shadow: var(--shadow-md);
+  --card-shadow-hover: var(--shadow-xl);
+  --radius-card: var(--radius-xl);
+  --radius-button: var(--radius-lg);
+  
+  /* Transiciones - Suaves y naturales */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   TEMA OSCURO - Estándar 2026
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface-primary: 220 20% 8%;
+    --surface-elevated: 220 18% 12%;
+    --surface-sunken: 220 20% 5%;
+    
+    --text-primary: 220 15% 95%;
+    --text-secondary: 220 10% 70%;
+    --text-tertiary: 220 8% 55%;
+    --text-muted: 220 5% 45%;
+    
+    --accent-primary: 230 85% 65%;
+    --accent-primary-hover: 230 85% 70%;
+    
+    --border-subtle: 220 15% 15%;
+    --border-default: 220 12% 20%;
+    --border-strong: 220 10% 30%;
+    
+    --shadow-xs: 0 1px 2px hsl(0 0% 0% / 0.2);
+    --shadow-sm: 0 2px 4px hsl(0 0% 0% / 0.2), 0 1px 2px hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 8px hsl(0 0% 0% / 0.2), 0 2px 4px hsl(0 0% 0% / 0.3);
+    --shadow-lg: 0 12px 24px hsl(0 0% 0% / 0.3), 0 4px 8px hsl(0 0% 0% / 0.2);
+    --shadow-xl: 0 24px 48px hsl(0 0% 0% / 0.4), 0 8px 16px hsl(0 0% 0% / 0.3);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CONFIGURACIÓN DE TAILWIND
+   ───────────────────────────────────────────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-blue-600: var(--color-blue-600);
-  --color-orange-500: var(--color-orange-500);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --color-background: hsl(var(--surface-primary));
+  --color-foreground: hsl(var(--text-primary));
+  --color-blue-600: hsl(var(--accent-primary));
+  --color-orange-500: hsl(var(--accent-secondary));
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Custom Scrollbars */
+/* ─────────────────────────────────────────────────────────────────────────────
+   TIPOGRAFÍA FLUIDA 2026
+   Escalado responsivo sin breakpoints usando clamp()
+   ───────────────────────────────────────────────────────────────────────────── */
+body {
+  background: hsl(var(--surface-primary));
+  color: hsl(var(--text-primary));
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, sans-serif;
+  
+  /* Tipografía fluida - Tendencia 2026 */
+  font-size: clamp(0.9375rem, 0.875rem + 0.25vw, 1.0625rem);
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  
+  /* Renderizado optimizado */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+}
+
+/* Títulos con fuente display */
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+/* Escala tipográfica fluida */
+h1, .text-display {
+  font-size: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+h2, .text-title {
+  font-size: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
+  font-weight: 700;
+}
+
+h3, .text-heading {
+  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.75rem);
+  font-weight: 600;
+}
+
+h4, .text-subheading {
+  font-size: clamp(1.1rem, 1rem + 0.25vw, 1.35rem);
+  font-weight: 600;
+}
+
+/* Texto pequeño y etiquetas */
+.text-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.text-caption {
+  font-size: 0.8125rem;
+  color: hsl(var(--text-tertiary));
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCROLLBARS MODERNOS - Estilo 2026
+   ───────────────────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
   background: transparent;
+  border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
+  background: hsl(var(--text-muted) / 0.3);
+  border-radius: var(--radius-full);
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background var(--duration-fast) var(--ease-out-expo);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: hsl(var(--text-tertiary) / 0.5);
+  background-clip: content-box;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-inter), Inter, system-ui, -apple-system, sans-serif;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  font-size: 16px;
-  line-height: 1.5;
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--text-muted) / 0.3) transparent;
 }
 
-@media (min-width: 768px) {
-  body {
-    font-size: 18px;
-  }
-}
-
-/* HI - Smart Home Style Elements */
+/* ─────────────────────────────────────────────────────────────────────────────
+   COMPONENTES GLASS - Glassmorphism 2026
+   Más sutil y refinado que versiones anteriores
+   ───────────────────────────────────────────────────────────────────────────── */
 .glass-header {
-  @apply bg-white/80 backdrop-blur-xl border-b border-zinc-100 sticky top-0 z-50;
+  background: hsl(var(--surface-elevated) / 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid hsl(var(--border-subtle));
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 .glass-card {
-  @apply bg-white shadow-[var(--card-shadow)] border border-white transition-all duration-300 rounded-[var(--radius-card)];
+  background: hsl(var(--surface-elevated));
+  box-shadow: var(--shadow-md);
+  border: 1px solid hsl(var(--border-subtle));
+  border-radius: var(--radius-xl);
+  transition: all var(--duration-normal) var(--ease-out-expo);
 }
 
 .glass-card:hover {
-  @apply shadow-[var(--card-shadow-hover)] -translate-y-1;
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-4px);
+  border-color: hsl(var(--border-default));
 }
 
-/* Standardized Hit Targets */
+/* Variante con glow de acento */
+.glass-card-accent {
+  background: hsl(var(--surface-elevated));
+  box-shadow: var(--shadow-md), var(--shadow-accent);
+  border: 1px solid hsl(var(--accent-primary) / 0.1);
+  border-radius: var(--radius-xl);
+  transition: all var(--duration-normal) var(--ease-out-expo);
+}
+
+.glass-card-accent:hover {
+  box-shadow: var(--shadow-xl), var(--glow-accent);
+  transform: translateY(-4px);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ELEMENTOS INTERACTIVOS - Estándares de Accesibilidad 2026
+   ───────────────────────────────────────────────────────────────────────────── */
 button,
 a,
 input,
-select {
-  @apply min-h-[44px] min-w-[44px] transition-all duration-200;
+select,
+[role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+  transition: all var(--duration-fast) var(--ease-out-expo);
 }
 
+/* Focus visible - Accesibilidad mejorada */
+:focus-visible {
+  outline: 2px solid hsl(var(--accent-primary));
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Estados de hover modernos */
+.interactive-hover {
+  transition: all var(--duration-normal) var(--ease-out-expo);
+}
+
+.interactive-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.interactive-hover:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   UTILIDADES DE SOMBRA 2026
+   ───────────────────────────────────────────────────────────────────────────── */
+.shadow-elevation-1 { box-shadow: var(--shadow-xs); }
+.shadow-elevation-2 { box-shadow: var(--shadow-sm); }
+.shadow-elevation-3 { box-shadow: var(--shadow-md); }
+.shadow-elevation-4 { box-shadow: var(--shadow-lg); }
+.shadow-elevation-5 { box-shadow: var(--shadow-xl); }
+.shadow-elevation-6 { box-shadow: var(--shadow-2xl); }
+
+.shadow-glow { box-shadow: var(--glow-subtle); }
+.shadow-glow-accent { box-shadow: var(--glow-accent); }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   GRADIENTES MODERNOS 2026
+   ───────────────────────────────────────────────────────────────────────────── */
+.gradient-primary {
+  background: linear-gradient(135deg, hsl(var(--accent-primary)) 0%, hsl(230 85% 50%) 100%);
+}
+
+.gradient-warm {
+  background: linear-gradient(135deg, hsl(var(--accent-secondary)) 0%, hsl(15 90% 55%) 100%);
+}
+
+.gradient-surface {
+  background: linear-gradient(180deg, hsl(var(--surface-elevated)) 0%, hsl(var(--surface-primary)) 100%);
+}
+
+.gradient-mesh {
+  background: 
+    radial-gradient(at 20% 20%, hsl(var(--accent-primary) / 0.1) 0%, transparent 50%),
+    radial-gradient(at 80% 80%, hsl(var(--accent-secondary) / 0.08) 0%, transparent 50%),
+    hsl(var(--surface-primary));
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ANIMACIONES SUTILES - Micro-interacciones 2026
+   ───────────────────────────────────────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: var(--shadow-md); }
+  50% { box-shadow: var(--shadow-lg), var(--glow-accent); }
+}
+
+.animate-fade-in {
+  animation: fade-in var(--duration-normal) var(--ease-out-expo);
+}
+
+.animate-scale-in {
+  animation: scale-in var(--duration-normal) var(--ease-out-expo);
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   UTILIDADES ADICIONALES
+   ───────────────────────────────────────────────────────────────────────────── */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -82,4 +369,22 @@ select {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Texto con gradiente - Tendencia 2026 */
+.text-gradient {
+  background: linear-gradient(135deg, hsl(var(--accent-primary)) 0%, hsl(280 80% 60%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Contenedor con ratio fijo */
+.aspect-card {
+  aspect-ratio: 16 / 10;
+}
+
+/* Safe area para móviles */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
