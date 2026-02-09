@@ -58,12 +58,14 @@ export default function Dashboard({
     }), []);
 
     const filteredArticles = useMemo(() => {
-        return initialArticles.filter(a => {
-            const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase()) ||
-                a.description.toLowerCase().includes(search.toLowerCase());
-            const matchesFeed = selectedFeed ? a.sourceId === selectedFeed : true;
-            return matchesSearch && matchesFeed;
-        });
+        return initialArticles
+            .filter(a => {
+                const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase()) ||
+                    a.description.toLowerCase().includes(search.toLowerCase());
+                const matchesFeed = selectedFeed ? a.sourceId === selectedFeed : true;
+                return matchesSearch && matchesFeed;
+            })
+            .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
     }, [initialArticles, search, selectedFeed]);
 
     const selectedArticle = useMemo(() =>
