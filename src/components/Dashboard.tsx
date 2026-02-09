@@ -42,6 +42,7 @@ export default function Dashboard({
     const [mockSummary, setMockSummary] = useState<string | null>(null);
     const [articles, setArticles] = useState<Article[]>(initialArticles);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [globalSearch, setGlobalSearch] = useState('');
 
     // Persistence
     useEffect(() => {
@@ -129,7 +130,7 @@ export default function Dashboard({
                 <NavIcon active={activeTab === 'folders'} onClick={() => setActiveTab('folders')} label="Biblioteca"><RssIcon /></NavIcon>
                 <NavIcon active={activeTab === 'saved'} onClick={() => setActiveTab('saved')} label="Guardados"><BookmarkIcon /></NavIcon>
                 <NavIcon active={activeTab === 'automate'} onClick={() => setActiveTab('automate')} label="Automatizar"><ZapIcon /></NavIcon>
-                <NavIcon active={activeTab === 'search'} onClick={() => setActiveTab('search')} label="Buscar"><SearchIcon /></NavIcon>
+                <NavIcon active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setGlobalSearch(''); }} label="Buscar"><SearchIcon /></NavIcon>
                 <div className="mt-auto flex flex-col gap-8">
                     <NavIcon active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} label="Ajustes"><SettingsIcon /></NavIcon>
                 </div>
@@ -244,7 +245,166 @@ export default function Dashboard({
                     </div>
                 </header>
 
-                <div className="flex-1 flex overflow-hidden">
+                {/* Vista de Búsqueda Global */}
+                {activeTab === 'search' && (
+                    <div className="flex-1 overflow-y-auto p-8 md:p-12">
+                        <div className="max-w-4xl mx-auto">
+                            {/* Cabecera de Búsqueda */}
+                            <div className="text-center mb-12">
+                                <h1 className="text-4xl md:text-5xl font-black text-zinc-900 tracking-tight mb-4 font-display">
+                                    Buscar Noticias
+                                </h1>
+                                <p className="text-zinc-500 text-lg font-medium">
+                                    Encontrá cualquier noticia en tiempo real
+                                </p>
+                            </div>
+
+                            {/* Campo de Búsqueda Grande */}
+                            <div className="relative mb-12">
+                                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-blue-500">
+                                    <SearchIcon className="w-6 h-6" />
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Escribí para buscar..."
+                                    value={globalSearch}
+                                    onChange={(e) => setGlobalSearch(e.target.value)}
+                                    autoFocus
+                                    className="w-full bg-white border-2 border-zinc-200 rounded-[2rem] pl-16 pr-6 py-5 text-xl font-medium focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none shadow-lg shadow-zinc-200/50 placeholder:text-zinc-400"
+                                />
+                                {globalSearch && (
+                                    <button
+                                        onClick={() => setGlobalSearch('')}
+                                        className="absolute right-6 top-1/2 -translate-y-1/2 p-2 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-full transition-all"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Resultados de Búsqueda */}
+                            {globalSearch.length > 0 && (
+                                <div className="space-y-6">
+                                    {/* Contador de resultados */}
+                                    <div className="flex items-center gap-3 mb-8">
+                                        <div className="h-8 w-1.5 bg-blue-600 rounded-full" />
+                                        <span className="text-sm font-bold text-zinc-500 uppercase tracking-tight">
+                                            {articles.filter(a =>
+                                                a.title.toLowerCase().includes(globalSearch.toLowerCase()) ||
+                                                a.description.toLowerCase().includes(globalSearch.toLowerCase())
+                                            ).length} resultados encontrados
+                                        </span>
+                                    </div>
+
+                                    {/* Lista de resultados */}
+                                    <div className="space-y-4">
+                                        {articles
+                                            .filter(a =>
+                                                a.title.toLowerCase().includes(globalSearch.toLowerCase()) ||
+                                                a.description.toLowerCase().includes(globalSearch.toLowerCase())
+                                            )
+                                            .slice(0, 20)
+                                            .map(article => (
+                                                <button
+                                                    key={article.id}
+                                                    onClick={() => {
+                                                        setSelectedArticleId(article.id);
+                                                        setActiveTab('home');
+                                                    }}
+                                                    className="w-full text-left bg-white rounded-[1.5rem] p-6 border border-zinc-100 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-500/5 transition-all group"
+                                                >
+                                                    <div className="flex items-start gap-4">
+                                                        {article.thumbnail && (
+                                                            <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-zinc-100">
+                                                                <img
+                                                                    src={article.thumbnail}
+                                                                    alt=""
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        <div className="flex-1 min-w-0">
+                                                            <h3 className="font-bold text-zinc-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2">
+                                                                {article.title}
+                                                            </h3>
+                                                            <p className="text-sm text-zinc-500 line-clamp-2 mb-3">
+                                                                {article.description.replace(/<[^>]*>/g, '').substring(0, 150)}...
+                                                            </p>
+                                                            <div className="flex items-center gap-3 text-xs">
+                                                                <span className="font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                                                                    {article.sourceName}
+                                                                </span>
+                                                                <span className="text-zinc-400">
+                                                                    {new Date(article.pubDate).toLocaleDateString('es-AR', {
+                                                                        day: 'numeric',
+                                                                        month: 'short',
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit'
+                                                                    })}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-zinc-300 group-hover:text-blue-500 transition-colors">
+                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            ))}
+                                    </div>
+
+                                    {/* Sin resultados */}
+                                    {articles.filter(a =>
+                                        a.title.toLowerCase().includes(globalSearch.toLowerCase()) ||
+                                        a.description.toLowerCase().includes(globalSearch.toLowerCase())
+                                    ).length === 0 && (
+                                            <div className="text-center py-16">
+                                                <div className="w-20 h-20 bg-zinc-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                                                    <SearchIcon className="w-8 h-8 text-zinc-300" />
+                                                </div>
+                                                <h3 className="text-xl font-bold text-zinc-900 mb-2">Sin resultados</h3>
+                                                <p className="text-zinc-500">No encontramos noticias con "{globalSearch}"</p>
+                                            </div>
+                                        )}
+                                </div>
+                            )}
+
+                            {/* Estado inicial - Sin búsqueda */}
+                            {globalSearch.length === 0 && (
+                                <div className="text-center py-16">
+                                    <div className="w-24 h-24 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-blue-500/10">
+                                        <SearchIcon className="w-10 h-10 text-blue-500" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-zinc-900 mb-3">Buscá en todas las noticias</h3>
+                                    <p className="text-zinc-500 max-w-md mx-auto">
+                                        Escribí cualquier palabra clave para buscar en títulos y descripciones de {articles.length} noticias disponibles.
+                                    </p>
+
+                                    {/* Sugerencias rápidas */}
+                                    <div className="mt-10">
+                                        <p className="text-xs font-bold text-zinc-400 uppercase tracking-tight mb-4">Búsquedas sugeridas</p>
+                                        <div className="flex flex-wrap justify-center gap-3">
+                                            {['Ushuaia', 'clima', 'gobierno', 'deportes', 'economía'].map(suggestion => (
+                                                <button
+                                                    key={suggestion}
+                                                    onClick={() => setGlobalSearch(suggestion)}
+                                                    className="px-5 py-2.5 bg-white border border-zinc-200 rounded-full text-sm font-medium text-zinc-600 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 transition-all"
+                                                >
+                                                    {suggestion}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {activeTab !== 'search' && (<div className="flex-1 flex overflow-hidden">
                     {/* Master: Article List */}
                     <div className={`flex-1 overflow-y-auto p-8 md:p-12 scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-1/3' : 'w-full'}`}>
                         <div className="max-w-7xl mx-auto space-y-12 pb-40">
@@ -338,7 +498,7 @@ export default function Dashboard({
                             summary={mockSummary}
                         />
                     )}
-                </div>
+                </div>)}
 
                 {/* Mobile Bottom Nav */}
                 <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-20 glass-header border-t border-zinc-200/50 flex items-center justify-around px-4 z-40 pb-safe shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
