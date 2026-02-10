@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Article } from '@/types';
-import { ZapIcon } from './Icons';
+import { ZapIcon, BookmarkIcon } from './Icons';
+import ShareMenu from './ShareMenu';
 
 interface ArticleReaderProps {
     article: Article;
@@ -11,6 +12,10 @@ interface ArticleReaderProps {
     onSummarize: () => void;
     isSummarizing: boolean;
     summary: string | null;
+    isSaved?: boolean;
+    isRead?: boolean;
+    onToggleSave?: () => void;
+    onMarkAsRead?: () => void;
 }
 
 export default function ArticleReader({
@@ -19,10 +24,24 @@ export default function ArticleReader({
     onNavigate,
     onSummarize,
     isSummarizing,
-    summary
+    summary,
+    isSaved = false,
+    isRead = false,
+    onToggleSave,
+    onMarkAsRead
 }: ArticleReaderProps) {
     const [touchStart, setTouchStart] = useState<number | null>(null);
     const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+    // Mark as read after 3 seconds of viewing
+    useEffect(() => {
+        if (onMarkAsRead && !isRead) {
+            const timer = setTimeout(() => {
+                onMarkAsRead();
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [article.id, isRead, onMarkAsRead]);
 
     const onTouchStart = (e: React.TouchEvent) => {
         setTouchEnd(null);
@@ -44,10 +63,38 @@ export default function ArticleReader({
             onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
         >
             <header className="h-24 border-b border-zinc-50 flex items-center px-8 justify-between bg-white sticky top-0 z-10">
-                <button onClick={onClose} className="p-3 -ml-3 text-zinc-400 hover:text-zinc-900 transition-colors bg-zinc-50 rounded-2xl">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-                </button>
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4">
+                    <button onClick={onClose} className="p-3 -ml-3 text-zinc-400 hover:text-zinc-900 transition-colors bg-zinc-50 rounded-2xl">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                    </button>
+
+                    {/* Read indicator */}
+                    {isRead && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-100 rounded-xl animate-in fade-in duration-300">
+                            <div className="w-2 h-2 rounded-full bg-green-500" />
+                            <span className="text-[10px] font-bold text-green-600 uppercase tracking-tight">Leído</span>
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                    {/* Save Button */}
+                    {onToggleSave && (
+                        <button
+                            onClick={onToggleSave}
+                            className={`p-3 rounded-2xl transition-all ${isSaved
+                                    ? 'bg-amber-50 text-amber-600 hover:bg-amber-100'
+                                    : 'bg-zinc-50 text-zinc-400 hover:text-amber-600 hover:bg-amber-50'
+                                }`}
+                            aria-label={isSaved ? 'Quitar de guardados' : 'Guardar artículo'}
+                        >
+                            <BookmarkIcon className="w-5 h-5" filled={isSaved} />
+                        </button>
+                    )}
+
+                    {/* Share Menu */}
+                    <ShareMenu url={article.link} title={article.title} />
+
                     <button
                         onClick={onSummarize}
                         disabled={isSummarizing || !!summary}
