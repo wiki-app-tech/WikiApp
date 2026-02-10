@@ -11,7 +11,10 @@ import RoadStatus from '@/components/RoadStatus';
 import NewsCarousel from '@/components/NewsCarousel';
 import RefreshIndicator from '@/components/RefreshIndicator';
 import MediosWikiAppLogo from '@/components/MediosWikiAppLogo';
+import SavedArticlesView from '@/components/SavedArticlesView';
+import SaveArticleModal from '@/components/SaveArticleModal';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
+import { useSavedArticles } from '@/hooks/useSavedArticles';
 import { NavIcon, CategoryButton, MobileTab } from '@/components/DashboardUI';
 import {
     LayoutIcon,
@@ -43,6 +46,20 @@ export default function Dashboard({
     const [articles, setArticles] = useState<Article[]>(initialArticles);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [globalSearch, setGlobalSearch] = useState('');
+    const [saveModalArticle, setSaveModalArticle] = useState<Article | null>(null);
+
+    // Hook para artículos guardados
+    const {
+        savedArticles,
+        isArticleSaved,
+        toggleSaveArticle,
+        saveArticle,
+        unsaveArticle,
+        markAsRead,
+        isArticleRead,
+        getAllTags,
+        removeTagFromArticle
+    } = useSavedArticles();
 
     // Persistence
     useEffect(() => {
@@ -404,7 +421,23 @@ export default function Dashboard({
                     </div>
                 )}
 
-                {activeTab !== 'search' && (<div className="flex-1 flex overflow-hidden">
+                {/* Vista de Artículos Guardados */}
+                {activeTab === 'saved' && (
+                    <div className="flex-1 overflow-y-auto">
+                        <SavedArticlesView
+                            savedArticles={savedArticles}
+                            allTags={getAllTags()}
+                            onArticleClick={(articleId) => {
+                                setSelectedArticleId(articleId);
+                                setActiveTab('home');
+                            }}
+                            onUnsaveArticle={unsaveArticle}
+                            onRemoveTag={removeTagFromArticle}
+                        />
+                    </div>
+                )}
+
+                {activeTab !== 'search' && activeTab !== 'saved' && (<div className="flex-1 flex overflow-hidden">
                     {/* Master: Article List */}
                     <div className={`flex-1 overflow-y-auto p-8 md:p-12 scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-1/3' : 'w-full'}`}>
                         <div className="max-w-7xl mx-auto space-y-12 pb-40">
@@ -496,6 +529,16 @@ export default function Dashboard({
                             onSummarize={handleSummarize}
                             isSummarizing={isSummarizing}
                             summary={mockSummary}
+                            isSaved={isArticleSaved(selectedArticle.id)}
+                            isRead={isArticleRead(selectedArticle.id)}
+                            onToggleSave={() => {
+                                if (isArticleSaved(selectedArticle.id)) {
+                                    unsaveArticle(selectedArticle.id);
+                                } else {
+                                    setSaveModalArticle(selectedArticle);
+                                }
+                            }}
+                            onMarkAsRead={() => markAsRead(selectedArticle.id)}
                         />
                     )}
                 </div>)}
@@ -505,9 +548,37 @@ export default function Dashboard({
                     <MobileTab active={activeTab === 'home' && !selectedArticleId} onClick={() => { setActiveTab('home'); setSelectedFeed(null); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Inicio" icon={<LayoutIcon className="w-6 h-6" />} />
                     <MobileTab active={activeTab === 'folders'} onClick={() => { setActiveTab('folders'); setIsMobileMenuOpen(true); }} label="Feeds" icon={<RssIcon className="w-6 h-6" />} />
                     <MobileTab active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Buscar" icon={<SearchIcon className="w-6 h-6" />} />
-                    <MobileTab active={false} onClick={() => { }} label="Perfil" icon={<BookmarkIcon className="w-6 h-6" />} />
+                    <MobileTab
+                        active={activeTab === 'saved'}
+                        onClick={() => { setActiveTab('saved'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }}
+                        label="Guardados"
+                        icon={
+                            <div className="relative">
+                                <BookmarkIcon className="w-6 h-6" />
+                                {savedArticles.length > 0 && (
+                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                                        {savedArticles.length > 9 ? '9+' : savedArticles.length}
+                                    </span>
+                                )}
+                            </div>
+                        }
+                    />
                 </nav>
             </main>
+
+            {/* Modal para guardar artículo con etiquetas */}
+            {saveModalArticle && (
+                <SaveArticleModal
+                    article={saveModalArticle}
+                    isOpen={!!saveModalArticle}
+                    onClose={() => setSaveModalArticle(null)}
+                    onSave={(tags) => {
+                        saveArticle(saveModalArticle, tags);
+                        setSaveModalArticle(null);
+                    }}
+                    existingTags={getAllTags()}
+                />
+            )}
         </div>
     );
 }
