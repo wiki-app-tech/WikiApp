@@ -147,7 +147,7 @@ export default function Dashboard({
                 <NavIcon active={activeTab === 'folders'} onClick={() => setActiveTab('folders')} label="Biblioteca"><RssIcon /></NavIcon>
                 <NavIcon active={activeTab === 'saved'} onClick={() => setActiveTab('saved')} label="Guardados"><BookmarkIcon /></NavIcon>
                 <NavIcon active={activeTab === 'automate'} onClick={() => setActiveTab('automate')} label="Automatizar"><ZapIcon /></NavIcon>
-                <NavIcon active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setGlobalSearch(''); }} label="Buscar"><SearchIcon /></NavIcon>
+                <NavIcon active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setGlobalSearch(''); }} label="Buscar" showLabelBelow><SearchIcon /></NavIcon>
                 <div className="mt-auto flex flex-col gap-8">
                     <NavIcon active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} label="Ajustes"><SettingsIcon /></NavIcon>
                 </div>
@@ -205,7 +205,7 @@ export default function Dashboard({
                                         {feeds.filter(f => f.category === category).map(feed => (
                                             <button
                                                 key={feed.id}
-                                                onClick={() => { setSelectedFeed(feed.id); setIsMobileMenuOpen(false); }}
+                                                onClick={() => { setSelectedFeed(feed.id); setActiveTab('home'); setIsMobileMenuOpen(false); }}
                                                 className={`w-full text-left px-4 py-2.5 rounded-xl text-sm transition-all ${selectedFeed === feed.id ? 'bg-blue-50 text-blue-600 font-bold' : 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50/50'}`}
                                             >
                                                 {feed.name}
@@ -217,13 +217,10 @@ export default function Dashboard({
                         ))}
                     </nav>
 
-                    <div className="mt-auto pt-8 border-t border-zinc-50">
-                        <button className="w-full flex items-center gap-4 px-4 py-4 bg-orange-50 text-orange-600 rounded-[1.5rem] group transition-all hover:shadow-xl hover:shadow-orange-500/10">
-                            <div className="w-8 h-8 rounded-xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
-                                <ZapIcon className="w-4 h-4" />
-                            </div>
-                            <span className="text-sm font-bold tracking-tight">Actualizar a Pro+</span>
-                        </button>
+                    <div className="mt-auto pt-8 border-t border-zinc-50 flex flex-col items-center">
+                        <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest text-center px-4">
+                            Copyright 2026 V1
+                        </span>
                     </div>
                 </div>
             </aside>

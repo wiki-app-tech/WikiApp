@@ -2,14 +2,21 @@
 
 import React from 'react';
 
-export function NavIcon({ children, active, label, onClick }: { children: React.ReactNode, active?: boolean, label: string, onClick?: () => void }) {
+export function NavIcon({ children, active, label, onClick, showLabelBelow }: { children: React.ReactNode, active?: boolean, label: string, onClick?: () => void, showLabelBelow?: boolean }) {
     return (
         <button
             onClick={onClick}
-            className={`w-12 h-12 flex flex-col items-center justify-center rounded-2xl transition-all relative group ${active ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' : 'text-zinc-500 hover:bg-white/10 hover:text-white'}`}
+            className={`flex flex-col items-center justify-center rounded-2xl transition-all relative group ${showLabelBelow ? 'w-auto h-auto px-2 py-1' : 'w-12 h-12'} ${active ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'}`}
         >
-            {children}
-            <span className="hidden lg:group-hover:block absolute left-full ml-4 px-3 py-1.5 bg-zinc-900 text-white text-xs font-bold rounded-xl whitespace-nowrap z-50">{label}</span>
+            <div className={`${showLabelBelow ? 'w-10 h-10 flex items-center justify-center' : ''}`}>
+                {children}
+            </div>
+            {showLabelBelow && (
+                <span className="text-[10px] font-black uppercase tracking-tighter mt-1">{label}</span>
+            )}
+            {!showLabelBelow && (
+                <span className="hidden lg:group-hover:block absolute left-full ml-4 px-3 py-1.5 bg-zinc-900 text-white text-xs font-bold rounded-xl whitespace-nowrap z-50">{label}</span>
+            )}
         </button>
     );
 }
