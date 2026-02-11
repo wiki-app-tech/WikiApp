@@ -23,7 +23,7 @@
     {
         "id": "infobae",
         "name": "Infobae",
-        "url": "https://www.infobae.com/argentina/rss/ultimas-noticias/",
+        "url": "https://www.infobae.com/rss/",
         "type": "rss",
         "category": "nacionales"
     },
@@ -51,14 +51,14 @@
     {
         "id": "ole",
         "name": "Diario Olé",
-        "url": "https://www.ole.com.ar/rss/lo-ultimo/",
+        "url": "http://www.ole.com.ar/rss/ultimas-noticias/",
         "type": "rss",
         "category": "deporte"
     },
     {
         "id": "tyc-sports",
         "name": "TyC Sports",
-        "url": "https://www.tycsports.com/rss/ultimas-noticias.xml",
+        "url": "http://www.tycsports.com/rss/ultimas-noticias.xml",
         "type": "rss",
         "category": "deporte"
     },

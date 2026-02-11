@@ -183,7 +183,7 @@ export default function RoadStatus() {
                             href="https://www.facebook.com/SuDefensaCivil/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-zinc-900 hover:bg-zinc-800 text-white px-6 py-3 rounded-[var(--radius-button)] font-bold text-[10px] uppercase tracking-tight transition-all duration-300 hover:scale-105 active:scale-95 shadow-sm"
+                            className="bg-white hover:bg-zinc-100 text-blue-600 px-6 py-3 rounded-[var(--radius-button)] font-bold text-[10px] uppercase tracking-tight transition-all duration-300 hover:scale-105 active:scale-95 shadow-sm border border-zinc-100"
                         >
                             Defensa Civil (FB)
                         </a>

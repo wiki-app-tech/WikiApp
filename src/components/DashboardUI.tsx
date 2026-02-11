@@ -6,16 +6,16 @@ export function NavIcon({ children, active, label, onClick, showLabelBelow }: { 
     return (
         <button
             onClick={onClick}
-            className={`flex flex-col items-center justify-center transition-all relative group ${showLabelBelow ? 'w-full h-16' : 'w-14 h-14'} ${active ? 'text-white' : 'text-slate-400 hover:text-white'}`}
+            className={`flex flex-col items-center justify-center transition-all relative group ${showLabelBelow ? 'w-full h-16' : 'w-14 h-14'} ${active ? 'text-blue-600' : 'text-slate-400 hover:text-slate-900'}`}
         >
-            <div className={`p-2 transition-all duration-300 ${active ? 'bg-blue-600 rounded-xl shadow-lg shadow-blue-600/40' : 'group-hover:scale-110'}`}>
+            <div className={`p-2 transition-all duration-300 ${active ? 'bg-blue-50 text-blue-600 rounded-xl border border-blue-100 shadow-sm' : 'group-hover:scale-110'}`}>
                 {children}
             </div>
             {showLabelBelow && (
                 <span className="text-[9px] font-bold uppercase tracking-tight mt-1 opacity-70">{label}</span>
             )}
             {!showLabelBelow && (
-                <span className="hidden lg:group-hover:block absolute left-full ml-2 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg whitespace-nowrap z-50 pointer-events-none">{label}</span>
+                <span className="hidden lg:group-hover:block absolute left-full ml-2 px-3 py-1.5 bg-white text-slate-900 text-[10px] font-bold rounded-lg whitespace-nowrap z-50 pointer-events-none shadow-xl border border-slate-100">{label}</span>
             )}
         </button>
     );

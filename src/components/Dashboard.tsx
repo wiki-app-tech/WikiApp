@@ -36,6 +36,13 @@ import {
     ListIcon,
     GridSmallIcon,
     DotsIcon,
+    CheckIcon,
+    FacebookIcon,
+    YoutubeIcon,
+    RedditIcon,
+    TelegramIcon,
+    PodcastIcon,
+    Share2Icon,
     UserIcon
 } from '@/components/Icons';
 
@@ -51,7 +58,7 @@ export default function Dashboard({
     const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
     const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'home' | 'search' | 'folders' | 'saved' | 'automate' | 'settings' | 'audio'>('home');
+    const [activeTab, setActiveTab] = useState<'home' | 'videos' | 'audio' | 'zonas' | 'search' | 'folders' | 'saved' | 'automate' | 'settings'>('home');
     const [viewMode, setViewMode] = useState<'list' | 'card' | 'magazine'>('card');
     const [isSummarizing, setIsSummarizing] = useState(false);
     const [mockSummary, setMockSummary] = useState<string | null>(null);
@@ -62,6 +69,9 @@ export default function Dashboard({
     const [activeStream, setActiveStream] = useState<any | null>(null);
     const [feedSearch, setFeedSearch] = useState('');
     const [showFeedResults, setShowFeedResults] = useState(false);
+    const [startDate, setStartDate] = useState<string | null>(null);
+    const [endDate, setEndDate] = useState<string | null>(null);
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     const {
         followedFeeds,
@@ -154,10 +164,15 @@ export default function Dashboard({
                 const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase()) ||
                     a.description.toLowerCase().includes(search.toLowerCase());
                 const matchesFeed = selectedFeed ? a.sourceId === selectedFeed : true;
-                return matchesSearch && matchesFeed;
+
+                const articleDate = new Date(a.pubDate);
+                const matchesStartDate = startDate ? articleDate >= new Date(startDate) : true;
+                const matchesEndDate = endDate ? articleDate <= new Date(`${endDate}T23:59:59`) : true;
+
+                return matchesSearch && matchesFeed && matchesStartDate && matchesEndDate;
             })
             .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-    }, [articles, search, selectedFeed]);
+    }, [articles, search, selectedFeed, startDate, endDate]);
 
     const selectedArticle = useMemo(() =>
         articles.find(a => a.id === selectedArticleId) || null
@@ -187,38 +202,30 @@ export default function Dashboard({
 
     return (
         <div className="flex h-screen bg-[#F8FAFC] text-slate-900 font-sans overflow-hidden">
-            {/* Sidebar 1: Icon Bar (Narrow Dark) */}
-            <aside className="hidden lg:flex w-16 bg-[#0f172a] flex-col items-center py-6 gap-2 shrink-0 z-50">
+            {/* Sidebar 1: Icon Bar (Narrow Light) */}
+            <aside className="hidden lg:flex w-16 bg-white flex-col items-center py-6 gap-2 shrink-0 z-50 border-r border-slate-100 shadow-sm">
                 <div className="mb-8">
-                    <MediosWikiAppLogo className="w-10 h-10 brightness-200" />
+                    <MediosWikiAppLogo className="w-10 h-10" />
                 </div>
-                <NavIcon active={activeTab === 'home' && !selectedFeed} onClick={() => { setActiveTab('home'); setSelectedFeed(null); }} label="Dashboard"><LayoutIcon className="w-5 h-5" /></NavIcon>
-                <NavIcon active={activeTab === 'home' && !!selectedFeed} onClick={() => setActiveTab('home')} label="Feeds"><RssIcon className="w-5 h-5" /></NavIcon>
-                <NavIcon active={activeTab === 'saved'} onClick={() => setActiveTab('saved')} label="Saved"><BookmarkIcon className="w-5 h-5" /></NavIcon>
-                <NavIcon active={activeTab === 'audio'} onClick={() => setActiveTab('audio')} label="Audio">
-                    <div className="relative">
-                        <HeadphonesIcon className="w-5 h-5" />
-                        {activeStream && (
-                            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-500 rounded-full border-2 border-[#0f172a] animate-pulse" />
-                        )}
-                    </div>
-                </NavIcon>
-                <NavIcon active={activeTab === 'automate'} onClick={() => setActiveTab('automate')} label="Automate"><ZapIcon className="w-5 h-5" /></NavIcon>
-                <NavIcon active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setGlobalSearch(''); }} label="Search"><SearchIcon className="w-5 h-5" /></NavIcon>
+                <NavIcon active={activeTab === 'home' && !selectedFeed} onClick={() => { setActiveTab('home'); setSelectedFeed(null); }} label="DASHBOARD"><LayoutIcon className="w-5 h-5" /></NavIcon>
+                <NavIcon active={activeTab === 'videos'} onClick={() => setActiveTab('videos')} label="VIDEOS"><YoutubeIcon className="w-5 h-5" /></NavIcon>
+                <NavIcon active={activeTab === 'audio'} onClick={() => setActiveTab('audio')} label="AUDIOS"><HeadphonesIcon className="w-5 h-5" /></NavIcon>
+                <NavIcon active={activeTab === 'zonas'} onClick={() => setActiveTab('zonas')} label="ZONAS"><Share2Icon className="w-5 h-5" /></NavIcon>
 
-                <div className="mt-auto flex flex-col gap-2 pb-4">
-                    <NavIcon active={false} label="Add Feed" showLabelBelow onClick={() => { setActiveTab('home'); setFeedSearch(''); }}><PlusIcon className="w-5 h-5" /></NavIcon>
-                    <div className="mt-4 pt-4 border-t border-slate-800 w-full flex justify-center">
-                        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-300">JS</div>
+                <div className="mt-auto flex flex-col gap-2 pb-6 w-full items-center">
+                    <NavIcon active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setGlobalSearch(''); }} label="BUSCAR"><SearchIcon className="w-5 h-5" /></NavIcon>
+                    <NavIcon active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} label="OPCIONES"><SettingsIcon className="w-5 h-5" /></NavIcon>
+                    <div className="mt-4 pt-4 border-t border-slate-100 w-full flex justify-center">
+                        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-[10px] font-bold text-blue-600 border border-blue-100 shadow-sm">JS</div>
                     </div>
                 </div>
             </aside>
 
-            {/* Sidebar 2: Categories Panel (White) */}
+            {/* Sidebar 2: Content Sidebar (Wider Light) */}
             <aside className={`
                 fixed inset-0 z-40 lg:relative lg:inset-auto lg:z-auto
                 h-full border-r border-slate-100 flex flex-col bg-white transition-all duration-300 ease-in-out overflow-hidden
-                ${isMobileMenuOpen || (activeTab === 'home' || activeTab === 'audio')
+                ${isMobileMenuOpen || (activeTab === 'home' || activeTab === 'audio' || activeTab === 'automate')
                     ? 'w-full lg:w-72 opacity-100 translate-x-0'
                     : 'w-0 opacity-0 -translate-x-full pointer-events-none'}
                 ${selectedArticleId && !isMobileMenuOpen ? 'hidden lg:flex' : 'flex'}
@@ -468,6 +475,59 @@ export default function Dashboard({
                                 </div>
                             )}
                         </>
+                    ) : activeTab === 'automate' ? (
+                        <>
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-lg font-bold tracking-tight text-slate-900">Automation Hub</h2>
+                                <button className="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg transition-colors">
+                                    <ZapIcon className="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6 overflow-y-auto pr-2 -mr-2 scrollbar-hide">
+                                <div>
+                                    <div className="flex items-center gap-2 px-3 py-1 mb-2">
+                                        <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sincronización</span>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">
+                                            <YoutubeIcon className="w-3.5 h-3.5 text-red-500" />
+                                            <span className="flex-1 text-left truncate">YouTube Subs</span>
+                                        </button>
+                                        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">
+                                            <PodcastIcon className="w-3.5 h-3.5 text-purple-500" />
+                                            <span className="flex-1 text-left truncate">Podcast Feeds</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="flex items-center gap-2 px-3 py-1 mb-2">
+                                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Social Monitor</span>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">
+                                            <FacebookIcon className="w-3.5 h-3.5 text-blue-600" />
+                                            <span className="flex-1 text-left truncate">Facebook Pages</span>
+                                        </button>
+                                        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">
+                                            <TelegramIcon className="w-3.5 h-3.5 text-sky-500" />
+                                            <span className="flex-1 text-left truncate">Telegram Channels</span>
+                                        </button>
+                                        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">
+                                            <RedditIcon className="w-3.5 h-3.5 text-orange-500" />
+                                            <span className="flex-1 text-left truncate">Reddit Feeds</span>
+                                        </button>
+                                        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">
+                                            <Share2Icon className="w-3.5 h-3.5 text-indigo-500" />
+                                            <span className="flex-1 text-left truncate">Mastodon Ins.</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
                     ) : null}
                 </div>
             </aside>
@@ -483,14 +543,69 @@ export default function Dashboard({
                             <ChevronIcon className="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-colors" />
                         </div>
 
-                        <div className="hidden md:flex items-center border-l border-slate-100 pl-6 gap-2">
+                        <div className="hidden md:flex items-center border-l border-slate-100 pl-6 gap-2 relative">
                             <button className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors">
                                 Unread ({filteredArticles.length})
                                 <ChevronIcon className="w-3 h-3 opacity-50" />
                             </button>
-                            <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg">
-                                <FilterIcon className="w-4 h-4" />
-                            </button>
+                            <div className="relative group">
+                                <button
+                                    onClick={() => setShowDatePicker(!showDatePicker)}
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${startDate || endDate ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50 border border-transparent'}`}
+                                >
+                                    <FilterIcon className="w-4 h-4" />
+                                    <span>{startDate || endDate ? 'Filtrado por fecha' : 'Filtrar por fecha'}</span>
+                                </button>
+
+                                {showDatePicker && (
+                                    <>
+                                        <div className="fixed inset-0 z-40" onClick={() => setShowDatePicker(false)} />
+                                        <div className="absolute top-full left-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl p-6 z-50 w-72 animate-fade-in">
+                                            <div className="space-y-4">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Rango de Fechas</h3>
+                                                    {(startDate || endDate) && (
+                                                        <button
+                                                            onClick={() => { setStartDate(null); setEndDate(null); }}
+                                                            className="text-[10px] font-bold text-blue-600 hover:text-blue-700"
+                                                        >
+                                                            LIMPIAR
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                <div className="space-y-3">
+                                                    <div>
+                                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mb-1.5 block">Desde</label>
+                                                        <input
+                                                            type="date"
+                                                            value={startDate || ''}
+                                                            onChange={(e) => setStartDate(e.target.value)}
+                                                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mb-1.5 block">Hasta</label>
+                                                        <input
+                                                            type="date"
+                                                            value={endDate || ''}
+                                                            onChange={(e) => setEndDate(e.target.value)}
+                                                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <button
+                                                    onClick={() => setShowDatePicker(false)}
+                                                    className="w-full mt-4 bg-slate-900 text-white rounded-xl py-2.5 text-xs font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10"
+                                                >
+                                                    APLICAR FILTRO
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -763,8 +878,8 @@ export default function Dashboard({
 
                                             <div className="flex items-center justify-between mt-auto">
                                                 <span className="text-xs font-semibold text-slate-400">Stream HD • 128kbps</span>
-                                                <div className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-bold shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
-                                                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
+                                                <div className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-bold shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
+                                                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
                                                     ESCUCHAR
                                                 </div>
                                             </div>
@@ -786,16 +901,16 @@ export default function Dashboard({
                                         <button
                                             key={source.id}
                                             onClick={() => setActiveStream(source)}
-                                            className="group relative bg-[#0f172a] rounded-[2.5rem] p-1 border border-slate-800 shadow-2xl overflow-hidden hover:scale-[1.02] transition-all"
+                                            className="group relative bg-white rounded-[2.5rem] p-1 border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden hover:scale-[1.02] transition-all"
                                         >
-                                            <div className="aspect-video w-full rounded-[2.2rem] overflow-hidden relative">
-                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10" />
+                                            <div className="aspect-video w-full rounded-[2.2rem] overflow-hidden relative border border-slate-50">
+                                                <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-10" />
 
                                                 {/* Placeholder Image or Gradient */}
-                                                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-indigo-900/40" />
+                                                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50" />
 
                                                 <div className="absolute inset-0 flex items-center justify-center z-20 group-hover:scale-110 transition-transform duration-500">
-                                                    <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-2xl">
+                                                    <div className="w-16 h-16 bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 shadow-xl">
                                                         <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all">
                                                             <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                                                         </div>
@@ -804,10 +919,10 @@ export default function Dashboard({
 
                                                 <div className="absolute bottom-8 left-8 right-8 z-20">
                                                     <div className="flex items-center gap-3 mb-2">
-                                                        <span className="px-3 py-1 bg-red-600 text-white text-[10px] font-black rounded-lg shadow-lg shadow-red-600/30 animate-pulse">EN VIVO</span>
-                                                        <span className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">{source.location}</span>
+                                                        <span className="px-3 py-1 bg-red-600 text-white text-[10px] font-black rounded-lg shadow-lg shadow-red-600/20 animate-pulse">EN VIVO</span>
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">{source.location}</span>
                                                     </div>
-                                                    <h3 className="text-2xl font-bold text-white tracking-tight">{source.name}</h3>
+                                                    <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{source.name}</h3>
                                                 </div>
                                             </div>
                                         </button>
@@ -855,14 +970,14 @@ export default function Dashboard({
                                     </div>
                                     <div>
                                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Datos del Sistema</label>
-                                        <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800">
+                                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                             <div className="flex items-center justify-between mb-2">
-                                                <span className="text-[10px] font-bold text-slate-500">VERSION</span>
-                                                <span className="text-[10px] font-bold text-blue-400">2026.1.4</span>
+                                                <span className="text-[10px] font-bold text-slate-400">VERSION</span>
+                                                <span className="text-[10px] font-bold text-blue-600">2026.1.4</span>
                                             </div>
                                             <div className="flex items-center justify-between">
-                                                <span className="text-[10px] font-bold text-slate-500">CODEC</span>
-                                                <span className="text-[10px] font-bold text-orange-400">OPUS/H.264</span>
+                                                <span className="text-[10px] font-bold text-slate-400">CODEC</span>
+                                                <span className="text-[10px] font-bold text-orange-600">OPUS/H.264</span>
                                             </div>
                                         </div>
                                     </div>
@@ -876,7 +991,7 @@ export default function Dashboard({
                                     <MediosWikiAppLogo className="w-8 h-8 opacity-20" />
                                     <div className="w-8 h-[2px] bg-slate-200" />
                                 </div>
-                                <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">
                                     Premium Media Experience V2
                                 </span>
                             </div>
@@ -884,21 +999,204 @@ export default function Dashboard({
                     </div>
                 )}
 
-                {activeTab !== 'search' && activeTab !== 'saved' && activeTab !== 'audio' && (<div className="flex-1 flex overflow-hidden">
-                    {/* Master: Article List */}
-                    <div className={`flex-1 overflow-y-auto p-8 md:p-12 scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-1/3' : 'w-full'}`}>
-                        <div className="max-w-7xl mx-auto space-y-12 pb-40">
-                            {/* Weather section extracted to WeatherCard */}
+                {/* Vista de Automatización y Fuentes Externas */}
+                {activeTab === 'automate' && (
+                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-[#F8FAFC]">
+                        <div className="max-w-6xl mx-auto">
+                            {/* Cabecera Premium */}
+                            <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-8">
+                                <div className="text-center md:text-left">
+                                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black tracking-widest uppercase mb-4 shadow-sm border border-indigo-100">
+                                        <ZapIcon className="w-3 h-3 animate-pulse" />
+                                        Automation Suite
+                                    </div>
+                                    <h1 className="text-5xl font-black text-slate-900 tracking-tighter mb-4 font-display">
+                                        Monitor <span className="text-indigo-600">& Sync</span>
+                                    </h1>
+                                    <p className="text-slate-500 text-lg font-medium max-w-lg">
+                                        Conecta tus redes sociales, sincroniza YouTube y gestiona tus podcasts favoritos en un hub centralizado.
+                                    </p>
+                                </div>
+                                <div className="w-24 h-24 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[2rem] shadow-2xl shadow-indigo-500/30 flex items-center justify-center transform hover:scale-105 transition-all">
+                                    <ZapIcon className="w-10 h-10 text-white" />
+                                </div>
+                            </div>
+
+                            {/* Grid de Servicios */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {/* Monitor Social Media */}
+                                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col">
+                                    <div className="flex items-center gap-4 mb-8">
+                                        <div className="p-4 bg-blue-50 text-blue-600 rounded-2xl">
+                                            <FacebookIcon className="w-6 h-6" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-slate-900">Social Monitor</h3>
+                                    </div>
+                                    <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+                                        Monitorea páginas de Facebook, canales de Telegram, Mastodon y feeds de Reddit sin salir de la app.
+                                    </p>
+                                    <div className="space-y-3 mt-auto">
+                                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <div className="flex items-center gap-2">
+                                                <TelegramIcon className="w-4 h-4 text-sky-500" />
+                                                <span className="text-xs font-bold text-slate-600 uppercase tracking-tighter">Canales Activos</span>
+                                            </div>
+                                            <span className="text-xs font-black text-blue-600">12</span>
+                                        </div>
+                                        <button className="w-full py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
+                                            Añadir Monitor
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Sync Video Services */}
+                                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col">
+                                    <div className="flex items-center gap-4 mb-8">
+                                        <div className="p-4 bg-red-50 text-red-600 rounded-2xl">
+                                            <YoutubeIcon className="w-6 h-6" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-slate-900">Video Sync</h3>
+                                    </div>
+                                    <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+                                        Sincroniza tus suscripciones de YouTube y convierte canales en feeds automatizados de noticias.
+                                    </p>
+                                    <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 mb-6 flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                            <YoutubeIcon className="w-5 h-5 text-red-600" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Estado Canal</div>
+                                            <div className="text-xs font-bold text-slate-900">Sincronizado</div>
+                                        </div>
+                                    </div>
+                                    <button className="w-full mt-auto py-4 bg-red-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-red-700 transition-colors shadow-lg shadow-red-500/20">
+                                        Sincronizar YouTube
+                                    </button>
+                                </div>
+
+                                {/* Podcasts & Audio */}
+                                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col">
+                                    <div className="flex items-center gap-4 mb-8">
+                                        <div className="p-4 bg-purple-50 text-purple-600 rounded-2xl">
+                                            <PodcastIcon className="w-6 h-6" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-slate-900">Podcast Hub</h3>
+                                    </div>
+                                    <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+                                        Escucha tus podcasts favoritos. Suscríbete a feeds RSS de audio y gestiona tu biblioteca globalmente.
+                                    </p>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-4 group cursor-pointer p-2 rounded-2xl hover:bg-slate-50 transition-all">
+                                            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                                                <PodcastIcon className="w-4 h-4 text-purple-600" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-xs font-bold text-slate-900 truncate">Hablemos de Código</div>
+                                                <div className="text-[10px] text-slate-400">Nuevo episodio hoy</div>
+                                            </div>
+                                        </div>
+                                        <button className="w-full py-4 border-2 border-dashed border-slate-200 text-slate-400 rounded-2xl text-xs font-black uppercase tracking-widest hover:border-purple-300 hover:text-purple-600 transition-all">
+                                            + Agregar Podcast
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Banner Mastodon / Reddit */}
+                            <div className="mt-12 p-12 bg-white rounded-[3.5rem] text-slate-900 shadow-xl shadow-slate-200/50 relative overflow-hidden border border-slate-100">
+                                <div className="absolute top-0 right-0 p-12 opacity-5 scale-150">
+                                    <Share2Icon className="w-64 h-64 text-blue-600" />
+                                </div>
+                                <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+                                    <div className="max-w-2xl">
+                                        <div className="flex items-center gap-3 mb-6">
+                                            <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black rounded-lg border border-blue-100 tracking-[0.2em] uppercase">Connectors</span>
+                                        </div>
+                                        <h2 className="text-4xl font-black mb-6 tracking-tight">Fediverso & Reddit <span className="text-blue-600">Express</span></h2>
+                                        <p className="text-slate-500 text-lg leading-relaxed mb-8">
+                                            Conecta con el ecosistema descentralizado de Mastodon y las comunidades más activas de Reddit. Filtra contenido específico y recíbelo directamente en tu feed personalizado.
+                                        </p>
+                                        <div className="flex flex-wrap gap-4">
+                                            <div className="px-4 py-2 bg-slate-50 rounded-xl text-xs font-bold border border-slate-100 flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full" />
+                                                Mastodon.social
+                                            </div>
+                                            <div className="px-4 py-2 bg-slate-50 rounded-xl text-xs font-bold border border-slate-100 flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 bg-orange-500 rounded-full" />
+                                                r/TierraDelFuego
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button className="px-12 py-6 bg-blue-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-blue-600/30 hover:bg-blue-500 hover:scale-105 transition-all">
+                                        Configurar Conexiones
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Vista de Zonas / Mapas */}
+                {activeTab === 'zonas' && (
+                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-[#F8FAFC]">
+                        <div className="max-w-7xl mx-auto space-y-12">
+                            <div className="flex flex-col gap-4">
+                                <h2 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">SISTEMA DE MONITOREO GEOGRÁFICO</h2>
+                                <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase">Mapas y <span className="text-blue-600">Zonas</span></h1>
+                            </div>
                             <WeatherCard cities={cities} />
-                            <RoadStatus />
+                        </div>
+                    </div>
+                )}
+
+                {/* Vista de Videos */}
+                {activeTab === 'videos' && (
+                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-[#F8FAFC]">
+                        <div className="max-w-7xl mx-auto space-y-12">
+                            <div className="flex flex-col gap-4">
+                                <h2 className="text-[10px] font-black text-red-600 uppercase tracking-[0.2em]">MULTIMEDIA & VIDEO SYNC</h2>
+                                <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase">Hub de <span className="text-red-600">Video</span></h1>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col">
+                                    <div className="flex items-center gap-4 mb-8">
+                                        <div className="p-4 bg-red-50 text-red-600 rounded-2xl">
+                                            <YoutubeIcon className="w-6 h-6" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-slate-900">Video Subscription Sync</h3>
+                                    </div>
+                                    <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+                                        Convierte tus canales de YouTube favoritos en fuentes de noticias automáticas.
+                                    </p>
+                                    <button className="w-full py-4 bg-red-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-red-700 transition-colors shadow-lg shadow-red-500/20">
+                                        Conectar YouTube
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab !== 'search' && activeTab !== 'saved' && activeTab !== 'audio' && activeTab !== 'automate' && activeTab !== 'zonas' && activeTab !== 'videos' && (<div className="flex-1 flex overflow-hidden">
+                    {/* Master: Article List */}
+                    <div className={`flex-1 overflow-y-auto p-8 md:p-12 scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-2/5' : 'w-full'}`}>
+                        <div className="max-w-7xl mx-auto space-y-12 pb-40">
+                            {/* Weather & Road Hero Section - Design 2026 */}
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
+                                <WeatherCard cities={cities} />
+                                <RoadStatus />
+                            </div>
 
                             {/* Section Header */}
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h1 className="text-4xl font-black text-zinc-900 tracking-tight">
+                                    <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase">
                                         {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Centro de Noticias'}
                                     </h1>
-                                    <p className="text-zinc-400 font-medium mt-2">Tu feed personalizado</p>
+                                    <p className="text-slate-500 font-bold uppercase tracking-widest text-xs mt-3 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" />
+                                        Tu feed personalizado
+                                    </p>
                                 </div>
                                 {selectedFeed && (
                                     <button onClick={() => setSelectedFeed(null)} className="px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-[11px] font-bold tracking-tight shadow-xl shadow-blue-500/30">VOLVER AL INICIO</button>

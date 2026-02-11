@@ -80,10 +80,13 @@ async function main() {
     const successful = results.filter(r => r).length;
     const total = results.length;
 
-    if (successful === total) {
+    if (successful === total && total > 0) {
         log(`✨ Actualización completada exitosamente en ${duration}s`, 'green');
-    } else {
+    } else if (successful > 0) {
         log(`⚠️  Actualización parcial: ${successful}/${total} exitosos en ${duration}s`, 'yellow');
+    } else {
+        log(`❌ Fallo total en la actualización: ${successful}/${total} exitosos en ${duration}s`, 'red');
+        process.exit(1);
     }
     log('═'.repeat(40), 'blue');
 }

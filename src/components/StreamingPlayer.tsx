@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 
-interface StreamingSource {
+export interface StreamingSource {
     id: string;
     name: string;
     type: 'radio' | 'tv';
@@ -129,7 +129,7 @@ export function StreamingPlayer({ source, onClose }: { source: StreamingSource, 
                                 </div>
                                 <button
                                     onClick={togglePlay}
-                                    className="w-20 h-20 bg-zinc-900 text-white rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-xl"
+                                    className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-xl shadow-blue-500/30"
                                 >
                                     {isPlaying ? (
                                         <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>

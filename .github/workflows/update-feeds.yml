@@ -18,7 +18,7 @@ jobs:
           cache: 'npm'
           
       - name: Install dependencies
-        run: npm install rss-parser
+        run: npm ci
         
       - name: Update All Data Sources
         run: node scripts/update-all.mjs

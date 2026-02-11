@@ -14,13 +14,13 @@
   --surface-primary: 220 20% 97%;
   --surface-elevated: 0 0% 100%;
   --surface-sunken: 220 15% 94%;
-  
+
   /* Textos - Jerarquía clara */
   --text-primary: 220 20% 10%;
   --text-secondary: 220 10% 40%;
   --text-tertiary: 220 8% 55%;
   --text-muted: 220 5% 65%;
-  
+
   /* Colores de marca - Vibrantes pero elegantes */
   --accent-primary: 230 85% 60%;
   --accent-primary-hover: 230 85% 55%;
@@ -28,12 +28,12 @@
   --accent-success: 160 70% 45%;
   --accent-warning: 40 95% 55%;
   --accent-error: 0 75% 55%;
-  
+
   /* Bordes y separadores */
   --border-subtle: 220 15% 92%;
   --border-default: 220 12% 88%;
   --border-strong: 220 10% 80%;
-  
+
   /* Sistema de sombras 2026 - Multi-capa con color */
   --shadow-xs: 0 1px 2px hsl(220 20% 10% / 0.04);
   --shadow-sm: 0 2px 4px hsl(220 20% 10% / 0.04), 0 1px 2px hsl(220 20% 10% / 0.06);
@@ -41,17 +41,17 @@
   --shadow-lg: 0 12px 24px hsl(220 20% 10% / 0.06), 0 4px 8px hsl(220 20% 10% / 0.08), 0 2px 4px hsl(220 20% 10% / 0.04);
   --shadow-xl: 0 24px 48px hsl(220 20% 10% / 0.08), 0 8px 16px hsl(220 20% 10% / 0.06), 0 4px 8px hsl(220 20% 10% / 0.04);
   --shadow-2xl: 0 32px 64px hsl(220 20% 10% / 0.12), 0 16px 32px hsl(220 20% 10% / 0.08), 0 8px 16px hsl(220 20% 10% / 0.06);
-  
+
   /* Sombras con color de acento - Tendencia 2026 */
   --shadow-accent: 0 8px 24px hsl(230 85% 60% / 0.15), 0 4px 12px hsl(230 85% 60% / 0.10);
   --shadow-success: 0 8px 24px hsl(160 70% 45% / 0.15);
   --shadow-warning: 0 8px 24px hsl(40 95% 55% / 0.15);
   --shadow-error: 0 8px 24px hsl(0 75% 55% / 0.15);
-  
+
   /* Glow effects - Micro-interacciones */
   --glow-accent: 0 0 20px hsl(230 85% 60% / 0.3);
   --glow-subtle: 0 0 40px hsl(220 20% 10% / 0.05);
-  
+
   /* Radios - Más suaves para 2026 */
   --radius-xs: 0.5rem;
   --radius-sm: 0.75rem;
@@ -60,7 +60,7 @@
   --radius-xl: 2rem;
   --radius-2xl: 2.5rem;
   --radius-full: 9999px;
-  
+
   /* Variables legacy para compatibilidad */
   --background: hsl(var(--surface-primary));
   --foreground: hsl(var(--text-primary));
@@ -70,7 +70,7 @@
   --card-shadow-hover: var(--shadow-xl);
   --radius-card: var(--radius-xl);
   --radius-button: var(--radius-lg);
-  
+
   /* Transiciones - Suaves y naturales */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
@@ -84,27 +84,28 @@
    ───────────────────────────────────────────────────────────────────────────── */
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface-primary: 220 20% 8%;
-    --surface-elevated: 220 18% 12%;
-    --surface-sunken: 220 20% 5%;
-    
-    --text-primary: 220 15% 95%;
-    --text-secondary: 220 10% 70%;
+    --surface-primary: 220 20% 98%;
+    --surface-elevated: 0 0% 100%;
+    --surface-sunken: 220 15% 95%;
+
+    --text-primary: 220 20% 10%;
+    --text-secondary: 220 10% 40%;
     --text-tertiary: 220 8% 55%;
-    --text-muted: 220 5% 45%;
-    
-    --accent-primary: 230 85% 65%;
-    --accent-primary-hover: 230 85% 70%;
-    
-    --border-subtle: 220 15% 15%;
-    --border-default: 220 12% 20%;
-    --border-strong: 220 10% 30%;
-    
-    --shadow-xs: 0 1px 2px hsl(0 0% 0% / 0.2);
-    --shadow-sm: 0 2px 4px hsl(0 0% 0% / 0.2), 0 1px 2px hsl(0 0% 0% / 0.3);
-    --shadow-md: 0 4px 8px hsl(0 0% 0% / 0.2), 0 2px 4px hsl(0 0% 0% / 0.3);
-    --shadow-lg: 0 12px 24px hsl(0 0% 0% / 0.3), 0 4px 8px hsl(0 0% 0% / 0.2);
-    --shadow-xl: 0 24px 48px hsl(0 0% 0% / 0.4), 0 8px 16px hsl(0 0% 0% / 0.3);
+    --text-muted: 220 5% 65%;
+
+    --accent-primary: 230 85% 60%;
+    --accent-primary-hover: 230 85% 55%;
+
+    --border-subtle: 220 15% 94%;
+    --border-default: 220 12% 90%;
+    --border-strong: 220 10% 85%;
+
+    /* Reseting shadows for dark mode to be soft as well */
+    --shadow-xs: 0 1px 2px hsl(220 20% 10% / 0.04);
+    --shadow-sm: 0 2px 4px hsl(220 20% 10% / 0.04);
+    --shadow-md: 0 4px 8px hsl(220 20% 10% / 0.04);
+    --shadow-lg: 0 12px 24px hsl(220 20% 10% / 0.06);
+    --shadow-xl: 0 24px 48px hsl(220 20% 10% / 0.08);
   }
 }
 
@@ -128,12 +129,12 @@ body {
   background: hsl(var(--surface-primary));
   color: hsl(var(--text-primary));
   font-family: var(--font-inter), Inter, system-ui, -apple-system, sans-serif;
-  
+
   /* Tipografía fluida - Tendencia 2026 */
   font-size: clamp(0.9375rem, 0.875rem + 0.25vw, 1.0625rem);
   line-height: 1.6;
   letter-spacing: -0.01em;
-  
+
   /* Renderizado optimizado */
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -142,7 +143,13 @@ body {
 }
 
 /* Títulos con fuente display */
-h1, h2, h3, h4, h5, h6, .font-display {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display {
   font-family: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
   font-weight: 700;
   letter-spacing: -0.025em;
@@ -150,23 +157,27 @@ h1, h2, h3, h4, h5, h6, .font-display {
 }
 
 /* Escala tipográfica fluida */
-h1, .text-display {
+h1,
+.text-display {
   font-size: clamp(2rem, 1.5rem + 2vw, 3.5rem);
   font-weight: 800;
   letter-spacing: -0.03em;
 }
 
-h2, .text-title {
+h2,
+.text-title {
   font-size: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
   font-weight: 700;
 }
 
-h3, .text-heading {
+h3,
+.text-heading {
   font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.75rem);
   font-weight: 600;
 }
 
-h4, .text-subheading {
+h4,
+.text-subheading {
   font-size: clamp(1.1rem, 1rem + 0.25vw, 1.35rem);
   font-weight: 600;
 }
@@ -297,15 +308,37 @@ select,
 /* ─────────────────────────────────────────────────────────────────────────────
    UTILIDADES DE SOMBRA 2026
    ───────────────────────────────────────────────────────────────────────────── */
-.shadow-elevation-1 { box-shadow: var(--shadow-xs); }
-.shadow-elevation-2 { box-shadow: var(--shadow-sm); }
-.shadow-elevation-3 { box-shadow: var(--shadow-md); }
-.shadow-elevation-4 { box-shadow: var(--shadow-lg); }
-.shadow-elevation-5 { box-shadow: var(--shadow-xl); }
-.shadow-elevation-6 { box-shadow: var(--shadow-2xl); }
+.shadow-elevation-1 {
+  box-shadow: var(--shadow-xs);
+}
 
-.shadow-glow { box-shadow: var(--glow-subtle); }
-.shadow-glow-accent { box-shadow: var(--glow-accent); }
+.shadow-elevation-2 {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow-elevation-3 {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-elevation-4 {
+  box-shadow: var(--shadow-lg);
+}
+
+.shadow-elevation-5 {
+  box-shadow: var(--shadow-xl);
+}
+
+.shadow-elevation-6 {
+  box-shadow: var(--shadow-2xl);
+}
+
+.shadow-glow {
+  box-shadow: var(--glow-subtle);
+}
+
+.shadow-glow-accent {
+  box-shadow: var(--glow-accent);
+}
 
 /* ─────────────────────────────────────────────────────────────────────────────
    GRADIENTES MODERNOS 2026
@@ -323,7 +356,7 @@ select,
 }
 
 .gradient-mesh {
-  background: 
+  background:
     radial-gradient(at 20% 20%, hsl(var(--accent-primary) / 0.1) 0%, transparent 50%),
     radial-gradient(at 80% 80%, hsl(var(--accent-secondary) / 0.08) 0%, transparent 50%),
     hsl(var(--surface-primary));
@@ -333,18 +366,39 @@ select,
    ANIMACIONES SUTILES - Micro-interacciones 2026
    ───────────────────────────────────────────────────────────────────────────── */
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: var(--shadow-md); }
-  50% { box-shadow: var(--shadow-lg), var(--glow-accent); }
+
+  0%,
+  100% {
+    box-shadow: var(--shadow-md);
+  }
+
+  50% {
+    box-shadow: var(--shadow-lg), var(--glow-accent);
+  }
 }
 
 .animate-fade-in {

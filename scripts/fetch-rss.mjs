@@ -2,7 +2,13 @@ import Parser from 'rss-parser';
 import { promises as fs } from 'fs';
 import path from 'path';
 
-const parser = new Parser();
+const parser = new Parser({
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'application/rss+xml, application/xml, text/xml, */*'
+    },
+    timeout: 10000, // 10 segundos de timeout
+});
 
 /**
  * Detecta si un texto está en inglés basándose en palabras comunes
@@ -163,7 +169,7 @@ async function fetchFeeds() {
         const allArticles = [];
 
         for (const feed of feedsData) {
-            console.log(`Obteniendo ${feed.name}...`);
+            console.log(`Obteniendo ${feed.name} desde ${feed.url}...`);
             try {
                 let articles = [];
                 if (feed.type === 'telegram') {
@@ -258,10 +264,12 @@ async function fetchFeeds() {
 
         await fs.writeFile(articlesPath, JSON.stringify(result, null, 2));
         console.log('¡Feeds actualizados correctamente!');
+        return true;
     } catch (error) {
-        console.error('Error principal:', error);
+        console.error('Error principal en fetch-rss:', error);
+        return false;
     }
 }
 
-fetchFeeds();
+await fetchFeeds();
 

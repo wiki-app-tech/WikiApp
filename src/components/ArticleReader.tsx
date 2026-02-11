@@ -83,8 +83,8 @@ export default function ArticleReader({
                         <button
                             onClick={onToggleSave}
                             className={`p-3 rounded-2xl transition-all ${isSaved
-                                    ? 'bg-amber-50 text-amber-600 hover:bg-amber-100'
-                                    : 'bg-zinc-50 text-zinc-400 hover:text-amber-600 hover:bg-amber-50'
+                                ? 'bg-amber-50 text-amber-600 hover:bg-amber-100'
+                                : 'bg-zinc-50 text-zinc-400 hover:text-amber-600 hover:bg-amber-50'
                                 }`}
                             aria-label={isSaved ? 'Quitar de guardados' : 'Guardar artículo'}
                         >
@@ -98,7 +98,7 @@ export default function ArticleReader({
                     <button
                         onClick={onSummarize}
                         disabled={isSummarizing || !!summary}
-                        className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-[11px] font-bold transition-all ${summary ? 'bg-orange-50 text-orange-600' : 'bg-zinc-900 text-white hover:bg-black shadow-xl shadow-black/10'
+                        className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-[11px] font-bold transition-all ${summary ? 'bg-orange-50 text-orange-600' : 'bg-white text-zinc-900 border border-zinc-100 hover:bg-zinc-50 shadow-xl shadow-zinc-200/50'
                             } disabled:opacity-50`}
                     >
                         <ZapIcon className="w-3.5 h-3.5" />
