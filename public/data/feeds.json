@@ -70,6 +70,13 @@
         "category": "deporte"
     },
     {
+        "id": "radio-sudamericana",
+        "name": "Radio Sudamericana",
+        "url": "https://www.radiosudamericana.com/rss.php",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
         "id": "telegram-news",
         "name": "Últimas Noticias (Telegram)",
         "url": "https://t.me/+rkKMfpVR3G0yMDBh",
