@@ -15,7 +15,10 @@ import SavedArticlesView from '@/components/SavedArticlesView';
 import SaveArticleModal from '@/components/SaveArticleModal';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { useSavedArticles } from '@/hooks/useSavedArticles';
+import { useFollowedFeeds } from '@/hooks/useFollowedFeeds';
 import { NavIcon, CategoryButton, MobileTab } from '@/components/DashboardUI';
+import { StreamingPlayer, STREAMING_SOURCES } from '@/components/StreamingPlayer';
+import type { StreamingSource } from '@/components/StreamingPlayer';
 import {
     LayoutIcon,
     RssIcon,
@@ -24,7 +27,9 @@ import {
     SearchIcon,
     SettingsIcon,
     FolderIcon,
-    ChevronIcon
+    ChevronIcon,
+    HeadphonesIcon,
+    PlusIcon
 } from '@/components/Icons';
 
 export default function Dashboard({
@@ -39,7 +44,7 @@ export default function Dashboard({
     const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
     const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'home' | 'search' | 'folders' | 'saved' | 'automate' | 'settings'>('home');
+    const [activeTab, setActiveTab] = useState<'home' | 'search' | 'folders' | 'saved' | 'automate' | 'settings' | 'audio'>('home');
     const [viewMode, setViewMode] = useState<'list' | 'card' | 'magazine'>('card');
     const [isSummarizing, setIsSummarizing] = useState(false);
     const [mockSummary, setMockSummary] = useState<string | null>(null);
@@ -47,6 +52,24 @@ export default function Dashboard({
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [globalSearch, setGlobalSearch] = useState('');
     const [saveModalArticle, setSaveModalArticle] = useState<Article | null>(null);
+    const [activeStream, setActiveStream] = useState<any | null>(null);
+    const [feedSearch, setFeedSearch] = useState('');
+    const [showFeedResults, setShowFeedResults] = useState(false);
+
+    const {
+        followedFeeds,
+        followFeed,
+        unfollowFeed,
+        isFollowing
+    } = useFollowedFeeds(feeds);
+
+    const feedResults = useMemo(() => {
+        if (feedSearch.length < 2) return [];
+        return feeds.filter(f =>
+            f.name.toLowerCase().includes(feedSearch.toLowerCase()) ||
+            f.category.toLowerCase().includes(feedSearch.toLowerCase())
+        ).slice(0, 5);
+    }, [feeds, feedSearch]);
 
     // Hook para artículos guardados
     const {
@@ -134,7 +157,7 @@ export default function Dashboard({
         }, 1500);
     };
 
-    const categories = useMemo(() => Array.from(new Set(feeds.map(f => f.category))), [feeds]);
+    const categories = useMemo(() => Array.from(new Set(followedFeeds.map(f => f.category))), [followedFeeds]);
 
     return (
         <div className="flex h-screen bg-[#F1F4F9] text-zinc-900 font-sans overflow-hidden">
@@ -146,6 +169,7 @@ export default function Dashboard({
                 <NavIcon active={activeTab === 'home'} onClick={() => setActiveTab('home')} label="Inicio"><LayoutIcon /></NavIcon>
                 <NavIcon active={activeTab === 'folders'} onClick={() => setActiveTab('folders')} label="Biblioteca"><RssIcon /></NavIcon>
                 <NavIcon active={activeTab === 'saved'} onClick={() => setActiveTab('saved')} label="Guardados"><BookmarkIcon /></NavIcon>
+                <NavIcon active={activeTab === 'audio'} onClick={() => setActiveTab('audio')} label="Audio" showLabelBelow><HeadphonesIcon /></NavIcon>
                 <NavIcon active={activeTab === 'automate'} onClick={() => setActiveTab('automate')} label="Automatizar"><ZapIcon /></NavIcon>
                 <NavIcon active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setGlobalSearch(''); }} label="Buscar" showLabelBelow><SearchIcon /></NavIcon>
                 <div className="mt-auto flex flex-col gap-8">
@@ -174,11 +198,78 @@ export default function Dashboard({
                         <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 w-4 h-4" />
                         <input
                             type="text"
-                            placeholder="Buscar en feeds..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full bg-zinc-50 border-zinc-100 border rounded-2xl pl-12 pr-5 py-3.5 text-sm font-medium focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all outline-none"
+                            placeholder="Buscar o añadir feed..."
+                            value={feedSearch}
+                            onChange={(e) => {
+                                setFeedSearch(e.target.value);
+                                setShowFeedResults(true);
+                            }}
+                            onFocus={() => setShowFeedResults(true)}
+                            className="w-full bg-zinc-50 border-zinc-100 border rounded-2xl pl-12 pr-10 py-3.5 text-sm font-medium focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all outline-none"
                         />
+                        {feedSearch && (
+                            <button
+                                onClick={() => { setFeedSearch(''); setShowFeedResults(false); }}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-zinc-300 hover:text-zinc-500 hover:bg-zinc-100 rounded-xl transition-all"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        )}
+
+                        {/* Dropdown de resultados de feeds */}
+                        {showFeedResults && feedSearch.length >= 2 && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-100 rounded-[1.5rem] shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="p-3 bg-zinc-50/50 border-b border-zinc-100 flex items-center justify-between">
+                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest pl-2">Recomendados</span>
+                                    <button onClick={() => setShowFeedResults(false)} className="p-1 hover:bg-zinc-200 rounded-lg transition-colors">
+                                        <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    </button>
+                                </div>
+                                <div className="max-h-80 overflow-y-auto">
+                                    {feedResults.length > 0 ? (
+                                        feedResults.map(feed => (
+                                            <div key={feed.id} className="group p-2">
+                                                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-zinc-50 transition-all">
+                                                    <button
+                                                        onClick={() => {
+                                                            setSelectedFeed(feed.id);
+                                                            setActiveTab('home');
+                                                            setShowFeedResults(false);
+                                                            setFeedSearch('');
+                                                            setIsMobileMenuOpen(false);
+                                                        }}
+                                                        className="flex-1 text-left"
+                                                    >
+                                                        <div className="font-bold text-sm text-zinc-900 group-hover:text-blue-600 transition-colors">{feed.name}</div>
+                                                        <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-tighter mt-0.5">{feed.category}</div>
+                                                    </button>
+
+                                                    {isFollowing(feed.id) ? (
+                                                        <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest px-3 py-1.5">Siguiendo</span>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => followFeed(feed.id)}
+                                                            className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold transition-all shadow-lg shadow-blue-500/20 active:scale-95"
+                                                        >
+                                                            <PlusIcon className="w-3 h-3" />
+                                                            SEGUIR
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="p-8 text-center">
+                                            <p className="text-zinc-400 text-sm font-medium">No se encontraron feeds</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                        {/* Overlay para cerrar el dropdown */}
+                        {showFeedResults && (
+                            <div className="fixed inset-0 z-40" onClick={() => setShowFeedResults(false)} />
+                        )}
                     </div>
 
                     <nav className="space-y-2 overflow-y-auto max-h-[calc(100vh-250px)] scrollbar-hide">
@@ -202,14 +293,25 @@ export default function Dashboard({
 
                                 {!collapsedCategories[category] && (
                                     <div className="mt-2 space-y-1 pl-6">
-                                        {feeds.filter(f => f.category === category).map(feed => (
-                                            <button
-                                                key={feed.id}
-                                                onClick={() => { setSelectedFeed(feed.id); setActiveTab('home'); setIsMobileMenuOpen(false); }}
-                                                className={`w-full text-left px-4 py-2.5 rounded-xl text-sm transition-all ${selectedFeed === feed.id ? 'bg-blue-50 text-blue-600 font-bold' : 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50/50'}`}
-                                            >
-                                                {feed.name}
-                                            </button>
+                                        {followedFeeds.filter(f => f.category === category).map(feed => (
+                                            <div key={feed.id} className="relative group/feed">
+                                                <button
+                                                    onClick={() => { setSelectedFeed(feed.id); setActiveTab('home'); setIsMobileMenuOpen(false); }}
+                                                    className={`w-full text-left px-4 py-2.5 rounded-xl text-sm transition-all pr-8 ${selectedFeed === feed.id ? 'bg-blue-50 text-blue-600 font-bold' : 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50/50'}`}
+                                                >
+                                                    {feed.name}
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        unfollowFeed(feed.id);
+                                                    }}
+                                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-zinc-300 hover:text-red-500 opacity-0 group-hover/feed:opacity-100 transition-all"
+                                                    title="Dejar de seguir"
+                                                >
+                                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                                </button>
+                                            </div>
                                         ))}
                                     </div>
                                 )}
@@ -434,7 +536,99 @@ export default function Dashboard({
                     </div>
                 )}
 
-                {activeTab !== 'search' && activeTab !== 'saved' && (<div className="flex-1 flex overflow-hidden">
+                {/* Vista de Audio y Streaming */}
+                {activeTab === 'audio' && (
+                    <div className="flex-1 overflow-y-auto p-8 md:p-12">
+                        <div className="max-w-6xl mx-auto">
+                            <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
+                                <div>
+                                    <h1 className="text-4xl md:text-5xl font-black text-zinc-900 tracking-tight mb-4">
+                                        Sección de Audio & TV
+                                    </h1>
+                                    <p className="text-zinc-500 text-lg font-medium">
+                                        Streaming en vivo de radios y canales locales
+                                    </p>
+                                </div>
+                                <div className="p-4 bg-blue-600 rounded-3xl shadow-xl shadow-blue-500/20">
+                                    <HeadphonesIcon className="w-10 h-10 text-white" />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Placeholder para Radio */}
+                                <div className="bg-white rounded-[2.5rem] p-10 border border-zinc-100 shadow-xl shadow-blue-500/5 flex flex-col items-center text-center">
+                                    <div className="w-20 h-20 bg-orange-50 rounded-3xl flex items-center justify-center mb-6">
+                                        <ZapIcon className="w-10 h-10 text-orange-500" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-zinc-900 mb-4">Radios en Vivo</h3>
+                                    <p className="text-zinc-500 mb-8 max-w-sm">
+                                        Aquí se integrará el reproductor de las principales emisoras de radio con soporte para streaming continuo.
+                                    </p>
+                                    <div className="w-full h-40 flex items-center justify-center">
+                                        <button
+                                            onClick={() => setActiveStream(STREAMING_SOURCES.find(s => s.type === 'radio' && s.location === 'Ushuaia'))}
+                                            className="px-8 py-4 bg-orange-500 text-white rounded-2xl font-bold shadow-lg shadow-orange-500/20 hover:scale-105 transition-transform"
+                                        >
+                                            ESCUCHAR LRA10
+                                        </button>
+                                    </div>
+                                    <div className="mt-4 grid grid-cols-1 gap-2 w-full">
+                                        {STREAMING_SOURCES.filter(s => s.type === 'radio').map(s => (
+                                            <button
+                                                key={s.id}
+                                                onClick={() => setActiveStream(s)}
+                                                className="w-full flex items-center justify-between p-4 bg-zinc-50 hover:bg-zinc-100 rounded-2xl transition-colors text-sm font-bold text-zinc-700"
+                                            >
+                                                <span>{s.name}</span>
+                                                <ZapIcon className="w-4 h-4 text-orange-500" />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Placeholder para TV */}
+                                <div className="bg-white rounded-[2.5rem] p-10 border border-zinc-100 shadow-xl shadow-blue-500/5 flex flex-col items-center text-center">
+                                    <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mb-6">
+                                        <LayoutIcon className="w-10 h-10 text-blue-500" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-zinc-900 mb-4">Canales de TV</h3>
+                                    <p className="text-zinc-500 mb-8 max-w-sm">
+                                        Acceso directo a las transmisiones en vivo de los canales de televisión locales y regionales.
+                                    </p>
+                                    <div className="w-full h-40 flex items-center justify-center">
+                                        <button
+                                            onClick={() => setActiveStream(STREAMING_SOURCES.find(s => s.id === 'canal11'))}
+                                            className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-500/20 hover:scale-105 transition-transform"
+                                        >
+                                            VER CANAL 11
+                                        </button>
+                                    </div>
+                                    <div className="mt-4 grid grid-cols-1 gap-2 w-full">
+                                        {STREAMING_SOURCES.filter(s => s.type === 'tv').map(s => (
+                                            <button
+                                                key={s.id}
+                                                onClick={() => setActiveStream(s)}
+                                                className="w-full flex items-center justify-between p-4 bg-zinc-50 hover:bg-zinc-100 rounded-2xl transition-colors text-sm font-bold text-zinc-700"
+                                            >
+                                                <span>{s.name}</span>
+                                                <LayoutIcon className="w-4 h-4 text-blue-500" />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Info de Copyright en esta vista también */}
+                            <div className="mt-20 py-8 border-t border-zinc-100 text-center">
+                                <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">
+                                    Copyright 2026 V1 - Media Center
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab !== 'search' && activeTab !== 'saved' && activeTab !== 'audio' && (<div className="flex-1 flex overflow-hidden">
                     {/* Master: Article List */}
                     <div className={`flex-1 overflow-y-auto p-8 md:p-12 scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-1/3' : 'w-full'}`}>
                         <div className="max-w-7xl mx-auto space-y-12 pb-40">
@@ -543,6 +737,7 @@ export default function Dashboard({
                 {/* Mobile Bottom Nav */}
                 <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-20 glass-header border-t border-zinc-200/50 flex items-center justify-around px-4 z-40 pb-safe shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
                     <MobileTab active={activeTab === 'home' && !selectedArticleId} onClick={() => { setActiveTab('home'); setSelectedFeed(null); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Inicio" icon={<LayoutIcon className="w-6 h-6" />} />
+                    <MobileTab active={activeTab === 'audio'} onClick={() => { setActiveTab('audio'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Audio" icon={<HeadphonesIcon className="w-6 h-6" />} />
                     <MobileTab active={activeTab === 'folders'} onClick={() => { setActiveTab('folders'); setIsMobileMenuOpen(true); }} label="Feeds" icon={<RssIcon className="w-6 h-6" />} />
                     <MobileTab active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Buscar" icon={<SearchIcon className="w-6 h-6" />} />
                     <MobileTab
@@ -574,6 +769,13 @@ export default function Dashboard({
                         setSaveModalArticle(null);
                     }}
                     existingTags={getAllTags()}
+                />
+            )}
+            {/* Reproductor de Streaming */}
+            {activeStream && (
+                <StreamingPlayer
+                    source={activeStream}
+                    onClose={() => setActiveStream(null)}
                 />
             )}
         </div>

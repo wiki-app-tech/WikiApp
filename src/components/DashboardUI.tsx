@@ -6,18 +6,27 @@ export function NavIcon({ children, active, label, onClick, showLabelBelow }: { 
     return (
         <button
             onClick={onClick}
-            className={`flex flex-col items-center justify-center rounded-2xl transition-all relative group ${showLabelBelow ? 'w-auto h-auto px-2 py-1' : 'w-12 h-12'} ${active ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'}`}
+            className={`flex flex-col items-center justify-center transition-all relative group ${showLabelBelow ? 'w-full h-16' : 'w-14 h-14'} ${active ? 'text-white' : 'text-slate-400 hover:text-white'}`}
         >
-            <div className={`${showLabelBelow ? 'w-10 h-10 flex items-center justify-center' : ''}`}>
+            <div className={`p-2 transition-all duration-300 ${active ? 'bg-blue-600 rounded-xl shadow-lg shadow-blue-600/40' : 'group-hover:scale-110'}`}>
                 {children}
             </div>
             {showLabelBelow && (
-                <span className="text-[10px] font-black uppercase tracking-tighter mt-1">{label}</span>
+                <span className="text-[9px] font-bold uppercase tracking-tight mt-1 opacity-70">{label}</span>
             )}
             {!showLabelBelow && (
-                <span className="hidden lg:group-hover:block absolute left-full ml-4 px-3 py-1.5 bg-zinc-900 text-white text-xs font-bold rounded-xl whitespace-nowrap z-50">{label}</span>
+                <span className="hidden lg:group-hover:block absolute left-full ml-2 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg whitespace-nowrap z-50 pointer-events-none">{label}</span>
             )}
         </button>
+    );
+}
+
+export function SidebarCountBadge({ count }: { count: number }) {
+    if (count <= 0) return null;
+    return (
+        <span className="text-[10px] font-medium text-slate-400">
+            {count > 999 ? '999+' : count}
+        </span>
     );
 }
 
