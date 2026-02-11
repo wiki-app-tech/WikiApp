@@ -29,7 +29,14 @@ import {
     FolderIcon,
     ChevronIcon,
     HeadphonesIcon,
-    PlusIcon
+    PlusIcon,
+    CircleIcon,
+    FilterIcon,
+    SortIcon,
+    ListIcon,
+    GridSmallIcon,
+    DotsIcon,
+    UserIcon
 } from '@/components/Icons';
 
 export default function Dashboard({
@@ -70,6 +77,25 @@ export default function Dashboard({
             f.category.toLowerCase().includes(feedSearch.toLowerCase())
         ).slice(0, 5);
     }, [feeds, feedSearch]);
+
+    // Calcular conteos de artículos por feed
+    const feedCounts = useMemo(() => {
+        const counts: Record<string, number> = {};
+        articles.forEach(a => {
+            counts[a.sourceId] = (counts[a.sourceId] || 0) + 1;
+        });
+        return counts;
+    }, [articles]);
+
+    // Calcular conteos por categoría
+    const categoryCounts = useMemo(() => {
+        const counts: Record<string, number> = {};
+        followedFeeds.forEach(f => {
+            const feedCount = feedCounts[f.id] || 0;
+            counts[f.category] = (counts[f.category] || 0) + feedCount;
+        });
+        return counts;
+    }, [followedFeeds, feedCounts]);
 
     // Hook para artículos guardados
     const {
@@ -160,218 +186,359 @@ export default function Dashboard({
     const categories = useMemo(() => Array.from(new Set(followedFeeds.map(f => f.category))), [followedFeeds]);
 
     return (
-        <div className="flex h-screen bg-[#F1F4F9] text-zinc-900 font-sans overflow-hidden">
-            {/* Sidebar 1: Icon Bar (Narrow) */}
-            <aside className="hidden lg:flex w-20 bg-white flex-col items-center py-8 gap-8 shrink-0 z-50 shadow-xl shadow-blue-500/5 border-r border-zinc-100">
-                <div className="mb-6">
-                    <MediosWikiAppLogo className="w-12 h-12" />
+        <div className="flex h-screen bg-[#F8FAFC] text-slate-900 font-sans overflow-hidden">
+            {/* Sidebar 1: Icon Bar (Narrow Dark) */}
+            <aside className="hidden lg:flex w-16 bg-[#0f172a] flex-col items-center py-6 gap-2 shrink-0 z-50">
+                <div className="mb-8">
+                    <MediosWikiAppLogo className="w-10 h-10 brightness-200" />
                 </div>
-                <NavIcon active={activeTab === 'home'} onClick={() => setActiveTab('home')} label="Inicio"><LayoutIcon /></NavIcon>
-                <NavIcon active={activeTab === 'folders'} onClick={() => setActiveTab('folders')} label="Biblioteca"><RssIcon /></NavIcon>
-                <NavIcon active={activeTab === 'saved'} onClick={() => setActiveTab('saved')} label="Guardados"><BookmarkIcon /></NavIcon>
-                <NavIcon active={activeTab === 'audio'} onClick={() => setActiveTab('audio')} label="Audio" showLabelBelow><HeadphonesIcon /></NavIcon>
-                <NavIcon active={activeTab === 'automate'} onClick={() => setActiveTab('automate')} label="Automatizar"><ZapIcon /></NavIcon>
-                <NavIcon active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setGlobalSearch(''); }} label="Buscar" showLabelBelow><SearchIcon /></NavIcon>
-                <div className="mt-auto flex flex-col gap-8">
-                    <NavIcon active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} label="Ajustes"><SettingsIcon /></NavIcon>
+                <NavIcon active={activeTab === 'home' && !selectedFeed} onClick={() => { setActiveTab('home'); setSelectedFeed(null); }} label="Dashboard"><LayoutIcon className="w-5 h-5" /></NavIcon>
+                <NavIcon active={activeTab === 'home' && !!selectedFeed} onClick={() => setActiveTab('home')} label="Feeds"><RssIcon className="w-5 h-5" /></NavIcon>
+                <NavIcon active={activeTab === 'saved'} onClick={() => setActiveTab('saved')} label="Saved"><BookmarkIcon className="w-5 h-5" /></NavIcon>
+                <NavIcon active={activeTab === 'audio'} onClick={() => setActiveTab('audio')} label="Audio">
+                    <div className="relative">
+                        <HeadphonesIcon className="w-5 h-5" />
+                        {activeStream && (
+                            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-500 rounded-full border-2 border-[#0f172a] animate-pulse" />
+                        )}
+                    </div>
+                </NavIcon>
+                <NavIcon active={activeTab === 'automate'} onClick={() => setActiveTab('automate')} label="Automate"><ZapIcon className="w-5 h-5" /></NavIcon>
+                <NavIcon active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setGlobalSearch(''); }} label="Search"><SearchIcon className="w-5 h-5" /></NavIcon>
+
+                <div className="mt-auto flex flex-col gap-2 pb-4">
+                    <NavIcon active={false} label="Add Feed" showLabelBelow onClick={() => { setActiveTab('home'); setFeedSearch(''); }}><PlusIcon className="w-5 h-5" /></NavIcon>
+                    <div className="mt-4 pt-4 border-t border-slate-800 w-full flex justify-center">
+                        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-300">JS</div>
+                    </div>
                 </div>
             </aside>
 
-            {/* Sidebar 2: Categories Panel */}
+            {/* Sidebar 2: Categories Panel (White) */}
             <aside className={`
                 fixed inset-0 z-40 lg:relative lg:inset-auto lg:z-auto
-                h-full border-r border-zinc-100 flex flex-col bg-white transition-all duration-500 ease-in-out overflow-hidden
-                ${isMobileMenuOpen || activeTab === 'folders'
-                    ? 'w-full lg:w-80 opacity-100 translate-x-0'
-                    : 'w-0 opacity-0 -translate-x-full lg:translate-x-0 pointer-events-none lg:pointer-events-auto shadow-2xl shadow-blue-500/10'}
+                h-full border-r border-slate-100 flex flex-col bg-white transition-all duration-300 ease-in-out overflow-hidden
+                ${isMobileMenuOpen || (activeTab === 'home' || activeTab === 'audio')
+                    ? 'w-full lg:w-72 opacity-100 translate-x-0'
+                    : 'w-0 opacity-0 -translate-x-full pointer-events-none'}
                 ${selectedArticleId && !isMobileMenuOpen ? 'hidden lg:flex' : 'flex'}
             `}>
-                <div className="p-8 flex flex-col h-full">
-                    <div className="flex items-center justify-between mb-10">
-                        <h2 className="text-[11px] font-bold tracking-tight text-zinc-400 uppercase">Vista de Biblioteca</h2>
-                        <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden p-2 text-zinc-400 hover:bg-zinc-50 rounded-2xl transition-colors">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
-                    </div>
-
-                    <div className="relative mb-8">
-                        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 w-4 h-4" />
-                        <input
-                            type="text"
-                            placeholder="Buscar o añadir feed..."
-                            value={feedSearch}
-                            onChange={(e) => {
-                                setFeedSearch(e.target.value);
-                                setShowFeedResults(true);
-                            }}
-                            onFocus={() => setShowFeedResults(true)}
-                            className="w-full bg-zinc-50 border-zinc-100 border rounded-2xl pl-12 pr-10 py-3.5 text-sm font-medium focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all outline-none"
-                        />
-                        {feedSearch && (
-                            <button
-                                onClick={() => { setFeedSearch(''); setShowFeedResults(false); }}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-zinc-300 hover:text-zinc-500 hover:bg-zinc-100 rounded-xl transition-all"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
-                            </button>
-                        )}
-
-                        {/* Dropdown de resultados de feeds */}
-                        {showFeedResults && feedSearch.length >= 2 && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-100 rounded-[1.5rem] shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                <div className="p-3 bg-zinc-50/50 border-b border-zinc-100 flex items-center justify-between">
-                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest pl-2">Recomendados</span>
-                                    <button onClick={() => setShowFeedResults(false)} className="p-1 hover:bg-zinc-200 rounded-lg transition-colors">
-                                        <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                <div className="p-5 flex flex-col h-full">
+                    {activeTab === 'home' ? (
+                        <>
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-lg font-bold tracking-tight text-slate-900">Feeds</h2>
+                                <div className="flex items-center gap-1">
+                                    <button className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50">
+                                        <SettingsIcon className="w-4 h-4" />
+                                    </button>
+                                    <button className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50">
+                                        <CircleIcon className="w-4 h-4" />
+                                    </button>
+                                    <button className="p-1.5 text-blue-600 hover:text-blue-700 rounded-lg hover:bg-blue-50">
+                                        <SearchIcon className="w-4 h-4" />
                                     </button>
                                 </div>
-                                <div className="max-h-80 overflow-y-auto">
-                                    {feedResults.length > 0 ? (
-                                        feedResults.map(feed => (
-                                            <div key={feed.id} className="group p-2">
-                                                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-zinc-50 transition-all">
-                                                    <button
-                                                        onClick={() => {
-                                                            setSelectedFeed(feed.id);
-                                                            setActiveTab('home');
-                                                            setShowFeedResults(false);
-                                                            setFeedSearch('');
-                                                            setIsMobileMenuOpen(false);
-                                                        }}
-                                                        className="flex-1 text-left"
-                                                    >
-                                                        <div className="font-bold text-sm text-zinc-900 group-hover:text-blue-600 transition-colors">{feed.name}</div>
-                                                        <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-tighter mt-0.5">{feed.category}</div>
-                                                    </button>
-
-                                                    {isFollowing(feed.id) ? (
-                                                        <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest px-3 py-1.5">Siguiendo</span>
-                                                    ) : (
-                                                        <button
-                                                            onClick={() => followFeed(feed.id)}
-                                                            className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold transition-all shadow-lg shadow-blue-500/20 active:scale-95"
-                                                        >
-                                                            <PlusIcon className="w-3 h-3" />
-                                                            SEGUIR
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="p-8 text-center">
-                                            <p className="text-zinc-400 text-sm font-medium">No se encontraron feeds</p>
-                                        </div>
-                                    )}
-                                </div>
                             </div>
-                        )}
-                        {/* Overlay para cerrar el dropdown */}
-                        {showFeedResults && (
-                            <div className="fixed inset-0 z-40" onClick={() => setShowFeedResults(false)} />
-                        )}
-                    </div>
 
-                    <nav className="space-y-2 overflow-y-auto max-h-[calc(100vh-250px)] scrollbar-hide">
-                        <CategoryButton
-                            active={!selectedFeed}
-                            onClick={() => { setSelectedFeed(null); setIsMobileMenuOpen(false); }}
-                            label="Todas las Noticias"
-                            icon={<LayoutIcon className="w-4 h-4" />}
-                        />
+                            <div className="relative mb-8">
+                                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 w-4 h-4" />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar o añadir feed..."
+                                    value={feedSearch}
+                                    onChange={(e) => {
+                                        setFeedSearch(e.target.value);
+                                        setShowFeedResults(true);
+                                    }}
+                                    onFocus={() => setShowFeedResults(true)}
+                                    className="w-full bg-zinc-50 border-zinc-100 border rounded-2xl pl-12 pr-10 py-3.5 text-sm font-medium focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all outline-none"
+                                />
+                                {feedSearch && (
+                                    <button
+                                        onClick={() => { setFeedSearch(''); setShowFeedResults(false); }}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-zinc-300 hover:text-zinc-500 hover:bg-zinc-100 rounded-xl transition-all"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    </button>
+                                )}
 
-                        {categories.map(category => (
-                            <div key={category} className="mt-6">
-                                <button
-                                    onClick={() => setCollapsedCategories(prev => ({ ...prev, [category]: !prev[category] }))}
-                                    className="w-full flex items-center gap-3 px-4 py-3 text-zinc-400 hover:text-zinc-900 rounded-[1.25rem] group transition-all hover:bg-zinc-50"
-                                >
-                                    <FolderIcon className="w-4 h-4" />
-                                    <span className="text-sm font-bold capitalize flex-1 text-left tracking-tight">{category}</span>
-                                    <ChevronIcon className={`w-3 h-3 transition-transform ${collapsedCategories[category] ? '-rotate-90' : ''}`} />
-                                </button>
+                                {/* Dropdown de resultados de feeds */}
+                                {showFeedResults && feedSearch.length >= 2 && (
+                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-100 rounded-[1.5rem] shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <div className="p-3 bg-zinc-50/50 border-b border-zinc-100 flex items-center justify-between">
+                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest pl-2">Recomendados</span>
+                                            <button onClick={() => setShowFeedResults(false)} className="p-1 hover:bg-zinc-200 rounded-lg transition-colors">
+                                                <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                                            </button>
+                                        </div>
+                                        <div className="max-h-80 overflow-y-auto">
+                                            {feedResults.length > 0 ? (
+                                                feedResults.map(feed => (
+                                                    <div key={feed.id} className="group p-2">
+                                                        <div className="flex items-center justify-between p-3 rounded-xl hover:bg-zinc-50 transition-all">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setSelectedFeed(feed.id);
+                                                                    setActiveTab('home');
+                                                                    setShowFeedResults(false);
+                                                                    setFeedSearch('');
+                                                                    setIsMobileMenuOpen(false);
+                                                                }}
+                                                                className="flex-1 text-left"
+                                                            >
+                                                                <div className="font-bold text-sm text-zinc-900 group-hover:text-blue-600 transition-colors">{feed.name}</div>
+                                                                <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-tighter mt-0.5">{feed.category}</div>
+                                                            </button>
 
-                                {!collapsedCategories[category] && (
-                                    <div className="mt-2 space-y-1 pl-6">
-                                        {followedFeeds.filter(f => f.category === category).map(feed => (
-                                            <div key={feed.id} className="relative group/feed">
-                                                <button
-                                                    onClick={() => { setSelectedFeed(feed.id); setActiveTab('home'); setIsMobileMenuOpen(false); }}
-                                                    className={`w-full text-left px-4 py-2.5 rounded-xl text-sm transition-all pr-8 ${selectedFeed === feed.id ? 'bg-blue-50 text-blue-600 font-bold' : 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50/50'}`}
-                                                >
-                                                    {feed.name}
-                                                </button>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        unfollowFeed(feed.id);
-                                                    }}
-                                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-zinc-300 hover:text-red-500 opacity-0 group-hover/feed:opacity-100 transition-all"
-                                                    title="Dejar de seguir"
-                                                >
-                                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                                                </button>
-                                            </div>
-                                        ))}
+                                                            {isFollowing(feed.id) ? (
+                                                                <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest px-3 py-1.5">Siguiendo</span>
+                                                            ) : (
+                                                                <button
+                                                                    onClick={() => followFeed(feed.id)}
+                                                                    className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold transition-all shadow-lg shadow-blue-500/20 active:scale-95"
+                                                                >
+                                                                    <PlusIcon className="w-3 h-3" />
+                                                                    SEGUIR
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="p-8 text-center">
+                                                    <p className="text-zinc-400 text-sm font-medium">No se encontraron feeds</p>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
+                                {/* Overlay para cerrar el dropdown */}
+                                {showFeedResults && (
+                                    <div className="fixed inset-0 z-40" onClick={() => setShowFeedResults(false)} />
+                                )}
                             </div>
-                        ))}
-                    </nav>
 
-                    <div className="mt-auto pt-8 border-t border-zinc-50 flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest text-center px-4">
-                            Copyright 2026 V1
-                        </span>
-                    </div>
+                            <nav className="space-y-0.5 overflow-y-auto pr-2 -mr-2 scrollbar-hide">
+                                <button
+                                    onClick={() => { setSelectedFeed(null); setIsMobileMenuOpen(false); }}
+                                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${!selectedFeed ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}
+                                >
+                                    <LayoutIcon className={`w-4 h-4 ${!selectedFeed ? 'text-blue-600' : 'text-slate-400'}`} />
+                                    <span className="text-sm flex-1 text-left">Newsfeed</span>
+                                    <span className="text-[10px] font-bold opacity-60">{articles.length}</span>
+                                </button>
+
+                                {categories.map(category => (
+                                    <div key={category} className="mt-1">
+                                        <button
+                                            onClick={() => setCollapsedCategories(prev => ({ ...prev, [category]: !prev[category] }))}
+                                            className="w-full flex items-center gap-3 px-3 py-2 text-slate-600 hover:text-slate-900 rounded-lg group transition-all hover:bg-slate-50"
+                                        >
+                                            <ChevronIcon className={`w-3 h-3 transition-transform text-slate-400 ${collapsedCategories[category] ? '-rotate-90' : ''}`} />
+                                            <span className="text-sm font-bold capitalize flex-1 text-left">{category}</span>
+                                            <span className="text-[10px] font-bold text-slate-400">{categoryCounts[category] || 0}</span>
+                                        </button>
+
+                                        {!collapsedCategories[category] && (
+                                            <div className="mt-0.5 space-y-0.5 pl-4">
+                                                {followedFeeds.filter(f => f.category === category).map(feed => (
+                                                    <div key={feed.id} className="relative group/feed">
+                                                        <button
+                                                            onClick={() => { setSelectedFeed(feed.id); setActiveTab('home'); setIsMobileMenuOpen(false); }}
+                                                            className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] transition-all ${selectedFeed === feed.id ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                                                        >
+                                                            <span className="flex-1 text-left truncate">{feed.name}</span>
+                                                            <span className="text-[10px] font-medium opacity-50 group-hover/feed:opacity-0 transition-opacity">{feedCounts[feed.id] || 0}</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); unfollowFeed(feed.id); }}
+                                                            className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-300 hover:text-red-500 opacity-0 group-hover/feed:opacity-100 transition-all"
+                                                        >
+                                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </nav>
+
+                            <div className="mt-auto pt-4 space-y-4 border-t border-slate-50">
+                                {activeStream && (
+                                    <button
+                                        onClick={() => setActiveTab('audio')}
+                                        className="w-full bg-slate-900 rounded-2xl p-4 shadow-xl shadow-slate-900/10 flex items-center gap-3 group/mini hover:scale-[1.02] transition-all"
+                                    >
+                                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shrink-0">
+                                            <div className="flex gap-0.5 items-end h-3">
+                                                <div className="w-0.5 h-2 bg-white rounded-full animate-pulse" />
+                                                <div className="w-0.5 h-3 bg-white rounded-full animate-bounce" />
+                                                <div className="w-0.5 h-1.5 bg-white rounded-full animate-pulse" />
+                                            </div>
+                                        </div>
+                                        <div className="flex-1 min-w-0 text-left">
+                                            <div className="text-[8px] font-black text-blue-400 uppercase tracking-widest leading-none">LIVE</div>
+                                            <div className="text-[11px] font-bold text-white truncate leading-tight">{activeStream.name}</div>
+                                        </div>
+                                    </button>
+                                )}
+                                <button className="w-full flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
+                                    <PlusIcon className="w-4 h-4 text-slate-400" />
+                                    <span className="text-sm font-bold">Add feed</span>
+                                </button>
+                            </div>
+                        </>
+                    ) : activeTab === 'audio' ? (
+                        <>
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-lg font-bold tracking-tight text-slate-900">Media Library</h2>
+                                <button className="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg transition-colors">
+                                    <PlusIcon className="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6 overflow-y-auto pr-2 -mr-2 scrollbar-hide">
+                                {/* Radios Section */}
+                                <div>
+                                    <div className="flex items-center gap-2 px-3 py-1 mb-2">
+                                        <div className="w-1.5 h-1.5 bg-orange-500 rounded-full" />
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Radios</span>
+                                    </div>
+                                    <div className="space-y-1">
+                                        {STREAMING_SOURCES.filter(s => s.type === 'radio').map(source => (
+                                            <button
+                                                key={source.id}
+                                                onClick={() => setActiveStream(source)}
+                                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all ${activeStream?.id === source.id ? 'bg-orange-50 text-orange-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}
+                                            >
+                                                <ZapIcon className={`w-3.5 h-3.5 ${activeStream?.id === source.id ? 'text-orange-600' : 'text-slate-400'}`} />
+                                                <span className="flex-1 text-left truncate">{source.name}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* TV Section */}
+                                <div>
+                                    <div className="flex items-center gap-2 px-3 py-1 mb-2">
+                                        <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Canales TV</span>
+                                    </div>
+                                    <div className="space-y-1">
+                                        {STREAMING_SOURCES.filter(s => s.type === 'tv').map(source => (
+                                            <button
+                                                key={source.id}
+                                                onClick={() => setActiveStream(source)}
+                                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all ${activeStream?.id === source.id ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}
+                                            >
+                                                <LayoutIcon className={`w-3.5 h-3.5 ${activeStream?.id === source.id ? 'text-blue-600' : 'text-slate-400'}`} />
+                                                <span className="flex-1 text-left truncate">{source.name}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Playing Status if active */}
+                            {activeStream && (
+                                <div className="mt-auto pt-6 border-t border-slate-50">
+                                    <div className="bg-slate-900 rounded-2xl p-4 shadow-xl shadow-slate-900/20 animate-scale-in">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                                                <div className="flex gap-0.5 items-end h-3">
+                                                    <div className="w-0.5 h-2 bg-white rounded-full animate-pulse" />
+                                                    <div className="w-0.5 h-3 bg-white rounded-full animate-bounce" />
+                                                    <div className="w-0.5 h-1.5 bg-white rounded-full animate-pulse" />
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Reproduciendo</div>
+                                                <div className="text-xs font-bold text-white truncate">{activeStream.name}</div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => setActiveStream(null)}
+                                            className="w-full py-2 bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold rounded-lg transition-all"
+                                        >
+                                            DETENER
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    ) : null}
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0 bg-[#F1F4F9] relative">
-                <header className="h-24 glass-header flex flex-col md:flex-row items-center px-8 justify-between sticky top-0 z-30 py-2 md:py-0">
-                    <div className="flex items-center justify-between w-full md:w-auto gap-10">
-                        <div className="flex items-center gap-5">
-                            <button
-                                onClick={() => setIsMobileMenuOpen(true)}
-                                className="lg:hidden p-2 -ml-2 text-zinc-600 active:bg-zinc-100 rounded-2xl"
-                                aria-label="Open Menu"
-                            >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
-                            </button>
-                            <div>
-                                <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-zinc-900 leading-none">MediosWikiApp</h1>
-                                <p className="text-[10px] md:text-[11px] font-bold text-blue-600 uppercase tracking-tight mt-1.5">Smart Dashboard</p>
-                            </div>
+            <main className="flex-1 flex flex-col min-w-0 bg-[#F8FAFC] relative">
+                <header className="h-16 bg-white border-b border-slate-100 flex items-center px-8 justify-between sticky top-0 z-30">
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2 group cursor-pointer">
+                            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+                                {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Newsfeed'}
+                            </h1>
+                            <ChevronIcon className="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-colors" />
                         </div>
 
-                        {/* Date and Time */}
-                        <Clock />
+                        <div className="hidden md:flex items-center border-l border-slate-100 pl-6 gap-2">
+                            <button className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors">
+                                Unread ({filteredArticles.length})
+                                <ChevronIcon className="w-3 h-3 opacity-50" />
+                            </button>
+                            <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg">
+                                <FilterIcon className="w-4 h-4" />
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <RefreshIndicator lastUpdate={lastUpdate} isRefreshing={isRefreshing} />
-                        <LayoutSwitcher currentMode={viewMode} onModeChange={handleViewModeChange} />
-                        <div className="px-5 py-2.5 bg-zinc-900 rounded-[1.25rem] shadow-xl shadow-black/10 flex items-center gap-2.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                            <span className="text-[11px] font-bold text-white uppercase tracking-tight">
-                                {filteredArticles.length} Noticias Disponibles
-                            </span>
+                        <div className="relative group hidden lg:block">
+                            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                            <input
+                                type="text"
+                                placeholder="Search in articles"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="bg-slate-100/50 border-slate-200 border focus:bg-white focus:border-blue-400 rounded-full pl-9 pr-4 py-1.5 text-xs w-64 outline-none transition-all"
+                            />
+                            {search && (
+                                <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-300 hover:text-slate-500">
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-1 border-l border-slate-100 pl-4">
+                            <button onClick={refreshArticles} className={`p-2 text-slate-400 hover:text-blue-600 rounded-lg transition-colors ${isRefreshing ? 'animate-spin' : ''}`}>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                            </button>
+                            <button onClick={() => handleViewModeChange('list')} className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-slate-100 text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
+                                <ListIcon className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => handleViewModeChange('card')} className={`p-2 rounded-lg transition-colors ${viewMode === 'card' ? 'bg-slate-100 text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
+                                <GridSmallIcon className="w-4 h-4" />
+                            </button>
+                            <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg">
+                                <SortIcon className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
                 </header>
 
                 {/* Vista de Búsqueda Global */}
                 {activeTab === 'search' && (
-                    <div className="flex-1 overflow-y-auto p-8 md:p-12">
+                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-white">
                         <div className="max-w-4xl mx-auto">
                             {/* Cabecera de Búsqueda */}
                             <div className="text-center mb-12">
-                                <h1 className="text-4xl md:text-5xl font-black text-zinc-900 tracking-tight mb-4 font-display">
-                                    Buscar Noticias
+                                <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4 font-display">
+                                    Search News
                                 </h1>
-                                <p className="text-zinc-500 text-lg font-medium">
-                                    Encontrá cualquier noticia en tiempo real
+                                <p className="text-slate-500 text-lg font-medium">
+                                    Find any article in real-time
                                 </p>
                             </div>
 
@@ -538,90 +705,179 @@ export default function Dashboard({
 
                 {/* Vista de Audio y Streaming */}
                 {activeTab === 'audio' && (
-                    <div className="flex-1 overflow-y-auto p-8 md:p-12">
+                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-[#F8FAFC]">
                         <div className="max-w-6xl mx-auto">
-                            <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
-                                <div>
-                                    <h1 className="text-4xl md:text-5xl font-black text-zinc-900 tracking-tight mb-4">
-                                        Sección de Audio & TV
+                            {/* Cabecera Premium */}
+                            <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-8">
+                                <div className="text-center md:text-left">
+                                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-xs font-bold tracking-widest uppercase mb-4 shadow-sm">
+                                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
+                                        Multimedia Center
+                                    </div>
+                                    <h1 className="text-5xl font-black text-slate-900 tracking-tight mb-4 font-display">
+                                        Audio & <span className="text-blue-600">Video</span>
                                     </h1>
-                                    <p className="text-zinc-500 text-lg font-medium">
-                                        Streaming en vivo de radios y canales locales
+                                    <p className="text-slate-500 text-lg font-medium max-w-lg">
+                                        Transmisiones en vivo de las mejores radios y canales de televisión locales y nacionales.
                                     </p>
                                 </div>
-                                <div className="p-4 bg-blue-600 rounded-3xl shadow-xl shadow-blue-500/20">
-                                    <HeadphonesIcon className="w-10 h-10 text-white" />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {/* Placeholder para Radio */}
-                                <div className="bg-white rounded-[2.5rem] p-10 border border-zinc-100 shadow-xl shadow-blue-500/5 flex flex-col items-center text-center">
-                                    <div className="w-20 h-20 bg-orange-50 rounded-3xl flex items-center justify-center mb-6">
-                                        <ZapIcon className="w-10 h-10 text-orange-500" />
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-zinc-900 mb-4">Radios en Vivo</h3>
-                                    <p className="text-zinc-500 mb-8 max-w-sm">
-                                        Aquí se integrará el reproductor de las principales emisoras de radio con soporte para streaming continuo.
-                                    </p>
-                                    <div className="w-full h-40 flex items-center justify-center">
-                                        <button
-                                            onClick={() => setActiveStream(STREAMING_SOURCES.find(s => s.type === 'radio' && s.location === 'Ushuaia'))}
-                                            className="px-8 py-4 bg-orange-500 text-white rounded-2xl font-bold shadow-lg shadow-orange-500/20 hover:scale-105 transition-transform"
-                                        >
-                                            ESCUCHAR LRA10
-                                        </button>
-                                    </div>
-                                    <div className="mt-4 grid grid-cols-1 gap-2 w-full">
-                                        {STREAMING_SOURCES.filter(s => s.type === 'radio').map(s => (
-                                            <button
-                                                key={s.id}
-                                                onClick={() => setActiveStream(s)}
-                                                className="w-full flex items-center justify-between p-4 bg-zinc-50 hover:bg-zinc-100 rounded-2xl transition-colors text-sm font-bold text-zinc-700"
-                                            >
-                                                <span>{s.name}</span>
-                                                <ZapIcon className="w-4 h-4 text-orange-500" />
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Placeholder para TV */}
-                                <div className="bg-white rounded-[2.5rem] p-10 border border-zinc-100 shadow-xl shadow-blue-500/5 flex flex-col items-center text-center">
-                                    <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mb-6">
-                                        <LayoutIcon className="w-10 h-10 text-blue-500" />
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-zinc-900 mb-4">Canales de TV</h3>
-                                    <p className="text-zinc-500 mb-8 max-w-sm">
-                                        Acceso directo a las transmisiones en vivo de los canales de televisión locales y regionales.
-                                    </p>
-                                    <div className="w-full h-40 flex items-center justify-center">
-                                        <button
-                                            onClick={() => setActiveStream(STREAMING_SOURCES.find(s => s.id === 'canal11'))}
-                                            className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-500/20 hover:scale-105 transition-transform"
-                                        >
-                                            VER CANAL 11
-                                        </button>
-                                    </div>
-                                    <div className="mt-4 grid grid-cols-1 gap-2 w-full">
-                                        {STREAMING_SOURCES.filter(s => s.type === 'tv').map(s => (
-                                            <button
-                                                key={s.id}
-                                                onClick={() => setActiveStream(s)}
-                                                className="w-full flex items-center justify-between p-4 bg-zinc-50 hover:bg-zinc-100 rounded-2xl transition-colors text-sm font-bold text-zinc-700"
-                                            >
-                                                <span>{s.name}</span>
-                                                <LayoutIcon className="w-4 h-4 text-blue-500" />
-                                            </button>
-                                        ))}
+                                <div className="flex items-center gap-4">
+                                    <button className="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-3xl shadow-lg border border-slate-100 hover:border-blue-200 transition-all group">
+                                        <SettingsIcon className="w-6 h-6 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                                        <span className="text-[10px] font-bold text-slate-400 mt-2">CONFIG</span>
+                                    </button>
+                                    <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] shadow-2xl shadow-blue-500/30 flex items-center justify-center transform hover:scale-105 transition-transform">
+                                        <HeadphonesIcon className="w-10 h-10 text-white" />
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Info de Copyright en esta vista también */}
-                            <div className="mt-20 py-8 border-t border-zinc-100 text-center">
-                                <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">
-                                    Copyright 2026 V1 - Media Center
+                            {/* Sección de Radios */}
+                            <div className="mb-20">
+                                <div className="flex items-center gap-4 mb-8">
+                                    <div className="h-10 w-1.5 bg-orange-500 rounded-full" />
+                                    <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Radios en Vivo</h2>
+                                    <span className="ml-auto text-xs font-black text-slate-400 uppercase tracking-widest">{STREAMING_SOURCES.filter(s => s.type === 'radio').length} EMISORAS</span>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {STREAMING_SOURCES.filter(s => s.type === 'radio').map(source => (
+                                        <button
+                                            key={source.id}
+                                            onClick={() => setActiveStream(source)}
+                                            className="group relative bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-orange-500/5 hover:-translate-y-1 transition-all text-left overflow-hidden"
+                                        >
+                                            <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-10 transition-opacity">
+                                                <ZapIcon className="w-24 h-24 text-orange-500 transform rotate-12" />
+                                            </div>
+
+                                            <div className="flex items-center gap-5 mb-6">
+                                                <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-all shadow-inner">
+                                                    <ZapIcon className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <div className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1">{source.location}</div>
+                                                    <h3 className="font-bold text-slate-900 group-hover:text-orange-600 transition-colors line-clamp-1">{source.name}</h3>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center justify-between mt-auto">
+                                                <span className="text-xs font-semibold text-slate-400">Stream HD • 128kbps</span>
+                                                <div className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-bold shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
+                                                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
+                                                    ESCUCHAR
+                                                </div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Sección de TV */}
+                            <div className="mb-20">
+                                <div className="flex items-center gap-4 mb-8">
+                                    <div className="h-10 w-1.5 bg-blue-600 rounded-full" />
+                                    <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Canales de TV</h2>
+                                    <span className="ml-auto text-xs font-black text-slate-400 uppercase tracking-widest">{STREAMING_SOURCES.filter(s => s.type === 'tv').length} CANALES</span>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {STREAMING_SOURCES.filter(s => s.type === 'tv').map(source => (
+                                        <button
+                                            key={source.id}
+                                            onClick={() => setActiveStream(source)}
+                                            className="group relative bg-[#0f172a] rounded-[2.5rem] p-1 border border-slate-800 shadow-2xl overflow-hidden hover:scale-[1.02] transition-all"
+                                        >
+                                            <div className="aspect-video w-full rounded-[2.2rem] overflow-hidden relative">
+                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10" />
+
+                                                {/* Placeholder Image or Gradient */}
+                                                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-indigo-900/40" />
+
+                                                <div className="absolute inset-0 flex items-center justify-center z-20 group-hover:scale-110 transition-transform duration-500">
+                                                    <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-2xl">
+                                                        <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all">
+                                                            <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="absolute bottom-8 left-8 right-8 z-20">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        <span className="px-3 py-1 bg-red-600 text-white text-[10px] font-black rounded-lg shadow-lg shadow-red-600/30 animate-pulse">EN VIVO</span>
+                                                        <span className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">{source.location}</span>
+                                                    </div>
+                                                    <h3 className="text-2xl font-bold text-white tracking-tight">{source.name}</h3>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Panel de Configuración Rápida */}
+                            <div className="bg-white rounded-[3rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50">
+                                <div className="flex items-center gap-4 mb-10">
+                                    <div className="p-3 bg-slate-50 rounded-2xl">
+                                        <SettingsIcon className="w-6 h-6 text-slate-900" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-slate-900 tracking-tight">Opciones de Reproducción</h3>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                                    <div>
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Calidad de Audio</label>
+                                        <div className="space-y-2">
+                                            {['Baja (64kbps)', 'Media (128kbps)', 'Alta (320kbps)'].map((quality, idx) => (
+                                                <button key={quality} className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${idx === 1 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'}`}>
+                                                    {quality}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Reproducción Automática</label>
+                                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+                                            <span className="text-sm font-bold text-slate-700">Autoplay</span>
+                                            <div className="w-12 h-6 bg-blue-600 rounded-full relative flex items-center px-1 shadow-inner">
+                                                <div className="w-4 h-4 bg-white rounded-full shadow-md ml-auto" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Modo de Video</label>
+                                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mb-2">
+                                            <span className="text-sm font-bold text-slate-700">Pop-out por defecto</span>
+                                            <div className="w-12 h-6 bg-slate-200 rounded-full relative flex items-center px-1">
+                                                <div className="w-4 h-4 bg-white rounded-full shadow-md" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Datos del Sistema</label>
+                                        <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-[10px] font-bold text-slate-500">VERSION</span>
+                                                <span className="text-[10px] font-bold text-blue-400">2026.1.4</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] font-bold text-slate-500">CODEC</span>
+                                                <span className="text-[10px] font-bold text-orange-400">OPUS/H.264</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Footer del Media Center */}
+                            <div className="mt-20 py-12 border-t border-slate-100 text-center">
+                                <div className="flex items-center justify-center gap-2 mb-4">
+                                    <div className="w-8 h-[2px] bg-slate-200" />
+                                    <MediosWikiAppLogo className="w-8 h-8 opacity-20" />
+                                    <div className="w-8 h-[2px] bg-slate-200" />
+                                </div>
+                                <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">
+                                    Premium Media Experience V2
                                 </span>
                             </div>
                         </div>
@@ -649,54 +905,24 @@ export default function Dashboard({
                                 )}
                             </div>
 
-                            {/* Category Grouped Carousels or Single Feed Grid */}
-                            {!selectedFeed ? (
-                                <div className="space-y-20">
-                                    {categories.map(category => {
-                                        const categoryArticles = filteredArticles.filter(a => a.sourceCategory === category);
-                                        if (categoryArticles.length === 0) return null;
-
-                                        return (
-                                            <section key={category} className="space-y-8">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-5">
-                                                        <div className="h-10 w-2.5 bg-blue-600 rounded-full" />
-                                                        <h2 className="text-3xl font-black text-zinc-900 tracking-tight capitalize">
-                                                            {category}
-                                                        </h2>
-                                                    </div>
-                                                    <button className="text-[11px] font-bold text-blue-600 tracking-tight hover:underline underline-offset-4 decoration-blue-200">VER TODO</button>
-                                                </div>
-
-                                                <NewsCarousel
-                                                    articles={categoryArticles}
-                                                    viewMode={viewMode}
-                                                    selectedArticleId={selectedArticleId}
-                                                    onArticleClick={(id) => setSelectedArticleId(id)}
-                                                />
-                                            </section>
-                                        );
-                                    })}
-                                </div>
-                            ) : (
-                                <div className={
-                                    viewMode === 'list'
-                                        ? "flex flex-col bg-white border border-white rounded-[2.5rem] overflow-hidden divide-y divide-zinc-50 shadow-2xl shadow-blue-500/5"
-                                        : viewMode === 'magazine'
-                                            ? "grid grid-cols-1 lg:grid-cols-2 gap-10"
-                                            : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10"
-                                }>
-                                    {filteredArticles.map(article => (
-                                        <ArticleCard
-                                            key={article.id}
-                                            article={article}
-                                            viewMode={viewMode}
-                                            isSelected={selectedArticleId === article.id}
-                                            onClick={() => setSelectedArticleId(article.id)}
-                                        />
-                                    ))}
-                                </div>
-                            )}
+                            {/* Single Feed Grid - Always show grid for unified look */}
+                            <div className={
+                                viewMode === 'list'
+                                    ? "flex flex-col bg-white border border-slate-100 rounded-xl overflow-hidden divide-y divide-slate-50"
+                                    : viewMode === 'magazine'
+                                        ? "grid grid-cols-1 lg:grid-cols-2 gap-8"
+                                        : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+                            }>
+                                {filteredArticles.map(article => (
+                                    <ArticleCard
+                                        key={article.id}
+                                        article={article}
+                                        viewMode={viewMode}
+                                        isSelected={selectedArticleId === article.id}
+                                        onClick={() => setSelectedArticleId(article.id)}
+                                    />
+                                ))}
+                            </div>
 
                             {/* Empty State */}
                             {filteredArticles.length === 0 && (
@@ -735,20 +961,20 @@ export default function Dashboard({
                 </div>)}
 
                 {/* Mobile Bottom Nav */}
-                <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-20 glass-header border-t border-zinc-200/50 flex items-center justify-around px-4 z-40 pb-safe shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
-                    <MobileTab active={activeTab === 'home' && !selectedArticleId} onClick={() => { setActiveTab('home'); setSelectedFeed(null); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Inicio" icon={<LayoutIcon className="w-6 h-6" />} />
+                <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-100 flex items-center justify-around px-4 z-40 pb-safe shadow-lg">
+                    <MobileTab active={activeTab === 'home' && !selectedArticleId} onClick={() => { setActiveTab('home'); setSelectedFeed(null); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Home" icon={<LayoutIcon className="w-6 h-6" />} />
                     <MobileTab active={activeTab === 'audio'} onClick={() => { setActiveTab('audio'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Audio" icon={<HeadphonesIcon className="w-6 h-6" />} />
                     <MobileTab active={activeTab === 'folders'} onClick={() => { setActiveTab('folders'); setIsMobileMenuOpen(true); }} label="Feeds" icon={<RssIcon className="w-6 h-6" />} />
-                    <MobileTab active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Buscar" icon={<SearchIcon className="w-6 h-6" />} />
+                    <MobileTab active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Search" icon={<SearchIcon className="w-6 h-6" />} />
                     <MobileTab
                         active={activeTab === 'saved'}
                         onClick={() => { setActiveTab('saved'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }}
-                        label="Guardados"
+                        label="Saved"
                         icon={
                             <div className="relative">
                                 <BookmarkIcon className="w-6 h-6" />
                                 {savedArticles.length > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                                         {savedArticles.length > 9 ? '9+' : savedArticles.length}
                                     </span>
                                 )}

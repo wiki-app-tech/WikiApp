@@ -26,17 +26,38 @@ export const STREAMING_SOURCES: StreamingSource[] = [
         location: 'Río Grande'
     },
     {
+        id: 'mitre',
+        name: 'Radio Mitre',
+        type: 'radio',
+        url: 'https://stream.cienradios.com/Mitre_AM790.mp3',
+        location: 'Buenos Aires'
+    },
+    {
+        id: 'la100',
+        name: 'La 100',
+        type: 'radio',
+        url: 'https://stream.cienradios.com/La_100.mp3',
+        location: 'Buenos Aires'
+    },
+    {
+        id: 'aspen',
+        name: 'Aspen 102.3',
+        type: 'radio',
+        url: 'https://streaming.latam.pro/8010/stream',
+        location: 'Buenos Aires'
+    },
+    {
         id: 'canal11',
         name: 'Canal 11 Ushuaia',
         type: 'tv',
-        url: 'https://www.youtube.com/embed/live_stream?channel=UC_1E6T1N8r9o1V5vj6AaxWA', // Placeholder channel ID for Canal 11
+        url: 'https://www.youtube.com/embed/live_stream?channel=UC_1E6T1N8r9o1V5vj6AaxWA',
         location: 'Ushuaia'
     },
     {
         id: 'canal13',
         name: 'Canal 13 Río Grande',
         type: 'tv',
-        url: 'https://www.youtube.com/embed/live_stream?channel=UC_1E6T1N8r9o1V5vj6AaxWA', // Placeholder channel ID for Canal 13
+        url: 'https://www.youtube.com/embed/live_stream?channel=UC_1E6T1N8r9o1V5vj6AaxWA',
         location: 'Río Grande'
     }
 ];

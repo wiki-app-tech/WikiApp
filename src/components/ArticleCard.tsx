@@ -97,58 +97,52 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
         );
     }
 
-    // Default: Card View
+    // Default: Card View (Inoreader Style)
     return (
         <div
             onClick={onClick}
-            className={`${commonClasses} group flex flex-col glass-card overflow-hidden ${isSelected ? 'ring-2 ring-blue-600/20' : ''}`}
+            className={`${commonClasses} group flex flex-col bg-white rounded-xl border border-slate-100 hover:shadow-2xl hover:shadow-slate-200/50 hover:border-blue-100 overflow-hidden h-full`}
         >
             {imageUrl && (
-                <div className="aspect-[16/11] w-full overflow-hidden relative">
+                <div className="aspect-[16/10] w-full overflow-hidden relative bg-slate-50">
                     <Image
                         src={imageUrl}
                         alt={article.title}
                         fill
-                        className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
                         sizes="(max-width: 1200px) 100vw, (max-width: 1536px) 50vw, 33vw"
-                        priority={isSelected}
                     />
-                    <div className="absolute top-6 left-6 bg-white/95 px-5 py-2.5 rounded-[var(--radius-button)] text-[10px] font-bold text-blue-600 uppercase tracking-tight shadow-2xl backdrop-blur-md">
-                        {article.sourceName}
-                    </div>
                 </div>
             )}
-            <div className="p-8 flex flex-col flex-1">
-                <div className="flex items-center gap-3 mb-5">
-                    <div className="w-2 h-2 rounded-full bg-blue-600 shadow-lg shadow-blue-500/50" />
-                    <span className="text-[11px] text-zinc-400 font-bold">{formattedDate}</span>
-                </div>
 
-                <h3 className={`text-2xl font-bold leading-tight mb-5 transition-colors ${isSelected ? 'text-blue-600' : 'text-zinc-900 group-hover:text-blue-600'} line-clamp-2 tracking-tight`}>
+            <div className="p-5 flex flex-col flex-1">
+                <h3 className={`text-lg font-bold leading-snug mb-3 transition-colors ${isSelected ? 'text-blue-600' : 'text-slate-900 group-hover:text-blue-600'} line-clamp-3 tracking-tight`}>
                     {article.title}
                 </h3>
 
-                <p className="text-[15px] text-zinc-400 line-clamp-3 leading-relaxed flex-1 font-medium mb-10">
-                    {cleanDescription}
-                </p>
+                <div className="flex items-center gap-2 mb-4">
+                    <div className="w-5 h-5 rounded-md bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <span className="text-[8px] font-black text-slate-400 capitalize">{article.sourceName.charAt(0)}</span>
+                    </div>
+                    <span className="text-xs font-bold text-slate-500 truncate">{article.sourceName}</span>
+                </div>
 
-                <div className="pt-8 border-t border-zinc-50 flex items-center justify-between">
-                    <button className="flex items-center gap-3 text-zinc-400 hover:text-blue-600 font-bold transition-all group/action">
-                        <div className="w-10 h-10 rounded-2xl bg-zinc-50 flex items-center justify-center group-hover/action:bg-blue-50 transition-colors">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                            </svg>
-                        </div>
-                        <span className="text-[11px] uppercase tracking-tight">Chat</span>
-                    </button>
-                    <button className="flex items-center gap-3 text-zinc-400 hover:text-blue-600 font-bold transition-all group/action">
-                        <div className="w-10 h-10 rounded-2xl bg-zinc-50 flex items-center justify-center group-hover/action:bg-blue-50 transition-colors">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                            </svg>
-                        </div>
-                        <span className="text-[11px] uppercase tracking-tight">Share</span>
-                    </button>
+                <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
+                    <span className="text-[11px] font-medium text-slate-400 uppercase tracking-tighter">
+                        {formattedDate}
+                    </span>
+
+                    <div className="flex items-center gap-1">
+                        <button className="p-2 text-slate-300 hover:text-amber-500 transition-colors">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" /></svg>
+                        </button>
+                        <button className="p-2 text-slate-300 hover:text-blue-500 transition-colors">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" strokeWidth="2.5" /></svg>
+                        </button>
+                        <button className="p-2 text-slate-300 hover:text-slate-600 transition-colors">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
