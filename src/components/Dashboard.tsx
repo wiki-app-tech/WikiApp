@@ -201,9 +201,9 @@ export default function Dashboard({
     const categories = useMemo(() => Array.from(new Set(followedFeeds.map(f => f.category))), [followedFeeds]);
 
     return (
-        <div className="flex h-screen bg-[#F8FAFC] text-slate-900 font-sans overflow-hidden">
-            {/* Sidebar 1: Icon Bar (Narrow Light) */}
-            <aside className="hidden lg:flex w-16 bg-white flex-col items-center py-6 gap-2 shrink-0 z-50 border-r border-slate-100 shadow-sm">
+        <div className="flex h-screen bg-surface-primary text-text-primary font-sans overflow-hidden">
+            {/* Sidebar 1: Icon Bar (Narrow Aqua) */}
+            <aside className="hidden lg:flex w-16 bg-surface-elevated flex-col items-center py-6 gap-2 shrink-0 z-50 border-r border-accent-primary/10 shadow-lg">
                 <div className="mb-8">
                     <MediosWikiAppLogo className="w-10 h-10" />
                 </div>
@@ -221,10 +221,10 @@ export default function Dashboard({
                 </div>
             </aside>
 
-            {/* Sidebar 2: Content Sidebar (Wider Light) */}
+            {/* Sidebar 2: Content Sidebar (Wider Aqua) */}
             <aside className={`
                 fixed inset-0 z-40 lg:relative lg:inset-auto lg:z-auto
-                h-full border-r border-slate-100 flex flex-col bg-white transition-all duration-300 ease-in-out overflow-hidden
+                h-full border-r border-accent-primary/10 flex flex-col bg-surface-elevated transition-all duration-300 ease-in-out overflow-hidden
                 ${isMobileMenuOpen || (activeTab === 'home' || activeTab === 'audio' || activeTab === 'automate')
                     ? 'w-full lg:w-72 opacity-100 translate-x-0'
                     : 'w-0 opacity-0 -translate-x-full pointer-events-none'}
@@ -234,15 +234,15 @@ export default function Dashboard({
                     {activeTab === 'home' ? (
                         <>
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-bold tracking-tight text-slate-900">Feeds</h2>
+                                <h2 className="text-lg font-bold tracking-tight text-text-primary">Feeds</h2>
                                 <div className="flex items-center gap-1">
-                                    <button className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50">
+                                    <button className="p-1.5 text-text-tertiary hover:text-accent-primary rounded-lg hover:bg-white/5">
                                         <SettingsIcon className="w-4 h-4" />
                                     </button>
-                                    <button className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50">
+                                    <button className="p-1.5 text-text-tertiary hover:text-accent-primary rounded-lg hover:bg-white/5">
                                         <CircleIcon className="w-4 h-4" />
                                     </button>
-                                    <button className="p-1.5 text-blue-600 hover:text-blue-700 rounded-lg hover:bg-blue-50">
+                                    <button className="p-1.5 text-accent-primary hover:text-accent-secondary rounded-lg hover:bg-accent-primary/10">
                                         <SearchIcon className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -272,11 +272,11 @@ export default function Dashboard({
 
                                 {/* Dropdown de resultados de feeds */}
                                 {showFeedResults && feedSearch.length >= 2 && (
-                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-100 rounded-[1.5rem] shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <div className="p-3 bg-zinc-50/50 border-b border-zinc-100 flex items-center justify-between">
-                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest pl-2">Recomendados</span>
-                                            <button onClick={() => setShowFeedResults(false)} className="p-1 hover:bg-zinc-200 rounded-lg transition-colors">
-                                                <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    <div className="absolute top-full left-0 right-0 mt-2 bg-surface-elevated border border-accent-primary/20 rounded-[1.5rem] shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 glass-card">
+                                        <div className="p-3 bg-surface-primary/30 border-b border-accent-primary/10 flex items-center justify-between">
+                                            <span className="text-[10px] font-bold text-text-tertiary uppercase tracking-widest pl-2">Recomendados</span>
+                                            <button onClick={() => setShowFeedResults(false)} className="p-1 hover:bg-white/10 rounded-lg transition-colors">
+                                                <svg className="w-3.5 h-3.5 text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
                                             </button>
                                         </div>
                                         <div className="max-h-80 overflow-y-auto">
@@ -294,16 +294,16 @@ export default function Dashboard({
                                                                 }}
                                                                 className="flex-1 text-left"
                                                             >
-                                                                <div className="font-bold text-sm text-zinc-900 group-hover:text-blue-600 transition-colors">{feed.name}</div>
-                                                                <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-tighter mt-0.5">{feed.category}</div>
+                                                                <div className="font-bold text-sm text-text-primary group-hover:text-accent-primary transition-colors">{feed.name}</div>
+                                                                <div className="text-[10px] text-text-tertiary font-bold uppercase tracking-tighter mt-0.5">{feed.category}</div>
                                                             </button>
 
                                                             {isFollowing(feed.id) ? (
-                                                                <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest px-3 py-1.5">Siguiendo</span>
+                                                                <span className="text-[10px] font-bold text-text-tertiary uppercase tracking-widest px-3 py-1.5">Siguiendo</span>
                                                             ) : (
                                                                 <button
                                                                     onClick={() => followFeed(feed.id)}
-                                                                    className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold transition-all shadow-lg shadow-blue-500/20 active:scale-95"
+                                                                    className="flex items-center gap-1.5 px-4 py-1.5 bg-accent-primary hover:bg-accent-secondary text-surface-primary rounded-xl text-[10px] font-bold transition-all shadow-lg shadow-accent-primary/20 active:scale-95"
                                                                 >
                                                                     <PlusIcon className="w-3 h-3" />
                                                                     SEGUIR
@@ -329,11 +329,11 @@ export default function Dashboard({
                             <nav className="space-y-0.5 overflow-y-auto pr-2 -mr-2 scrollbar-hide">
                                 <button
                                     onClick={() => { setSelectedFeed(null); setIsMobileMenuOpen(false); }}
-                                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${!selectedFeed ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}
+                                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${!selectedFeed ? 'bg-accent-primary/10 text-accent-primary font-bold' : 'text-text-secondary hover:bg-white/5'}`}
                                 >
-                                    <LayoutIcon className={`w-4 h-4 ${!selectedFeed ? 'text-blue-600' : 'text-slate-400'}`} />
+                                    <LayoutIcon className={`w-4 h-4 ${!selectedFeed ? 'text-accent-primary' : 'text-text-tertiary'}`} />
                                     <span className="text-sm flex-1 text-left">Newsfeed</span>
-                                    <span className="text-[10px] font-bold opacity-60">{articles.length}</span>
+                                    <span className="text-[10px] font-bold opacity-60 text-text-tertiary">{articles.length}</span>
                                 </button>
 
                                 {categories.map(category => (
@@ -353,7 +353,7 @@ export default function Dashboard({
                                                     <div key={feed.id} className="relative group/feed">
                                                         <button
                                                             onClick={() => { setSelectedFeed(feed.id); setActiveTab('home'); setIsMobileMenuOpen(false); }}
-                                                            className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] transition-all ${selectedFeed === feed.id ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                                                            className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] transition-all ${selectedFeed === feed.id ? 'bg-accent-primary/10 text-accent-primary font-bold shadow-glow-accent' : 'text-text-tertiary hover:text-text-primary hover:bg-accent-primary/5'}`}
                                                         >
                                                             <span className="flex-1 text-left truncate">{feed.name}</span>
                                                             <span className="text-[10px] font-medium opacity-50 group-hover/feed:opacity-0 transition-opacity">{feedCounts[feed.id] || 0}</span>
@@ -376,23 +376,23 @@ export default function Dashboard({
                                 {activeStream && (
                                     <button
                                         onClick={() => setActiveTab('audio')}
-                                        className="w-full bg-slate-900 rounded-2xl p-4 shadow-xl shadow-slate-900/10 flex items-center gap-3 group/mini hover:scale-[1.02] transition-all"
+                                        className="w-full bg-accent-primary/10 rounded-2xl p-4 shadow-glow-accent flex items-center gap-3 group/mini hover:scale-[1.02] transition-all border border-accent-primary/20 glass-card"
                                     >
-                                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shrink-0">
+                                        <div className="w-8 h-8 bg-accent-primary rounded-lg flex items-center justify-center text-surface-primary shrink-0">
                                             <div className="flex gap-0.5 items-end h-3">
-                                                <div className="w-0.5 h-2 bg-white rounded-full animate-pulse" />
-                                                <div className="w-0.5 h-3 bg-white rounded-full animate-bounce" />
-                                                <div className="w-0.5 h-1.5 bg-white rounded-full animate-pulse" />
+                                                <div className="w-0.5 h-2 bg-surface-primary rounded-full animate-pulse" />
+                                                <div className="w-0.5 h-3 bg-surface-primary rounded-full animate-bounce" />
+                                                <div className="w-0.5 h-1.5 bg-surface-primary rounded-full animate-pulse" />
                                             </div>
                                         </div>
                                         <div className="flex-1 min-w-0 text-left">
-                                            <div className="text-[8px] font-black text-blue-400 uppercase tracking-widest leading-none">LIVE</div>
-                                            <div className="text-[11px] font-bold text-white truncate leading-tight">{activeStream.name}</div>
+                                            <div className="text-[8px] font-black text-accent-primary uppercase tracking-widest leading-none">LIVE</div>
+                                            <div className="text-[11px] font-bold text-text-primary truncate leading-tight font-display">{activeStream.name}</div>
                                         </div>
                                     </button>
                                 )}
-                                <button className="w-full flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
-                                    <PlusIcon className="w-4 h-4 text-slate-400" />
+                                <button className="w-full flex items-center gap-3 px-3 py-2 text-text-tertiary hover:text-text-primary hover:bg-accent-primary/5 rounded-lg transition-all">
+                                    <PlusIcon className="w-4 h-4 text-accent-primary/50" />
                                     <span className="text-sm font-bold">Add feed</span>
                                 </button>
                             </div>
@@ -438,9 +438,9 @@ export default function Dashboard({
                                             <button
                                                 key={source.id}
                                                 onClick={() => setActiveStream(source)}
-                                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all ${activeStream?.id === source.id ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}
+                                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all ${activeStream?.id === source.id ? 'bg-accent-primary/10 text-accent-primary font-bold shadow-glow-accent border border-accent-primary/20' : 'text-text-secondary hover:bg-accent-primary/5'}`}
                                             >
-                                                <LayoutIcon className={`w-3.5 h-3.5 ${activeStream?.id === source.id ? 'text-blue-600' : 'text-slate-400'}`} />
+                                                <LayoutIcon className={`w-3.5 h-3.5 ${activeStream?.id === source.id ? 'text-accent-primary' : 'text-text-tertiary'}`} />
                                                 <span className="flex-1 text-left truncate">{source.name}</span>
                                             </button>
                                         ))}
@@ -450,24 +450,24 @@ export default function Dashboard({
 
                             {/* Playing Status if active */}
                             {activeStream && (
-                                <div className="mt-auto pt-6 border-t border-slate-50">
-                                    <div className="bg-slate-900 rounded-2xl p-4 shadow-xl shadow-slate-900/20 animate-scale-in">
+                                <div className="mt-auto pt-6 border-t border-accent-primary/5">
+                                    <div className="bg-surface-elevated rounded-2xl p-4 shadow-glow-accent animate-scale-in glass-card border border-accent-primary/20">
                                         <div className="flex items-center gap-3 mb-3">
-                                            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                                            <div className="w-8 h-8 bg-accent-primary rounded-lg flex items-center justify-center text-surface-primary">
                                                 <div className="flex gap-0.5 items-end h-3">
-                                                    <div className="w-0.5 h-2 bg-white rounded-full animate-pulse" />
-                                                    <div className="w-0.5 h-3 bg-white rounded-full animate-bounce" />
-                                                    <div className="w-0.5 h-1.5 bg-white rounded-full animate-pulse" />
+                                                    <div className="w-0.5 h-2 bg-surface-primary rounded-full animate-pulse" />
+                                                    <div className="w-0.5 h-3 bg-surface-primary rounded-full animate-bounce" />
+                                                    <div className="w-0.5 h-1.5 bg-surface-primary rounded-full animate-pulse" />
                                                 </div>
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <div className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Reproduciendo</div>
-                                                <div className="text-xs font-bold text-white truncate">{activeStream.name}</div>
+                                                <div className="text-[9px] font-black text-accent-primary uppercase tracking-widest">Reproduciendo</div>
+                                                <div className="text-xs font-bold text-text-primary truncate">{activeStream.name}</div>
                                             </div>
                                         </div>
                                         <button
                                             onClick={() => setActiveStream(null)}
-                                            className="w-full py-2 bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold rounded-lg transition-all"
+                                            className="w-full py-2 bg-accent-primary/10 hover:bg-accent-primary/20 text-accent-primary text-[10px] font-bold rounded-lg transition-all"
                                         >
                                             DETENER
                                         </button>
@@ -533,25 +533,25 @@ export default function Dashboard({
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0 bg-[#F8FAFC] relative">
-                <header className="h-16 bg-white border-b border-slate-100 flex items-center px-8 justify-between sticky top-0 z-30">
+            <main className="flex-1 flex flex-col min-w-0 bg-surface-primary relative">
+                <header className="h-16 bg-surface-elevated/80 border-b border-accent-primary/10 flex items-center px-8 justify-between sticky top-0 z-30 glass-header">
                     <div className="flex items-center gap-6">
                         <div className="flex items-center gap-2 group cursor-pointer">
-                            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+                            <h1 className="text-xl font-bold text-text-primary tracking-tight font-display">
                                 {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Newsfeed'}
                             </h1>
-                            <ChevronIcon className="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-colors" />
+                            <ChevronIcon className="w-4 h-4 text-text-tertiary group-hover:text-accent-primary transition-colors" />
                         </div>
 
-                        <div className="hidden md:flex items-center border-l border-slate-100 pl-6 gap-2 relative">
-                            <button className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors">
+                        <div className="hidden md:flex items-center border-l border-accent-primary/10 pl-6 gap-2 relative">
+                            <button className="flex items-center gap-2 px-3 py-1.5 bg-accent-primary/5 border border-accent-primary/10 rounded-lg text-xs font-bold text-text-secondary hover:bg-accent-primary/10 transition-colors">
                                 Unread ({filteredArticles.length})
                                 <ChevronIcon className="w-3 h-3 opacity-50" />
                             </button>
                             <div className="relative group">
                                 <button
                                     onClick={() => setShowDatePicker(!showDatePicker)}
-                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${startDate || endDate ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50 border border-transparent'}`}
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${startDate || endDate ? 'bg-accent-primary/10 text-accent-primary border border-accent-primary/20 shadow-glow-accent' : 'text-text-tertiary hover:text-text-primary hover:bg-accent-primary/5 border border-transparent'}`}
                                 >
                                     <FilterIcon className="w-4 h-4" />
                                     <span>{startDate || endDate ? 'Filtrado por fecha' : 'Filtrar por fecha'}</span>
@@ -560,14 +560,14 @@ export default function Dashboard({
                                 {showDatePicker && (
                                     <>
                                         <div className="fixed inset-0 z-40" onClick={() => setShowDatePicker(false)} />
-                                        <div className="absolute top-full left-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl p-6 z-50 w-72 animate-fade-in">
+                                        <div className="absolute top-full left-0 mt-2 bg-surface-elevated border border-accent-primary/20 rounded-2xl shadow-2xl p-6 z-50 w-72 animate-fade-in glass-card">
                                             <div className="space-y-4">
                                                 <div className="flex items-center justify-between mb-2">
-                                                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Rango de Fechas</h3>
+                                                    <h3 className="text-sm font-black text-text-primary uppercase tracking-widest font-display">Rango de Fechas</h3>
                                                     {(startDate || endDate) && (
                                                         <button
                                                             onClick={() => { setStartDate(null); setEndDate(null); }}
-                                                            className="text-[10px] font-bold text-blue-600 hover:text-blue-700"
+                                                            className="text-[10px] font-bold text-accent-primary hover:text-accent-secondary"
                                                         >
                                                             LIMPIAR
                                                         </button>
@@ -576,28 +576,28 @@ export default function Dashboard({
 
                                                 <div className="space-y-3">
                                                     <div>
-                                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mb-1.5 block">Desde</label>
+                                                        <label className="text-[10px] font-bold text-text-tertiary uppercase tracking-tighter mb-1.5 block">Desde</label>
                                                         <input
                                                             type="date"
                                                             value={startDate || ''}
                                                             onChange={(e) => setStartDate(e.target.value)}
-                                                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                                                            className="w-full bg-surface-primary/50 border border-accent-primary/10 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary outline-none transition-all text-text-primary"
                                                         />
                                                     </div>
                                                     <div>
-                                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mb-1.5 block">Hasta</label>
+                                                        <label className="text-[10px] font-bold text-text-tertiary uppercase tracking-tighter mb-1.5 block">Hasta</label>
                                                         <input
                                                             type="date"
                                                             value={endDate || ''}
                                                             onChange={(e) => setEndDate(e.target.value)}
-                                                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                                                            className="w-full bg-surface-primary/50 border border-accent-primary/10 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary outline-none transition-all text-text-primary"
                                                         />
                                                     </div>
                                                 </div>
 
                                                 <button
                                                     onClick={() => setShowDatePicker(false)}
-                                                    className="w-full mt-4 bg-slate-900 text-white rounded-xl py-2.5 text-xs font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10"
+                                                    className="w-full mt-4 bg-accent-primary text-surface-primary rounded-xl py-2.5 text-xs font-bold hover:bg-accent-secondary transition-all shadow-lg shadow-accent-primary/20"
                                                 >
                                                     APLICAR FILTRO
                                                 </button>
@@ -611,32 +611,32 @@ export default function Dashboard({
 
                     <div className="flex items-center gap-4">
                         <div className="relative group hidden lg:block">
-                            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary w-4 h-4" />
                             <input
                                 type="text"
                                 placeholder="Search in articles"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="bg-slate-100/50 border-slate-200 border focus:bg-white focus:border-blue-400 rounded-full pl-9 pr-4 py-1.5 text-xs w-64 outline-none transition-all"
+                                className="bg-surface-primary/50 border-accent-primary/10 border focus:bg-surface-primary focus:border-accent-primary/40 rounded-full pl-9 pr-4 py-1.5 text-xs w-64 outline-none transition-all text-text-primary glass-card"
                             />
                             {search && (
-                                <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-300 hover:text-slate-500">
+                                <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-text-tertiary hover:text-accent-primary">
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg>
                                 </button>
                             )}
                         </div>
 
-                        <div className="flex items-center gap-1 border-l border-slate-100 pl-4">
-                            <button onClick={refreshArticles} className={`p-2 text-slate-400 hover:text-blue-600 rounded-lg transition-colors ${isRefreshing ? 'animate-spin' : ''}`}>
+                        <div className="flex items-center gap-1 border-l border-accent-primary/10 pl-4">
+                            <button onClick={refreshArticles} className={`p-2 text-text-tertiary hover:text-accent-primary rounded-lg transition-colors ${isRefreshing ? 'animate-spin' : ''}`}>
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                             </button>
-                            <button onClick={() => handleViewModeChange('list')} className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-slate-100 text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
+                            <button onClick={() => handleViewModeChange('list')} className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-accent-primary/10 text-accent-primary shadow-glow-accent' : 'text-text-tertiary hover:text-text-primary'}`}>
                                 <ListIcon className="w-4 h-4" />
                             </button>
-                            <button onClick={() => handleViewModeChange('card')} className={`p-2 rounded-lg transition-colors ${viewMode === 'card' ? 'bg-slate-100 text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
+                            <button onClick={() => handleViewModeChange('card')} className={`p-2 rounded-lg transition-colors ${viewMode === 'card' ? 'bg-accent-primary/10 text-accent-primary shadow-glow-accent' : 'text-text-tertiary hover:text-text-primary'}`}>
                                 <GridSmallIcon className="w-4 h-4" />
                             </button>
-                            <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg">
+                            <button className="p-2 text-text-tertiary hover:text-accent-primary rounded-lg transition-colors">
                                 <SortIcon className="w-4 h-4" />
                             </button>
                         </div>
@@ -804,7 +804,7 @@ export default function Dashboard({
 
                 {/* Vista de Artículos Guardados */}
                 {activeTab === 'saved' && (
-                    <div className="flex-1 overflow-y-auto">
+                    <div className="flex-1 overflow-y-auto bg-surface-primary">
                         <SavedArticlesView
                             savedArticles={savedArticles}
                             allTags={getAllTags()}
@@ -820,28 +820,28 @@ export default function Dashboard({
 
                 {/* Vista de Audio y Streaming */}
                 {activeTab === 'audio' && (
-                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-[#F8FAFC]">
+                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-surface-primary text-text-primary">
                         <div className="max-w-6xl mx-auto">
                             {/* Cabecera Premium */}
                             <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-8">
                                 <div className="text-center md:text-left">
-                                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-xs font-bold tracking-widest uppercase mb-4 shadow-sm">
-                                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
+                                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent-primary/10 text-accent-primary rounded-full text-xs font-bold tracking-widest uppercase mb-4 shadow-sm">
+                                        <div className="w-2 h-2 bg-accent-primary rounded-full animate-pulse" />
                                         Multimedia Center
                                     </div>
-                                    <h1 className="text-5xl font-black text-slate-900 tracking-tight mb-4 font-display">
-                                        Audio & <span className="text-blue-600">Video</span>
+                                    <h1 className="text-5xl font-black text-text-primary tracking-tight mb-4 font-display">
+                                        Audio & <span className="text-accent-primary">Video</span>
                                     </h1>
-                                    <p className="text-slate-500 text-lg font-medium max-w-lg">
+                                    <p className="text-text-secondary text-lg font-medium max-w-lg">
                                         Transmisiones en vivo de las mejores radios y canales de televisión locales y nacionales.
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-4">
-                                    <button className="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-3xl shadow-lg border border-slate-100 hover:border-blue-200 transition-all group">
-                                        <SettingsIcon className="w-6 h-6 text-slate-400 group-hover:text-blue-600 transition-colors" />
-                                        <span className="text-[10px] font-bold text-slate-400 mt-2">CONFIG</span>
+                                    <button className="flex flex-col items-center justify-center w-20 h-20 bg-surface-elevated rounded-3xl shadow-lg border border-accent-primary/10 hover:border-accent-primary/40 transition-all group glass-card">
+                                        <SettingsIcon className="w-6 h-6 text-text-tertiary group-hover:text-accent-primary transition-colors" />
+                                        <span className="text-[10px] font-bold text-text-tertiary mt-2">CONFIG</span>
                                     </button>
-                                    <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] shadow-2xl shadow-blue-500/30 flex items-center justify-center transform hover:scale-105 transition-transform">
+                                    <div className="w-24 h-24 bg-gradient-to-br from-accent-primary to-accent-secondary rounded-[2rem] shadow-glow-accent flex items-center justify-center transform hover:scale-105 transition-transform">
                                         <HeadphonesIcon className="w-10 h-10 text-white" />
                                     </div>
                                 </div>
@@ -850,9 +850,9 @@ export default function Dashboard({
                             {/* Sección de Radios */}
                             <div className="mb-20">
                                 <div className="flex items-center gap-4 mb-8">
-                                    <div className="h-10 w-1.5 bg-orange-500 rounded-full" />
-                                    <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Radios en Vivo</h2>
-                                    <span className="ml-auto text-xs font-black text-slate-400 uppercase tracking-widest">{STREAMING_SOURCES.filter(s => s.type === 'radio').length} EMISORAS</span>
+                                    <div className="h-10 w-1.5 bg-accent-secondary rounded-full" />
+                                    <h2 className="text-3xl font-bold text-text-primary tracking-tight">Radios en Vivo</h2>
+                                    <span className="ml-auto text-xs font-black text-text-tertiary uppercase tracking-widest">{STREAMING_SOURCES.filter(s => s.type === 'radio').length} EMISORAS</span>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -860,26 +860,26 @@ export default function Dashboard({
                                         <button
                                             key={source.id}
                                             onClick={() => setActiveStream(source)}
-                                            className="group relative bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-orange-500/5 hover:-translate-y-1 transition-all text-left overflow-hidden"
+                                            className="group relative bg-surface-elevated rounded-[2rem] p-6 border border-accent-primary/10 shadow-sm hover:shadow-glow-accent/20 hover:-translate-y-1 transition-all text-left overflow-hidden glass-card"
                                         >
                                             <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-10 transition-opacity">
-                                                <ZapIcon className="w-24 h-24 text-orange-500 transform rotate-12" />
+                                                <ZapIcon className="w-24 h-24 text-accent-secondary transform rotate-12" />
                                             </div>
 
                                             <div className="flex items-center gap-5 mb-6">
-                                                <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-all shadow-inner">
+                                                <div className="w-14 h-14 bg-accent-secondary/10 rounded-2xl flex items-center justify-center text-accent-secondary group-hover:bg-accent-secondary group-hover:text-white transition-all shadow-inner">
                                                     <ZapIcon className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <div className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1">{source.location}</div>
-                                                    <h3 className="font-bold text-slate-900 group-hover:text-orange-600 transition-colors line-clamp-1">{source.name}</h3>
+                                                    <div className="text-[10px] font-black text-accent-secondary uppercase tracking-widest mb-1">{source.location}</div>
+                                                    <h3 className="font-bold text-text-primary group-hover:text-accent-secondary transition-colors line-clamp-1">{source.name}</h3>
                                                 </div>
                                             </div>
 
                                             <div className="flex items-center justify-between mt-auto">
-                                                <span className="text-xs font-semibold text-slate-400">Stream HD • 128kbps</span>
-                                                <div className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-bold shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
-                                                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                                                <span className="text-xs font-semibold text-text-tertiary">Stream HD • 128kbps</span>
+                                                <div className="flex items-center gap-2 px-4 py-2 bg-accent-primary text-surface-primary rounded-xl text-[10px] font-bold shadow-glow-accent opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
+                                                    <div className="w-1.5 h-1.5 bg-surface-primary rounded-full animate-pulse" />
                                                     ESCUCHAR
                                                 </div>
                                             </div>
@@ -891,9 +891,9 @@ export default function Dashboard({
                             {/* Sección de TV */}
                             <div className="mb-20">
                                 <div className="flex items-center gap-4 mb-8">
-                                    <div className="h-10 w-1.5 bg-blue-600 rounded-full" />
-                                    <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Canales de TV</h2>
-                                    <span className="ml-auto text-xs font-black text-slate-400 uppercase tracking-widest">{STREAMING_SOURCES.filter(s => s.type === 'tv').length} CANALES</span>
+                                    <div className="h-10 w-1.5 bg-accent-primary rounded-full" />
+                                    <h2 className="text-3xl font-bold text-text-primary tracking-tight">Canales de TV</h2>
+                                    <span className="ml-auto text-xs font-black text-text-tertiary uppercase tracking-widest">{STREAMING_SOURCES.filter(s => s.type === 'tv').length} CANALES</span>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -901,17 +901,17 @@ export default function Dashboard({
                                         <button
                                             key={source.id}
                                             onClick={() => setActiveStream(source)}
-                                            className="group relative bg-white rounded-[2.5rem] p-1 border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden hover:scale-[1.02] transition-all"
+                                            className="group relative bg-surface-elevated rounded-[2.5rem] p-1 border border-accent-primary/10 shadow-glow-accent/20 overflow-hidden hover:scale-[1.02] transition-all glass-card"
                                         >
-                                            <div className="aspect-video w-full rounded-[2.2rem] overflow-hidden relative border border-slate-50">
-                                                <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-10" />
+                                            <div className="aspect-video w-full rounded-[2.2rem] overflow-hidden relative border border-accent-primary/5">
+                                                <div className="absolute inset-0 bg-gradient-to-t from-surface-elevated via-transparent to-transparent z-10" />
 
                                                 {/* Placeholder Image or Gradient */}
-                                                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50" />
+                                                <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10" />
 
                                                 <div className="absolute inset-0 flex items-center justify-center z-20 group-hover:scale-110 transition-transform duration-500">
-                                                    <div className="w-16 h-16 bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 shadow-xl">
-                                                        <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all">
+                                                    <div className="w-16 h-16 bg-surface-elevated/40 backdrop-blur-md rounded-full flex items-center justify-center border border-accent-primary/20 shadow-xl">
+                                                        <div className="w-12 h-12 bg-accent-primary text-surface-primary rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all">
                                                             <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                                                         </div>
                                                     </div>
@@ -919,10 +919,10 @@ export default function Dashboard({
 
                                                 <div className="absolute bottom-8 left-8 right-8 z-20">
                                                     <div className="flex items-center gap-3 mb-2">
-                                                        <span className="px-3 py-1 bg-red-600 text-white text-[10px] font-black rounded-lg shadow-lg shadow-red-600/20 animate-pulse">EN VIVO</span>
-                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">{source.location}</span>
+                                                        <span className="px-3 py-1 bg-accent-primary/10 text-accent-primary text-[10px] font-black rounded-lg shadow-glow-accent animate-pulse">EN VIVO</span>
+                                                        <span className="text-[10px] font-bold text-text-tertiary uppercase tracking-[0.2em]">{source.location}</span>
                                                     </div>
-                                                    <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{source.name}</h3>
+                                                    <h3 className="text-2xl font-bold text-text-primary tracking-tight">{source.name}</h3>
                                                 </div>
                                             </div>
                                         </button>
@@ -931,53 +931,53 @@ export default function Dashboard({
                             </div>
 
                             {/* Panel de Configuración Rápida */}
-                            <div className="bg-white rounded-[3rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50">
+                            <div className="bg-surface-elevated rounded-[3rem] p-10 border border-accent-primary/10 shadow-glow-accent/20 glass-card">
                                 <div className="flex items-center gap-4 mb-10">
-                                    <div className="p-3 bg-slate-50 rounded-2xl">
-                                        <SettingsIcon className="w-6 h-6 text-slate-900" />
+                                    <div className="p-3 bg-surface-primary rounded-2xl">
+                                        <SettingsIcon className="w-6 h-6 text-text-primary" />
                                     </div>
-                                    <h3 className="text-2xl font-bold text-slate-900 tracking-tight">Opciones de Reproducción</h3>
+                                    <h3 className="text-2xl font-bold text-text-primary tracking-tight">Opciones de Reproducción</h3>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Calidad de Audio</label>
+                                        <label className="text-[10px] font-black text-text-tertiary uppercase tracking-[0.2em] mb-4 block">Calidad de Audio</label>
                                         <div className="space-y-2">
                                             {['Baja (64kbps)', 'Media (128kbps)', 'Alta (320kbps)'].map((quality, idx) => (
-                                                <button key={quality} className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${idx === 1 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'}`}>
+                                                <button key={quality} className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${idx === 1 ? 'bg-accent-primary text-surface-primary shadow-glow-accent' : 'bg-surface-primary text-text-secondary hover:bg-accent-primary/5'}`}>
                                                     {quality}
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Reproducción Automática</label>
-                                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
-                                            <span className="text-sm font-bold text-slate-700">Autoplay</span>
-                                            <div className="w-12 h-6 bg-blue-600 rounded-full relative flex items-center px-1 shadow-inner">
+                                        <label className="text-[10px] font-black text-text-tertiary uppercase tracking-[0.2em] mb-4 block">Reproducción Automática</label>
+                                        <div className="flex items-center justify-between p-4 bg-surface-primary rounded-2xl">
+                                            <span className="text-sm font-bold text-text-secondary">Autoplay</span>
+                                            <div className="w-12 h-6 bg-accent-primary rounded-full relative flex items-center px-1 shadow-inner">
                                                 <div className="w-4 h-4 bg-white rounded-full shadow-md ml-auto" />
                                             </div>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Modo de Video</label>
-                                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mb-2">
-                                            <span className="text-sm font-bold text-slate-700">Pop-out por defecto</span>
-                                            <div className="w-12 h-6 bg-slate-200 rounded-full relative flex items-center px-1">
+                                        <label className="text-[10px] font-black text-text-tertiary uppercase tracking-[0.2em] mb-4 block">Modo de Video</label>
+                                        <div className="flex items-center justify-between p-4 bg-surface-primary rounded-2xl mb-2">
+                                            <span className="text-sm font-bold text-text-secondary">Pop-out por defecto</span>
+                                            <div className="w-12 h-6 bg-surface-elevated/50 rounded-full relative flex items-center px-1">
                                                 <div className="w-4 h-4 bg-white rounded-full shadow-md" />
                                             </div>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Datos del Sistema</label>
-                                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <label className="text-[10px] font-black text-text-tertiary uppercase tracking-[0.2em] mb-4 block">Datos del Sistema</label>
+                                        <div className="p-4 bg-surface-primary rounded-2xl border border-accent-primary/10">
                                             <div className="flex items-center justify-between mb-2">
-                                                <span className="text-[10px] font-bold text-slate-400">VERSION</span>
-                                                <span className="text-[10px] font-bold text-blue-600">2026.1.4</span>
+                                                <span className="text-[10px] font-bold text-text-tertiary">VERSION</span>
+                                                <span className="text-[10px] font-bold text-accent-primary">2026.1.4</span>
                                             </div>
                                             <div className="flex items-center justify-between">
-                                                <span className="text-[10px] font-bold text-slate-400">CODEC</span>
-                                                <span className="text-[10px] font-bold text-orange-600">OPUS/H.264</span>
+                                                <span className="text-[10px] font-bold text-text-tertiary">CODEC</span>
+                                                <span className="text-[10px] font-bold text-accent-secondary">OPUS/H.264</span>
                                             </div>
                                         </div>
                                     </div>
@@ -985,13 +985,13 @@ export default function Dashboard({
                             </div>
 
                             {/* Footer del Media Center */}
-                            <div className="mt-20 py-12 border-t border-slate-100 text-center">
+                            <div className="mt-20 py-12 border-t border-accent-primary/10 text-center">
                                 <div className="flex items-center justify-center gap-2 mb-4">
-                                    <div className="w-8 h-[2px] bg-slate-200" />
+                                    <div className="w-8 h-[2px] bg-accent-primary/20" />
                                     <MediosWikiAppLogo className="w-8 h-8 opacity-20" />
-                                    <div className="w-8 h-[2px] bg-slate-200" />
+                                    <div className="w-8 h-[2px] bg-accent-primary/20" />
                                 </div>
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">
+                                <span className="text-[10px] font-black text-text-tertiary uppercase tracking-[0.4em]">
                                     Premium Media Experience V2
                                 </span>
                             </div>
@@ -1001,23 +1001,23 @@ export default function Dashboard({
 
                 {/* Vista de Automatización y Fuentes Externas */}
                 {activeTab === 'automate' && (
-                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-[#F8FAFC]">
+                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-surface-primary">
                         <div className="max-w-6xl mx-auto">
                             {/* Cabecera Premium */}
                             <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-8">
                                 <div className="text-center md:text-left">
-                                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black tracking-widest uppercase mb-4 shadow-sm border border-indigo-100">
+                                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent-primary/10 text-accent-primary rounded-full text-[10px] font-black tracking-widest uppercase mb-4 shadow-sm border border-accent-primary/10">
                                         <ZapIcon className="w-3 h-3 animate-pulse" />
                                         Automation Suite
                                     </div>
-                                    <h1 className="text-5xl font-black text-slate-900 tracking-tighter mb-4 font-display">
-                                        Monitor <span className="text-indigo-600">& Sync</span>
+                                    <h1 className="text-5xl font-black text-text-primary tracking-tighter mb-4 font-display">
+                                        Monitor <span className="text-accent-primary">& Sync</span>
                                     </h1>
-                                    <p className="text-slate-500 text-lg font-medium max-w-lg">
+                                    <p className="text-text-secondary text-lg font-medium max-w-lg">
                                         Conecta tus redes sociales, sincroniza YouTube y gestiona tus podcasts favoritos en un hub centralizado.
                                     </p>
                                 </div>
-                                <div className="w-24 h-24 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[2rem] shadow-2xl shadow-indigo-500/30 flex items-center justify-center transform hover:scale-105 transition-all">
+                                <div className="w-24 h-24 bg-gradient-to-br from-accent-primary to-accent-secondary rounded-[2rem] shadow-glow-accent flex items-center justify-center transform hover:scale-105 transition-all">
                                     <ZapIcon className="w-10 h-10 text-white" />
                                 </div>
                             </div>
@@ -1025,77 +1025,77 @@ export default function Dashboard({
                             {/* Grid de Servicios */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {/* Monitor Social Media */}
-                                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col">
+                                <div className="bg-surface-elevated rounded-[2.5rem] p-8 border border-accent-primary/10 shadow-glow-accent/20 flex flex-col glass-card">
                                     <div className="flex items-center gap-4 mb-8">
-                                        <div className="p-4 bg-blue-50 text-blue-600 rounded-2xl">
+                                        <div className="p-4 bg-accent-primary/10 text-accent-primary rounded-2xl">
                                             <FacebookIcon className="w-6 h-6" />
                                         </div>
-                                        <h3 className="text-xl font-bold text-slate-900">Social Monitor</h3>
+                                        <h3 className="text-xl font-bold text-text-primary">Social Monitor</h3>
                                     </div>
-                                    <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+                                    <p className="text-text-secondary text-sm mb-8 leading-relaxed">
                                         Monitorea páginas de Facebook, canales de Telegram, Mastodon y feeds de Reddit sin salir de la app.
                                     </p>
                                     <div className="space-y-3 mt-auto">
-                                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                        <div className="flex items-center justify-between p-3 bg-surface-primary rounded-xl border border-accent-primary/10">
                                             <div className="flex items-center gap-2">
-                                                <TelegramIcon className="w-4 h-4 text-sky-500" />
-                                                <span className="text-xs font-bold text-slate-600 uppercase tracking-tighter">Canales Activos</span>
+                                                <TelegramIcon className="w-4 h-4 text-accent-primary" />
+                                                <span className="text-xs font-bold text-text-secondary uppercase tracking-tighter">Canales Activos</span>
                                             </div>
-                                            <span className="text-xs font-black text-blue-600">12</span>
+                                            <span className="text-xs font-black text-accent-primary">12</span>
                                         </div>
-                                        <button className="w-full py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
+                                        <button className="w-full py-4 bg-accent-primary text-surface-primary rounded-2xl text-xs font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-glow-accent">
                                             Añadir Monitor
                                         </button>
                                     </div>
                                 </div>
 
                                 {/* Sync Video Services */}
-                                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col">
+                                <div className="bg-surface-elevated rounded-[2.5rem] p-8 border border-accent-primary/10 shadow-glow-accent/20 flex flex-col glass-card">
                                     <div className="flex items-center gap-4 mb-8">
-                                        <div className="p-4 bg-red-50 text-red-600 rounded-2xl">
+                                        <div className="p-4 bg-accent-secondary/10 text-accent-secondary rounded-2xl">
                                             <YoutubeIcon className="w-6 h-6" />
                                         </div>
-                                        <h3 className="text-xl font-bold text-slate-900">Video Sync</h3>
+                                        <h3 className="text-xl font-bold text-text-primary">Video Sync</h3>
                                     </div>
-                                    <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+                                    <p className="text-text-secondary text-sm mb-8 leading-relaxed">
                                         Sincroniza tus suscripciones de YouTube y convierte canales en feeds automatizados de noticias.
                                     </p>
-                                    <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 mb-6 flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
-                                            <YoutubeIcon className="w-5 h-5 text-red-600" />
+                                    <div className="p-6 bg-surface-primary rounded-3xl border border-accent-primary/10 mb-6 flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-surface-elevated rounded-full flex items-center justify-center shadow-inner border border-accent-primary/5">
+                                            <YoutubeIcon className="w-5 h-5 text-accent-secondary" />
                                         </div>
                                         <div className="flex-1">
-                                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Estado Canal</div>
-                                            <div className="text-xs font-bold text-slate-900">Sincronizado</div>
+                                            <div className="text-[10px] font-black text-text-tertiary uppercase tracking-widest mb-0.5">Estado Canal</div>
+                                            <div className="text-xs font-bold text-text-primary">Sincronizado</div>
                                         </div>
                                     </div>
-                                    <button className="w-full mt-auto py-4 bg-red-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-red-700 transition-colors shadow-lg shadow-red-500/20">
+                                    <button className="w-full mt-auto py-4 bg-accent-secondary text-surface-primary rounded-2xl text-xs font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-glow-accent/20">
                                         Sincronizar YouTube
                                     </button>
                                 </div>
 
                                 {/* Podcasts & Audio */}
-                                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col">
+                                <div className="bg-surface-elevated rounded-[2.5rem] p-8 border border-accent-primary/10 shadow-glow-accent/20 flex flex-col glass-card">
                                     <div className="flex items-center gap-4 mb-8">
-                                        <div className="p-4 bg-purple-50 text-purple-600 rounded-2xl">
+                                        <div className="p-4 bg-accent-primary/10 text-accent-primary rounded-2xl">
                                             <PodcastIcon className="w-6 h-6" />
                                         </div>
-                                        <h3 className="text-xl font-bold text-slate-900">Podcast Hub</h3>
+                                        <h3 className="text-xl font-bold text-text-primary">Podcast Hub</h3>
                                     </div>
-                                    <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+                                    <p className="text-text-secondary text-sm mb-8 leading-relaxed">
                                         Escucha tus podcasts favoritos. Suscríbete a feeds RSS de audio y gestiona tu biblioteca globalmente.
                                     </p>
                                     <div className="space-y-4">
-                                        <div className="flex items-center gap-4 group cursor-pointer p-2 rounded-2xl hover:bg-slate-50 transition-all">
-                                            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                                                <PodcastIcon className="w-4 h-4 text-purple-600" />
+                                        <div className="flex items-center gap-4 group cursor-pointer p-2 rounded-2xl hover:bg-surface-primary transition-all">
+                                            <div className="w-10 h-10 bg-accent-primary/10 rounded-xl flex items-center justify-center">
+                                                <PodcastIcon className="w-4 h-4 text-accent-primary" />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <div className="text-xs font-bold text-slate-900 truncate">Hablemos de Código</div>
-                                                <div className="text-[10px] text-slate-400">Nuevo episodio hoy</div>
+                                                <div className="text-xs font-bold text-text-primary truncate">Hablemos de Código</div>
+                                                <div className="text-[10px] text-text-tertiary">Nuevo episodio hoy</div>
                                             </div>
                                         </div>
-                                        <button className="w-full py-4 border-2 border-dashed border-slate-200 text-slate-400 rounded-2xl text-xs font-black uppercase tracking-widest hover:border-purple-300 hover:text-purple-600 transition-all">
+                                        <button className="w-full py-4 border-2 border-dashed border-accent-primary/20 text-text-tertiary rounded-2xl text-xs font-black uppercase tracking-widest hover:border-accent-primary/40 hover:text-accent-primary transition-all">
                                             + Agregar Podcast
                                         </button>
                                     </div>
@@ -1103,31 +1103,31 @@ export default function Dashboard({
                             </div>
 
                             {/* Banner Mastodon / Reddit */}
-                            <div className="mt-12 p-12 bg-white rounded-[3.5rem] text-slate-900 shadow-xl shadow-slate-200/50 relative overflow-hidden border border-slate-100">
+                            <div className="mt-12 p-12 bg-surface-elevated rounded-[3.5rem] text-text-primary shadow-glow-accent/20 relative overflow-hidden border border-accent-primary/10 glass-card">
                                 <div className="absolute top-0 right-0 p-12 opacity-5 scale-150">
-                                    <Share2Icon className="w-64 h-64 text-blue-600" />
+                                    <Share2Icon className="w-64 h-64 text-accent-primary" />
                                 </div>
                                 <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
                                     <div className="max-w-2xl">
                                         <div className="flex items-center gap-3 mb-6">
-                                            <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black rounded-lg border border-blue-100 tracking-[0.2em] uppercase">Connectors</span>
+                                            <span className="px-3 py-1 bg-accent-primary/10 text-accent-primary text-[10px] font-black rounded-lg border border-accent-primary/20 tracking-[0.2em] uppercase">Connectors</span>
                                         </div>
-                                        <h2 className="text-4xl font-black mb-6 tracking-tight">Fediverso & Reddit <span className="text-blue-600">Express</span></h2>
-                                        <p className="text-slate-500 text-lg leading-relaxed mb-8">
+                                        <h2 className="text-4xl font-black mb-6 tracking-tight">Fediverso & Reddit <span className="text-accent-primary">Express</span></h2>
+                                        <p className="text-text-secondary text-lg leading-relaxed mb-8">
                                             Conecta con el ecosistema descentralizado de Mastodon y las comunidades más activas de Reddit. Filtra contenido específico y recíbelo directamente en tu feed personalizado.
                                         </p>
                                         <div className="flex flex-wrap gap-4">
-                                            <div className="px-4 py-2 bg-slate-50 rounded-xl text-xs font-bold border border-slate-100 flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full" />
+                                            <div className="px-4 py-2 bg-surface-primary rounded-xl text-xs font-bold border border-accent-primary/10 flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 bg-accent-secondary rounded-full" />
                                                 Mastodon.social
                                             </div>
-                                            <div className="px-4 py-2 bg-slate-50 rounded-xl text-xs font-bold border border-slate-100 flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 bg-orange-500 rounded-full" />
+                                            <div className="px-4 py-2 bg-surface-primary rounded-xl text-xs font-bold border border-accent-primary/10 flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 bg-accent-primary rounded-full" />
                                                 r/TierraDelFuego
                                             </div>
                                         </div>
                                     </div>
-                                    <button className="px-12 py-6 bg-blue-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-blue-600/30 hover:bg-blue-500 hover:scale-105 transition-all">
+                                    <button className="px-12 py-6 bg-accent-primary text-surface-primary rounded-2xl font-black text-sm uppercase tracking-widest shadow-glow-accent hover:opacity-90 hover:scale-105 transition-all">
                                         Configurar Conexiones
                                     </button>
                                 </div>
@@ -1138,11 +1138,11 @@ export default function Dashboard({
 
                 {/* Vista de Zonas / Mapas */}
                 {activeTab === 'zonas' && (
-                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-[#F8FAFC]">
+                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-surface-primary">
                         <div className="max-w-7xl mx-auto space-y-12">
                             <div className="flex flex-col gap-4">
-                                <h2 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">SISTEMA DE MONITOREO GEOGRÁFICO</h2>
-                                <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase">Mapas y <span className="text-blue-600">Zonas</span></h1>
+                                <h2 className="text-[10px] font-black text-accent-primary uppercase tracking-[0.2em]">SISTEMA DE MONITOREO GEOGRÁFICO</h2>
+                                <h1 className="text-5xl font-black text-text-primary tracking-tighter uppercase">Mapas y <span className="text-accent-primary">Zonas</span></h1>
                             </div>
                             <WeatherCard cities={cities} />
                         </div>
@@ -1151,24 +1151,24 @@ export default function Dashboard({
 
                 {/* Vista de Videos */}
                 {activeTab === 'videos' && (
-                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-[#F8FAFC]">
+                    <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-surface-primary">
                         <div className="max-w-7xl mx-auto space-y-12">
                             <div className="flex flex-col gap-4">
-                                <h2 className="text-[10px] font-black text-red-600 uppercase tracking-[0.2em]">MULTIMEDIA & VIDEO SYNC</h2>
-                                <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase">Hub de <span className="text-red-600">Video</span></h1>
+                                <h2 className="text-[10px] font-black text-accent-secondary uppercase tracking-[0.2em]">MULTIMEDIA & VIDEO SYNC</h2>
+                                <h1 className="text-5xl font-black text-text-primary tracking-tighter uppercase">Hub de <span className="text-accent-secondary">Video</span></h1>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col">
+                                <div className="bg-surface-elevated rounded-[2.5rem] p-8 border border-accent-primary/10 shadow-glow-accent/20 flex flex-col glass-card">
                                     <div className="flex items-center gap-4 mb-8">
-                                        <div className="p-4 bg-red-50 text-red-600 rounded-2xl">
+                                        <div className="p-4 bg-accent-secondary/10 text-accent-secondary rounded-2xl">
                                             <YoutubeIcon className="w-6 h-6" />
                                         </div>
-                                        <h3 className="text-xl font-bold text-slate-900">Video Subscription Sync</h3>
+                                        <h3 className="text-xl font-bold text-text-primary">Video Subscription Sync</h3>
                                     </div>
-                                    <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+                                    <p className="text-text-secondary text-sm mb-8 leading-relaxed">
                                         Convierte tus canales de YouTube favoritos en fuentes de noticias automáticas.
                                     </p>
-                                    <button className="w-full py-4 bg-red-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-red-700 transition-colors shadow-lg shadow-red-500/20">
+                                    <button className="w-full py-4 bg-accent-secondary text-surface-primary rounded-2xl text-xs font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-glow-accent/20">
                                         Conectar YouTube
                                     </button>
                                 </div>
@@ -1190,23 +1190,23 @@ export default function Dashboard({
                             {/* Section Header */}
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase">
+                                    <h1 className="text-5xl font-black text-text-primary tracking-tighter uppercase font-display">
                                         {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Centro de Noticias'}
                                     </h1>
-                                    <p className="text-slate-500 font-bold uppercase tracking-widest text-xs mt-3 flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" />
+                                    <p className="text-text-secondary font-bold uppercase tracking-widest text-xs mt-3 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 bg-accent-primary rounded-full animate-pulse shadow-glow-accent" />
                                         Tu feed personalizado
                                     </p>
                                 </div>
                                 {selectedFeed && (
-                                    <button onClick={() => setSelectedFeed(null)} className="px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-[11px] font-bold tracking-tight shadow-xl shadow-blue-500/30">VOLVER AL INICIO</button>
+                                    <button onClick={() => setSelectedFeed(null)} className="px-5 py-2.5 bg-accent-primary text-surface-primary rounded-2xl text-[11px] font-bold tracking-tight shadow-glow-accent hover:opacity-90 transition-all">VOLVER AL INICIO</button>
                                 )}
                             </div>
 
                             {/* Single Feed Grid - Always show grid for unified look */}
                             <div className={
                                 viewMode === 'list'
-                                    ? "flex flex-col bg-white border border-slate-100 rounded-xl overflow-hidden divide-y divide-slate-50"
+                                    ? "flex flex-col bg-surface-elevated border border-accent-primary/10 rounded-xl overflow-hidden divide-y divide-accent-primary/5 glass-card"
                                     : viewMode === 'magazine'
                                         ? "grid grid-cols-1 lg:grid-cols-2 gap-8"
                                         : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
@@ -1224,12 +1224,12 @@ export default function Dashboard({
 
                             {/* Empty State */}
                             {filteredArticles.length === 0 && (
-                                <div className="flex flex-col items-center justify-center py-32 text-center bg-white rounded-[3rem] shadow-xl shadow-blue-500/5 border border-white">
-                                    <div className="w-20 h-20 bg-zinc-50 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
-                                        <SearchIcon className="w-8 h-8 text-zinc-300" />
+                                <div className="flex flex-col items-center justify-center py-32 text-center bg-surface-elevated rounded-[3rem] shadow-glow-accent/10 border border-accent-primary/5 glass-card">
+                                    <div className="w-20 h-20 bg-surface-primary rounded-3xl flex items-center justify-center mb-6 shadow-inner">
+                                        <SearchIcon className="w-8 h-8 text-text-tertiary" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-zinc-900 tracking-tight">No se encontraron artículos</h3>
-                                    <p className="text-sm text-zinc-400 max-w-xs mx-auto mt-3 font-medium">Probá con otra búsqueda o ajustá los filtros de la biblioteca.</p>
+                                    <h3 className="text-xl font-bold text-text-primary tracking-tight">No se encontraron artículos</h3>
+                                    <p className="text-sm text-text-tertiary max-w-xs mx-auto mt-3 font-medium">Probá con otra búsqueda o ajustá los filtros de la biblioteca.</p>
                                 </div>
                             )}
                         </div>
@@ -1259,7 +1259,7 @@ export default function Dashboard({
                 </div>)}
 
                 {/* Mobile Bottom Nav */}
-                <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-100 flex items-center justify-around px-4 z-40 pb-safe shadow-lg">
+                <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-elevated/80 border-t border-accent-primary/10 flex items-center justify-around px-4 z-40 pb-safe shadow-glow-accent/10 backdrop-blur-xl glass-card">
                     <MobileTab active={activeTab === 'home' && !selectedArticleId} onClick={() => { setActiveTab('home'); setSelectedFeed(null); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Home" icon={<LayoutIcon className="w-6 h-6" />} />
                     <MobileTab active={activeTab === 'audio'} onClick={() => { setActiveTab('audio'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Audio" icon={<HeadphonesIcon className="w-6 h-6" />} />
                     <MobileTab active={activeTab === 'folders'} onClick={() => { setActiveTab('folders'); setIsMobileMenuOpen(true); }} label="Feeds" icon={<RssIcon className="w-6 h-6" />} />
@@ -1272,7 +1272,7 @@ export default function Dashboard({
                             <div className="relative">
                                 <BookmarkIcon className="w-6 h-6" />
                                 {savedArticles.length > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent-primary text-surface-primary text-[9px] font-bold rounded-full flex items-center justify-center shadow-glow-accent">
                                         {savedArticles.length > 9 ? '9+' : savedArticles.length}
                                     </span>
                                 )}

@@ -59,20 +59,20 @@ export default function ArticleReader({
 
     return (
         <div
-            className="fixed inset-0 z-50 bg-white md:relative md:flex-[2.5] md:inset-auto md:bg-white flex flex-col md:border-l md:border-zinc-100 animate-in slide-in-from-right duration-500 ease-out"
+            className="fixed inset-0 z-50 bg-surface-primary md:relative md:flex-[2.5] md:inset-auto flex flex-col md:border-l md:border-accent-primary/10 animate-in slide-in-from-right duration-500 ease-out h-full"
             onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
         >
-            <header className="h-24 border-b border-zinc-50 flex items-center px-8 justify-between bg-white sticky top-0 z-10">
+            <header className="h-24 border-b border-accent-primary/10 flex items-center px-8 justify-between bg-surface-elevated/80 sticky top-0 z-10 glass-header">
                 <div className="flex items-center gap-4">
-                    <button onClick={onClose} className="p-3 -ml-3 text-zinc-400 hover:text-zinc-900 transition-colors bg-zinc-50 rounded-2xl">
+                    <button onClick={onClose} className="p-3 -ml-3 text-text-tertiary hover:text-accent-primary transition-colors bg-accent-primary/5 rounded-2xl border border-accent-primary/10">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                     </button>
 
                     {/* Read indicator */}
                     {isRead && (
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-100 rounded-xl animate-in fade-in duration-300">
-                            <div className="w-2 h-2 rounded-full bg-green-500" />
-                            <span className="text-[10px] font-bold text-green-600 uppercase tracking-tight">Leído</span>
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-accent-secondary/10 border border-accent-secondary/20 rounded-xl animate-in fade-in duration-300">
+                            <div className="w-2 h-2 rounded-full bg-accent-secondary" />
+                            <span className="text-[10px] font-bold text-accent-secondary uppercase tracking-tight">Leído</span>
                         </div>
                     )}
                 </div>
@@ -82,9 +82,9 @@ export default function ArticleReader({
                     {onToggleSave && (
                         <button
                             onClick={onToggleSave}
-                            className={`p-3 rounded-2xl transition-all ${isSaved
-                                ? 'bg-amber-50 text-amber-600 hover:bg-amber-100'
-                                : 'bg-zinc-50 text-zinc-400 hover:text-amber-600 hover:bg-amber-50'
+                            className={`p-3 rounded-2xl transition-all border ${isSaved
+                                ? 'bg-accent-secondary/10 text-accent-secondary border-accent-secondary/20 shadow-glow'
+                                : 'bg-accent-primary/5 text-text-tertiary border-accent-primary/10 hover:text-accent-secondary hover:bg-accent-primary/10'
                                 }`}
                             aria-label={isSaved ? 'Quitar de guardados' : 'Guardar artículo'}
                         >
@@ -98,55 +98,55 @@ export default function ArticleReader({
                     <button
                         onClick={onSummarize}
                         disabled={isSummarizing || !!summary}
-                        className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-[11px] font-bold transition-all ${summary ? 'bg-orange-50 text-orange-600' : 'bg-white text-zinc-900 border border-zinc-100 hover:bg-zinc-50 shadow-xl shadow-zinc-200/50'
+                        className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-[11px] font-bold transition-all ${summary ? 'bg-accent-primary/20 text-accent-primary shadow-glow-accent' : 'bg-surface-elevated text-text-primary border border-accent-primary/20 hover:bg-surface-primary shadow-xl shadow-accent-primary/10'
                             } disabled:opacity-50`}
                     >
                         <ZapIcon className="w-3.5 h-3.5" />
                         {isSummarizing ? 'ANALYZING...' : summary ? 'AI SUMMARY' : 'GET SMART SUMMARY'}
                     </button>
                     <div className="flex items-center gap-2">
-                        <button onClick={() => onNavigate('prev')} className="p-3 text-zinc-400 hover:text-zinc-900 bg-zinc-50 rounded-2xl transition-all">
+                        <button onClick={() => onNavigate('prev')} className="p-3 text-text-tertiary hover:text-accent-primary bg-accent-primary/5 border border-accent-primary/10 rounded-2xl transition-all">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                         </button>
-                        <button onClick={() => onNavigate('next')} className="p-3 text-zinc-400 hover:text-zinc-900 bg-zinc-50 rounded-2xl transition-all">
+                        <button onClick={() => onNavigate('next')} className="p-3 text-text-tertiary hover:text-accent-primary bg-accent-primary/5 border border-accent-primary/10 rounded-2xl transition-all">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
                         </button>
                     </div>
-                    <a href={article.link} target="_blank" rel="noopener noreferrer" className="hidden lg:block bg-blue-600 text-white text-[11px] font-bold px-8 py-3.5 rounded-2xl uppercase tracking-tight shadow-xl shadow-blue-500/30 active:scale-95 transition-all">OPEN SOURCE SITE</a>
+                    <a href={article.link} target="_blank" rel="noopener noreferrer" className="hidden lg:block bg-accent-primary text-surface-primary text-[11px] font-bold px-8 py-3.5 rounded-2xl uppercase tracking-tight shadow-xl shadow-accent-primary/30 active:scale-95 transition-all">OPEN SOURCE SITE</a>
                 </div>
             </header>
 
-            <article className="flex-1 overflow-y-auto p-10 md:p-20 scroll-smooth">
+            <article className="flex-1 overflow-y-auto p-10 md:p-20 scroll-smooth bg-surface-primary">
                 <div className="max-w-3xl mx-auto space-y-16">
                     {summary && (
-                        <div className="bg-orange-50/50 border border-orange-100 rounded-[2.5rem] p-10 md:p-12 animate-in fade-in slide-in-from-top-4 duration-700 shadow-xl shadow-orange-500/5">
+                        <div className="bg-accent-primary/5 border border-accent-primary/20 rounded-[2.5rem] p-10 md:p-12 animate-in fade-in slide-in-from-top-4 duration-700 shadow-xl shadow-accent-primary/5 glass-card-accent">
                             <div className="flex items-center gap-4 mb-8">
-                                <div className="w-10 h-10 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
+                                <div className="w-10 h-10 rounded-2xl bg-accent-primary flex items-center justify-center text-surface-primary shadow-lg shadow-accent-primary/30">
                                     <ZapIcon className="w-5 h-5" />
                                 </div>
-                                <span className="text-[11px] font-bold uppercase tracking-tight text-orange-600">Smart Summary Agent</span>
+                                <span className="text-[11px] font-bold uppercase tracking-tight text-accent-primary">Smart Summary Agent</span>
                             </div>
-                            <p className="text-orange-900 text-xl md:text-2xl font-bold leading-relaxed tracking-tight">
+                            <p className="text-text-primary text-xl md:text-2xl font-bold leading-relaxed tracking-tight">
                                 {summary}
                             </p>
                             <div className="mt-10 flex gap-6">
-                                <button className="text-[11px] font-bold text-orange-600 uppercase tracking-tight hover:underline underline-offset-4">Copy Analysis</button>
-                                <button className="text-[11px] font-bold text-orange-600 uppercase tracking-tight hover:underline underline-offset-4">Learn More</button>
+                                <button className="text-[11px] font-bold text-accent-primary uppercase tracking-tight hover:underline underline-offset-4">Copy Analysis</button>
+                                <button className="text-[11px] font-bold text-accent-primary uppercase tracking-tight hover:underline underline-offset-4">Learn More</button>
                             </div>
                         </div>
                     )}
                     <div className="space-y-8">
                         <div className="flex items-center gap-4 text-[11px] font-bold uppercase tracking-tight">
-                            <span className="text-blue-600 px-3 py-1 bg-blue-50 rounded-lg">{article.sourceName}</span>
-                            <span className="text-zinc-200">•</span>
-                            <span className="text-zinc-400 font-medium">{new Date(article.pubDate).toLocaleString('es-AR')}</span>
+                            <span className="text-accent-primary px-3 py-1 bg-accent-primary/10 rounded-lg">{article.sourceName}</span>
+                            <span className="text-text-tertiary opacity-30">•</span>
+                            <span className="text-text-tertiary font-bold">{new Date(article.pubDate).toLocaleString('es-AR')}</span>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-black leading-[1.05] tracking-tighter text-zinc-900">{article.title}</h1>
-                        <div className="w-20 h-2 bg-blue-600 rounded-full mt-10" />
+                        <h1 className="text-4xl md:text-6xl font-black leading-[1.05] tracking-tighter text-text-primary font-display">{article.title}</h1>
+                        <div className="w-20 h-2 bg-accent-primary rounded-full mt-10 shadow-glow-accent" />
                     </div>
 
                     <div
-                        className="text-zinc-700 text-lg md:text-xl leading-[1.8] space-y-8 font-serif antialiased prose prose-zinc max-w-none prose-headings:font-black prose-headings:tracking-tighter prose-a:text-blue-600 prose-img:rounded-[2rem] prose-img:shadow-2xl"
+                        className="text-text-secondary text-lg md:text-xl leading-[1.8] space-y-8 antialiased prose prose-invert max-w-none prose-headings:font-black prose-headings:tracking-tighter prose-headings:text-text-primary prose-a:text-accent-primary prose-img:rounded-[2rem] prose-img:shadow-2xl prose-img:border prose-img:border-accent-primary/10"
                         dangerouslySetInnerHTML={{ __html: article.description }}
                     />
                 </div>

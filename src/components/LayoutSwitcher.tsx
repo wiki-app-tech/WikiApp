@@ -41,7 +41,7 @@ export default function LayoutSwitcher({ currentMode, onModeChange }: LayoutSwit
     ];
 
     return (
-        <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-xl border border-zinc-200/50 shadow-inner">
+        <div className="flex items-center gap-1 bg-surface-primary/50 p-1 rounded-xl border border-accent-primary/20 shadow-inner glass-card">
             {modes.map((mode) => (
                 <button
                     key={mode.id}
@@ -49,8 +49,8 @@ export default function LayoutSwitcher({ currentMode, onModeChange }: LayoutSwit
                     className={`
                         relative p-2 rounded-lg transition-all duration-300 group
                         ${currentMode === mode.id
-                            ? 'bg-white text-blue-600 shadow-md transform scale-105'
-                            : 'text-zinc-400 hover:text-zinc-600 hover:bg-white/50'
+                            ? 'bg-accent-primary text-surface-primary shadow-glow-accent transform scale-105'
+                            : 'text-text-tertiary hover:text-text-primary hover:bg-white/5'
                         }
                     `}
                     aria-label={mode.label}
@@ -58,9 +58,9 @@ export default function LayoutSwitcher({ currentMode, onModeChange }: LayoutSwit
                     {mode.icon}
 
                     {/* Tooltip */}
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2 py-1 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest rounded-md opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none translate-y-2 group-hover:translate-y-0 z-50">
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-surface-elevated text-text-primary text-[10px] font-black uppercase tracking-widest rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none translate-y-2 group-hover:translate-y-0 z-50 border border-accent-primary/20 glass-card shadow-2xl">
                         {mode.label}
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-900" />
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-accent-primary/20" />
                     </div>
                 </button>
             ))}

@@ -6,16 +6,20 @@ export default function MediosWikiAppLogo({ className = "w-10 h-10" }: { classNa
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >
-            {/* Fondo con gradiente azul */}
+            {/* Fondo con gradiente Aqua */}
             <defs>
-                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#3B82F6" />
-                    <stop offset="100%" stopColor="#1E40AF" />
+                <linearGradient id="logoAquaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#22d3ee" />
+                    <stop offset="100%" stopColor="#0d9488" />
                 </linearGradient>
+                <filter id="logoGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
             </defs>
 
             {/* Círculo de fondo */}
-            <circle cx="32" cy="32" r="30" fill="url(#logoGradient)" />
+            <circle cx="32" cy="32" r="30" fill="url(#logoAquaGradient)" filter="url(#logoGlow)" />
 
             {/* Icono de megáfono/comunicación */}
             <g transform="translate(16, 16)">

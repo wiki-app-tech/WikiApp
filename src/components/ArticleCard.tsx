@@ -42,18 +42,18 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
         return (
             <div
                 onClick={onClick}
-                className={`${commonClasses} flex items-start gap-4 p-5 border-b border-zinc-50 hover:bg-white hover:shadow-xl hover:shadow-blue-500/5 group ${isSelected ? 'bg-white shadow-xl shadow-blue-500/10 border-l-4 border-l-blue-600' : 'bg-transparent'}`}
+                className={`${commonClasses} flex items-start gap-4 p-5 border-b border-accent-primary/5 hover:bg-accent-primary/5 hover:shadow-xl hover:shadow-accent-primary/5 group ${isSelected ? 'bg-accent-primary/5 shadow-lg shadow-accent-primary/10 border-l-4 border-l-accent-primary' : 'bg-transparent'}`}
             >
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2.5">
-                        <span className="text-[11px] font-bold text-blue-600 uppercase tracking-tight">{article.sourceName}</span>
-                        <span className="w-1 h-1 rounded-full bg-zinc-200" />
-                        <span className="text-[11px] font-bold text-zinc-400">{formattedDate}</span>
+                        <span className="text-[11px] font-bold text-accent-primary uppercase tracking-tight">{article.sourceName}</span>
+                        <span className="w-1 h-1 rounded-full bg-accent-primary/20" />
+                        <span className="text-[11px] font-bold text-text-tertiary">{formattedDate}</span>
                     </div>
-                    <h3 className={`text-base font-bold leading-tight transition-colors ${isSelected ? 'text-blue-600' : 'text-zinc-900 group-hover:text-blue-600'} line-clamp-1 tracking-tight`}>
+                    <h3 className={`text-base font-bold leading-tight transition-colors ${isSelected ? 'text-accent-primary' : 'text-text-primary group-hover:text-accent-primary'} line-clamp-1 tracking-tight`}>
                         {article.title}
                     </h3>
-                    <p className="text-xs text-zinc-400 line-clamp-1 mt-1.5 font-medium leading-relaxed">
+                    <p className="text-xs text-text-tertiary line-clamp-1 mt-1.5 font-medium leading-relaxed">
                         {cleanDescription}
                     </p>
                 </div>
@@ -65,10 +65,10 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
         return (
             <div
                 onClick={onClick}
-                className={`${commonClasses} flex flex-col md:flex-row gap-6 p-6 glass-card group ${isSelected ? 'ring-2 ring-blue-600/20' : ''}`}
+                className={`${commonClasses} flex flex-col md:flex-row gap-6 p-6 glass-card group ${isSelected ? 'shadow-glow-accent border-accent-primary/30 ring-1 ring-accent-primary/20' : ''}`}
             >
                 {imageUrl && (
-                    <div className="w-full md:w-60 h-44 flex-shrink-0 overflow-hidden rounded-[calc(var(--radius-card)-0.5rem)] bg-zinc-50 relative">
+                    <div className="w-full md:w-60 h-44 flex-shrink-0 overflow-hidden rounded-2xl bg-surface-primary/50 relative">
                         <Image
                             src={imageUrl}
                             alt={article.title}
@@ -80,16 +80,16 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
                 )}
                 <div className="flex-1 flex flex-col justify-center">
                     <div className="flex items-center gap-3 mb-4">
-                        <span className="text-[11px] font-bold text-blue-600 uppercase tracking-tight">
+                        <span className="text-[11px] font-bold text-accent-primary uppercase tracking-tight">
                             {article.sourceName}
                         </span>
-                        <span className="w-1 h-1 rounded-full bg-zinc-200" />
-                        <span className="text-[11px] text-zinc-400 font-bold">{formattedDate}</span>
+                        <span className="w-1 h-1 rounded-full bg-accent-primary/20" />
+                        <span className="text-[11px] text-text-tertiary font-bold">{formattedDate}</span>
                     </div>
-                    <h3 className={`text-xl font-bold leading-tight mb-4 transition-colors ${isSelected ? 'text-blue-600' : 'text-zinc-900 group-hover:text-blue-600'} line-clamp-2 tracking-tight`}>
+                    <h3 className={`text-xl font-bold leading-tight mb-4 transition-colors ${isSelected ? 'text-accent-primary' : 'text-text-primary group-hover:text-accent-primary'} line-clamp-2 tracking-tight`}>
                         {article.title}
                     </h3>
-                    <p className="text-sm text-zinc-400 line-clamp-2 leading-relaxed font-medium">
+                    <p className="text-sm text-text-tertiary line-clamp-2 leading-relaxed font-medium">
                         {cleanDescription}
                     </p>
                 </div>
@@ -101,10 +101,10 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
     return (
         <div
             onClick={onClick}
-            className={`${commonClasses} group flex flex-col bg-white rounded-xl border border-slate-100 hover:shadow-2xl hover:shadow-slate-200/50 hover:border-blue-100 overflow-hidden h-full`}
+            className={`${commonClasses} group flex flex-col bg-surface-elevated/50 rounded-2xl border border-accent-primary/10 hover:shadow-2xl hover:shadow-accent-primary/5 hover:border-accent-primary/30 overflow-hidden h-full glass-card ${isSelected ? 'shadow-glow-accent border-accent-primary/40 brightness-110' : ''}`}
         >
             {imageUrl && (
-                <div className="aspect-[16/10] w-full overflow-hidden relative bg-slate-50">
+                <div className="aspect-[16/10] w-full overflow-hidden relative bg-surface-primary/30">
                     <Image
                         src={imageUrl}
                         alt={article.title}
@@ -116,31 +116,31 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
             )}
 
             <div className="p-5 flex flex-col flex-1">
-                <h3 className={`text-lg font-bold leading-snug mb-3 transition-colors ${isSelected ? 'text-blue-600' : 'text-slate-900 group-hover:text-blue-600'} line-clamp-3 tracking-tight`}>
+                <h3 className={`text-lg font-bold leading-snug mb-3 transition-colors ${isSelected ? 'text-accent-primary' : 'text-text-primary group-hover:text-accent-primary'} line-clamp-3 tracking-tight`}>
                     {article.title}
                 </h3>
 
                 <div className="flex items-center gap-2 mb-4">
-                    <div className="w-5 h-5 rounded-md bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                        <span className="text-[8px] font-black text-slate-400 capitalize">{article.sourceName.charAt(0)}</span>
+                    <div className="w-5 h-5 rounded-md bg-accent-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <span className="text-[8px] font-black text-accent-primary capitalize">{article.sourceName.charAt(0)}</span>
                     </div>
-                    <span className="text-xs font-bold text-slate-500 truncate">{article.sourceName}</span>
+                    <span className="text-xs font-bold text-text-secondary truncate">{article.sourceName}</span>
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
-                    <span className="text-[11px] font-medium text-slate-400 uppercase tracking-tighter">
+                <div className="mt-auto pt-4 border-t border-accent-primary/10 flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-tighter opacity-70">
                         {formattedDate}
                     </span>
 
                     <div className="flex items-center gap-1">
-                        <button className="p-2 text-slate-300 hover:text-amber-500 transition-colors">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" /></svg>
+                        <button className="p-2 text-text-tertiary/50 hover:text-accent-secondary transition-colors">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         </button>
-                        <button className="p-2 text-slate-300 hover:text-blue-500 transition-colors">
+                        <button className="p-2 text-text-tertiary/50 hover:text-accent-primary transition-colors">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" strokeWidth="2.5" /></svg>
                         </button>
-                        <button className="p-2 text-slate-300 hover:text-slate-600 transition-colors">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
+                        <button className="p-2 text-text-tertiary/50 hover:text-text-primary transition-colors">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.2" fill="currentColor" /><circle cx="19" cy="12" r="1.2" fill="currentColor" /><circle cx="5" cy="12" r="1.2" fill="currentColor" /></svg>
                         </button>
                     </div>
                 </div>
