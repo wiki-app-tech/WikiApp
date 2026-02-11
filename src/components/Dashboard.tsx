@@ -9,10 +9,17 @@ import WeatherCard from '@/components/WeatherCard';
 import ArticleReader from '@/components/ArticleReader';
 import RoadStatus from '@/components/RoadStatus';
 import NewsCarousel from '@/components/NewsCarousel';
+import CruiseShipWidget from '@/components/widgets/CruiseShipWidget';
+import FlightStatusWidget from '@/components/widgets/FlightStatusWidget';
+import LiveCamerasWidget from '@/components/widgets/LiveCamerasWidget';
+import ElectionsWidget from '@/components/widgets/ElectionsWidget';
+import PrintEditionsWidget from '@/components/widgets/PrintEditionsWidget';
+import EconomicIndicatorsWidget from '@/components/widgets/EconomicIndicatorsWidget';
 import RefreshIndicator from '@/components/RefreshIndicator';
 import MediosWikiAppLogo from '@/components/MediosWikiAppLogo';
 import SavedArticlesView from '@/components/SavedArticlesView';
 import SaveArticleModal from '@/components/SaveArticleModal';
+import { generateNewsSummary } from '@/services/geminiService';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { useSavedArticles } from '@/hooks/useSavedArticles';
 import { useFollowedFeeds } from '@/hooks/useFollowedFeeds';
@@ -61,7 +68,7 @@ export default function Dashboard({
     const [activeTab, setActiveTab] = useState<'home' | 'videos' | 'audio' | 'zonas' | 'search' | 'folders' | 'saved' | 'automate' | 'settings'>('home');
     const [viewMode, setViewMode] = useState<'list' | 'card' | 'magazine'>('card');
     const [isSummarizing, setIsSummarizing] = useState(false);
-    const [mockSummary, setMockSummary] = useState<string | null>(null);
+    const [articleSummary, setArticleSummary] = useState<string | null>(null);
     const [articles, setArticles] = useState<Article[]>(initialArticles);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [globalSearch, setGlobalSearch] = useState('');
@@ -187,15 +194,24 @@ export default function Dashboard({
         if (nextIndex >= filteredArticles.length) nextIndex = 0;
 
         setSelectedArticleId(filteredArticles[nextIndex].id);
-        setMockSummary(null);
+        setArticleSummary(null);
     };
 
-    const handleSummarize = () => {
+    const handleSummarize = async () => {
+        if (!selectedArticle) return;
         setIsSummarizing(true);
-        setTimeout(() => {
-            setMockSummary("Este artículo analiza las tendencias clave en la industria, destacando el impacto de la tecnología en los procesos actuales. Se recomienda prestar especial atención a las secciones de innovación y escalabilidad.");
+        try {
+            const summaryResult = await generateNewsSummary([{
+                title: selectedArticle.title,
+                source: selectedArticle.sourceName
+            }]);
+            setArticleSummary(summaryResult);
+        } catch (error) {
+            console.error("Error generating summary:", error);
+            setArticleSummary("No se pudo generar el resumen inteligente. Por favor, intente más tarde.");
+        } finally {
             setIsSummarizing(false);
-        }, 1500);
+        }
     };
 
     const categories = useMemo(() => Array.from(new Set(followedFeeds.map(f => f.category))), [followedFeeds]);
@@ -1112,19 +1128,23 @@ export default function Dashboard({
                                         <div className="flex items-center gap-3 mb-6">
                                             <span className="px-3 py-1 bg-accent-primary/10 text-accent-primary text-[10px] font-black rounded-lg border border-accent-primary/20 tracking-[0.2em] uppercase">Connectors</span>
                                         </div>
-                                        <h2 className="text-4xl font-black mb-6 tracking-tight">Fediverso & Reddit <span className="text-accent-primary">Express</span></h2>
+                                        <h2 className="text-4xl font-black mb-6 tracking-tight">Ecosistema <span className="text-accent-primary">Social Sync</span></h2>
                                         <p className="text-text-secondary text-lg leading-relaxed mb-8">
-                                            Conecta con el ecosistema descentralizado de Mastodon y las comunidades más activas de Reddit. Filtra contenido específico y recíbelo directamente en tu feed personalizado.
+                                            Conecta con Mastodon, Reddit y nuestro canal exclusivo de Telegram. Filtra contenido específico y recíbelo directamente en tu feed personalizado.
                                         </p>
                                         <div className="flex flex-wrap gap-4">
                                             <div className="px-4 py-2 bg-surface-primary rounded-xl text-xs font-bold border border-accent-primary/10 flex items-center gap-2">
                                                 <div className="w-1.5 h-1.5 bg-accent-secondary rounded-full" />
-                                                Mastodon.social
+                                                Mastodon
                                             </div>
                                             <div className="px-4 py-2 bg-surface-primary rounded-xl text-xs font-bold border border-accent-primary/10 flex items-center gap-2">
                                                 <div className="w-1.5 h-1.5 bg-accent-primary rounded-full" />
                                                 r/TierraDelFuego
                                             </div>
+                                            <a href="https://t.me/+rkKMfpVR3G0yMDBh" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-surface-primary rounded-xl text-xs font-bold border border-[#0088cc]/30 text-[#0088cc] flex items-center gap-2 hover:bg-[#0088cc]/10 transition-colors">
+                                                <div className="w-1.5 h-1.5 bg-[#0088cc] rounded-full shadow-[0_0_8px_#0088cc]" />
+                                                Canal Telegram
+                                            </a>
                                         </div>
                                     </div>
                                     <button className="px-12 py-6 bg-accent-primary text-surface-primary rounded-2xl font-black text-sm uppercase tracking-widest shadow-glow-accent hover:opacity-90 hover:scale-105 transition-all">
@@ -1139,12 +1159,41 @@ export default function Dashboard({
                 {/* Vista de Zonas / Mapas */}
                 {activeTab === 'zonas' && (
                     <div className="flex-1 overflow-y-auto p-8 md:p-12 bg-surface-primary">
-                        <div className="max-w-7xl mx-auto space-y-12">
-                            <div className="flex flex-col gap-4">
-                                <h2 className="text-[10px] font-black text-accent-primary uppercase tracking-[0.2em]">SISTEMA DE MONITOREO GEOGRÁFICO</h2>
-                                <h1 className="text-5xl font-black text-text-primary tracking-tighter uppercase">Mapas y <span className="text-accent-primary">Zonas</span></h1>
+                        <div className="max-w-7xl mx-auto space-y-16">
+                            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                                <div className="flex flex-col gap-4">
+                                    <h2 className="text-[10px] font-black text-accent-primary uppercase tracking-[0.2em]">SISTEMA DE MONITOREO GEOGRÁFICO</h2>
+                                    <h1 className="text-5xl font-black text-text-primary tracking-tighter uppercase font-display">Mapas y <span className="text-accent-primary">Zonas</span></h1>
+                                    <p className="text-text-secondary text-lg font-medium max-w-xl">
+                                        Información en tiempo real sobre clima, rutas, tráfico marítimo y aéreo en Tierra del Fuego.
+                                    </p>
+                                </div>
+                                <div className="hidden lg:flex items-center gap-6">
+                                    <div className="text-right">
+                                        <div className="text-3xl font-black text-text-primary">100%</div>
+                                        <div className="text-[10px] font-bold text-accent-secondary uppercase tracking-widest">Live Sync</div>
+                                    </div>
+                                    <div className="w-px h-12 bg-accent-primary/20" />
+                                    <div className="w-16 h-16 bg-accent-primary/10 rounded-3xl flex items-center justify-center text-accent-primary shadow-glow-accent">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                                    </div>
+                                </div>
                             </div>
+
                             <WeatherCard cities={cities} />
+
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
+                                <CruiseShipWidget />
+                                <FlightStatusWidget />
+                            </div>
+
+                            <LiveCamerasWidget />
+
+                            <ElectionsWidget />
+
+                            <PrintEditionsWidget />
+
+                            <EconomicIndicatorsWidget />
                         </div>
                     </div>
                 )}
@@ -1243,7 +1292,7 @@ export default function Dashboard({
                             onNavigate={handleNavigate}
                             onSummarize={handleSummarize}
                             isSummarizing={isSummarizing}
-                            summary={mockSummary}
+                            summary={articleSummary}
                             isSaved={isArticleSaved(selectedArticle.id)}
                             isRead={isArticleRead(selectedArticle.id)}
                             onToggleSave={() => {

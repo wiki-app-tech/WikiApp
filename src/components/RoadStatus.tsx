@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { generateRoadStatusSummary } from '@/services/geminiService';
+import { ZapIcon } from './Icons';
 
 interface RouteSegment {
     segment: string;
@@ -17,6 +19,8 @@ interface RoutesData {
 export default function RoadStatus() {
     const [activeTab, setActiveTab] = useState<'rn3' | 'complementary'>('rn3');
     const [routesData, setRoutesData] = useState<RoutesData | null>(null);
+    const [aiSummary, setAiSummary] = useState<string | null>(null);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -89,6 +93,21 @@ export default function RoadStatus() {
         }
     }, [routesData]);
 
+    const handleAIAnalysis = async () => {
+        if (!routesData) return;
+        setIsAnalyzing(true);
+        try {
+            const allRoutes = [...routesData.rn3, ...routesData.complementary];
+            const summary = await generateRoadStatusSummary(allRoutes);
+            setAiSummary(summary);
+        } catch (error) {
+            console.error("Error al generar análisis de IA:", error);
+            setAiSummary("No se pudo conectar con el motor de IA. Por favor reintente más tarde.");
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
     return (
         <div className="glass-card overflow-hidden p-8 shadow-2xl shadow-accent-primary/5 transition-all duration-300">
             <div className="flex items-center gap-4 mb-10">
@@ -112,11 +131,30 @@ export default function RoadStatus() {
                     Resumen del Estado Vial
                 </div>
                 <p className="text-text-secondary text-sm leading-relaxed font-bold">
-                    {shortSummary}
+                    {aiSummary || shortSummary}
                 </p>
-                <p className="text-[10px] text-text-tertiary mt-4 italic opacity-70">
-                    Información extraída de Vialidad Nacional y Defensa Civil de Tierra del Fuego
-                </p>
+                <div className="mt-6 flex items-center justify-between">
+                    <p className="text-[10px] text-text-tertiary italic opacity-70">
+                        Información extraída de Vialidad Nacional y Defensa Civil
+                    </p>
+                    <button
+                        onClick={handleAIAnalysis}
+                        disabled={isAnalyzing}
+                        className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${isAnalyzing ? 'bg-accent-primary/20 text-accent-primary' : 'bg-accent-primary/10 text-accent-primary hover:bg-accent-primary hover:text-surface-primary shadow-glow-accent'}`}
+                    >
+                        {isAnalyzing ? (
+                            <>
+                                <div className="w-3 h-3 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
+                                Analizando...
+                            </>
+                        ) : (
+                            <>
+                                <ZapIcon className="w-3 h-3" />
+                                Reporte IA
+                            </>
+                        )}
+                    </button>
+                </div>
             </div>
 
             <div className="flex p-1.5 bg-surface-primary/50 rounded-[var(--radius-card)] mb-10 w-fit border border-accent-primary/10">
