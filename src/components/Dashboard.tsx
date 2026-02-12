@@ -15,6 +15,7 @@ import LiveCamerasWidget from '@/components/widgets/LiveCamerasWidget';
 import ElectionsWidget from '@/components/widgets/ElectionsWidget';
 import PrintEditionsWidget from '@/components/widgets/PrintEditionsWidget';
 import EconomicIndicatorsWidget from '@/components/widgets/EconomicIndicatorsWidget';
+import TDFStatsWidget from '@/components/widgets/TDFStatsWidget';
 import RefreshIndicator from '@/components/RefreshIndicator';
 import MediosWikiAppLogo from '@/components/MediosWikiAppLogo';
 import SavedArticlesView from '@/components/SavedArticlesView';
@@ -1202,6 +1203,8 @@ export default function Dashboard({
                             <PrintEditionsWidget />
 
                             <EconomicIndicatorsWidget />
+
+                            <TDFStatsWidget />
                         </div>
                     </div>
                 )}
@@ -1243,6 +1246,11 @@ export default function Dashboard({
                                 <WeatherCard cities={cities} />
                                 <RoadStatus />
                             </div>
+
+                            {/* Estadísticas Clave de TDF */}
+                            <TDFStatsWidget />
+
+
 
                             {/* Section Header */}
                             <div className="flex items-center justify-between">

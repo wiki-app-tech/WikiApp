@@ -1,0 +1,99 @@
+{
+    "lastUpdated": "2026-02-12T10:00:00-03:00",
+    "sources": [
+        {
+            "name": "INDEC",
+            "url": "https://www.indec.gob.ar/"
+        },
+        {
+            "name": "IPIEC",
+            "url": "https://ipiec.tierradelfuego.gob.ar/"
+        }
+    ],
+    "indicators": [
+        {
+            "id": "poblacion",
+            "category": "Demografía",
+            "title": "Población Estimada",
+            "value": "181.263",
+            "unit": "hab.",
+            "period": "Censo 2022",
+            "trend": "up",
+            "change": "+8,4%",
+            "description": "Población total de Tierra del Fuego según el último Censo Nacional.",
+            "source": "INDEC",
+            "sourceUrl": "https://www.indec.gob.ar/indec/web/Nivel4-Tema-2-41-165",
+            "icon": "users"
+        },
+        {
+            "id": "ipc",
+            "category": "Precios",
+            "title": "Variación IPC",
+            "value": "2,9",
+            "unit": "%",
+            "period": "Enero 2026",
+            "trend": "down",
+            "change": "vs 3,2% dic",
+            "description": "Índice de Precios al Consumidor - Región Patagónica. Variación mensual.",
+            "source": "INDEC / IPIEC",
+            "sourceUrl": "https://www.indec.gob.ar/uploads/informesdeprensa/ipc_02_261443D4406C.pdf",
+            "icon": "chart"
+        },
+        {
+            "id": "ocupacion_hotelera",
+            "category": "Turismo",
+            "title": "Ocupación Hotelera",
+            "value": "72,0",
+            "unit": "%",
+            "period": "Nov 2025 - Ushuaia",
+            "trend": "up",
+            "change": "+5,2 pp",
+            "description": "Tasa de ocupación de plazas hoteleras en Ushuaia, temporada alta turística.",
+            "source": "INDEC",
+            "sourceUrl": "https://www.indec.gob.ar/uploads/informesdeprensa/eoh_01_265BAAB03CBF.pdf",
+            "icon": "hotel"
+        },
+        {
+            "id": "desocupacion",
+            "category": "Empleo",
+            "title": "Tasa de Desocupación",
+            "value": "6,8",
+            "unit": "%",
+            "period": "3° Trim. 2025",
+            "trend": "down",
+            "change": "-0,5 pp",
+            "description": "Tasa de desocupación del aglomerado Ushuaia-Río Grande. EPH.",
+            "source": "INDEC",
+            "sourceUrl": "https://www.indec.gob.ar/uploads/informesdeprensa/mercado_trabajo_eph_3trim254D509B02DD.pdf",
+            "icon": "briefcase"
+        },
+        {
+            "id": "cba",
+            "category": "Canastas",
+            "title": "Canasta Básica Alimentaria",
+            "value": "$285.400",
+            "unit": "",
+            "period": "Enero 2026",
+            "trend": "up",
+            "change": "+2,6%",
+            "description": "Costo mensual de la Canasta Básica Alimentaria para una familia tipo en TDF.",
+            "source": "IPIEC",
+            "sourceUrl": "https://ipiec.tierradelfuego.gob.ar/",
+            "icon": "shopping"
+        },
+        {
+            "id": "industria",
+            "category": "Industria",
+            "title": "Empleo Industrial",
+            "value": "10.250",
+            "unit": "puestos",
+            "period": "4° Trim. 2025",
+            "trend": "stable",
+            "change": "+0,2%",
+            "description": "Puestos de trabajo registrados en el sector industrial fueguino.",
+            "source": "IPIEC",
+            "sourceUrl": "https://ipiec.tierradelfuego.gob.ar/areas-tematicas/",
+            "icon": "factory"
+        }
+    ]
+}
