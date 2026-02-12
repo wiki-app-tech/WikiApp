@@ -3,6 +3,7 @@
 import { Article } from '@/types';
 import { useMemo } from 'react';
 import Image from 'next/image';
+import ShareMenu from './ShareMenu';
 
 interface ArticleCardProps {
     article: Article;
@@ -57,6 +58,10 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
                         {cleanDescription}
                     </p>
                 </div>
+                {/* Share button for list view */}
+                <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ShareMenu url={article.link} title={article.title} compact />
+                </div>
             </div>
         );
     }
@@ -89,9 +94,15 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
                     <h3 className={`text-xl font-bold leading-tight mb-4 transition-colors ${isSelected ? 'text-accent-primary' : 'text-text-primary group-hover:text-accent-primary'} line-clamp-2 tracking-tight`}>
                         {article.title}
                     </h3>
-                    <p className="text-sm text-text-tertiary line-clamp-2 leading-relaxed font-medium">
-                        {cleanDescription}
-                    </p>
+                    <div className="flex items-center justify-between">
+                        <p className="text-sm text-text-tertiary line-clamp-2 leading-relaxed font-medium flex-1">
+                            {cleanDescription}
+                        </p>
+                        {/* Share button for magazine view */}
+                        <div className="shrink-0 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <ShareMenu url={article.link} title={article.title} compact />
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -133,15 +144,14 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
                     </span>
 
                     <div className="flex items-center gap-1">
-                        <button className="p-2 text-text-tertiary/50 hover:text-accent-secondary transition-colors">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); }}
+                            className="p-2 text-text-tertiary/50 hover:text-accent-secondary transition-colors"
+                        >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         </button>
-                        <button className="p-2 text-text-tertiary/50 hover:text-accent-primary transition-colors">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" strokeWidth="2.5" /></svg>
-                        </button>
-                        <button className="p-2 text-text-tertiary/50 hover:text-text-primary transition-colors">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.2" fill="currentColor" /><circle cx="19" cy="12" r="1.2" fill="currentColor" /><circle cx="5" cy="12" r="1.2" fill="currentColor" /></svg>
-                        </button>
+                        {/* Share button for card view */}
+                        <ShareMenu url={article.link} title={article.title} compact />
                     </div>
                 </div>
             </div>
