@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import type { Article } from '@/types';
 import { ZapIcon, BookmarkIcon } from './Icons';
 import ShareMenu from './ShareMenu';
+import { useTheme } from './ThemeProvider';
 
 interface ArticleReaderProps {
     article: Article;
@@ -32,6 +33,7 @@ export default function ArticleReader({
 }: ArticleReaderProps) {
     const [touchStart, setTouchStart] = useState<number | null>(null);
     const [touchEnd, setTouchEnd] = useState<number | null>(null);
+    const { theme } = useTheme();
 
     // Mark as read after 3 seconds of viewing
     useEffect(() => {
@@ -146,7 +148,7 @@ export default function ArticleReader({
                     </div>
 
                     <div
-                        className="text-text-secondary text-lg md:text-xl leading-[1.8] space-y-8 antialiased prose prose-invert max-w-none prose-headings:font-black prose-headings:tracking-tighter prose-headings:text-text-primary prose-a:text-accent-primary prose-img:rounded-[2rem] prose-img:shadow-2xl prose-img:border prose-img:border-accent-primary/10"
+                        className={`text-text-secondary text-lg md:text-xl leading-[1.8] space-y-8 antialiased prose ${theme === 'dark' ? 'prose-invert' : ''} max-w-none prose-headings:font-black prose-headings:tracking-tighter prose-headings:text-text-primary prose-a:text-accent-primary prose-img:rounded-[2rem] prose-img:shadow-2xl prose-img:border prose-img:border-accent-primary/10`}
                         dangerouslySetInnerHTML={{ __html: article.description }}
                     />
                 </div>
