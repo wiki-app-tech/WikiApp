@@ -98,7 +98,8 @@ export default function RoadStatus() {
         setIsAnalyzing(true);
         try {
             const allRoutes = [...routesData.rn3, ...routesData.complementary];
-            const summary = await generateRoadStatusSummary(allRoutes);
+            const routeInfos = allRoutes.map(r => ({ section: r.segment, status: r.status as any, details: r.details }));
+            const summary = await generateRoadStatusSummary(routeInfos, '', 'Tierra del Fuego');
             setAiSummary(summary);
         } catch (error) {
             console.error("Error al generar análisis de IA:", error);
