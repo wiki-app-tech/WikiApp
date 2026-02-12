@@ -10,49 +10,53 @@
    Colores sofisticados con HSL para mejor control y accesibilidad
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Aqua Theme - Paleta "Deep Ocean" */
+  /* Dark Theme (Default Aqua "Deep Ocean") */
   --surface-primary: 195 67% 5%;
-  /* #041014 - Fondo Principal */
   --surface-elevated: 191 62% 10%;
-  /* #0a252b - Paneles y Sidebar */
   --surface-sunken: 195 60% 3%;
-
-  /* Textos - Legibilidad sobre fondo marino */
   --text-primary: 210 40% 98%;
-  /* Blanco nieve */
   --text-secondary: 212 33% 77%;
-  /* Gris perla */
   --text-tertiary: 191 30% 60%;
   --text-muted: 191 20% 40%;
-
-  /* Colores de marca - Gama Cian/Aqua */
   --accent-primary: 188 86% 53%;
-  /* #22d3ee - Cian brillante */
   --accent-primary-hover: 188 90% 45%;
   --accent-secondary: 172 66% 50%;
-  /* #2dd4bf - Turquesa */
   --accent-success: 160 84% 45%;
   --accent-warning: 188 86% 53%;
-  /* Sustituido amarillo por cian */
   --accent-error: 0 84% 60%;
-
-  /* Bordes y separadores - Translúcidos */
   --border-subtle: 188 86% 53% / 0.1;
   --border-default: 188 86% 53% / 0.2;
   --border-strong: 188 86% 53% / 0.4;
+}
 
-  /* Sistema de sombras Aqua */
-  --shadow-xs: 0 1px 2px hsl(188 86% 53% / 0.05);
-  --shadow-sm: 0 2px 4px hsl(188 86% 53% / 0.1);
-  --shadow-md: 0 4px 12px hsl(188 86% 53% / 0.15);
-  --shadow-lg: 0 12px 24px hsl(188 86% 53% / 0.2);
-  --shadow-xl: 0 20px 40px hsl(188 86% 53% / 0.25);
-  --shadow-2xl: 0 32px 64px hsl(188 86% 53% / 0.3);
+[data-theme='light'] {
+  /* Light Theme ("Crystal Ice") */
+  --surface-primary: 210 40% 98%;
+  --surface-elevated: 0 0% 100%;
+  --surface-sunken: 210 40% 94%;
+  --text-primary: 215 25% 15%;
+  --text-secondary: 215 16% 47%;
+  --text-tertiary: 215 13% 60%;
+  --text-muted: 215 13% 75%;
+  --accent-primary: 195 100% 45%;
+  --accent-primary-hover: 195 100% 40%;
+  --accent-secondary: 172 66% 45%;
+  --border-subtle: 215 25% 15% / 0.05;
+  --border-default: 215 25% 15% / 0.1;
+  --border-strong: 215 25% 15% / 0.15;
+}
 
-  /* Glow effects - Estilo Aqua */
-  --shadow-accent: 0 8px 24px hsl(188 86% 53% / 0.3);
-  --glow-accent: 0 0 20px hsl(188 86% 53% / 0.4);
-  --glow-subtle: 0 0 40px hsl(188 86% 53% / 0.1);
+:root {
+  /* Shared system variables */
+  --shadow-xs: 0 1px 2px hsl(var(--accent-primary) / 0.05);
+  --shadow-sm: 0 2px 4px hsl(var(--accent-primary) / 0.1);
+  --shadow-md: 0 4px 12px hsl(var(--accent-primary) / 0.15);
+  --shadow-lg: 0 12px 24px hsl(var(--accent-primary) / 0.2);
+  --shadow-xl: 0 20px 40px hsl(var(--accent-primary) / 0.25);
+  --shadow-2xl: 0 32px 64px hsl(var(--accent-primary) / 0.3);
+  --shadow-accent: 0 8px 24px hsl(var(--accent-primary) / 0.3);
+  --glow-accent: 0 0 20px hsl(var(--accent-primary) / 0.4);
+  --glow-subtle: 0 0 40px hsl(var(--accent-primary) / 0.1);
 
   /* Radios */
   --radius-xs: 0.5rem;
@@ -76,17 +80,7 @@
   /* Transiciones */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --duration-normal: 250ms;
-}
-
-/* Forzamos tema oscuro para el Tema Aqua */
-@media (prefers-color-scheme: light) {
-  :root {
-    /* Mismos valores que dark para mantener la estética Aqua siempre */
-    --surface-primary: 195 67% 5%;
-    --surface-elevated: 191 62% 10%;
-    --text-primary: 210 40% 98%;
-    --text-secondary: 212 33% 77%;
-  }
+  --duration-fast: 150ms;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
