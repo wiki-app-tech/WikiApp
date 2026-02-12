@@ -411,10 +411,7 @@ export default function Dashboard({
                                         </div>
                                     </button>
                                 )}
-                                <button className="w-full flex items-center gap-3 px-3 py-2 text-text-tertiary hover:text-text-primary hover:bg-accent-primary/5 rounded-lg transition-all">
-                                    <PlusIcon className="w-4 h-4 text-accent-primary/50" />
-                                    <span className="text-sm font-bold">Add feed</span>
-                                </button>
+
                             </div>
                         </>
                     ) : activeTab === 'audio' ? (
