@@ -19,18 +19,11 @@ export const STREAMING_SOURCES: StreamingSource[] = [
         location: 'Ushuaia'
     },
     {
-        id: 'fm-fuego',
-        name: 'FM Fuego',
+        id: 'radio-argentina-ushuaia',
+        name: 'Radio Argentina Ushuaia',
         type: 'radio',
-        url: 'https://v2.tustreaming.tv/8030/',
-        location: 'Río Grande'
-    },
-    {
-        id: 'siglo',
-        name: 'Estación del Siglo',
-        type: 'radio',
-        url: 'http://190.107.189.131:8100/stream',
-        location: 'Río Grande'
+        url: 'https://proxy.turadioinfo.com/6334;live',
+        location: 'Ushuaia'
     },
     {
         id: 'provincia',
@@ -38,6 +31,27 @@ export const STREAMING_SOURCES: StreamingSource[] = [
         type: 'radio',
         url: 'http://200.58.105.132:8000/ushuaia2',
         location: 'Ushuaia'
+    },
+    {
+        id: 'fm-fuego',
+        name: 'FM Fuego',
+        type: 'radio',
+        url: 'https://v2.tustreaming.tv/8030/',
+        location: 'Río Grande'
+    },
+    {
+        id: 'radio-fueguina',
+        name: 'La 97 Radio Fueguina',
+        type: 'radio',
+        url: 'http://streamall.alsolnet.com/radiofueguina/radiofueguina.stream',
+        location: 'Río Grande'
+    },
+    {
+        id: 'siglo',
+        name: 'Estación del Siglo',
+        type: 'radio',
+        url: 'http://streamall.alsolnet.com/estaciondelsigloaudio',
+        location: 'Río Grande'
     },
     {
         id: 'canal11',
@@ -52,7 +66,14 @@ export const STREAMING_SOURCES: StreamingSource[] = [
         type: 'tv',
         url: 'https://www.youtube.com/embed/live_stream?channel=UC_1E6T1N8r9o1V5vj6AaxWA',
         location: 'Río Grande'
-    }
+    },
+    {
+        id: 'tn-todo-noticias',
+        name: 'TN Todo Noticias',
+        type: 'tv',
+        url: 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1',
+        location: 'Nacional'
+    },
 ];
 
 export function StreamingPlayer({ source, onClose }: { source: StreamingSource, onClose: () => void }) {
