@@ -54,20 +54,6 @@ export const STREAMING_SOURCES: StreamingSource[] = [
         location: 'Río Grande'
     },
     {
-        id: 'canal11',
-        name: 'Canal 11 Ushuaia',
-        type: 'tv',
-        url: 'https://www.youtube.com/embed/live_stream?channel=UC_1E6T1N8r9o1V5vj6AaxWA',
-        location: 'Ushuaia'
-    },
-    {
-        id: 'canal13',
-        name: 'Canal 13 Río Grande',
-        type: 'tv',
-        url: 'https://www.youtube.com/embed/live_stream?channel=UC_1E6T1N8r9o1V5vj6AaxWA',
-        location: 'Río Grande'
-    },
-    {
         id: 'tn-todo-noticias',
         name: 'TN Todo Noticias',
         type: 'tv',
@@ -80,6 +66,13 @@ export const STREAMING_SOURCES: StreamingSource[] = [
         type: 'tv',
         url: 'https://www.youtube.com/embed/z-j1uxBmis0?autoplay=1',
         location: 'NASA'
+    },
+    {
+        id: 'tv-publica',
+        name: 'Televisión Pública Argentina',
+        type: 'tv',
+        url: 'https://www.youtube.com/embed/zpxyq7MTbMU?autoplay=1',
+        location: 'Nacional'
     },
 ];
 
