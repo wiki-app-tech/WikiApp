@@ -74,6 +74,13 @@ export const STREAMING_SOURCES: StreamingSource[] = [
         url: 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1',
         location: 'Nacional'
     },
+    {
+        id: 'nasa-artemis-ii',
+        name: 'NASA Artemis II — Vuelo Lunar',
+        type: 'tv',
+        url: 'https://www.youtube.com/embed/z-j1uxBmis0?autoplay=1',
+        location: 'NASA'
+    },
 ];
 
 export function StreamingPlayer({ source, onClose }: { source: StreamingSource, onClose: () => void }) {
