@@ -49,6 +49,69 @@
         "category": "provinciales"
     },
     {
+        "id": "actualidad-tdf",
+        "name": "Actualidad TDF",
+        "url": "https://www.actualidadtdf.com.ar/feed/",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "aire-libre",
+        "name": "Aire Libre",
+        "url": "https://www.airelibre.com.ar/feed/",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "info-fueguina",
+        "name": "Info Fueguina",
+        "url": "https://www.infofueguina.com/rss/feed.html?r=1",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "cronicas-fueguinas",
+        "name": "Crónicas Fueguinas",
+        "url": "http://cronicasfueguinas.blogspot.com/feeds/posts/default",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "diario-prensa",
+        "name": "Diario Prensa",
+        "url": "https://www.diarioprensa.com.ar/feed/",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "el-copernico",
+        "name": "El Copérnico",
+        "url": "https://elcopernico.com/feed/",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "el-diario-fin-mundo-economia",
+        "name": "El Diario del Fin del Mundo - Economía",
+        "url": "https://www.eldiariodelfindelmundo.com/rss/20-economia.xml",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "el-diario-fin-mundo-judiciales",
+        "name": "El Diario del Fin del Mundo - Judiciales",
+        "url": "https://www.eldiariodelfindelmundo.com/rss/15-judiciales.xml",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "el-diario-fin-mundo-provinciales",
+        "name": "El Diario del Fin del Mundo - Provinciales",
+        "url": "https://www.eldiariodelfindelmundo.com/rss/2-provinciales.xml",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
         "id": "ole",
         "name": "Diario Olé",
         "url": "http://www.ole.com.ar/rss/ultimas-noticias/",
