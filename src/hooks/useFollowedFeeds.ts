@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { FeedSource } from '@/types';
 
 const STORAGE_KEY = 'mediosWikiAppFollowedFeeds';
@@ -9,7 +9,11 @@ export function useFollowedFeeds(allFeeds: FeedSource[]) {
     const [followedFeedIds, setFollowedFeedIds] = useState<string[]>([]);
     const [isLoaded, setIsLoaded] = useState(false);
 
-    // Cargar desde localStorage al montar
+    // Use ref to avoid re-triggering effect when allFeeds reference changes
+    const allFeedsRef = useRef(allFeeds);
+    allFeedsRef.current = allFeeds;
+
+    // Load from localStorage ONCE on mount
     useEffect(() => {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
@@ -19,15 +23,15 @@ export function useFollowedFeeds(allFeeds: FeedSource[]) {
                 console.error('Error loading followed feeds:', e);
             }
         } else {
-            // Por defecto, seguimos todos los feeds para que no aparezca vacío la primera vez
-            const initialIds = allFeeds.slice(0, 5).map(f => f.id);
+            // By default follow first 5 feeds so the UI isn't empty
+            const initialIds = allFeedsRef.current.slice(0, 5).map(f => f.id);
             setFollowedFeedIds(initialIds);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(initialIds));
         }
         setIsLoaded(true);
-    }, [allFeeds]);
+    }, []); // Only run once on mount
 
-    // Guardar en localStorage cuando cambie
+    // Persist to localStorage on change
     useEffect(() => {
         if (isLoaded) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(followedFeedIds));

@@ -36,11 +36,25 @@ export const NEWS_SITES: Record<string, NewsSource[]> = {
 
 export const RADIO_STATIONS: RadioStation[] = [
     {
-        name: 'Radio Nacional',
+        name: 'Radio Nacional Ushuaia',
         city: 'Ushuaia',
         frequency: 'AM 780',
         logoUrl: 'https://www.radionacional.com.ar/wp-content/uploads/2020/03/LOGO-LRA10-USHUAIA-E-ISLAS-MALVINAS.png',
         streamUrl: 'http://190.111.245.221:8000/stream'
+    },
+    {
+        name: 'Radio Argentina Ushuaia',
+        city: 'Ushuaia',
+        frequency: '97.9 FM',
+        logoUrl: 'https://www.radioargentinaushuaia.com/wp-content/uploads/2020/radio-argentina-ushuaia-logo.png',
+        streamUrl: 'https://proxy.turadioinfo.com/6334;live'
+    },
+    {
+        name: 'Radio Provincia',
+        city: 'Ushuaia',
+        frequency: '99.5 FM',
+        logoUrl: 'https://www.tierradelfuego.gob.ar/wp-content/uploads/2023/03/logo-99-5-1.png',
+        streamUrl: 'http://200.58.105.132:8000/ushuaia2'
     },
     {
         name: 'FM Fuego',
@@ -50,19 +64,19 @@ export const RADIO_STATIONS: RadioStation[] = [
         streamUrl: 'https://v2.tustreaming.tv/8030/'
     },
     {
+        name: 'La 97 Radio Fueguina',
+        city: 'Río Grande',
+        frequency: '96.9 FM',
+        logoUrl: 'https://www.radiofueguina.com/wp-content/uploads/2020/08/logo-radio-fueguina-97.png',
+        streamUrl: 'http://streamall.alsolnet.com/radiofueguina/radiofueguina.stream'
+    },
+    {
         name: 'Estación del Siglo',
         city: 'Río Grande',
         frequency: '105.3 FM',
-        logoUrl: 'https://www.estaciondelsiglo.com.ar/wp-content/uploads/2020/03/logoestaciondelsiglo-1.png',
-        streamUrl: 'http://190.107.189.131:8100/stream'
+        logoUrl: 'https://estaciondelsiglo.net/wp-content/uploads/2020/01/cropped-logo-estacion-del-siglo.png',
+        streamUrl: 'http://streamall.alsolnet.com/estaciondelsigloaudio'
     },
-    {
-        name: 'Radio Provincia',
-        city: 'Ushuaia',
-        frequency: '99.5 FM',
-        logoUrl: 'https://www.tierradelfuego.gob.ar/wp-content/uploads/2023/03/logo-99-5-1.png',
-        streamUrl: 'http://200.58.105.132:8000/ushuaia2'
-    }
 ];
 
 export const LIVE_CAMERAS: LiveCamera[] = [

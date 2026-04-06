@@ -1,12 +1,25 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { RouteInfo } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Lazy initialization: do NOT instantiate at module level
+// to avoid crashes during SSR/build when API_KEY is not set
+let _ai: GoogleGenAI | null = null;
+
+function getAI(): GoogleGenAI {
+    if (!_ai) {
+        const apiKey = process.env.API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
+        if (!apiKey) {
+            throw new Error('Gemini API key is not configured. Set API_KEY or NEXT_PUBLIC_GEMINI_API_KEY environment variable.');
+        }
+        _ai = new GoogleGenAI({ apiKey });
+    }
+    return _ai;
+}
 
 export const generateElectionsSummary = async (): Promise<string> => {
-  try {
-    const prompt = `
+    try {
+        const ai = getAI();
+        const prompt = `
       Genera un resumen conciso e informativo sobre la importancia de las elecciones legislativas de mitad de período en Argentina,
       enfocándote en el año 2025. Explica qué se renueva (bancadas en Diputados y Senadores),
       por qué son cruciales para el equilibrio de poder político y el impacto que pueden tener en la agenda del gobierno de turno.
@@ -14,20 +27,21 @@ export const generateElectionsSummary = async (): Promise<string> => {
       mantén el análisis en un plano general e institucional.
     `;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-    });
-    
-    return response.text || "No se pudo generar el contenido.";
-  } catch (error) {
-    console.error("Error generating content with Gemini:", error);
-    return "No se pudo generar el resumen en este momento. Por favor, intente más tarde.";
-  }
+        const response = await ai.models.generateContent({
+            model: 'gemini-3-flash-preview',
+            contents: prompt,
+        });
+
+        return response.text || "No se pudo generar el contenido.";
+    } catch (error) {
+        console.error("Error generating content with Gemini:", error);
+        return "No se pudo generar el resumen en este momento. Por favor, intente más tarde.";
+    }
 };
 
 export const generateRoadStatusSummary = async (roadData: RouteInfo[], civilDefenseReport: string, routeName: string): Promise<string> => {
     try {
+        const ai = getAI();
         const roadStatusText = roadData.map(r => `- ${r.section}: ${r.status}. Detalles: ${r.details}`).join('\n');
 
         const prompt = `
@@ -62,6 +76,7 @@ export const generateRoadStatusSummary = async (roadData: RouteInfo[], civilDefe
 
 export const generateNewsSummary = async (articles: { title: string; source: string }[]): Promise<string> => {
     try {
+        const ai = getAI();
         const articlesText = articles.map(a => `- "${a.title}" (Fuente: ${a.source})`).join('\n');
 
         const prompt = `
@@ -70,7 +85,7 @@ export const generateNewsSummary = async (articles: { title: string; source: str
             
             Redacta un resumen conciso en formato de "Lectura Rápida". Utiliza viñetas (*) para cada tema principal. Tono neutral.
         `;
-        
+
         const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
             contents: prompt,
