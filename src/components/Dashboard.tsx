@@ -217,29 +217,29 @@ export default function Dashboard({
 
     return (
         <div className="flex h-screen bg-surface-primary text-text-primary font-sans overflow-hidden">
-            {/* Sidebar 1: Icon Bar (Narrow Aqua) */}
-            <aside className="hidden lg:flex w-16 bg-surface-elevated flex-col items-center py-6 gap-2 shrink-0 z-50 border-r border-accent-primary/10 shadow-lg">
-                <div className="mb-8">
-                    <MediosWikiAppLogo className="w-10 h-10" />
+            {/* Sidebar 1: Icon Bar — Wotech style */}
+            <aside className="hidden lg:flex w-[72px] bg-surface-elevated flex-col items-center py-6 gap-1 shrink-0 z-50 border-r border-slate-100 shadow-sm">
+                <div className="mb-6 p-1">
+                    <MediosWikiAppLogo className="w-9 h-9" />
                 </div>
-                <NavIcon active={activeTab === 'home' && !selectedFeed} onClick={() => { setActiveTab('home'); setSelectedFeed(null); }} label="DASHBOARD"><LayoutIcon className="w-5 h-5" /></NavIcon>
-                <NavIcon active={activeTab === 'videos'} onClick={() => setActiveTab('videos')} label="VIDEOS"><YoutubeIcon className="w-5 h-5" /></NavIcon>
-                <NavIcon active={activeTab === 'audio'} onClick={() => setActiveTab('audio')} label="AUDIOS"><HeadphonesIcon className="w-5 h-5" /></NavIcon>
-                <NavIcon active={activeTab === 'zonas'} onClick={() => setActiveTab('zonas')} label="ZONAS"><Share2Icon className="w-5 h-5" /></NavIcon>
+                <NavIcon active={activeTab === 'home' && !selectedFeed} onClick={() => { setActiveTab('home'); setSelectedFeed(null); }} label="Dashboard"><LayoutIcon className="w-5 h-5" /></NavIcon>
+                <NavIcon active={activeTab === 'videos'} onClick={() => setActiveTab('videos')} label="Videos"><YoutubeIcon className="w-5 h-5" /></NavIcon>
+                <NavIcon active={activeTab === 'audio'} onClick={() => setActiveTab('audio')} label="Medios"><HeadphonesIcon className="w-5 h-5" /></NavIcon>
+                <NavIcon active={activeTab === 'zonas'} onClick={() => setActiveTab('zonas')} label="Zonas"><Share2Icon className="w-5 h-5" /></NavIcon>
 
-                <div className="mt-auto flex flex-col gap-2 pb-6 w-full items-center">
-                    <NavIcon active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setGlobalSearch(''); }} label="BUSCAR"><SearchIcon className="w-5 h-5" /></NavIcon>
-                    <NavIcon active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} label="OPCIONES"><SettingsIcon className="w-5 h-5" /></NavIcon>
-                    <div className="mt-4 pt-4 border-t border-slate-100 w-full flex justify-center">
-                        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-[10px] font-bold text-blue-600 border border-blue-100 shadow-sm">JS</div>
+                <div className="mt-auto flex flex-col gap-1 pb-4 w-full items-center">
+                    <NavIcon active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setGlobalSearch(''); }} label="Buscar"><SearchIcon className="w-5 h-5" /></NavIcon>
+                    <NavIcon active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} label="Ajustes"><SettingsIcon className="w-5 h-5" /></NavIcon>
+                    <div className="mt-3 pt-3 border-t border-slate-100 w-full flex justify-center">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center text-[10px] font-black text-white shadow">TF</div>
                     </div>
                 </div>
             </aside>
 
-            {/* Sidebar 2: Content Sidebar (Wider Aqua) */}
+            {/* Sidebar 2: Content Sidebar — Wotech style */}
             <aside className={`
                 fixed inset-0 z-40 lg:relative lg:inset-auto lg:z-auto
-                h-full border-r border-accent-primary/10 flex flex-col bg-surface-elevated transition-all duration-300 ease-in-out overflow-hidden
+                h-full border-r border-slate-100 flex flex-col bg-white transition-all duration-300 ease-in-out overflow-hidden shadow-sm
                 ${isMobileMenuOpen || showContentSidebar
                     ? 'w-full lg:w-72 opacity-100 translate-x-0'
                     : 'w-0 opacity-0 -translate-x-full pointer-events-none'}
@@ -248,33 +248,31 @@ export default function Dashboard({
                 <div className="p-5 flex flex-col h-full">
                     {activeTab === 'home' ? (
                         <>
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-bold tracking-tight text-text-primary">Feeds</h2>
-                                <div className="flex items-center gap-1">
-                                    <button className="p-1.5 text-text-tertiary hover:text-accent-primary rounded-lg hover:bg-white/5">
-                                        <SettingsIcon className="w-4 h-4" />
-                                    </button>
-                                    <button className="p-1.5 text-text-tertiary hover:text-accent-primary rounded-lg hover:bg-white/5">
-                                        <CircleIcon className="w-4 h-4" />
-                                    </button>
-                                    <button className="p-1.5 text-accent-primary hover:text-accent-secondary rounded-lg hover:bg-accent-primary/10">
-                                        <SearchIcon className="w-4 h-4" />
-                                    </button>
+                            {/* Wotech sidebar header */}
+                            <div className="px-5 pt-5 pb-4 border-b border-slate-100">
+                                <div className="section-label mb-2">Fuentes</div>
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-lg font-black tracking-tight text-text-primary">Mis Feeds</h2>
+                                    <div className="flex items-center gap-1">
+                                        <button className="p-1.5 text-text-tertiary hover:text-accent-primary rounded-lg hover:bg-accent-primary/6 transition-colors">
+                                            <SettingsIcon className="w-4 h-4" />
+                                        </button>
+                                        <button className="p-1.5 text-accent-primary hover:text-accent-secondary rounded-lg hover:bg-accent-primary/6 transition-colors">
+                                            <SearchIcon className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="relative mb-8">
-                                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 w-4 h-4" />
+                            <div className="relative mb-4 px-4 pt-4">
+                                <SearchIcon className="absolute left-7 top-1/2 mt-2 -translate-y-1/2 text-slate-300 w-4 h-4" />
                                 <input
                                     type="text"
-                                    placeholder="Buscar o añadir feed..."
+                                    placeholder="Buscar feed..."
                                     value={feedSearch}
-                                    onChange={(e) => {
-                                        setFeedSearch(e.target.value);
-                                        setShowFeedResults(true);
-                                    }}
+                                    onChange={(e) => { setFeedSearch(e.target.value); setShowFeedResults(true); }}
                                     onFocus={() => setShowFeedResults(true)}
-                                    className="w-full bg-zinc-50 border-zinc-100 border rounded-2xl pl-12 pr-10 py-3.5 text-sm font-medium focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all outline-none"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-8 py-2.5 text-sm font-medium focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary/40 transition-all outline-none text-text-primary"
                                 />
                                 {feedSearch && (
                                     <button
@@ -338,43 +336,45 @@ export default function Dashboard({
                                 )}
                             </div>
 
-                            <nav className="space-y-0.5 overflow-y-auto pr-2 -mr-2 scrollbar-hide">
+                            <nav className="flex-1 overflow-y-auto px-3 pb-4 space-y-0.5 scrollbar-hide">
+                                {/* All feeds button */}
                                 <button
                                     onClick={() => { setSelectedFeed(null); setIsMobileMenuOpen(false); }}
-                                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${!selectedFeed ? 'bg-accent-primary/10 text-accent-primary font-bold' : 'text-text-secondary hover:bg-white/5'}`}
+                                    className={`sidebar-feed-item w-full ${!selectedFeed ? 'active' : ''}`}
                                 >
-                                    <LayoutIcon className={`w-4 h-4 ${!selectedFeed ? 'text-accent-primary' : 'text-text-tertiary'}`} />
-                                    <span className="text-sm flex-1 text-left">Newsfeed</span>
-                                    <span className="text-[10px] font-bold opacity-60 text-text-tertiary">{articles.length}</span>
+                                    <LayoutIcon className="w-4 h-4 shrink-0" />
+                                    <span className="flex-1 text-left font-medium">Todos los artículos</span>
+                                    <span className="text-[10px] font-bold text-text-tertiary/60 tabular-nums">{articles.length}</span>
                                 </button>
 
+                                {/* Categories + feeds */}
                                 {categories.map(category => (
-                                    <div key={category} className="mt-1">
-                                        <button
-                                            onClick={() => setCollapsedCategories(prev => ({ ...prev, [category]: !prev[category] }))}
-                                            className="w-full flex items-center gap-3 px-3 py-2 text-slate-600 hover:text-slate-900 rounded-lg group transition-all hover:bg-slate-50"
-                                        >
-                                            <ChevronIcon className={`w-3 h-3 transition-transform text-slate-400 ${collapsedCategories[category] ? '-rotate-90' : ''}`} />
-                                            <span className="text-sm font-bold capitalize flex-1 text-left">{category}</span>
-                                            <span className="text-[10px] font-bold text-slate-400">{categoryCounts[category] || 0}</span>
-                                        </button>
+                                    <div key={category} className="mt-3">
+                                        <div className="sidebar-section-header px-1 mb-1">
+                                            <ChevronIcon
+                                                className={`w-3 h-3 text-text-tertiary/50 transition-transform cursor-pointer ${collapsedCategories[category] ? '-rotate-90' : ''}`}
+                                                onClick={() => setCollapsedCategories(prev => ({ ...prev, [category]: !prev[category] }))}
+                                            />
+                                            <span>{category}</span>
+                                            <span className="ml-auto text-[10px] font-bold text-text-tertiary/40 tabular-nums">{categoryCounts[category] || 0}</span>
+                                        </div>
 
                                         {!collapsedCategories[category] && (
-                                            <div className="mt-0.5 space-y-0.5 pl-4">
+                                            <div className="space-y-0.5">
                                                 {followedFeeds.filter(f => f.category === category).map(feed => (
                                                     <div key={feed.id} className="relative group/feed">
                                                         <button
                                                             onClick={() => { setSelectedFeed(feed.id); setActiveTab('home'); setIsMobileMenuOpen(false); }}
-                                                            className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] transition-all ${selectedFeed === feed.id ? 'bg-accent-primary/10 text-accent-primary font-bold shadow-glow-accent' : 'text-text-tertiary hover:text-text-primary hover:bg-accent-primary/5'}`}
+                                                            className={`sidebar-feed-item w-full ${selectedFeed === feed.id ? 'active' : ''}`}
                                                         >
                                                             <span className="flex-1 text-left truncate">{feed.name}</span>
-                                                            <span className="text-[10px] font-medium opacity-50 group-hover/feed:opacity-0 transition-opacity">{feedCounts[feed.id] || 0}</span>
+                                                            <span className="text-[10px] tabular-nums opacity-40 group-hover/feed:opacity-0 transition-opacity">{feedCounts[feed.id] || 0}</span>
                                                         </button>
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); unfollowFeed(feed.id); }}
-                                                            className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-300 hover:text-red-500 opacity-0 group-hover/feed:opacity-100 transition-all"
+                                                            className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-300 hover:text-red-400 opacity-0 group-hover/feed:opacity-100 transition-all rounded-md"
                                                         >
-                                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
                                                         </button>
                                                     </div>
                                                 ))}
@@ -534,7 +534,7 @@ export default function Dashboard({
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col min-w-0 bg-surface-primary relative">
-                <header className="h-16 bg-surface-elevated/80 border-b border-accent-primary/10 flex items-center px-8 justify-between sticky top-0 z-30 glass-header">
+                <header className="h-16 bg-white border-b border-slate-100 flex items-center px-6 md:px-8 justify-between sticky top-0 z-30 shadow-sm">
                     <div className="flex items-center gap-6">
                         <div className="flex items-center gap-2 group cursor-pointer">
                             <h1 className="text-xl font-bold text-text-primary tracking-tight font-display">
@@ -699,29 +699,32 @@ export default function Dashboard({
 
                                 <TDFStatsWidget />
 
-                                {/* Section Header */}
-                                <div className="flex items-center justify-between">
+                                {/* Section Header — Wotech style */}
+                                <div className="flex flex-wrap items-end justify-between gap-4 pb-2 border-b border-slate-100">
                                     <div>
-                                        <h1 className="text-5xl font-black text-text-primary tracking-tighter uppercase font-display">
+                                        <div className="section-label mb-2">Tierra del Fuego</div>
+                                        <h1 className="text-3xl md:text-4xl font-black text-text-primary tracking-tight font-display">
                                             {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Centro de Noticias'}
                                         </h1>
-                                        <p className="text-text-secondary font-bold uppercase tracking-widest text-xs mt-3 flex items-center gap-2">
-                                            <span className="w-1.5 h-1.5 bg-accent-primary rounded-full animate-pulse shadow-glow-accent" />
-                                            Tu feed personalizado
-                                        </p>
                                     </div>
-                                    {selectedFeed && (
-                                        <button onClick={() => setSelectedFeed(null)} className="px-5 py-2.5 bg-accent-primary text-surface-primary rounded-2xl text-[11px] font-bold tracking-tight shadow-glow-accent hover:opacity-90 transition-all">VOLVER AL INICIO</button>
-                                    )}
+                                    <div className="flex items-center gap-3">
+                                        <span className="flex items-center gap-1.5 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">
+                                            <span className="w-1.5 h-1.5 bg-accent-secondary rounded-full animate-pulse" />
+                                            {filteredArticles.length} artículos
+                                        </span>
+                                        {selectedFeed && (
+                                            <button onClick={() => setSelectedFeed(null)} className="btn-secondary text-xs py-1.5 px-4">← Volver</button>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Article Grid */}
                                 <div className={
                                     viewMode === 'list'
-                                        ? "flex flex-col bg-surface-elevated border border-accent-primary/10 rounded-xl overflow-hidden divide-y divide-accent-primary/5 glass-card"
+                                        ? "flex flex-col bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm divide-y divide-slate-50"
                                         : viewMode === 'magazine'
-                                            ? "grid grid-cols-1 lg:grid-cols-2 gap-8"
-                                            : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+                                            ? "grid grid-cols-1 lg:grid-cols-2 gap-5"
+                                            : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
                                 }>
                                     {filteredArticles.map(article => (
                                         <ArticleCard
@@ -771,21 +774,21 @@ export default function Dashboard({
                     </div>
                 )}
 
-                {/* Mobile Bottom Nav */}
-                <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-elevated/80 border-t border-accent-primary/10 flex items-center justify-around px-4 z-40 pb-safe shadow-glow-accent/10 backdrop-blur-xl glass-card">
-                    <MobileTab active={activeTab === 'home' && !selectedArticleId} onClick={() => { setActiveTab('home'); setSelectedFeed(null); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Home" icon={<LayoutIcon className="w-6 h-6" />} />
-                    <MobileTab active={activeTab === 'audio'} onClick={() => { setActiveTab('audio'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Audio" icon={<HeadphonesIcon className="w-6 h-6" />} />
-                    <MobileTab active={activeTab === 'folders'} onClick={() => { setActiveTab('folders'); setIsMobileMenuOpen(true); }} label="Feeds" icon={<RssIcon className="w-6 h-6" />} />
-                    <MobileTab active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Search" icon={<SearchIcon className="w-6 h-6" />} />
+                {/* Mobile Bottom Nav — Wotech style */}
+                <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 flex items-center justify-around z-40 pb-safe shadow-lg">
+                    <MobileTab active={activeTab === 'home' && !selectedArticleId} onClick={() => { setActiveTab('home'); setSelectedFeed(null); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Inicio" icon={<LayoutIcon className="w-5 h-5" />} />
+                    <MobileTab active={activeTab === 'audio'} onClick={() => { setActiveTab('audio'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Medios" icon={<HeadphonesIcon className="w-5 h-5" />} />
+                    <MobileTab active={activeTab === 'folders'} onClick={() => { setActiveTab('folders'); setIsMobileMenuOpen(true); }} label="Feeds" icon={<RssIcon className="w-5 h-5" />} />
+                    <MobileTab active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Buscar" icon={<SearchIcon className="w-5 h-5" />} />
                     <MobileTab
                         active={activeTab === 'saved'}
                         onClick={() => { setActiveTab('saved'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }}
-                        label="Saved"
+                        label="Guardado"
                         icon={
                             <div className="relative">
-                                <BookmarkIcon className="w-6 h-6" />
+                                <BookmarkIcon className="w-5 h-5" />
                                 {savedArticles.length > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent-primary text-surface-primary text-[9px] font-bold rounded-full flex items-center justify-center shadow-glow-accent">
+                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow">
                                         {savedArticles.length > 9 ? '9+' : savedArticles.length}
                                     </span>
                                 )}

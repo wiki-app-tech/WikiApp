@@ -1,345 +1,458 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   MediosWikiApp - Design System 2026
-   Implementación de estándares UX/UI modernos
+   MediosWikiApp — Design System 2026 "Wotech Light"
+   Tema claro profesional con acentos Azul / Verde Esmeralda
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   TOKENS DE DISEÑO - Paleta 2026
-   Colores sofisticados con HSL para mejor control y accesibilidad
-   ───────────────────────────────────────────────────────────────────────────── */
+/* ─── PALETA LIGHT — Default ──────────────────────────────────────────────── */
 :root {
-  /* Dark Theme (Default Aqua "Deep Ocean") */
-  --surface-primary: 195 67% 5%;
-  --surface-elevated: 191 62% 10%;
-  --surface-sunken: 195 60% 3%;
-  --text-primary: 210 40% 98%;
-  --text-secondary: 212 33% 77%;
-  --text-tertiary: 191 30% 60%;
-  --text-muted: 191 20% 40%;
-  --accent-primary: 188 86% 53%;
-  --accent-primary-hover: 188 90% 45%;
-  --accent-secondary: 172 66% 50%;
-  --accent-success: 160 84% 45%;
-  --accent-warning: 188 86% 53%;
-  --accent-error: 0 84% 60%;
-  --border-subtle: 188 86% 53% / 0.1;
-  --border-default: 188 86% 53% / 0.2;
-  --border-strong: 188 86% 53% / 0.4;
+  /* Superficies */
+  --surface-primary:   215 28% 97%;   /* #f2f5f9 fondo principal */
+  --surface-elevated:  0 0% 100%;     /* #ffffff tarjetas */
+  --surface-sunken:    215 25% 93%;   /* #e4eaf2 inputs */
+
+  /* Texto */
+  --text-primary:      215 35% 12%;   /* #0f1a2e muy oscuro */
+  --text-secondary:    215 22% 38%;   /* #4b5e7a medio */
+  --text-tertiary:     215 18% 60%;   /* #8699b3 suave */
+  --text-muted:        215 15% 75%;   /* #b0bece placeholder */
+
+  /* Acentos — Azul cielo + Verde esmeralda */
+  --accent-primary:        199 89% 48%;  /* #0ea5e9 sky-500 */
+  --accent-primary-hover:  199 89% 40%;  /* #0284c7 sky-600 */
+  --accent-secondary:      160 84% 39%;  /* #10b981 emerald-500 */
+  --accent-secondary-hover:160 84% 32%;  /* #059669 emerald-600 */
+  --accent-success:        160 84% 39%;
+  --accent-warning:        38  92% 50%;  /* amber */
+  --accent-error:          0   84% 60%;
+
+  /* Bordes */
+  --border-subtle:   215 25% 12% / 0.06;
+  --border-default:  215 25% 12% / 0.12;
+  --border-strong:   199 89% 48% / 0.35;
 }
 
-[data-theme='light'] {
-  /* Light Theme ("Crystal Ice") */
-  --surface-primary: 210 40% 98%;
-  --surface-elevated: 0 0% 100%;
-  --surface-sunken: 210 40% 94%;
-  --text-primary: 215 25% 15%;
-  --text-secondary: 215 16% 47%;
-  --text-tertiary: 215 13% 60%;
-  --text-muted: 215 13% 75%;
-  --accent-primary: 195 100% 45%;
-  --accent-primary-hover: 195 100% 40%;
-  --accent-secondary: 172 66% 45%;
-  --border-subtle: 215 25% 15% / 0.05;
-  --border-default: 215 25% 15% / 0.1;
-  --border-strong: 215 25% 15% / 0.15;
+/* ─── PALETA DARK — Alternativa ───────────────────────────────────────────── */
+[data-theme='dark'] {
+  --surface-primary:   215 50% 6%;
+  --surface-elevated:  215 45% 11%;
+  --surface-sunken:    215 50% 4%;
+
+  --text-primary:      210 40% 97%;
+  --text-secondary:    212 30% 75%;
+  --text-tertiary:     212 22% 55%;
+  --text-muted:        212 15% 38%;
+
+  --accent-primary:        199 89% 55%;
+  --accent-primary-hover:  199 89% 48%;
+  --accent-secondary:      160 84% 45%;
+  --accent-secondary-hover:160 84% 38%;
+
+  --border-subtle:   199 89% 55% / 0.08;
+  --border-default:  199 89% 55% / 0.16;
+  --border-strong:   199 89% 55% / 0.40;
 }
 
+/* ─── TOKENS COMPARTIDOS ──────────────────────────────────────────────────── */
 :root {
-  /* Shared system variables */
-  --shadow-xs: 0 1px 2px hsl(var(--accent-primary) / 0.05);
-  --shadow-sm: 0 2px 4px hsl(var(--accent-primary) / 0.1);
-  --shadow-md: 0 4px 12px hsl(var(--accent-primary) / 0.15);
-  --shadow-lg: 0 12px 24px hsl(var(--accent-primary) / 0.2);
-  --shadow-xl: 0 20px 40px hsl(var(--accent-primary) / 0.25);
-  --shadow-2xl: 0 32px 64px hsl(var(--accent-primary) / 0.3);
-  --shadow-accent: 0 8px 24px hsl(var(--accent-primary) / 0.3);
-  --glow-accent: 0 0 20px hsl(var(--accent-primary) / 0.4);
-  --glow-subtle: 0 0 40px hsl(var(--accent-primary) / 0.1);
+  /* Sombras */
+  --shadow-xs:  0 1px 3px hsl(215 25% 12% / 0.06);
+  --shadow-sm:  0 2px 6px hsl(215 25% 12% / 0.08);
+  --shadow-md:  0 4px 14px hsl(215 25% 12% / 0.10);
+  --shadow-lg:  0 8px 24px hsl(215 25% 12% / 0.14);
+  --shadow-xl:  0 16px 40px hsl(215 25% 12% / 0.18);
+  --shadow-2xl: 0 28px 60px hsl(215 25% 12% / 0.22);
+  --shadow-accent:   0 6px 20px hsl(var(--accent-primary) / 0.20);
+  --glow-accent:     0 0 24px hsl(var(--accent-primary) / 0.25);
+  --glow-subtle:     0 0 40px hsl(var(--accent-primary) / 0.10);
 
   /* Radios */
-  --radius-xs: 0.5rem;
-  --radius-sm: 0.75rem;
-  --radius-md: 1rem;
-  --radius-lg: 1.5rem;
-  --radius-xl: 2rem;
-  --radius-2xl: 2.5rem;
+  --radius-xs:   0.375rem;
+  --radius-sm:   0.5rem;
+  --radius-md:   0.75rem;
+  --radius-lg:   1rem;
+  --radius-xl:   1.5rem;
+  --radius-2xl:  2rem;
   --radius-full: 9999px;
 
-  /* Variables legacy para compatibilidad */
-  --background: hsl(var(--surface-primary));
-  --foreground: hsl(var(--text-primary));
-  --color-blue-600: hsl(var(--accent-primary));
-  --color-orange-500: hsl(var(--accent-secondary));
-  --card-shadow: var(--shadow-md);
+  /* Legacy */
+  --background:        hsl(var(--surface-primary));
+  --foreground:        hsl(var(--text-primary));
+  --card-shadow:       var(--shadow-md);
   --card-shadow-hover: var(--shadow-xl);
-  --radius-card: var(--radius-xl);
-  --radius-button: var(--radius-lg);
+  --radius-card:       var(--radius-lg);
+  --radius-button:     var(--radius-md);
 
   /* Transiciones */
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast:   150ms;
   --duration-normal: 250ms;
-  --duration-fast: 150ms;
+  --duration-slow:   400ms;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   CONFIGURACIÓN DE TAILWIND
-   ───────────────────────────────────────────────────────────────────────────── */
+/* ─── TAILWIND THEME MAPPING ─────────────────────────────────────────────── */
 @theme inline {
-  --color-background: hsl(var(--surface-primary));
-  --color-foreground: hsl(var(--text-primary));
-
-  --color-surface-primary: hsl(var(--surface-primary));
-  --color-surface-elevated: hsl(var(--surface-elevated));
-  --color-surface-sunken: hsl(var(--surface-sunken));
-
-  --color-text-primary: hsl(var(--text-primary));
-  --color-text-secondary: hsl(var(--text-secondary));
-  --color-text-tertiary: hsl(var(--text-tertiary));
-
-  --color-accent-primary: hsl(var(--accent-primary));
-  --color-accent-secondary: hsl(var(--accent-secondary));
-
-  --color-blue-600: hsl(var(--accent-primary));
-  --color-orange-500: hsl(var(--accent-secondary));
-
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-outfit), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --color-background:        hsl(var(--surface-primary));
+  --color-foreground:        hsl(var(--text-primary));
+  --color-surface-primary:   hsl(var(--surface-primary));
+  --color-surface-elevated:  hsl(var(--surface-elevated));
+  --color-surface-sunken:    hsl(var(--surface-sunken));
+  --color-text-primary:      hsl(var(--text-primary));
+  --color-text-secondary:    hsl(var(--text-secondary));
+  --color-text-tertiary:     hsl(var(--text-tertiary));
+  --color-accent-primary:    hsl(var(--accent-primary));
+  --color-accent-secondary:  hsl(var(--accent-secondary));
+  --color-blue-600:          hsl(var(--accent-primary));
+  --color-orange-500:        hsl(var(--accent-secondary));
+  --font-sans:     var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display:  var(--font-outfit), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   TIPOGRAFÍA FLUIDA 2026
-   Escalado responsivo sin breakpoints usando clamp()
-   ───────────────────────────────────────────────────────────────────────────── */
+/* ─── BASE ───────────────────────────────────────────────────────────────── */
 body {
   background: hsl(var(--surface-primary));
   color: hsl(var(--text-primary));
   font-family: var(--font-inter), Inter, system-ui, -apple-system, sans-serif;
-
-  /* Tipografía fluida - Tendencia 2026 */
-  font-size: clamp(0.9375rem, 0.875rem + 0.25vw, 1.0625rem);
-  line-height: 1.6;
+  font-size: clamp(0.9rem, 0.85rem + 0.25vw, 1.05rem);
+  line-height: 1.65;
   letter-spacing: -0.01em;
-
-  /* Renderizado optimizado */
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
 }
 
-/* Títulos con fuente display */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.font-display {
+h1, h2, h3, h4, h5, h6, .font-display {
   font-family: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1.2;
+  color: hsl(var(--text-primary));
 }
 
-/* Escala tipográfica fluida */
-h1,
-.text-display {
-  font-size: clamp(2rem, 1.5rem + 2vw, 3.5rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-
-h2,
-.text-title {
-  font-size: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
-  font-weight: 700;
-}
-
-h3,
-.text-heading {
-  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.75rem);
-  font-weight: 600;
-}
-
-h4,
-.text-subheading {
-  font-size: clamp(1.1rem, 1rem + 0.25vw, 1.35rem);
-  font-weight: 600;
-}
-
-/* Texto pequeño y etiquetas */
-.text-label {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.text-caption {
-  font-size: 0.8125rem;
-  color: hsl(var(--text-tertiary));
-  line-height: 1.5;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   SCROLLBARS MODERNOS - Estilo 2026
-   ───────────────────────────────────────────────────────────────────────────── */
-/* ─────────────────────────────────────────────────────────────────────────────
-   SCROLLBARS AQUA - Estilo 2026
-   ───────────────────────────────────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--surface-primary));
-}
-
+/* ─── SCROLLBARS ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: hsl(var(--surface-primary)); }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, hsl(var(--accent-primary)), hsl(var(--accent-secondary)));
+  background: hsl(var(--accent-primary) / 0.3);
   border-radius: var(--radius-full);
-  border: 1px solid hsl(var(--surface-primary));
 }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--accent-primary) / 0.6); }
+* { scrollbar-width: thin; scrollbar-color: hsl(var(--accent-primary) / 0.3) transparent; }
 
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, hsl(var(--accent-secondary)), hsl(var(--accent-primary)));
-}
-
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--accent-primary)) hsl(var(--surface-primary));
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   COMPONENTES GLASS - Glassmorphism 2026
-   Más sutil y refinado que versiones anteriores
-   ───────────────────────────────────────────────────────────────────────────── */
-.glass-header {
-  background: hsl(var(--surface-elevated) / 0.7);
-  backdrop-filter: blur(12px) saturate(150%);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
-  border-bottom: 1px solid hsl(var(--accent-primary) / 0.2);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.glass-card {
-  background: hsl(var(--surface-elevated) / 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: var(--shadow-md);
-  border: 1px solid hsl(var(--accent-primary) / 0.15);
-  border-radius: var(--radius-xl);
-  transition: all var(--duration-normal) var(--ease-out-expo);
-}
-
-.glass-card:hover {
-  box-shadow: var(--shadow-xl), var(--glow-accent);
-  transform: translateY(-4px);
-  border-color: hsl(var(--accent-primary) / 0.4);
-}
-
-/* Variante con glow de acento Aqua */
-.glass-card-accent {
-  background: hsl(var(--surface-elevated) / 0.6);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  box-shadow: var(--shadow-lg), var(--glow-accent);
-  border: 1px solid hsl(var(--accent-primary) / 0.3);
-  border-radius: var(--radius-xl);
-  transition: all var(--duration-normal) var(--ease-out-expo);
-}
-
-.glass-card-accent:hover {
-  box-shadow: var(--shadow-xl), var(--glow-accent);
-  transform: translateY(-4px);
-  border-color: hsl(var(--accent-secondary) / 0.5);
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   ELEMENTOS INTERACTIVOS - Estándares de Accesibilidad 2026
-   ───────────────────────────────────────────────────────────────────────────── */
-button,
-a,
-input,
-select,
-[role="button"] {
-  min-height: 44px;
-  min-width: 44px;
-  transition: all var(--duration-fast) var(--ease-out-expo);
-}
-
-/* Focus visible - Accesibilidad mejorada */
+/* ─── FOCUS ──────────────────────────────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid hsl(var(--accent-primary));
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 
-/* Estados de hover modernos */
-.interactive-hover {
+/* ─── WOTECH-STYLE CARDS ─────────────────────────────────────────────────── */
+.card-wotech {
+  background: hsl(var(--surface-elevated));
+  border: 1px solid hsl(var(--border-subtle));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--duration-normal) var(--ease-out-expo);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-wotech::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, hsl(var(--accent-primary)), hsl(var(--accent-secondary)));
+  border-radius: var(--radius-full) 0 0 var(--radius-full);
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-out-expo);
+}
+
+.card-wotech:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+  border-color: hsl(var(--border-strong));
+}
+
+.card-wotech:hover::before {
+  opacity: 1;
+}
+
+.card-wotech.selected::before {
+  opacity: 1;
+}
+
+.card-wotech.selected {
+  border-color: hsl(var(--accent-primary) / 0.3);
+  box-shadow: var(--shadow-accent);
+}
+
+/* Card hover arrow (Wotech style) */
+.card-wotech .arrow-icon {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: all var(--duration-fast) var(--ease-out-expo);
+}
+.card-wotech:hover .arrow-icon {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ─── GLASSMORPHISM (legacy) ─────────────────────────────────────────────── */
+.glass-card {
+  background: hsl(var(--surface-elevated) / 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border-default));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   transition: all var(--duration-normal) var(--ease-out-expo);
 }
-
-.interactive-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.interactive-hover:active {
-  transform: translateY(0);
-  box-shadow: var(--shadow-sm);
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   UTILIDADES DE SOMBRA 2026
-   ───────────────────────────────────────────────────────────────────────────── */
-.shadow-elevation-1 {
-  box-shadow: var(--shadow-xs);
-}
-
-.shadow-elevation-2 {
-  box-shadow: var(--shadow-sm);
-}
-
-.shadow-elevation-3 {
-  box-shadow: var(--shadow-md);
-}
-
-.shadow-elevation-4 {
-  box-shadow: var(--shadow-lg);
-}
-
-.shadow-elevation-5 {
+.glass-card:hover {
   box-shadow: var(--shadow-xl);
+  transform: translateY(-3px);
 }
 
-.shadow-elevation-6 {
-  box-shadow: var(--shadow-2xl);
+.glass-header {
+  background: hsl(var(--surface-elevated) / 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid hsl(var(--border-default));
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
-.shadow-glow {
-  box-shadow: var(--glow-subtle);
+/* ─── SECTION DIVIDERS (Wotech Style) ────────────────────────────────────── */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: hsl(var(--accent-primary));
 }
 
-.shadow-glow-accent {
-  box-shadow: var(--glow-accent);
+.section-label::before {
+  content: '';
+  display: block;
+  width: 1.5rem;
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, hsl(var(--accent-primary)), hsl(var(--accent-secondary)));
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   GRADIENTES MODERNOS 2026
-   ───────────────────────────────────────────────────────────────────────────── */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-divider h2 {
+  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: hsl(var(--border-subtle));
+}
+
+/* ─── BADGE / PILLS ──────────────────────────────────────────────────────── */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.badge-primary {
+  background: hsl(var(--accent-primary) / 0.12);
+  color: hsl(var(--accent-primary));
+  border: 1px solid hsl(var(--accent-primary) / 0.2);
+}
+
+.badge-secondary {
+  background: hsl(var(--accent-secondary) / 0.12);
+  color: hsl(var(--accent-secondary));
+  border: 1px solid hsl(var(--accent-secondary) / 0.2);
+}
+
+.badge-live {
+  background: hsl(0 84% 60% / 0.12);
+  color: hsl(0 84% 50%);
+  border: 1px solid hsl(0 84% 60% / 0.25);
+  animation: pulse-live 2s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.7; }
+}
+
+/* ─── BUTTONS ────────────────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  background: hsl(var(--accent-primary));
+  color: #ffffff;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out-expo);
+  box-shadow: 0 4px 14px hsl(var(--accent-primary) / 0.3);
+}
+
+.btn-primary:hover {
+  background: hsl(var(--accent-primary-hover));
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px hsl(var(--accent-primary) / 0.4);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  background: transparent;
+  color: hsl(var(--accent-primary));
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border: 1.5px solid hsl(var(--accent-primary) / 0.35);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out-expo);
+}
+
+.btn-secondary:hover {
+  background: hsl(var(--accent-primary) / 0.08);
+  border-color: hsl(var(--accent-primary) / 0.6);
+}
+
+/* ─── NAVIGATION SIDEBAR ─────────────────────────────────────────────────── */
+.nav-icon-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-out-expo);
+  color: hsl(var(--text-tertiary));
+}
+
+.nav-icon-btn:hover {
+  background: hsl(var(--accent-primary) / 0.08);
+  color: hsl(var(--accent-primary));
+}
+
+.nav-icon-btn.active {
+  background: hsl(var(--accent-primary) / 0.12);
+  color: hsl(var(--accent-primary));
+  box-shadow: inset 3px 0 0 hsl(var(--accent-primary));
+}
+
+/* ─── SIDEBAR CONTENT ────────────────────────────────────────────────────── */
+.sidebar-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  margin-bottom: 0.375rem;
+}
+
+.sidebar-section-header span {
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: hsl(var(--text-tertiary));
+}
+
+.sidebar-feed-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  color: hsl(var(--text-secondary));
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out-expo);
+  border-left: 2px solid transparent;
+}
+
+.sidebar-feed-item:hover {
+  background: hsl(var(--accent-primary) / 0.06);
+  color: hsl(var(--accent-primary));
+}
+
+.sidebar-feed-item.active {
+  background: hsl(var(--accent-primary) / 0.1);
+  color: hsl(var(--accent-primary));
+  font-weight: 700;
+  border-left-color: hsl(var(--accent-primary));
+}
+
+/* ─── ARTICLE CARD WOTECH ────────────────────────────────────────────────── */
+.article-card-wotech {
+  background: hsl(var(--surface-elevated));
+  border: 1px solid hsl(var(--border-subtle));
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-lg);
+  transition: all var(--duration-normal) var(--ease-out-expo);
+  padding: 1.25rem 1.25rem 1.25rem 1.5rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.article-card-wotech:hover {
+  border-left-color: hsl(var(--accent-primary));
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.article-card-wotech.selected {
+  border-left-color: hsl(var(--accent-secondary));
+  box-shadow: var(--shadow-accent);
+}
+
+/* ─── SOMBRAS UTILITARIAS ────────────────────────────────────────────────── */
+.shadow-elevation-1 { box-shadow: var(--shadow-xs); }
+.shadow-elevation-2 { box-shadow: var(--shadow-sm); }
+.shadow-elevation-3 { box-shadow: var(--shadow-md); }
+.shadow-elevation-4 { box-shadow: var(--shadow-lg); }
+.shadow-elevation-5 { box-shadow: var(--shadow-xl); }
+.shadow-elevation-6 { box-shadow: var(--shadow-2xl); }
+.shadow-glow        { box-shadow: var(--glow-subtle); }
+.shadow-glow-accent { box-shadow: var(--glow-accent); }
+
+/* ─── GRADIENTES ─────────────────────────────────────────────────────────── */
 .gradient-primary {
-  background: linear-gradient(135deg, hsl(var(--accent-primary)) 0%, hsl(230 85% 50%) 100%);
-}
-
-.gradient-warm {
-  background: linear-gradient(135deg, hsl(var(--accent-secondary)) 0%, hsl(15 90% 55%) 100%);
+  background: linear-gradient(135deg, hsl(var(--accent-primary)) 0%, hsl(var(--accent-secondary)) 100%);
 }
 
 .gradient-surface {
@@ -348,88 +461,65 @@ select,
 
 .gradient-mesh {
   background:
-    radial-gradient(at 20% 20%, hsl(var(--accent-primary) / 0.1) 0%, transparent 50%),
-    radial-gradient(at 80% 80%, hsl(var(--accent-secondary) / 0.08) 0%, transparent 50%),
+    radial-gradient(at 15% 25%, hsl(var(--accent-primary) / 0.07) 0%, transparent 55%),
+    radial-gradient(at 85% 75%, hsl(var(--accent-secondary) / 0.06) 0%, transparent 55%),
     hsl(var(--surface-primary));
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   ANIMACIONES SUTILES - Micro-interacciones 2026
-   ───────────────────────────────────────────────────────────────────────────── */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes glow-pulse {
-
-  0%,
-  100% {
-    box-shadow: var(--shadow-md);
-  }
-
-  50% {
-    box-shadow: var(--shadow-lg), var(--glow-accent);
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in var(--duration-normal) var(--ease-out-expo);
-}
-
-.animate-scale-in {
-  animation: scale-in var(--duration-normal) var(--ease-out-expo);
-}
-
-.animate-glow-pulse {
-  animation: glow-pulse 2s ease-in-out infinite;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   UTILIDADES ADICIONALES
-   ───────────────────────────────────────────────────────────────────────────── */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Texto con gradiente - Tendencia 2026 */
 .text-gradient {
-  background: linear-gradient(135deg, hsl(var(--accent-primary)) 0%, hsl(280 80% 60%) 100%);
+  background: linear-gradient(135deg, hsl(var(--accent-primary)) 0%, hsl(var(--accent-secondary)) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Contenedor con ratio fijo */
-.aspect-card {
-  aspect-ratio: 16 / 10;
+/* ─── ANIMACIONES ────────────────────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Safe area para móviles */
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0);
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: var(--shadow-md); }
+  50%       { box-shadow: var(--shadow-lg), var(--glow-accent); }
+}
+
+.animate-fade-in      { animation: fade-in var(--duration-normal) var(--ease-out-expo) both; }
+.animate-scale-in     { animation: scale-in var(--duration-normal) var(--ease-out-expo) both; }
+.animate-slide-left   { animation: slide-in-left var(--duration-slow) var(--ease-out-expo) both; }
+.animate-slide-right  { animation: slide-in-right var(--duration-slow) var(--ease-out-expo) both; }
+.animate-glow-pulse   { animation: glow-pulse 2.5s ease-in-out infinite; }
+
+/* ─── UTILIDADES ─────────────────────────────────────────────────────────── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+.aspect-card { aspect-ratio: 16/10; }
+
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0); }
+
+/* Botones e interactivos — tamaño mínimo accesible */
+button, a, input, select, [role="button"] {
+  transition: all var(--duration-fast) var(--ease-out-expo);
+}
+
+/* ─── RESPONSIVE HELPERS ─────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .card-wotech::before { width: 2px; }
+  .article-card-wotech { padding: 1rem 1rem 1rem 1.25rem; }
 }

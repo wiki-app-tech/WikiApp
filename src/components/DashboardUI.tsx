@@ -2,51 +2,116 @@
 
 import React from 'react';
 
-export function NavIcon({ children, active, label, onClick, showLabelBelow }: { children: React.ReactNode, active?: boolean, label: string, onClick?: () => void, showLabelBelow?: boolean }) {
+/* ── NavIcon ─────────────────────────────────────────────────────────────── */
+export function NavIcon({
+    children, active, label, onClick,
+}: {
+    children: React.ReactNode;
+    active?: boolean;
+    label: string;
+    onClick?: () => void;
+}) {
     return (
         <button
             onClick={onClick}
-            className={`flex flex-col items-center justify-center transition-all relative group ${showLabelBelow ? 'w-full h-16' : 'w-14 h-14'} ${active ? 'text-accent-primary' : 'text-text-tertiary hover:text-text-primary'}`}
+            title={label}
+            className={`
+                relative flex flex-col items-center justify-center w-14 h-14 rounded-xl
+                transition-all duration-200 group
+                ${active
+                    ? 'bg-accent-primary/10 text-accent-primary shadow-inner border-l-[3px] border-accent-primary'
+                    : 'text-text-tertiary hover:bg-accent-primary/6 hover:text-accent-primary border-l-[3px] border-transparent'
+                }
+            `}
         >
-            <div className={`p-2 transition-all duration-300 ${active ? 'bg-accent-primary/10 text-accent-primary rounded-xl border border-accent-primary/20 shadow-glow-accent' : 'group-hover:scale-110'}`}>
+            <div className={`transition-transform duration-200 ${active ? '' : 'group-hover:scale-110'}`}>
                 {children}
             </div>
-            {showLabelBelow && (
-                <span className="text-[9px] font-bold uppercase tracking-tight mt-1 opacity-70">{label}</span>
-            )}
-            {!showLabelBelow && (
-                <span className="hidden lg:group-hover:block absolute left-full ml-2 px-3 py-1.5 bg-surface-elevated text-text-primary text-[10px] font-bold rounded-lg whitespace-nowrap z-50 pointer-events-none shadow-xl border border-accent-primary/20 glass-card">{label}</span>
-            )}
+
+            {/* Tooltip */}
+            <span className="
+                pointer-events-none absolute left-full ml-3 px-3 py-1.5
+                bg-text-primary text-surface-primary
+                text-[10px] font-bold rounded-md whitespace-nowrap z-50
+                opacity-0 group-hover:opacity-100 translate-x-[-4px] group-hover:translate-x-0
+                transition-all duration-150 shadow-lg
+            ">
+                {label}
+            </span>
         </button>
     );
 }
 
+/* ── SidebarCountBadge ───────────────────────────────────────────────────── */
 export function SidebarCountBadge({ count }: { count: number }) {
     if (count <= 0) return null;
     return (
-        <span className="text-[10px] font-bold text-text-tertiary opacity-60">
+        <span className="text-[10px] font-bold text-text-tertiary opacity-50 tabular-nums">
             {count > 999 ? '999+' : count}
         </span>
     );
 }
 
-export function CategoryButton({ active, label, icon, onClick }: { active: boolean, label: string, icon: React.ReactNode, onClick: () => void }) {
+/* ── CategoryButton ──────────────────────────────────────────────────────── */
+export function CategoryButton({
+    active, label, icon, onClick,
+}: {
+    active: boolean;
+    label: string;
+    icon: React.ReactNode;
+    onClick: () => void;
+}) {
     return (
         <button
             onClick={onClick}
-            className={`w-full flex items-center gap-3 px-5 py-3.5 rounded-[var(--radius-button)] transition-all ${active ? 'bg-accent-primary text-surface-primary shadow-xl shadow-accent-primary/30 font-bold' : 'text-text-secondary hover:bg-surface-elevated hover:shadow-md hover:text-accent-primary'}`}
+            className={`
+                w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold
+                transition-all duration-200
+                ${active
+                    ? 'bg-accent-primary text-white shadow-md shadow-accent-primary/25'
+                    : 'text-text-secondary hover:bg-accent-primary/8 hover:text-accent-primary'
+                }
+            `}
         >
-            <div className={`p-2 rounded-xl ${active ? 'bg-surface-primary/20' : 'bg-surface-elevated/50'}`}>{icon}</div>
-            <span className="text-sm font-bold tracking-tight">{label}</span>
+            <span className={`shrink-0 ${active ? 'text-white/90' : 'text-text-tertiary'}`}>
+                {icon}
+            </span>
+            <span className="tracking-tight">{label}</span>
         </button>
     );
 }
 
-export function MobileTab({ active, label, icon, onClick }: { active: boolean, label: string, icon: React.ReactNode, onClick: () => void }) {
+/* ── MobileTab ───────────────────────────────────────────────────────────── */
+export function MobileTab({
+    active, label, icon, onClick,
+}: {
+    active: boolean;
+    label: string;
+    icon: React.ReactNode;
+    onClick: () => void;
+}) {
     return (
-        <button onClick={onClick} className={`flex flex-col items-center justify-center gap-1.5 flex-1 min-h-[64px] transition-all transform active:scale-95 ${active ? 'text-accent-primary' : 'text-text-tertiary'}`}>
-            <div className={`p-2.5 rounded-[var(--radius-button)] transition-all duration-300 ${active ? 'bg-accent-primary text-surface-primary shadow-lg shadow-accent-primary/20' : 'bg-transparent'}`}>{icon}</div>
-            <span className="text-[10px] font-bold tracking-tight">{label}</span>
+        <button
+            onClick={onClick}
+            className={`
+                flex flex-col items-center justify-center gap-1 flex-1 min-h-[60px]
+                transition-all duration-200 active:scale-95 relative
+                ${active ? 'text-accent-primary' : 'text-text-tertiary'}
+            `}
+        >
+            {/* Active indicator top bar */}
+            {active && (
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[2.5px] rounded-b-full bg-gradient-to-r from-accent-primary to-accent-secondary" />
+            )}
+            <div className={`
+                p-2 rounded-xl transition-all duration-200
+                ${active ? 'bg-accent-primary/12 text-accent-primary' : ''}
+            `}>
+                {icon}
+            </div>
+            <span className={`text-[9px] font-bold uppercase tracking-wider ${active ? 'text-accent-primary' : 'text-text-tertiary'}`}>
+                {label}
+            </span>
         </button>
     );
 }
