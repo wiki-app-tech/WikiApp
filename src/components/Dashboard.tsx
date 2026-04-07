@@ -538,121 +538,109 @@ export default function Dashboard({
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col min-w-0 bg-surface-primary relative">
-                <header className="h-16 bg-white border-b border-slate-100 flex items-center px-6 md:px-8 justify-between sticky top-0 z-30 shadow-sm">
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2 group cursor-pointer">
-                            <h1 className="text-xl font-bold text-text-primary tracking-tight font-display">
-                                {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Newsfeed'}
-                            </h1>
-                            <ChevronIcon className="w-4 h-4 text-text-tertiary group-hover:text-accent-primary transition-colors" />
+                <header className="h-14 bg-white border-b flex items-center px-4 sm:px-6 justify-between sticky top-0 z-30" style={{ borderColor: 'hsl(var(--border-subtle))', boxShadow: 'var(--shadow-xs)' }}>
+                    <div className="flex items-center gap-4">
+                        {/* Botón para abrir sidebar feeds en mobile */}
+                        <button
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="btn-icon lg:hidden"
+                            title="Mostrar fuentes"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8M4 18h16" /></svg>
+                        </button>
+
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-[15px] font-bold" style={{ color: 'hsl(var(--text-primary))' }}>
+                                {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Noticias'}
+                            </h2>
+                            <span className="chip text-[11px]" style={{ padding: '0.1rem 0.5rem' }}>
+                                {filteredArticles.length}
+                            </span>
                         </div>
 
-                        <div className="hidden md:flex items-center border-l border-accent-primary/10 pl-6 gap-2 relative">
-                            <button className="flex items-center gap-2 px-3 py-1.5 bg-accent-primary/5 border border-accent-primary/10 rounded-lg text-xs font-bold text-text-secondary hover:bg-accent-primary/10 transition-colors">
-                                Unread ({filteredArticles.length})
-                                <ChevronIcon className="w-3 h-3 opacity-50" />
+                        {/* Filtro de fecha */}
+                        <div className="hidden md:flex items-center relative">
+                            <button
+                                onClick={() => setShowDatePicker(!showDatePicker)}
+                                className={`chip gap-1.5 ${startDate || endDate ? 'active' : ''}`}
+                            >
+                                <FilterIcon className="w-3.5 h-3.5" />
+                                <span>{startDate || endDate ? 'Filtrado' : 'Filtrar por fecha'}</span>
                             </button>
-                            <div className="relative group">
-                                <button
-                                    onClick={() => setShowDatePicker(!showDatePicker)}
-                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${startDate || endDate ? 'bg-accent-primary/10 text-accent-primary border border-accent-primary/20 shadow-glow-accent' : 'text-text-tertiary hover:text-text-primary hover:bg-accent-primary/5 border border-transparent'}`}
-                                >
-                                    <FilterIcon className="w-4 h-4" />
-                                    <span>{startDate || endDate ? 'Filtrado por fecha' : 'Filtrar por fecha'}</span>
-                                </button>
 
-                                {showDatePicker && (
-                                    <>
-                                        <div className="fixed inset-0 z-40" onClick={() => setShowDatePicker(false)} />
-                                        <div className="absolute top-full left-0 mt-2 bg-surface-elevated border border-accent-primary/20 rounded-2xl shadow-2xl p-6 z-50 w-72 animate-fade-in glass-card">
-                                            <div className="space-y-4">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <h3 className="text-sm font-black text-text-primary uppercase tracking-widest font-display">Rango de Fechas</h3>
-                                                    {(startDate || endDate) && (
-                                                        <button
-                                                            onClick={() => { setStartDate(null); setEndDate(null); }}
-                                                            className="text-[10px] font-bold text-accent-primary hover:text-accent-secondary"
-                                                        >
-                                                            LIMPIAR
-                                                        </button>
-                                                    )}
-                                                </div>
-                                                <div className="space-y-3">
-                                                    <div>
-                                                        <label className="text-[10px] font-bold text-text-tertiary uppercase tracking-tighter mb-1.5 block">Desde</label>
-                                                        <input
-                                                            type="date"
-                                                            value={startDate || ''}
-                                                            onChange={(e) => setStartDate(e.target.value)}
-                                                            className="w-full bg-surface-primary/50 border border-accent-primary/10 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary outline-none transition-all text-text-primary"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-[10px] font-bold text-text-tertiary uppercase tracking-tighter mb-1.5 block">Hasta</label>
-                                                        <input
-                                                            type="date"
-                                                            value={endDate || ''}
-                                                            onChange={(e) => setEndDate(e.target.value)}
-                                                            className="w-full bg-surface-primary/50 border border-accent-primary/10 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary outline-none transition-all text-text-primary"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <button
-                                                    onClick={() => setShowDatePicker(false)}
-                                                    className="w-full mt-4 bg-accent-primary text-surface-primary rounded-xl py-2.5 text-xs font-bold hover:bg-accent-secondary transition-all shadow-lg shadow-accent-primary/20"
-                                                >
-                                                    APLICAR FILTRO
-                                                </button>
+                            {showDatePicker && (
+                                <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setShowDatePicker(false)} />
+                                    <div className="absolute top-full left-0 mt-2 bg-white border rounded-xl shadow-lg p-5 z-50 w-64 animate-fade-in" style={{ borderColor: 'hsl(var(--border-default))' }}>
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="text-[13px] font-bold" style={{ color: 'hsl(var(--text-primary))' }}>Rango de fechas</h3>
+                                            {(startDate || endDate) && (
+                                                <button onClick={() => { setStartDate(null); setEndDate(null); }} className="text-[11px] font-semibold" style={{ color: 'hsl(var(--accent-primary))' }}>Limpiar</button>
+                                            )}
+                                        </div>
+                                        <div className="space-y-3">
+                                            <div>
+                                                <label className="block text-[11px] font-semibold mb-1" style={{ color: 'hsl(var(--text-tertiary))' }}>Desde</label>
+                                                <input type="date" value={startDate || ''} onChange={(e) => setStartDate(e.target.value)} className="input text-sm" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[11px] font-semibold mb-1" style={{ color: 'hsl(var(--text-tertiary))' }}>Hasta</label>
+                                                <input type="date" value={endDate || ''} onChange={(e) => setEndDate(e.target.value)} className="input text-sm" />
                                             </div>
                                         </div>
-                                    </>
-                                )}
-                            </div>
+                                        <button onClick={() => setShowDatePicker(false)} className="btn-primary w-full mt-4 text-[12px]">Aplicar</button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="relative group hidden lg:block">
-                            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary w-4 h-4" />
+                    <div className="flex items-center gap-2">
+                        {/* Búsqueda */}
+                        <div className="relative hidden lg:block">
+                            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-tertiary" />
                             <input
                                 type="text"
-                                placeholder="Search in articles"
+                                placeholder="Buscar artículos..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="bg-surface-primary/50 border-accent-primary/10 border focus:bg-surface-primary focus:border-accent-primary/40 rounded-full pl-9 pr-4 py-1.5 text-xs w-64 outline-none transition-all text-text-primary glass-card"
+                                className="input pl-8 pr-8 py-2 text-sm w-56"
+                                style={{ borderRadius: '9999px' }}
                             />
                             {search && (
-                                <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-text-tertiary hover:text-accent-primary">
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 btn-icon w-5 h-5">
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeWidth="2.5" strokeLinecap="round" /></svg>
                                 </button>
                             )}
                         </div>
 
-                        <div className="flex items-center gap-1 border-l border-accent-primary/10 pl-4">
-                            <button onClick={refreshArticles} className={`p-2 text-text-tertiary hover:text-accent-primary rounded-lg transition-colors ${isRefreshing ? 'animate-spin' : ''}`}>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                        {/* Vista: lista / grilla */}
+                        <div className="flex items-center gap-0.5 border rounded-lg p-0.5" style={{ borderColor: 'hsl(var(--border-subtle))' }}>
+                            <button onClick={() => handleViewModeChange('list')} className={`btn-icon w-8 h-8 ${viewMode === 'list' ? 'active' : ''}`} title="Lista">
+                                <ListIcon className="w-3.5 h-3.5" />
                             </button>
-                            <button onClick={() => handleViewModeChange('list')} className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-accent-primary/10 text-accent-primary shadow-glow-accent' : 'text-text-tertiary hover:text-text-primary'}`}>
-                                <ListIcon className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => handleViewModeChange('card')} className={`p-2 rounded-lg transition-colors ${viewMode === 'card' ? 'bg-accent-primary/10 text-accent-primary shadow-glow-accent' : 'text-text-tertiary hover:text-text-primary'}`}>
-                                <GridSmallIcon className="w-4 h-4" />
-                            </button>
-                            <button className="p-2 text-text-tertiary hover:text-accent-primary rounded-lg transition-colors">
-                                <SortIcon className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={toggleTheme}
-                                className="p-2.5 ml-2 bg-surface-primary border border-accent-primary/10 rounded-xl text-text-tertiary hover:text-accent-primary hover:border-accent-primary/30 transition-all shadow-sm"
-                                title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-                            >
-                                {theme === 'dark' ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
+                            <button onClick={() => handleViewModeChange('card')} className={`btn-icon w-8 h-8 ${viewMode === 'card' ? 'active' : ''}`} title="Grilla">
+                                <GridSmallIcon className="w-3.5 h-3.5" />
                             </button>
                         </div>
+
+                        {/* Actualizar */}
+                        <button onClick={refreshArticles} className={`btn-icon ${isRefreshing ? 'animate-spin' : ''}`} title="Actualizar">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                        </button>
+
+                        {/* Tema */}
+                        <button
+                            onClick={toggleTheme}
+                            className="btn-icon"
+                            title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+                        >
+                            {theme === 'dark' ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
+                        </button>
                     </div>
                 </header>
 
-                {/* Extracted Views — each renders only when its tab is active */}
+                {/* Vistas — cada una renderiza solo cuando su tab está activo */}
                 {activeTab === 'search' && (
                     <SearchView
                         articles={articles}
@@ -743,12 +731,14 @@ export default function Dashboard({
 
                                 {/* Empty State */}
                                 {filteredArticles.length === 0 && (
-                                    <div className="flex flex-col items-center justify-center py-32 text-center bg-surface-elevated rounded-[3rem] shadow-glow-accent/10 border border-accent-primary/5 glass-card">
-                                        <div className="w-20 h-20 bg-surface-primary rounded-3xl flex items-center justify-center mb-6 shadow-inner">
-                                            <SearchIcon className="w-8 h-8 text-text-tertiary" />
+                                    <div className="empty-state">
+                                        <div className="empty-state__icon">
+                                            <SearchIcon className="w-6 h-6" style={{ color: 'hsl(var(--text-muted))' }} />
                                         </div>
-                                        <h3 className="text-xl font-bold text-text-primary tracking-tight">No se encontraron artículos</h3>
-                                        <p className="text-sm text-text-tertiary max-w-xs mx-auto mt-3 font-medium">Probá con otra búsqueda o ajustá los filtros de la biblioteca.</p>
+                                        <h3 className="text-[16px] font-bold mb-1" style={{ color: 'hsl(var(--text-primary))' }}>No hay artículos</h3>
+                                        <p className="text-[13px] max-w-xs" style={{ color: 'hsl(var(--text-tertiary))' }}>
+                                            Probá ajustando el filtro o seleccionando otra fuente.
+                                        </p>
                                     </div>
                                 )}
                             </div>
