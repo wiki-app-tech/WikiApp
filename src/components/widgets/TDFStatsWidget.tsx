@@ -80,18 +80,18 @@ export default function TDFStatsWidget() {
 
     if (isLoading) {
         return (
-            <div className="glass-card overflow-hidden p-8 shadow-2xl shadow-accent-primary/5">
-                <div className="animate-pulse space-y-6">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-surface-primary/50 rounded-2xl" />
+            <div className="card-wotech overflow-hidden p-6">
+                <div className="animate-pulse space-y-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-slate-100 rounded-xl" />
                         <div className="space-y-2 flex-1">
-                            <div className="h-5 bg-surface-primary/50 rounded-lg w-48" />
-                            <div className="h-3 bg-surface-primary/30 rounded-lg w-72" />
+                            <div className="h-4 bg-slate-100 rounded-lg w-40" />
+                            <div className="h-3 bg-slate-100 rounded-lg w-56" />
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {[...Array(6)].map((_, i) => (
-                            <div key={i} className="h-40 bg-surface-primary/30 rounded-2xl" />
+                            <div key={i} className="h-32 bg-slate-100 rounded-xl" />
                         ))}
                     </div>
                 </div>
@@ -116,42 +116,37 @@ export default function TDFStatsWidget() {
     })();
 
     return (
-        <div className="glass-card overflow-hidden shadow-2xl shadow-accent-primary/5 transition-all duration-300">
-            {/* Header con gradiente premium */}
-            <div className="relative p-8 pb-0">
-                <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 via-transparent to-accent-secondary/5 pointer-events-none" />
-
-                <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                    <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 flex items-center justify-center bg-gradient-to-br from-accent-primary/20 to-accent-secondary/10 rounded-2xl text-accent-primary shadow-glow-accent border border-accent-primary/10">
-                            <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div className="card-wotech overflow-hidden">
+            {/* Header */}
+            <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100 bg-slate-50/30">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 flex items-center justify-center bg-gradient-to-br from-accent-primary/15 to-accent-secondary/10 rounded-xl text-accent-primary border border-accent-primary/10">
+                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <line x1="18" y1="20" x2="18" y2="10" />
                                 <line x1="12" y1="20" x2="12" y2="4" />
                                 <line x1="6" y1="20" x2="6" y2="14" />
                             </svg>
                         </div>
                         <div>
-                            <h2 className="text-xl font-black tracking-tight text-text-primary font-display uppercase">
-                                Estadísticas Clave de <span className="text-accent-primary">TDF</span>
+                            <div className="section-label mb-0.5">Indicadores</div>
+                            <h2 className="text-base font-black tracking-tight text-text-primary font-display">
+                                Estadísticas de <span className="text-accent-primary">TDF</span>
                             </h2>
-                            <p className="text-[11px] font-bold text-text-tertiary uppercase tracking-tight mt-1">
-                                Indicadores económicos y sociales • Actualización diaria
-                            </p>
                         </div>
                     </div>
-
-                    <div className="flex items-center gap-3">
-                        <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-surface-primary/50 rounded-xl border border-accent-primary/10">
-                            <div className="w-2 h-2 bg-accent-success rounded-full animate-pulse shadow-[0_0_8px_hsl(160_84%_45%)]" />
-                            <span className="text-[10px] font-bold text-text-tertiary uppercase tracking-widest">Live Data</span>
+                    <div className="flex items-center gap-2 self-start sm:self-auto">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-slate-100 shadow-sm">
+                            <div className="w-1.5 h-1.5 bg-accent-secondary rounded-full animate-pulse" />
+                            <span className="text-[10px] font-bold text-text-tertiary uppercase tracking-wider">Actualizado</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Grid de indicadores */}
-            <div className="px-8 pb-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="px-4 sm:px-6 py-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {data.indicators.map((indicator) => (
                         <a
                             key={indicator.id}
@@ -216,36 +211,31 @@ export default function TDFStatsWidget() {
                 </div>
             </div>
 
-            {/* Footer con fuentes y última actualización */}
-            <div className="px-8 pb-8 pt-4">
-                <div className="bg-gradient-to-r from-accent-primary/5 via-surface-primary/50 to-accent-secondary/5 rounded-2xl p-5 border border-accent-primary/10">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-surface-elevated flex items-center justify-center border border-accent-primary/10">
-                                <svg className="w-4 h-4 text-accent-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="12" cy="12" r="10" />
-                                    <polyline points="12 6 12 12 16 14" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-black text-text-tertiary uppercase tracking-widest">Última actualización</p>
-                                <p className="text-xs font-bold text-text-secondary">{formattedDate}</p>
-                            </div>
+            {/* Footer */}
+            <div className="px-4 sm:px-6 pb-4 pt-2">
+                <div className="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 text-accent-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <div>
+                            <p className="text-[10px] font-black text-text-tertiary uppercase tracking-widest">Actualizado</p>
+                            <p className="text-xs font-bold text-text-secondary">{formattedDate}</p>
                         </div>
-
-                        <div className="flex items-center gap-2">
-                            {data.sources.map((source) => (
-                                <a
-                                    key={source.name}
-                                    href={source.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="px-3 py-1.5 bg-surface-elevated text-text-secondary rounded-lg text-[10px] font-bold border border-accent-primary/10 hover:border-accent-primary/30 hover:text-accent-primary transition-all"
-                                >
-                                    {source.name}
-                                </a>
-                            ))}
-                        </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                        {data.sources.map((source) => (
+                            <a
+                                key={source.name}
+                                href={source.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-2.5 py-1 bg-white text-text-secondary rounded-lg text-[10px] font-bold border border-slate-200 hover:border-accent-primary/30 hover:text-accent-primary transition-all"
+                            >
+                                {source.name}
+                            </a>
+                        ))}
                     </div>
                 </div>
             </div>

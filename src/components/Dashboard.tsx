@@ -240,9 +240,11 @@ export default function Dashboard({
             <aside className={`
                 fixed inset-0 z-40 lg:relative lg:inset-auto lg:z-auto
                 h-full border-r border-slate-100 flex flex-col bg-white transition-all duration-300 ease-in-out overflow-hidden shadow-sm
-                ${isMobileMenuOpen || showContentSidebar
-                    ? 'w-full lg:w-72 opacity-100 translate-x-0'
-                    : 'w-0 opacity-0 -translate-x-full pointer-events-none'}
+                ${isMobileMenuOpen
+                    ? 'w-full opacity-100 translate-x-0'
+                    : showContentSidebar
+                        ? 'w-0 lg:w-72 opacity-0 lg:opacity-100 -translate-x-full lg:translate-x-0 pointer-events-none lg:pointer-events-auto'
+                        : 'w-0 opacity-0 -translate-x-full pointer-events-none'}
                 ${selectedArticleId && !isMobileMenuOpen ? 'hidden lg:flex' : 'flex'}
             `}>
                 <div className="p-5 flex flex-col h-full">
@@ -691,10 +693,10 @@ export default function Dashboard({
                 {activeTab !== 'search' && activeTab !== 'saved' && activeTab !== 'audio' && activeTab !== 'automate' && activeTab !== 'zonas' && activeTab !== 'videos' && (
                     <div className="flex-1 flex overflow-hidden">
                         {/* Master: Article List */}
-                        <div className={`flex-1 overflow-y-auto p-8 md:p-12 scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-2/5' : 'w-full'}`}>
-                            <div className="max-w-7xl mx-auto space-y-12 pb-40">
+                        <div className={`flex-1 overflow-y-auto scroll-smooth transition-all duration-300 ${selectedArticleId ? 'hidden md:block md:w-2/5' : 'w-full'}`}>
+                            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 md:py-8 space-y-6 md:space-y-10 pb-24 lg:pb-12">
                                 {/* Weather & Road Hero Section */}
-                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
                                     <WeatherCard cities={cities} />
                                     <RoadStatus />
                                 </div>
@@ -702,20 +704,20 @@ export default function Dashboard({
                                 <TDFStatsWidget />
 
                                 {/* Section Header — Wotech style */}
-                                <div className="flex flex-wrap items-end justify-between gap-4 pb-2 border-b border-slate-100">
+                                <div className="flex flex-wrap items-end justify-between gap-3 pb-3 border-b border-slate-100">
                                     <div>
-                                        <div className="section-label mb-2">Tierra del Fuego</div>
-                                        <h1 className="text-3xl md:text-4xl font-black text-text-primary tracking-tight font-display">
+                                        <div className="section-label mb-1.5">Tierra del Fuego</div>
+                                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-text-primary tracking-tight font-display">
                                             {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Centro de Noticias'}
                                         </h1>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <span className="flex items-center gap-1.5 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">
                                             <span className="w-1.5 h-1.5 bg-accent-secondary rounded-full animate-pulse" />
-                                            {filteredArticles.length} artículos
+                                            {filteredArticles.length} art.
                                         </span>
                                         {selectedFeed && (
-                                            <button onClick={() => setSelectedFeed(null)} className="btn-secondary text-xs py-1.5 px-4">← Volver</button>
+                                            <button onClick={() => setSelectedFeed(null)} className="btn-secondary text-xs py-1.5 px-3">← Volver</button>
                                         )}
                                     </div>
                                 </div>
@@ -725,8 +727,8 @@ export default function Dashboard({
                                     viewMode === 'list'
                                         ? "flex flex-col bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm divide-y divide-slate-50"
                                         : viewMode === 'magazine'
-                                            ? "grid grid-cols-1 lg:grid-cols-2 gap-5"
-                                            : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+                                            ? "grid grid-cols-1 md:grid-cols-2 gap-4"
+                                            : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
                                 }>
                                     {filteredArticles.map(article => (
                                         <ArticleCard
