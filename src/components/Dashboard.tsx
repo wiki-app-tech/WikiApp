@@ -350,10 +350,12 @@ export default function Dashboard({
                                 {/* Categories + feeds */}
                                 {categories.map(category => (
                                     <div key={category} className="mt-3">
-                                        <div className="sidebar-section-header px-1 mb-1">
+                                        <div
+                                            className="sidebar-section-header px-1 mb-1 cursor-pointer"
+                                            onClick={() => setCollapsedCategories(prev => ({ ...prev, [category]: !prev[category] }))}
+                                        >
                                             <ChevronIcon
-                                                className={`w-3 h-3 text-text-tertiary/50 transition-transform cursor-pointer ${collapsedCategories[category] ? '-rotate-90' : ''}`}
-                                                onClick={() => setCollapsedCategories(prev => ({ ...prev, [category]: !prev[category] }))}
+                                                className={`w-3 h-3 text-text-tertiary/50 transition-transform ${collapsedCategories[category] ? '-rotate-90' : ''}`}
                                             />
                                             <span>{category}</span>
                                             <span className="ml-auto text-[10px] font-bold text-text-tertiary/40 tabular-nums">{categoryCounts[category] || 0}</span>
