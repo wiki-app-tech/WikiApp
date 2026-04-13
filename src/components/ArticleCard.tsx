@@ -19,6 +19,8 @@ const BADGE_CLASS: Record<string, string> = {
     provinciales:    'badge-prov',
     deporte:         'badge-dep',
     social:          'badge-soc',
+    medios:          'badge-medios',
+    economia:        'badge-eco',
 };
 
 const getBadgeClass = (cat?: string) =>
@@ -34,9 +36,10 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
 
     const formattedDate = useMemo(() => {
         try {
-            return new Date(article.pubDate).toLocaleDateString('es-AR', {
-                day: '2-digit', month: 'short',
-            });
+            const d = new Date(article.pubDate);
+            const date = d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
+            const time = d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+            return `${date} · ${time}`;
         } catch { return article.pubDate; }
     }, [article.pubDate]);
 
@@ -81,8 +84,8 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
                         {article.title}
                     </h3>
 
-                    {/* Extracto — visible en sm+ */}
-                    <p className="hidden sm:block text-[12px] text-[hsl(var(--text-tertiary))] line-clamp-1 mt-1 leading-relaxed">
+                    {/* Extracto — siempre visible */}
+                    <p className="text-[12px] text-[hsl(var(--text-tertiary))] line-clamp-2 mt-1 leading-relaxed">
                         {cleanDescription}
                     </p>
                 </div>
@@ -193,22 +196,24 @@ export default function ArticleCard({ article, viewMode, isSelected, onClick }: 
                 </div>
 
                 {/* Título — el elemento más importante */}
-                <h3 className="text-[14px] font-bold leading-snug line-clamp-3 tracking-tight flex-1 transition-colors group-hover:text-[hsl(var(--accent-primary))]"
+                <h3 className="text-[14px] font-bold leading-snug line-clamp-2 tracking-tight transition-colors group-hover:text-[hsl(var(--accent-primary))]"
                     style={{ color: isSelected ? 'hsl(var(--accent-primary))' : 'hsl(var(--text-primary))' }}>
                     {article.title}
                 </h3>
+
+                {/* Cuerpo/extracto — siempre visible */}
+                {cleanDescription && (
+                    <p className="text-[12px] text-[hsl(var(--text-tertiary))] line-clamp-3 mt-2 leading-relaxed flex-1">
+                        {cleanDescription}
+                    </p>
+                )}
 
                 {/* Footer */}
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-[hsl(var(--border-subtle))]">
                     <time className="text-[11px] font-semibold text-[hsl(var(--text-muted))] uppercase tracking-wider">
                         {formattedDate}
                     </time>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={(e) => e.stopPropagation()} className="btn-icon w-7 h-7">
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                        </button>
+                    <div className="flex items-center gap-1">
                         <ShareMenu url={article.link} title={article.title} compact />
                     </div>
                 </div>

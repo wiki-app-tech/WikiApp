@@ -1,1 +1,303 @@
-[]
+[
+    {
+        "id": "clarin",
+        "name": "Clarín",
+        "url": "https://www.clarin.com/rss/lo-ultimo/",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "lanacion",
+        "name": "La Nación",
+        "url": "https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "infobae",
+        "name": "Infobae",
+        "url": "https://www.infobae.com/rss/",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "pagina12",
+        "name": "Página/12",
+        "url": "https://www.pagina12.com.ar/rss/portada",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "perfil",
+        "name": "Perfil",
+        "url": "https://www.perfil.com/feed",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "la-voz-interior",
+        "name": "La Voz del Interior",
+        "url": "https://www.lavoz.com.ar/feed/",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "los-andes",
+        "name": "Los Andes",
+        "url": "https://www.losandes.com.ar/feed/",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "la-gaceta",
+        "name": "La Gaceta",
+        "url": "https://www.lagaceta.com.ar/rss.html",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "rio-negro",
+        "name": "Río Negro",
+        "url": "https://www.rionegro.com.ar/feed/",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "el-dia",
+        "name": "El Día",
+        "url": "https://www.eldia.com/rss",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "el-destape",
+        "name": "El Destape",
+        "url": "https://www.eldestapeweb.com/rss.xml",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "a24",
+        "name": "A24",
+        "url": "https://www.a24.com/rss/ultimas-noticias",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "cronica",
+        "name": "Crónica",
+        "url": "https://www.cronica.com.ar/rss/",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "noticias-argentinas",
+        "name": "Noticias Argentinas",
+        "url": "https://www.noticiasargentinas.com/rss/",
+        "type": "rss",
+        "category": "nacionales"
+    },
+    {
+        "id": "tn",
+        "name": "TN (Todo Noticias)",
+        "url": "https://tn.com.ar/rss/",
+        "type": "rss",
+        "category": "medios"
+    },
+    {
+        "id": "lnplus",
+        "name": "La Nación+",
+        "url": "https://www.lnplus.com/feed",
+        "type": "rss",
+        "category": "medios"
+    },
+    {
+        "id": "radio-mitre",
+        "name": "Radio Mitre",
+        "url": "https://radiomitre.cienradios.com/feed/",
+        "type": "rss",
+        "category": "medios"
+    },
+    {
+        "id": "radio-10",
+        "name": "Radio 10",
+        "url": "https://radio10.cienradios.com/feed/",
+        "type": "rss",
+        "category": "medios"
+    },
+    {
+        "id": "rivadavia",
+        "name": "Radio Rivadavia",
+        "url": "https://www.radiorivadavia.com.ar/feed/",
+        "type": "rss",
+        "category": "medios"
+    },
+    {
+        "id": "la-red",
+        "name": "La Red",
+        "url": "https://www.lared.com.ar/feed/",
+        "type": "rss",
+        "category": "medios"
+    },
+    {
+        "id": "el-cronista",
+        "name": "El Cronista",
+        "url": "https://www.cronista.com/feeds/",
+        "type": "rss",
+        "category": "economia"
+    },
+    {
+        "id": "ambito",
+        "name": "Ámbito Financiero",
+        "url": "https://www.ambito.com/rss/noticias.xml",
+        "type": "rss",
+        "category": "economia"
+    },
+    {
+        "id": "bbc-mundo",
+        "name": "BBC Mundo",
+        "url": "https://feeds.bbci.co.uk/mundo/rss.xml",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "cnn-espanol",
+        "name": "CNN en Español",
+        "url": "http://rss.cnn.com/rss/cnn_spanish.rss",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "france24-es",
+        "name": "France 24 Español",
+        "url": "https://www.france24.com/es/rss",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "euronews-es",
+        "name": "Euronews Español",
+        "url": "https://feeds.feedburner.com/euronews/es/home/",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "dw-espanol",
+        "name": "Deutsche Welle Español",
+        "url": "https://rss.dw.com/rdf/rss-es-all",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "rt-espanol",
+        "name": "RT en Español",
+        "url": "https://actualidad.rt.com/feeds/all.rss",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "sputnik-mundo",
+        "name": "Sputnik Mundo",
+        "url": "https://sputniknews.lat/export/rss2/archive/index.xml",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "el-pais",
+        "name": "El País",
+        "url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "el-mundo-es",
+        "name": "El Mundo",
+        "url": "https://e00-elmundo.uecdn.es/elmundo/rss/portada.xml",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "nytimes-es",
+        "name": "The New York Times (ES)",
+        "url": "https://rss.nytimes.com/services/xml/rss/nyt/es.xml",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "el-universal-mx",
+        "name": "El Universal (México)",
+        "url": "https://www.eluniversal.com.mx/arc/outboundfeeds/rss/",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "la-jornada",
+        "name": "La Jornada",
+        "url": "https://www.jornada.com.mx/rss/edicion.xml",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "milenio",
+        "name": "Milenio",
+        "url": "https://www.milenio.com/rss",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "el-tiempo-co",
+        "name": "El Tiempo (Colombia)",
+        "url": "https://www.eltiempo.com/rss/",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "el-espectador",
+        "name": "El Espectador",
+        "url": "https://www.elespectador.com/feeds/",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "caracol-noticias",
+        "name": "Caracol Noticias",
+        "url": "https://caracol.com.co/feeds/",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "emol",
+        "name": "Emol (Chile)",
+        "url": "https://www.emol.com/rss/",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "la-tercera",
+        "name": "La Tercera",
+        "url": "https://www.latercera.com/feed/",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "radio-biobio",
+        "name": "Radio Bío Bío",
+        "url": "https://www.biobiochile.cl/feed/",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "el-comercio-pe",
+        "name": "El Comercio (Perú)",
+        "url": "https://elcomercio.pe/arcio/rss/",
+        "type": "rss",
+        "category": "internacionales"
+    },
+    {
+        "id": "rpp-noticias",
+        "name": "RPP Noticias",
+        "url": "https://rpp.pe/rss/portada.xml",
+        "type": "rss",
+        "category": "internacionales"
+    }
+]

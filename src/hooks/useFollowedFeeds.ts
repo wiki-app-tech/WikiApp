@@ -16,9 +16,20 @@ export function useFollowedFeeds(allFeeds: FeedSource[]) {
     // Load from localStorage ONCE on mount
     useEffect(() => {
         const stored = localStorage.getItem(STORAGE_KEY);
+        const validIds = new Set(allFeedsRef.current.map(f => f.id));
         if (stored) {
             try {
-                setFollowedFeedIds(JSON.parse(stored));
+                const parsed: string[] = JSON.parse(stored);
+                // Keep only IDs that still exist in the current feeds list
+                const filtered = parsed.filter(id => validIds.has(id));
+                if (filtered.length > 0) {
+                    setFollowedFeedIds(filtered);
+                } else {
+                    // All stored feeds were removed — fall back to first 5
+                    const initialIds = allFeedsRef.current.slice(0, 5).map(f => f.id);
+                    setFollowedFeedIds(initialIds);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(initialIds));
+                }
             } catch (e) {
                 console.error('Error loading followed feeds:', e);
             }
@@ -30,6 +41,7 @@ export function useFollowedFeeds(allFeeds: FeedSource[]) {
         }
         setIsLoaded(true);
     }, []); // Only run once on mount
+
 
     // Persist to localStorage on change
     useEffect(() => {
