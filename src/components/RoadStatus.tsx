@@ -21,6 +21,7 @@ export default function RoadStatus() {
     const [routesData, setRoutesData] = useState<RoutesData | null>(null);
     const [aiSummary, setAiSummary] = useState<string | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState<string>('');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -28,6 +29,11 @@ export default function RoadStatus() {
                 const response = await fetch('/data/routes.json');
                 const data = await response.json();
                 setRoutesData(data);
+                
+                const now = new Date();
+                const formattedDate = now.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const formattedTime = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+                setLastUpdated(`${formattedDate} a las ${formattedTime}`);
             } catch (error) {
                 console.error("Error al obtener estado de rutas:", error);
             }
@@ -177,7 +183,10 @@ export default function RoadStatus() {
                 {currentRoutes.map((route, idx) => (
                     <div key={idx} className="bg-surface-primary/30 border border-accent-primary/5 rounded-[1.5rem] p-5 transition-all hover:bg-surface-elevated hover:shadow-xl hover:shadow-accent-primary/5 group border-transparent hover:border-accent-primary/20">
                         <div className="flex justify-between items-start mb-2.5">
-                            <h3 className="font-bold text-text-primary group-hover:text-accent-primary transition-colors text-base font-display">{route.segment}</h3>
+                            <div>
+                                <h3 className="font-bold text-text-primary group-hover:text-accent-primary transition-colors text-base font-display">{route.segment}</h3>
+                                {lastUpdated && <p className="text-[10px] text-text-tertiary mt-0.5 font-semibold">Actualizado: {lastUpdated}</p>}
+                            </div>
                             <div className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-tight border ${route.severity === 'success' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                                 route.severity === 'warning' ? 'bg-accent-primary/10 text-accent-primary border-accent-primary/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
                                 }`}>

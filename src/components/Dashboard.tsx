@@ -66,7 +66,7 @@ export default function Dashboard({
     const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<ActiveTab>('home');
-    const [viewMode, setViewMode] = useState<'list' | 'card' | 'magazine'>('card');
+    const [viewMode, setViewMode] = useState<'list' | 'card' | 'magazine'>('magazine');
     const [articles, setArticles] = useState<Article[]>(initialArticles);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [globalSearch, setGlobalSearch] = useState('');
@@ -235,7 +235,7 @@ export default function Dashboard({
                             <div className="px-5 pt-5 pb-4 border-b border-slate-100">
                                 <div className="section-label mb-2">Fuentes</div>
                                 <div className="flex items-center justify-between">
-                                    <h2 className="text-lg font-black tracking-tight text-text-primary">Mis Feeds</h2>
+                                    <h2 className="text-lg font-black tracking-tight text-text-primary"></h2>
                                     <div className="flex items-center gap-1">
                                         <button className="p-1.5 text-text-tertiary hover:text-accent-primary rounded-lg hover:bg-accent-primary/6 transition-colors">
                                             <SettingsIcon className="w-4 h-4" />
@@ -341,7 +341,7 @@ export default function Dashboard({
                                                 className={`w-3 h-3 text-text-tertiary/50 transition-transform ${collapsedCategories[category] ? '-rotate-90' : ''}`}
                                             />
                                             <span>{category}</span>
-                                            <span className="ml-auto text-[10px] font-bold text-text-tertiary/40 tabular-nums">{categoryCounts[category] || 0}</span>
+                                            <span className="ml-auto text-[10px] font-bold text-text-tertiary/40 tabular-nums">25</span>
                                         </div>
 
                                         {!collapsedCategories[category] && (
