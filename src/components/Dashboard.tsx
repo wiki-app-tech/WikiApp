@@ -150,7 +150,7 @@ export default function Dashboard({
     const refreshArticles = useCallback(async () => {
         setIsRefreshing(true);
         try {
-            const response = await fetch('/data/articles.json');
+            const response = await fetch('/api/articles');
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
             setArticles(data.articles || []);
