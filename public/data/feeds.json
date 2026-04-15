@@ -299,5 +299,40 @@
         "url": "https://rpp.pe/rss/portada.xml",
         "type": "rss",
         "category": "internacionales"
+    },
+    {
+        "id": "el-diario-fin-del-mundo",
+        "name": "Diario del Fin del Mundo",
+        "url": "https://www.eldiariodelfindelmundo.com/rss/2-provinciales.xml",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "el-sureno",
+        "name": "El Sureño",
+        "url": "https://www.surenio.com.ar/feed/",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "sur54",
+        "name": "Sur54",
+        "url": "https://www.sur54.com/feed/",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "ushuaia-noticias",
+        "name": "Ushuaia Noticias",
+        "url": "https://ushuaianoticias.com/feed/",
+        "type": "rss",
+        "category": "provinciales"
+    },
+    {
+        "id": "tdf-al-dia",
+        "name": "TDF al Día",
+        "url": "https://tdfaldia.com.ar/feed/",
+        "type": "rss",
+        "category": "provinciales"
     }
 ]

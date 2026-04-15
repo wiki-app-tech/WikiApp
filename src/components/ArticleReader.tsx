@@ -10,9 +10,6 @@ interface ArticleReaderProps {
     article: Article;
     onClose: () => void;
     onNavigate: (dir: 'next' | 'prev') => void;
-    onSummarize: () => void;
-    isSummarizing: boolean;
-    summary: string | null;
     isSaved?: boolean;
     isRead?: boolean;
     onToggleSave?: () => void;
@@ -23,9 +20,6 @@ export default function ArticleReader({
     article,
     onClose,
     onNavigate,
-    onSummarize,
-    isSummarizing,
-    summary,
     isSaved = false,
     isRead = false,
     onToggleSave,
@@ -97,15 +91,7 @@ export default function ArticleReader({
                     {/* Share Menu */}
                     <ShareMenu url={article.link} title={article.title} />
 
-                    <button
-                        onClick={onSummarize}
-                        disabled={isSummarizing || !!summary}
-                        className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-[11px] font-bold transition-all ${summary ? 'bg-accent-primary/20 text-accent-primary shadow-glow-accent' : 'bg-surface-elevated text-text-primary border border-accent-primary/20 hover:bg-surface-primary shadow-xl shadow-accent-primary/10'
-                            } disabled:opacity-50`}
-                    >
-                        <ZapIcon className="w-3.5 h-3.5" />
-                        {isSummarizing ? 'ANALYZING...' : summary ? 'AI SUMMARY' : 'GET SMART SUMMARY'}
-                    </button>
+
                     <div className="flex items-center gap-2">
                         <button onClick={() => onNavigate('prev')} className="p-3 text-text-tertiary hover:text-accent-primary bg-accent-primary/5 border border-accent-primary/10 rounded-2xl transition-all">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
@@ -120,23 +106,7 @@ export default function ArticleReader({
 
             <article className="flex-1 overflow-y-auto p-10 md:p-20 scroll-smooth bg-surface-primary">
                 <div className="max-w-3xl mx-auto space-y-16">
-                    {summary && (
-                        <div className="bg-accent-primary/5 border border-accent-primary/20 rounded-[2.5rem] p-10 md:p-12 animate-in fade-in slide-in-from-top-4 duration-700 shadow-xl shadow-accent-primary/5 glass-card-accent">
-                            <div className="flex items-center gap-4 mb-8">
-                                <div className="w-10 h-10 rounded-2xl bg-accent-primary flex items-center justify-center text-surface-primary shadow-lg shadow-accent-primary/30">
-                                    <ZapIcon className="w-5 h-5" />
-                                </div>
-                                <span className="text-[11px] font-bold uppercase tracking-tight text-accent-primary">Smart Summary Agent</span>
-                            </div>
-                            <p className="text-text-primary text-xl md:text-2xl font-bold leading-relaxed tracking-tight">
-                                {summary}
-                            </p>
-                            <div className="mt-10 flex gap-6">
-                                <button className="text-[11px] font-bold text-accent-primary uppercase tracking-tight hover:underline underline-offset-4">Copy Analysis</button>
-                                <button className="text-[11px] font-bold text-accent-primary uppercase tracking-tight hover:underline underline-offset-4">Learn More</button>
-                            </div>
-                        </div>
-                    )}
+
                     <div className="space-y-8">
                         <div className="flex items-center gap-4 text-[11px] font-bold uppercase tracking-tight">
                             <span className="text-accent-primary px-3 py-1 bg-accent-primary/10 rounded-lg">{article.sourceName}</span>

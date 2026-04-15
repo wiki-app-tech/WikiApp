@@ -11,7 +11,6 @@ import RefreshIndicator from '@/components/RefreshIndicator';
 import MediosWikiAppLogo from '@/components/MediosWikiAppLogo';
 import SavedArticlesView from '@/components/SavedArticlesView';
 import SaveArticleModal from '@/components/SaveArticleModal';
-import { generateNewsSummary } from '@/services/geminiService';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { useSavedArticles } from '@/hooks/useSavedArticles';
 import { useFollowedFeeds } from '@/hooks/useFollowedFeeds';
@@ -68,8 +67,6 @@ export default function Dashboard({
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<ActiveTab>('home');
     const [viewMode, setViewMode] = useState<'list' | 'card' | 'magazine'>('card');
-    const [isSummarizing, setIsSummarizing] = useState(false);
-    const [articleSummary, setArticleSummary] = useState<string | null>(null);
     const [articles, setArticles] = useState<Article[]>(initialArticles);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [globalSearch, setGlobalSearch] = useState('');
@@ -190,25 +187,9 @@ export default function Dashboard({
         if (nextIndex < 0) nextIndex = filteredArticles.length - 1;
         if (nextIndex >= filteredArticles.length) nextIndex = 0;
         setSelectedArticleId(filteredArticles[nextIndex].id);
-        setArticleSummary(null);
     }, [filteredArticles, selectedArticleId]);
 
-    const handleSummarize = useCallback(async () => {
-        if (!selectedArticle) return;
-        setIsSummarizing(true);
-        try {
-            const summaryResult = await generateNewsSummary([{
-                title: selectedArticle.title,
-                source: selectedArticle.sourceName
-            }]);
-            setArticleSummary(summaryResult);
-        } catch (error) {
-            console.error("Error generating summary:", error);
-            setArticleSummary("No se pudo generar el resumen inteligente. Por favor, intente más tarde.");
-        } finally {
-            setIsSummarizing(false);
-        }
-    }, [selectedArticle]);
+
 
     const categories = useMemo(() => Array.from(new Set(followedFeeds.map(f => f.category))), [followedFeeds]);
 
@@ -750,9 +731,6 @@ export default function Dashboard({
                                 article={selectedArticle}
                                 onClose={() => setSelectedArticleId(null)}
                                 onNavigate={handleNavigate}
-                                onSummarize={handleSummarize}
-                                isSummarizing={isSummarizing}
-                                summary={articleSummary}
                                 isSaved={isArticleSaved(selectedArticle.id)}
                                 isRead={isArticleRead(selectedArticle.id)}
                                 onToggleSave={() => {

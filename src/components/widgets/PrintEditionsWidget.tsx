@@ -21,7 +21,7 @@ export default function PrintEditionsWidget() {
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.082.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.082.477-4.5 1.253" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold tracking-tight text-text-primary underline decoration-accent-primary/20 underline-offset-4 font-display">Kiosco de Tapas</h2>
+                        <h2 className="text-xl font-bold tracking-tight text-text-primary underline decoration-accent-primary/20 underline-offset-4 font-display">Tapas de Diarios</h2>
                         <p className="text-[11px] font-bold text-text-tertiary uppercase tracking-tight mt-1">Ediciones Digitales Impresas</p>
                     </div>
                 </div>
@@ -48,13 +48,13 @@ export default function PrintEditionsWidget() {
                         rel="noopener noreferrer"
                         className="group flex flex-col items-center gap-4 p-4 bg-surface-primary/20 rounded-[2rem] border border-transparent hover:border-accent-primary/20 hover:bg-surface-elevated transition-all hover:-translate-y-2 group"
                     >
-                        <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden bg-surface-elevated border border-white/5 shadow-xl group-hover:shadow-accent-primary/10 transition-shadow">
+                        <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden bg-surface-elevated/50 flex items-center justify-center border border-white/5 shadow-xl group-hover:shadow-accent-primary/10 transition-shadow">
                             <img
                                 src={getLogoUrl(source.logoUrl)}
                                 alt={source.name}
-                                className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all duration-700 scale-[1.01] group-hover:scale-110"
+                                className="w-full h-full object-contain p-4 grayscale-[0.2] transition-all duration-700 scale-[1.0] group-hover:scale-105"
                                 onError={(e) => {
-                                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x400?text=No+Disponible';
+                                    (e.target as HTMLImageElement).src = 'https://placehold.co/300x400/1e293b/94a3b8?text=No+Disponible';
                                 }}
                             />
                         </div>

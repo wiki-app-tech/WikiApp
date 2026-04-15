@@ -135,10 +135,8 @@ export async function fetchSingleFeed(feed: FeedSource, retries = 1): Promise<Ar
             return processRSSItems(response.items, feed);
         } catch (err: any) {
             if (attempt < retries) {
-                console.warn(`  ⚠ Reintento ${attempt + 1} para ${feed.name}...`);
                 await new Promise(r => setTimeout(r, 1000));
             } else {
-                console.error(`  ❌ Error en ${feed.name}: ${err.message}`);
                 return [];
             }
         }
