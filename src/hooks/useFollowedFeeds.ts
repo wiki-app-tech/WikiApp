@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { FeedSource } from '@/types';
 
-const STORAGE_KEY = 'mediosWikiAppFollowedFeeds';
+const STORAGE_KEY = 'mediosWikiAppFollowedFeeds_v2';
 
 export function useFollowedFeeds(allFeeds: FeedSource[]) {
     const [followedFeedIds, setFollowedFeedIds] = useState<string[]>([]);
@@ -25,8 +25,8 @@ export function useFollowedFeeds(allFeeds: FeedSource[]) {
                 if (filtered.length > 0) {
                     setFollowedFeedIds(filtered);
                 } else {
-                    // All stored feeds were removed — fall back to first 5
-                    const initialIds = allFeedsRef.current.slice(0, 5).map(f => f.id);
+                    // All stored feeds were removed — fall back to all feeds
+                    const initialIds = allFeedsRef.current.map(f => f.id);
                     setFollowedFeedIds(initialIds);
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(initialIds));
                 }
@@ -34,8 +34,8 @@ export function useFollowedFeeds(allFeeds: FeedSource[]) {
                 console.error('Error loading followed feeds:', e);
             }
         } else {
-            // By default follow first 5 feeds so the UI isn't empty
-            const initialIds = allFeedsRef.current.slice(0, 5).map(f => f.id);
+            // By default follow all feeds
+            const initialIds = allFeedsRef.current.map(f => f.id);
             setFollowedFeedIds(initialIds);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(initialIds));
         }
