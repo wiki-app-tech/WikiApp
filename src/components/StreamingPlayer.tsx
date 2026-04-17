@@ -14,8 +14,8 @@ export const STREAMING_SOURCES: StreamingSource[] = [
     {
         id: 'lra10',
         name: 'Radio Nacional Ushuaia',
-        type: 'radio',
-        url: 'http://190.111.245.221:8000/stream',
+        type: 'tv',
+        url: 'https://vmf.edge-apps.net/embed/live.php?streamname=sc_rad10-100131&autoplay=true',
         location: 'Ushuaia'
     },
     {
@@ -40,6 +40,13 @@ export const STREAMING_SOURCES: StreamingSource[] = [
         location: 'Río Grande'
     },
     {
+        id: 'the-cabinn-radio',
+        name: 'The Cabinn Radio',
+        type: 'tv',
+        url: 'http://e.radios-argentinas.org/embed/the-cabinn-radio',
+        location: 'Tierra del Fuego'
+    },
+    {
         id: 'radio-fueguina',
         name: 'La 97 Radio Fueguina',
         type: 'radio',
@@ -49,8 +56,43 @@ export const STREAMING_SOURCES: StreamingSource[] = [
     {
         id: 'siglo',
         name: 'Estación del Siglo',
+        type: 'tv',
+        url: 'http://e.radios-argentinas.org/embed/estacion-del-siglo-485368',
+        location: 'Río Grande'
+    },
+    {
+        id: 'fm-ushuaia',
+        name: 'FM Ushuaia',
+        type: 'tv',
+        url: 'http://e.radios-argentinas.org/embed/fm-ushuaia',
+        location: 'Ushuaia'
+    },
+    {
+        id: 'aire-libre-fm',
+        name: 'Aire Libre FM',
+        type: 'tv',
+        url: 'http://e.radios-argentinas.org/embed/aire-libre-fm-417666',
+        location: 'Río Grande'
+    },
+    {
+        id: 'radio-espectaculo',
+        name: 'Radio Espectáculo',
+        type: 'tv',
+        url: 'https://tustreaming.co/AUDIO/FMESPE/',
+        location: 'Tierra del Fuego'
+    },
+    {
+        id: 'la-retro',
+        name: 'Radio La Retro',
         type: 'radio',
-        url: 'http://streamall.alsolnet.com/estaciondelsigloaudio',
+        url: 'https://streaming3.locucionar.com/proxy/laretrofm?mp=/stream',
+        location: 'Tierra del Fuego'
+    },
+    {
+        id: 'fm-rio-grande',
+        name: 'FM Río Grande',
+        type: 'radio',
+        url: 'https://emisora.zonasinergia.com/8300/',
         location: 'Río Grande'
     },
     {
@@ -73,7 +115,7 @@ export const STREAMING_SOURCES: StreamingSource[] = [
         type: 'tv',
         url: 'https://www.youtube.com/embed/zpxyq7MTbMU?autoplay=1',
         location: 'Nacional'
-    },
+    }
 ];
 
 export function StreamingPlayer({ source, onClose }: { source: StreamingSource, onClose: () => void }) {
