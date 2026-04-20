@@ -326,7 +326,7 @@ export default function Dashboard({
                                     className={`sidebar-feed-item w-full ${!selectedFeed ? 'active' : ''}`}
                                 >
                                     <LayoutIcon className="w-4 h-4 shrink-0" />
-                                    <span className="flex-1 text-left font-medium">Todos los artículos</span>
+                                    <span className="flex-1 text-left font-medium">Todas las noticias</span>
                                     <span className="text-[10px] font-bold text-text-tertiary/60 tabular-nums">{articles.length}</span>
                                 </button>
 
@@ -532,7 +532,7 @@ export default function Dashboard({
 
                         <div className="flex items-center gap-2">
                             <h2 className="text-[15px] font-bold" style={{ color: 'hsl(var(--text-primary))' }}>
-                                {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Noticias'}
+                                {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Todas las Noticias'}
                             </h2>
                             <span className="chip text-[11px]" style={{ padding: '0.1rem 0.5rem' }}>
                                 {filteredArticles.length}
@@ -677,7 +677,7 @@ export default function Dashboard({
                                     <div>
                                         <div className="section-label mb-1.5">Tierra del Fuego</div>
                                         <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-text-primary tracking-tight font-display">
-                                            {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Centro de Noticias'}
+                                            {selectedFeed ? feeds.find(f => f.id === selectedFeed)?.name : 'Todas las Noticias'}
                                         </h1>
                                     </div>
                                     <div className="flex items-center gap-3">
