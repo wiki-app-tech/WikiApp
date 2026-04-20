@@ -20,10 +20,10 @@ export default function AutomateView() {
                     <div className="text-center md:text-left">
                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent-primary/10 text-accent-primary rounded-full text-[10px] font-black tracking-widest uppercase mb-4 shadow-sm border border-accent-primary/10">
                             <ZapIcon className="w-3 h-3 animate-pulse" />
-                            Automation Suite
+                            Suite de Automatización
                         </div>
                         <h1 className="text-5xl font-black text-text-primary tracking-tighter mb-4 font-display">
-                            Monitor <span className="text-accent-primary">& Sync</span>
+                            Monitor <span className="text-accent-primary">& Sincronización</span>
                         </h1>
                         <p className="text-text-secondary text-lg font-medium max-w-lg">
                             Conecta tus redes sociales, sincroniza YouTube y gestiona tus podcasts favoritos en un hub centralizado.
@@ -42,7 +42,7 @@ export default function AutomateView() {
                             <div className="p-4 bg-accent-primary/10 text-accent-primary rounded-2xl">
                                 <FacebookIcon className="w-6 h-6" />
                             </div>
-                            <h3 className="text-xl font-bold text-text-primary">Social Monitor</h3>
+                            <h3 className="text-xl font-bold text-text-primary">Monitor Social</h3>
                         </div>
                         <p className="text-text-secondary text-sm mb-8 leading-relaxed">
                             Monitorea páginas de Facebook, canales de Telegram, Mastodon y feeds de Reddit sin salir de la app.
@@ -67,7 +67,7 @@ export default function AutomateView() {
                             <div className="p-4 bg-accent-secondary/10 text-accent-secondary rounded-2xl">
                                 <YoutubeIcon className="w-6 h-6" />
                             </div>
-                            <h3 className="text-xl font-bold text-text-primary">Video Sync</h3>
+                            <h3 className="text-xl font-bold text-text-primary">Sincronizador de Video</h3>
                         </div>
                         <p className="text-text-secondary text-sm mb-8 leading-relaxed">
                             Sincroniza tus suscripciones de YouTube y convierte canales en feeds automatizados de noticias.
@@ -92,7 +92,7 @@ export default function AutomateView() {
                             <div className="p-4 bg-accent-primary/10 text-accent-primary rounded-2xl">
                                 <PodcastIcon className="w-6 h-6" />
                             </div>
-                            <h3 className="text-xl font-bold text-text-primary">Podcast Hub</h3>
+                            <h3 className="text-xl font-bold text-text-primary">Centro de Podcasts</h3>
                         </div>
                         <p className="text-text-secondary text-sm mb-8 leading-relaxed">
                             Escucha tus podcasts favoritos. Suscríbete a feeds RSS de audio y gestiona tu biblioteca globalmente.
@@ -122,9 +122,9 @@ export default function AutomateView() {
                     <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
                         <div className="max-w-2xl">
                             <div className="flex items-center gap-3 mb-6">
-                                <span className="px-3 py-1 bg-accent-primary/10 text-accent-primary text-[10px] font-black rounded-lg border border-accent-primary/20 tracking-[0.2em] uppercase">Connectors</span>
+                                <span className="px-3 py-1 bg-accent-primary/10 text-accent-primary text-[10px] font-black rounded-lg border border-accent-primary/20 tracking-[0.2em] uppercase">Conectores</span>
                             </div>
-                            <h2 className="text-4xl font-black mb-6 tracking-tight">Ecosistema <span className="text-accent-primary">Social Sync</span></h2>
+                            <h2 className="text-4xl font-black mb-6 tracking-tight">Ecosistema <span className="text-accent-primary">Social</span></h2>
                             <p className="text-text-secondary text-lg leading-relaxed mb-8">
                                 Conecta con Mastodon, Reddit y nuestro canal exclusivo de Telegram. Filtra contenido específico y recíbelo directamente en tu feed personalizado.
                             </p>

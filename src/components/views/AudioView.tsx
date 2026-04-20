@@ -24,10 +24,10 @@ export default function AudioView({ activeStream, setActiveStream }: AudioViewPr
                     <div className="text-center md:text-left">
                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent-primary/10 text-accent-primary rounded-full text-xs font-bold tracking-widest uppercase mb-4 shadow-sm">
                             <div className="w-2 h-2 bg-accent-primary rounded-full animate-pulse" />
-                            Multimedia Center
+                            Centro Multimedia
                         </div>
                         <h1 className="text-5xl font-black text-text-primary tracking-tight mb-4 font-display">
-                            Audio & <span className="text-accent-primary">Video</span>
+                            Audio y <span className="text-accent-primary">Video</span>
                         </h1>
                         <p className="text-text-secondary text-lg font-medium max-w-lg">
                             Transmisiones en vivo de las mejores radios y canales de televisión locales y nacionales.
@@ -36,7 +36,7 @@ export default function AudioView({ activeStream, setActiveStream }: AudioViewPr
                     <div className="flex items-center gap-4">
                         <button className="flex flex-col items-center justify-center w-20 h-20 bg-surface-elevated rounded-3xl shadow-lg border border-accent-primary/10 hover:border-accent-primary/40 transition-all group glass-card">
                             <SettingsIcon className="w-6 h-6 text-text-tertiary group-hover:text-accent-primary transition-colors" />
-                            <span className="text-[10px] font-bold text-text-tertiary mt-2">CONFIG</span>
+                            <span className="text-[10px] font-bold text-text-tertiary mt-2">AJUSTES</span>
                         </button>
                         <div className="w-24 h-24 bg-gradient-to-br from-accent-primary to-accent-secondary rounded-[2rem] shadow-glow-accent flex items-center justify-center transform hover:scale-105 transition-transform">
                             <HeadphonesIcon className="w-10 h-10 text-white" />
@@ -72,7 +72,7 @@ export default function AudioView({ activeStream, setActiveStream }: AudioViewPr
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between mt-auto">
-                                    <span className="text-xs font-semibold text-text-tertiary">Stream HD • 128kbps</span>
+                                    <span className="text-xs font-semibold text-text-tertiary">Transmisión HD • 128kbps</span>
                                     <div className="flex items-center gap-2 px-4 py-2 bg-accent-primary text-surface-primary rounded-xl text-[10px] font-bold shadow-glow-accent opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
                                         <div className="w-1.5 h-1.5 bg-surface-primary rounded-full animate-pulse" />
                                         ESCUCHAR
@@ -143,7 +143,7 @@ export default function AudioView({ activeStream, setActiveStream }: AudioViewPr
                         <div>
                             <label className="text-[10px] font-black text-text-tertiary uppercase tracking-[0.2em] mb-4 block">Reproducción Automática</label>
                             <div className="flex items-center justify-between p-4 bg-surface-primary rounded-2xl">
-                                <span className="text-sm font-bold text-text-secondary">Autoplay</span>
+                                <span className="text-sm font-bold text-text-secondary">Reproducir automáticamente</span>
                                 <div className="w-12 h-6 bg-accent-primary rounded-full relative flex items-center px-1 shadow-inner">
                                     <div className="w-4 h-4 bg-white rounded-full shadow-md ml-auto" />
                                 </div>
@@ -152,7 +152,7 @@ export default function AudioView({ activeStream, setActiveStream }: AudioViewPr
                         <div>
                             <label className="text-[10px] font-black text-text-tertiary uppercase tracking-[0.2em] mb-4 block">Modo de Video</label>
                             <div className="flex items-center justify-between p-4 bg-surface-primary rounded-2xl mb-2">
-                                <span className="text-sm font-bold text-text-secondary">Pop-out por defecto</span>
+                                <span className="text-sm font-bold text-text-secondary">Ventana flotante por defecto</span>
                                 <div className="w-12 h-6 bg-surface-elevated/50 rounded-full relative flex items-center px-1">
                                     <div className="w-4 h-4 bg-white rounded-full shadow-md" />
                                 </div>
@@ -162,11 +162,11 @@ export default function AudioView({ activeStream, setActiveStream }: AudioViewPr
                             <label className="text-[10px] font-black text-text-tertiary uppercase tracking-[0.2em] mb-4 block">Datos del Sistema</label>
                             <div className="p-4 bg-surface-primary rounded-2xl border border-accent-primary/10">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-[10px] font-bold text-text-tertiary">VERSION</span>
+                                    <span className="text-[10px] font-bold text-text-tertiary">VERSIÓN</span>
                                     <span className="text-[10px] font-bold text-accent-primary">2026.1.4</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-[10px] font-bold text-text-tertiary">CODEC</span>
+                                    <span className="text-[10px] font-bold text-text-tertiary">CÓDEC</span>
                                     <span className="text-[10px] font-bold text-accent-secondary">OPUS/H.264</span>
                                 </div>
                             </div>
@@ -182,7 +182,7 @@ export default function AudioView({ activeStream, setActiveStream }: AudioViewPr
                         <div className="w-8 h-[2px] bg-accent-primary/20" />
                     </div>
                     <span className="text-[10px] font-black text-text-tertiary uppercase tracking-[0.4em]">
-                        Premium Media Experience V2
+                        Experiencia Multimedia Premium V2
                     </span>
                 </div>
             </div>

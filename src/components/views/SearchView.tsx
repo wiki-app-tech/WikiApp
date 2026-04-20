@@ -30,10 +30,10 @@ export default function SearchView({ articles, globalSearch, setGlobalSearch, on
                 {/* Cabecera de Búsqueda */}
                 <div className="text-center mb-12">
                     <h1 className="text-4xl md:text-5xl font-black text-text-primary tracking-tight mb-4 font-display">
-                        Search News
+                        Buscar Noticias
                     </h1>
                     <p className="text-text-secondary text-lg font-medium">
-                        Find any article in real-time
+                        Encontrá cualquier artículo en tiempo real
                     </p>
                 </div>
 

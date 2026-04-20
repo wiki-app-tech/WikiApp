@@ -28,7 +28,7 @@ export default function ZonasView({ cities }: ZonasViewProps) {
                     <div className="hidden lg:flex items-center gap-6">
                         <div className="text-right">
                             <div className="text-3xl font-black text-text-primary">100%</div>
-                            <div className="text-[10px] font-bold text-accent-secondary uppercase tracking-widest">Live Sync</div>
+                            <div className="text-[10px] font-bold text-accent-secondary uppercase tracking-widest">Sinc. en Vivo</div>
                         </div>
                         <div className="w-px h-12 bg-accent-primary/20" />
                         <div className="w-16 h-16 bg-accent-primary/10 rounded-3xl flex items-center justify-center text-accent-primary shadow-glow-accent">

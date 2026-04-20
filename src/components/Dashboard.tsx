@@ -399,7 +399,7 @@ export default function Dashboard({
                     ) : activeTab === 'audio' ? (
                         <>
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-bold tracking-tight text-slate-900">Media Library</h2>
+                                <h2 className="text-lg font-bold tracking-tight text-slate-900">Biblioteca de Medios</h2>
                                 <button className="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg transition-colors">
                                     <PlusIcon className="w-4 h-4" />
                                 </button>
@@ -471,7 +471,7 @@ export default function Dashboard({
                     ) : activeTab === 'automate' ? (
                         <>
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-bold tracking-tight text-slate-900">Automation Hub</h2>
+                                <h2 className="text-lg font-bold tracking-tight text-slate-900">Centro de Automatización</h2>
                                 <button className="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg transition-colors">
                                     <ZapIcon className="w-4 h-4" />
                                 </button>
@@ -485,11 +485,11 @@ export default function Dashboard({
                                     <div className="space-y-1">
                                         <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">
                                             <YoutubeIcon className="w-3.5 h-3.5 text-red-500" />
-                                            <span className="flex-1 text-left truncate">YouTube Subs</span>
+                                            <span className="flex-1 text-left truncate">Suscripciones de YouTube</span>
                                         </button>
                                         <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">
                                             <PodcastIcon className="w-3.5 h-3.5 text-purple-500" />
-                                            <span className="flex-1 text-left truncate">Podcast Feeds</span>
+                                            <span className="flex-1 text-left truncate">Feeds de Podcasts</span>
                                         </button>
                                     </div>
                                 </div>
@@ -501,19 +501,19 @@ export default function Dashboard({
                                     <div className="space-y-1">
                                         <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">
                                             <FacebookIcon className="w-3.5 h-3.5 text-blue-600" />
-                                            <span className="flex-1 text-left truncate">Facebook Pages</span>
+                                            <span className="flex-1 text-left truncate">Páginas de Facebook</span>
                                         </button>
                                         <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">
                                             <TelegramIcon className="w-3.5 h-3.5 text-sky-500" />
-                                            <span className="flex-1 text-left truncate">Telegram Channels</span>
+                                            <span className="flex-1 text-left truncate">Canales de Telegram</span>
                                         </button>
                                         <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">
                                             <RedditIcon className="w-3.5 h-3.5 text-orange-500" />
-                                            <span className="flex-1 text-left truncate">Reddit Feeds</span>
+                                            <span className="flex-1 text-left truncate">Feeds de Reddit</span>
                                         </button>
                                         <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">
                                             <Share2Icon className="w-3.5 h-3.5 text-indigo-500" />
-                                            <span className="flex-1 text-left truncate">Mastodon Ins.</span>
+                                            <span className="flex-1 text-left truncate">Instancias de Mastodon</span>
                                         </button>
                                     </div>
                                 </div>
