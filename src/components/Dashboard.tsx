@@ -147,7 +147,7 @@ export default function Dashboard({
     const refreshArticles = useCallback(async () => {
         setIsRefreshing(true);
         try {
-            const response = await fetch('/api/articles');
+            const response = await fetch('/api/articles', { cache: 'no-store', headers: { 'Pragma': 'no-cache' } });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
             setArticles(data.articles || []);
@@ -173,7 +173,13 @@ export default function Dashboard({
                 if (endDate && new Date(a.pubDate) > new Date(`${endDate}T23:59:59`)) return false;
                 return true;
             })
-            .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+            .sort((a, b) => {
+                const dateA = new Date(a.pubDate).getTime();
+                const dateB = new Date(b.pubDate).getTime();
+                if (isNaN(dateA)) return 1;
+                if (isNaN(dateB)) return -1;
+                return dateB - dateA;
+            });
     }, [articles, search, selectedFeed, startDate, endDate]);
 
     const selectedArticle = useMemo(() =>
@@ -705,7 +711,7 @@ export default function Dashboard({
                                             article={article}
                                             viewMode={viewMode}
                                             isSelected={selectedArticleId === article.id}
-                                            onClick={() => setSelectedArticleId(article.id)}
+                                            onClick={() => window.open(article.link, '_blank', 'noopener,noreferrer')}
                                         />
                                     ))}
                                 </div>

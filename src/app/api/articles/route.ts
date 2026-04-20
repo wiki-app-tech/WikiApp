@@ -4,8 +4,9 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import type { FeedSource } from '@/types';
 
-// Let Next.js know this route can be cached or statically revalidated
-export const revalidate = 60; // ISR cache applies to this route for 60 seconds
+// Force dynamic rendering to ensure real-time news updates
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
     try {

@@ -4,7 +4,8 @@ import path from 'path';
 import type { FeedSource } from '@/types';
 import { updateAllFeeds } from '@/services/rssService';
 
-export const revalidate = 60; // ISR cada 60 segundos
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 async function getData() {
   const feedsPath = path.join(process.cwd(), 'public/data/feeds.json');
