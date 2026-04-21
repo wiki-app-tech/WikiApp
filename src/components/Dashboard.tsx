@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Clock, ChevronRight, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Clock, ChevronRight, Moon, Sun, Cloud } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import WeatherDashboard from './WeatherDashboard';
 
 export default function Dashboard({ initialArticles, feeds }: { initialArticles: Article[], feeds: FeedSource[] }) {
   const [activeTab, setActiveTab] = useState('home');
@@ -55,6 +56,14 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
           >
             <Bookmark className={`w-5 h-5 ${activeTab === 'saved' ? 'opacity-100' : 'opacity-70'}`} />
             Guardados
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('weather')}
+            className={`cursor-pointer w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${activeTab === 'weather' ? 'bg-[var(--color-accent-primary)] text-white shadow-md' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-sunken)] hover:text-[var(--color-text-primary)]'}`}
+          >
+            <Cloud className={`w-5 h-5 ${activeTab === 'weather' ? 'opacity-100' : 'opacity-70'}`} />
+            Clima
           </button>
 
           <div className="mt-8 mb-3 px-2 text-[11px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-widest">Fuentes ({feeds.length})</div>
@@ -119,54 +128,60 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-32">
           <div className="max-w-7xl mx-auto space-y-6">
             
-            <div className="flex items-center justify-between mb-8 px-2">
-              <div>
-                <h2 className="text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">Titulares Globales</h2>
-                <p className="text-sm text-[var(--color-text-tertiary)] mt-1 font-medium">Contenido sincronizado y procesado hoy.</p>
-              </div>
-              <div className="hidden sm:inline-flex text-xs font-bold text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10 px-3 py-1.5 rounded-lg border border-[var(--color-accent-primary)]/20 shadow-sm">
-                VER {initialArticles.length} ARCHIVOS
-              </div>
-            </div>
-
-            {/* Premium Article Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {initialArticles.slice(0, 12).map((article) => (
-                <article 
-                  key={article.id} 
-                  className="cursor-pointer group flex flex-col bg-[var(--color-surface-elevated)] border border-[var(--color-border-subtle)] rounded-2xl overflow-hidden transition-all duration-300 hover:border-[var(--color-accent-primary)]/50 hover:shadow-lg hover:shadow-[var(--color-accent-primary)]/5"
-                  onClick={() => window.open(article.link, '_blank')}
-                >
-                  <div className="p-6 flex-1">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-[10px] font-black text-[var(--color-accent-primary)] uppercase tracking-widest bg-[var(--color-accent-primary)]/10 px-2 py-1 rounded-md">
-                        {feeds.find(f => f.id === article.sourceId)?.name || 'FUENTE'}
-                      </span>
-                      <span className="text-[11px] font-semibold text-[var(--color-text-tertiary)]">
-                        {new Date(article.pubDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                      </span>
-                    </div>
-                    <h3 className="font-bold text-[var(--color-text-primary)] text-lg leading-tight mb-3 group-hover:text-[var(--color-accent-primary)] transition-colors duration-200 line-clamp-3">
-                      {article.title}
-                    </h3>
-                    <p className="text-sm font-medium text-[var(--color-text-tertiary)] line-clamp-2 leading-relaxed">
-                      {article.description?.replace(/<[^>]*>?/gm, '') || 'Sin detalles adicionales disponibles.'}
-                    </p>
+            {activeTab === 'weather' ? (
+              <WeatherDashboard />
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-8 px-2">
+                  <div>
+                    <h2 className="text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">Titulares Globales</h2>
+                    <p className="text-sm text-[var(--color-text-tertiary)] mt-1 font-medium">Contenido sincronizado y procesado hoy.</p>
                   </div>
-                  <div className="px-6 py-4 border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)]/50 flex justify-between items-center mt-auto group-hover:bg-[var(--color-surface-sunken)] transition-colors duration-200">
-                    <span className="text-xs font-bold text-[var(--color-text-secondary)]">Leer historial</span>
-                    <ChevronRight className="w-4 h-4 text-[var(--color-text-tertiary)] group-hover:text-[var(--color-accent-primary)] transform group-hover:translate-x-1 transition-all duration-200" />
+                  <div className="hidden sm:inline-flex text-xs font-bold text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10 px-3 py-1.5 rounded-lg border border-[var(--color-accent-primary)]/20 shadow-sm">
+                    VER {initialArticles.length} ARCHIVOS
                   </div>
-                </article>
-              ))}
-            </div>
+                </div>
 
-            {initialArticles.length === 0 && (
-              <div className="text-center py-24 bg-[var(--color-surface-elevated)] rounded-3xl border border-[var(--color-border-subtle)] border-dashed">
-                 <LayoutDashboard className="w-12 h-12 text-[var(--color-text-tertiary)] opacity-50 mx-auto mb-4" />
-                 <h3 className="text-lg font-bold text-[var(--color-text-primary)]">Bandeja Vacía</h3>
-                 <p className="text-sm font-medium text-[var(--color-text-tertiary)] max-w-sm mx-auto mt-2">No se han registrado artículos recientes en este espectro de búsqueda.</p>
-              </div>
+                {/* Premium Article Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {initialArticles.slice(0, 12).map((article) => (
+                    <article 
+                      key={article.id} 
+                      className="cursor-pointer group flex flex-col bg-[var(--color-surface-elevated)] border border-[var(--color-border-subtle)] rounded-2xl overflow-hidden transition-all duration-300 hover:border-[var(--color-accent-primary)]/50 hover:shadow-lg hover:shadow-[var(--color-accent-primary)]/5"
+                      onClick={() => window.open(article.link, '_blank')}
+                    >
+                      <div className="p-6 flex-1">
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className="text-[10px] font-black text-[var(--color-accent-primary)] uppercase tracking-widest bg-[var(--color-accent-primary)]/10 px-2 py-1 rounded-md">
+                            {feeds.find(f => f.id === article.sourceId)?.name || 'FUENTE'}
+                          </span>
+                          <span className="text-[11px] font-semibold text-[var(--color-text-tertiary)]">
+                            {new Date(article.pubDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </span>
+                        </div>
+                        <h3 className="font-bold text-[var(--color-text-primary)] text-lg leading-tight mb-3 group-hover:text-[var(--color-accent-primary)] transition-colors duration-200 line-clamp-3">
+                          {article.title}
+                        </h3>
+                        <p className="text-sm font-medium text-[var(--color-text-tertiary)] line-clamp-2 leading-relaxed">
+                          {article.description?.replace(/<[^>]*>?/gm, '') || 'Sin detalles adicionales disponibles.'}
+                        </p>
+                      </div>
+                      <div className="px-6 py-4 border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)]/50 flex justify-between items-center mt-auto group-hover:bg-[var(--color-surface-sunken)] transition-colors duration-200">
+                        <span className="text-xs font-bold text-[var(--color-text-secondary)]">Leer historial</span>
+                        <ChevronRight className="w-4 h-4 text-[var(--color-text-tertiary)] group-hover:text-[var(--color-accent-primary)] transform group-hover:translate-x-1 transition-all duration-200" />
+                      </div>
+                    </article>
+                  ))}
+                </div>
+
+                {initialArticles.length === 0 && (
+                  <div className="text-center py-24 bg-[var(--color-surface-elevated)] rounded-3xl border border-[var(--color-border-subtle)] border-dashed">
+                     <LayoutDashboard className="w-12 h-12 text-[var(--color-text-tertiary)] opacity-50 mx-auto mb-4" />
+                     <h3 className="text-lg font-bold text-[var(--color-text-primary)]">Bandeja Vacía</h3>
+                     <p className="text-sm font-medium text-[var(--color-text-tertiary)] max-w-sm mx-auto mt-2">No se han registrado artículos recientes en este espectro de búsqueda.</p>
+                  </div>
+                )}
+              </>
             )}
 
           </div>
@@ -196,6 +211,13 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
             >
                <Bookmark className="w-5 h-5" />
                <span className="text-[9px] font-bold mt-1">MARCADORES</span>
+            </button>
+            <button 
+               onClick={() => setActiveTab('weather')} 
+               className={`cursor-pointer flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 w-16 ${activeTab === 'weather' ? 'text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10' : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'}`}
+            >
+               <Cloud className="w-5 h-5" />
+               <span className="text-[9px] font-bold mt-1">CLIMA</span>
             </button>
         </nav>
       </div>
