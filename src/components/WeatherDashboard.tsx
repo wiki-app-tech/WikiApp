@@ -1,37 +1,55 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Cloud, CloudRain, CloudSnow, Sun, CloudFog, CloudLightning, Wind, Droplets, Thermometer, AlertCircle, Loader2 } from 'lucide-react';
+import { Cloud, CloudRain, CloudSnow, Sun, CloudFog, CloudLightning, Wind, Droplets, Thermometer, AlertCircle, Sunrise, Sunset, SunDim } from 'lucide-react';
+
+interface DailyForecast {
+  time: string[];
+  weatherCode: number[];
+  temperatureMax: number[];
+  temperatureMin: number[];
+  sunrise: string[];
+  sunset: string[];
+  uvIndexMax: number[];
+}
 
 interface WeatherData {
   id: string;
   name: string;
-  temperature: number;
-  apparentTemperature: number;
-  humidity: number;
-  windSpeed: number;
-  weatherCode: number;
+  current: {
+    temperature: number;
+    apparentTemperature: number;
+    humidity: number;
+    windSpeed: number;
+    weatherCode: number;
+  };
+  daily: DailyForecast;
 }
 
-const LOCATIONS = [
-  { id: 'ushuaia', name: 'Ushuaia', lat: -54.8019, lon: -68.3030 },
-  { id: 'riogrande', name: 'Río Grande', lat: -53.7833, lon: -67.7000 },
-  { id: 'tolhuin', name: 'Tolhuin', lat: -54.5117, lon: -67.1936 },
-  { id: 'malvinas', name: 'Islas Malvinas', lat: -51.6977, lon: -57.8517 },
-  { id: 'antartida', name: 'Antártida', lat: -64.2406, lon: -56.6214 },
-];
+// Map backgrounds depending on the weather code
+const getWeatherGradient = (code: number) => {
+  if (code === 0) return 'from-amber-400 to-orange-500'; // Clear
+  if (code === 1 || code === 2) return 'from-blue-400 to-amber-200'; // Partly cloudy
+  if (code === 3) return 'from-gray-400 to-gray-600'; // Overcast
+  if (code >= 45 && code <= 48) return 'from-slate-300 to-gray-500'; // Fog
+  if (code >= 51 && code <= 67) return 'from-blue-600 to-slate-800'; // Rain
+  if (code >= 71 && code <= 77) return 'from-blue-200 to-cyan-600'; // Snow
+  if (code >= 80 && code <= 82) return 'from-blue-500 to-indigo-800'; // Showers
+  if (code >= 85 && code <= 86) return 'from-cyan-300 to-blue-700'; // Snow showers
+  if (code >= 95) return 'from-purple-800 to-slate-900'; // Thunderstorm
+  return 'from-[var(--color-accent-primary)] to-[var(--color-accent-secondary)]';
+};
 
-// Open-Meteo Weather Codes interpretation
-const getWeatherIcon = (code: number) => {
-  if (code === 0) return <Sun className="w-10 h-10 text-[var(--color-accent-primary)] drop-shadow-md" />; // Clear sky
-  if (code === 1 || code === 2 || code === 3) return <Cloud className="w-10 h-10 text-[var(--color-text-secondary)] drop-shadow-md" />; // Mainly clear, partly cloudy, and overcast
-  if (code >= 45 && code <= 48) return <CloudFog className="w-10 h-10 text-gray-500 drop-shadow-md" />; // Fog
-  if (code >= 51 && code <= 67) return <CloudRain className="w-10 h-10 text-blue-500 drop-shadow-md" />; // Drizzle & Rain
-  if (code >= 71 && code <= 77) return <CloudSnow className="w-10 h-10 text-cyan-400 drop-shadow-md" />; // Snow fall
-  if (code >= 80 && code <= 82) return <CloudRain className="w-10 h-10 text-blue-600 drop-shadow-md" />; // Rain showers
-  if (code >= 85 && code <= 86) return <CloudSnow className="w-10 h-10 text-cyan-500 drop-shadow-md" />; // Snow showers
-  if (code >= 95) return <CloudLightning className="w-10 h-10 text-purple-500 drop-shadow-md" />; // Thunderstorm
-  return <Cloud className="w-10 h-10 text-[var(--color-text-secondary)]" />; // Default
+const getWeatherIcon = (code: number, className = "w-10 h-10") => {
+  if (code === 0) return <Sun className={`${className} text-yellow-300 drop-shadow-md`} />;
+  if (code === 1 || code === 2 || code === 3) return <Cloud className={`${className} text-white drop-shadow-md`} />;
+  if (code >= 45 && code <= 48) return <CloudFog className={`${className} text-gray-200 drop-shadow-md`} />;
+  if (code >= 51 && code <= 67) return <CloudRain className={`${className} text-blue-200 drop-shadow-md`} />;
+  if (code >= 71 && code <= 77) return <CloudSnow className={`${className} text-cyan-100 drop-shadow-md`} />;
+  if (code >= 80 && code <= 82) return <CloudRain className={`${className} text-blue-300 drop-shadow-md`} />;
+  if (code >= 85 && code <= 86) return <CloudSnow className={`${className} text-cyan-100 drop-shadow-md`} />;
+  if (code >= 95) return <CloudLightning className={`${className} text-purple-300 drop-shadow-md`} />;
+  return <Cloud className={`${className} text-white`} />;
 };
 
 const getWeatherDescription = (code: number) => {
@@ -49,8 +67,22 @@ const getWeatherDescription = (code: number) => {
   return 'Desconocido';
 };
 
+const formatTime = (isoString: string) => {
+  if (!isoString) return '--:--';
+  const date = new Date(isoString);
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+};
+
+const getDayName = (isoString: string, index: number) => {
+  if (index === 0) return 'Hoy';
+  if (index === 1) return 'Mañana';
+  const date = new Date(isoString);
+  return date.toLocaleDateString('es-AR', { weekday: 'short' }).replace('.', '');
+};
+
 export default function WeatherDashboard() {
-  const [weatherData, setWeatherData] = useState<Exclude<WeatherData, 'id' | 'name'>[] & { id: string; name: string }[]>([]);
+  const [dataList, setDataList] = useState<WeatherData[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,119 +91,180 @@ export default function WeatherDashboard() {
       try {
         setLoading(true);
         setError(null);
-        
-        const promises = LOCATIONS.map(async (loc) => {
-          const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&timezone=America%2FArgentina%2FUshuaia`);
-          if (!res.ok) throw new Error(`Error fetching ${loc.name}`);
-          const data = await res.json();
-          return {
-            id: loc.id,
-            name: loc.name,
-            temperature: data.current.temperature_2m,
-            apparentTemperature: data.current.apparent_temperature,
-            humidity: data.current.relative_humidity_2m,
-            windSpeed: data.current.wind_speed_10m,
-            weatherCode: data.current.weather_code,
-          };
-        });
-
-        const results = await Promise.all(promises);
-        setWeatherData(results);
+        const res = await fetch('/api/weather');
+        if (!res.ok) throw new Error('Error de red al cargar clima');
+        const data = await res.json();
+        setDataList(data);
       } catch (err) {
         console.error('Error fetching weather data:', err);
-        setError('No se pudo cargar la información del clima. Intente nuevamente más tarde.');
+        setError('No se pudo cargar la información del clima. Intente nuevamente.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchWeather();
-    
-    // Auto refresh every 15 minutes
-    const interval = setInterval(fetchWeather, 15 * 60 * 1000);
+    const interval = setInterval(fetchWeather, 15 * 60 * 1000); // 15 mins
     return () => clearInterval(interval);
   }, []);
 
+  if (loading && dataList.length === 0) {
+    return (
+      <div className="w-full flex-1">
+        <div className="animate-pulse bg-[var(--color-surface-elevated)] border border-[var(--color-border-subtle)] rounded-3xl h-[600px] w-full mt-4"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 bg-red-50 dark:bg-red-900/10 rounded-3xl border border-red-200 dark:border-red-800 mt-4">
+        <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+        <h3 className="text-lg font-bold text-red-700 dark:text-red-400 mb-2">Error de Conexión</h3>
+        <p className="text-red-600 dark:text-red-300 text-center max-w-md text-sm">{error}</p>
+        <button onClick={() => window.location.reload()} className="mt-6 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm">
+          Reintentar
+        </button>
+      </div>
+    );
+  }
+
+  if (dataList.length === 0) return null;
+
+  const currentData = dataList[selectedIndex];
+  const gradientClass = getWeatherGradient(currentData.current.weatherCode);
+
   return (
-    <div className="w-full flex-1">
-      <div className="flex items-center justify-between mb-8 px-2">
+    <div className="w-full flex flex-col gap-6">
+      
+      {/* Header Selector */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">Clima Regional</h2>
-          <p className="text-sm text-[var(--color-text-tertiary)] mt-1 font-medium">Condiciones meteorológicas actualizadas en tiempo real.</p>
+          <p className="text-sm text-[var(--color-text-tertiary)] mt-1 font-medium">Condiciones meteorológicas y pronóstico extendido.</p>
         </div>
-        <div className="hidden sm:inline-flex items-center gap-2 text-xs font-bold text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10 px-3 py-1.5 rounded-lg border border-[var(--color-accent-primary)]/20 shadow-sm">
-          <Cloud className="w-4 h-4" /> REPORTE METEOROLÓGICO
+        
+        {/* City Tabs */}
+        <div className="flex overflow-x-auto scrollbar-hide gap-2 p-1 bg-[var(--color-surface-elevated)] border border-[var(--color-border-subtle)] rounded-2xl w-full md:w-auto">
+          {dataList.map((loc, idx) => (
+            <button
+              key={loc.id}
+              onClick={() => setSelectedIndex(idx)}
+              className={`whitespace-nowrap px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 ${
+                selectedIndex === idx 
+                  ? 'bg-[var(--color-accent-primary)] text-white shadow-md' 
+                  : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-sunken)] hover:text-[var(--color-text-primary)]'
+              }`}
+            >
+              {loc.name}
+            </button>
+          ))}
         </div>
       </div>
 
-      {loading && weatherData.length === 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="animate-pulse bg-[var(--color-surface-elevated)] border border-[var(--color-border-subtle)] rounded-2xl h-48"></div>
-          ))}
-        </div>
-      ) : error ? (
-        <div className="flex flex-col items-center justify-center p-12 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-200 dark:border-red-800">
-          <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-          <h3 className="text-lg font-bold text-red-700 dark:text-red-400 mb-2">Error de Conexión</h3>
-          <p className="text-red-600 dark:text-red-300 text-center max-w-md text-sm">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="mt-6 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm"
-          >
-            Reintentar
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {weatherData.map((data) => (
-            <div 
-              key={data.id} 
-              className="group flex flex-col bg-[var(--color-surface-elevated)] border border-[var(--color-border-subtle)] rounded-2xl overflow-hidden transition-all duration-300 hover:border-[var(--color-accent-primary)]/50 hover:shadow-lg hover:shadow-[var(--color-accent-primary)]/5"
-            >
-              <div className="p-6 flex-1 flex flex-col gap-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <span className="text-[10px] font-black text-[var(--color-accent-primary)] uppercase tracking-widest bg-[var(--color-accent-primary)]/10 px-2 py-1 rounded-md">
-                      ESTACIÓN
-                    </span>
-                    <h3 className="font-bold text-[var(--color-text-primary)] text-2xl mt-3">{data.name}</h3>
-                    <p className="text-sm font-medium text-[var(--color-text-secondary)] mt-1">{getWeatherDescription(data.weatherCode)}</p>
-                  </div>
-                  <div className="bg-[var(--color-surface-sunken)] p-3 rounded-2xl group-hover:scale-110 transition-transform duration-300">
-                    {getWeatherIcon(data.weatherCode)}
-                  </div>
-                </div>
-                
-                <div className="flex items-baseline gap-2 mt-2">
-                  <span className="text-5xl font-extrabold tracking-tighter text-[var(--color-text-primary)] group-hover:text-[var(--color-accent-primary)] transition-colors duration-300">
-                    {data.temperature.toFixed(1)}°
+      {/* Main Weather Card */}
+      <div className={`relative overflow-hidden rounded-3xl shadow-xl bg-gradient-to-br ${gradientClass} text-white transition-all duration-700`}>
+        {/* Abstract Overlays */}
+        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 bg-black/10 rounded-full blur-2xl"></div>
+
+        <div className="relative z-10 p-6 md:p-10">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            {/* Left: Current Weather */}
+            <div className="lg:col-span-5 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest bg-black/20 px-3 py-1 rounded-full backdrop-blur-md">
+                    AHORA
                   </span>
-                  <span className="text-lg font-bold text-[var(--color-text-tertiary)]">C</span>
+                  <span className="text-sm font-semibold text-white/80">Hoy, {new Date().toLocaleDateString('es-AR')}</span>
                 </div>
+                <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mt-4 drop-shadow-sm">{currentData.name}</h1>
+                <p className="text-xl md:text-2xl font-medium text-white/90 mt-2 flex items-center gap-3">
+                  {getWeatherIcon(currentData.current.weatherCode, "w-8 h-8")} 
+                  {getWeatherDescription(currentData.current.weatherCode)}
+                </p>
+              </div>
+
+              <div className="flex items-baseline mt-8 gap-3">
+                <span className="text-8xl md:text-9xl font-black tracking-tighter drop-shadow-md">
+                  {currentData.current.temperature.toFixed(0)}°
+                </span>
               </div>
               
-              <div className="px-6 py-4 border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)]/50 grid grid-cols-3 gap-2 mt-auto">
-                <div className="flex flex-col gap-1 items-center justify-center text-center">
-                  <Thermometer className="w-4 h-4 text-[var(--color-text-tertiary)]" />
-                  <span className="text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase mt-1">Sensación</span>
-                  <span className="text-xs font-bold text-[var(--color-text-secondary)]">{data.apparentTemperature.toFixed(1)}°</span>
+              <div className="flex flex-wrap gap-4 mt-8">
+                <div className="flex items-center gap-2 bg-black/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/10">
+                  <Thermometer className="w-5 h-5 text-white/80" />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-bold text-white/70">Sensación</span>
+                    <span className="text-sm font-bold">{currentData.current.apparentTemperature.toFixed(0)}°C</span>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-1 items-center justify-center text-center px-2 border-x border-[var(--color-border-subtle)]">
-                  <Droplets className="w-4 h-4 text-blue-400" />
-                  <span className="text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase mt-1">Humedad</span>
-                  <span className="text-xs font-bold text-[var(--color-text-secondary)]">{data.humidity}%</span>
+                <div className="flex items-center gap-2 bg-black/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/10">
+                  <Wind className="w-5 h-5 text-white/80" />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-bold text-white/70">Viento</span>
+                    <span className="text-sm font-bold">{currentData.current.windSpeed.toFixed(1)} km/h</span>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-1 items-center justify-center text-center">
-                  <Wind className="w-4 h-4 text-gray-400" />
-                  <span className="text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase mt-1">Viento</span>
-                  <span className="text-xs font-bold text-[var(--color-text-secondary)]">{data.windSpeed.toFixed(1)} km/h</span>
+                <div className="flex items-center gap-2 bg-black/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/10">
+                  <Droplets className="w-5 h-5 text-white/80" />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-bold text-white/70">Humedad</span>
+                    <span className="text-sm font-bold">{currentData.current.humidity}%</span>
+                  </div>
                 </div>
               </div>
             </div>
-          ))}
+
+            {/* Right: Astro & Forecast */}
+            <div className="lg:col-span-7 flex flex-col gap-6">
+              
+              {/* Extra info cards */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-black/10 backdrop-blur-xl border border-white/10 p-4 rounded-3xl flex flex-col items-center justify-center text-center">
+                  <Sunrise className="w-6 h-6 text-yellow-300 mb-2" />
+                  <span className="text-xs font-bold text-white/70 uppercase">Amanecer</span>
+                  <span className="text-lg font-bold">{formatTime(currentData.daily.sunrise[0])}</span>
+                </div>
+                <div className="bg-black/10 backdrop-blur-xl border border-white/10 p-4 rounded-3xl flex flex-col items-center justify-center text-center">
+                  <Sunset className="w-6 h-6 text-orange-400 mb-2" />
+                  <span className="text-xs font-bold text-white/70 uppercase">Atardecer</span>
+                  <span className="text-lg font-bold">{formatTime(currentData.daily.sunset[0])}</span>
+                </div>
+                <div className="bg-black/10 backdrop-blur-xl border border-white/10 p-4 rounded-3xl flex flex-col items-center justify-center text-center">
+                  <SunDim className="w-6 h-6 text-fuchsia-300 mb-2" />
+                  <span className="text-xs font-bold text-white/70 uppercase">UV Máx</span>
+                  <span className="text-lg font-bold">{currentData.daily.uvIndexMax[0]?.toFixed(1)}</span>
+                </div>
+              </div>
+
+              {/* 7-Day Forecast */}
+              <div className="bg-black/10 backdrop-blur-xl border border-white/10 rounded-3xl p-6 flex-1">
+                <h3 className="text-sm font-black uppercase tracking-widest text-white/70 mb-4">Pronóstico {currentData.daily.time.length} Días</h3>
+                <div className="grid grid-cols-7 gap-2 h-full">
+                  {currentData.daily.time.map((timeString, idx) => (
+                    <div key={timeString} className="flex flex-col items-center justify-between pb-2 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors cursor-default">
+                      <span className="text-[11px] font-bold mt-3 uppercase text-white/80">{getDayName(timeString, idx)}</span>
+                      <div className="my-2">
+                        {getWeatherIcon(currentData.daily.weatherCode[idx], "w-6 h-6")}
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-sm font-bold">{currentData.daily.temperatureMax[idx].toFixed(0)}°</span>
+                        <span className="text-xs font-semibold text-white/50">{currentData.daily.temperatureMin[idx].toFixed(0)}°</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
         </div>
-      )}
+      </div>
+      
     </div>
   );
 }
