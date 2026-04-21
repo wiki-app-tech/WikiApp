@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { Article, FeedSource } from '@/types';
 import ArticleCard from '@/components/ArticleCard';
 import WeatherCard from '@/components/WeatherCard';
@@ -204,6 +205,23 @@ export default function Dashboard({
 
     return (
         <div className="flex h-screen bg-surface-primary text-text-primary font-sans overflow-hidden">
+            {/* Definición del Filtro SVG Líquido Oculto */}
+            <svg width="0" height="0" className="absolute hidden">
+                <filter id="goo">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
+                    <feColorMatrix
+                        in="blur"
+                        mode="matrix"
+                        values="1 0 0 0 0  
+                                0 1 0 0 0  
+                                0 0 1 0 0  
+                                0 0 0 25 -10"
+                        result="goo"
+                    />
+                    <feBlend in="SourceGraphic" in2="goo" />
+                </filter>
+            </svg>
+
             {/* Sidebar 1: Icon Bar — Wotech style */}
             <aside className="hidden lg:flex w-[72px] bg-surface-elevated flex-col items-center py-6 gap-1 shrink-0 z-50 border-r border-slate-100 shadow-sm">
                 <div className="mb-6 p-1">
@@ -752,28 +770,63 @@ export default function Dashboard({
                     </div>
                 )}
 
-                {/* Mobile Bottom Nav — Wotech style */}
-                <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 flex items-center justify-around z-40 pb-safe shadow-lg">
-                    <MobileTab active={activeTab === 'home' && !selectedArticleId} onClick={() => { setActiveTab('home'); setSelectedFeed(null); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Inicio" icon={<LayoutIcon className="w-5 h-5" />} />
-                    <MobileTab active={activeTab === 'audio'} onClick={() => { setActiveTab('audio'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Medios" icon={<HeadphonesIcon className="w-5 h-5" />} />
-                    <MobileTab active={activeTab === 'folders'} onClick={() => { setActiveTab('folders'); setIsMobileMenuOpen(true); }} label="Feeds" icon={<RssIcon className="w-5 h-5" />} />
-                    <MobileTab active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Buscar" icon={<SearchIcon className="w-5 h-5" />} />
-                    <MobileTab
-                        active={activeTab === 'saved'}
-                        onClick={() => { setActiveTab('saved'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }}
-                        label="Guardado"
-                        icon={
-                            <div className="relative">
-                                <BookmarkIcon className="w-5 h-5" />
-                                {savedArticles.length > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow">
-                                        {savedArticles.length > 9 ? '9+' : savedArticles.length}
-                                    </span>
-                                )}
-                            </div>
-                        }
-                    />
+                {/* Mobile Bottom Nav — Gooey style */}
+                <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-20 bg-surface-elevated/90 backdrop-blur-xl border-t border-surface-divider flex items-center justify-around z-40 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                    <div className="flex justify-around items-center w-full px-2">
+                        <MobileTab active={activeTab === 'home' && !selectedArticleId} onClick={() => { setActiveTab('home'); setSelectedFeed(null); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Inicio" icon={<LayoutIcon className="w-6 h-6" />} />
+                        <MobileTab active={activeTab === 'audio'} onClick={() => { setActiveTab('audio'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Medios" icon={<HeadphonesIcon className="w-6 h-6" />} />
+                        
+                        <div className="w-[72px]" /> {/* Placeholder para el FAB Central */}
+                        
+                        <MobileTab active={activeTab === 'search'} onClick={() => { setActiveTab('search'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }} label="Buscar" icon={<SearchIcon className="w-6 h-6" />} />
+                        <MobileTab
+                            active={activeTab === 'saved'}
+                            onClick={() => { setActiveTab('saved'); setSelectedArticleId(null); setIsMobileMenuOpen(false); }}
+                            label="Guardado"
+                            icon={
+                                <div className="relative">
+                                    <BookmarkIcon className="w-6 h-6" />
+                                    {savedArticles.length > 0 && (
+                                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow">
+                                            {savedArticles.length > 9 ? '9+' : savedArticles.length}
+                                        </span>
+                                    )}
+                                </div>
+                            }
+                        />
+                    </div>
                 </nav>
+
+                {/* FAB Central con Efecto Gooey en su propio container absoluto para overlapear */}
+                <div className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+                    <div 
+                        className="relative w-32 h-32 flex items-center justify-center"
+                        style={{ filter: "url(#goo)" }}
+                    >
+                        {/* Gotas de base (mismo color que background del boton para que se fundan sin error de coloracion) */}
+                        <motion.div
+                            animate={{ scale: [1, 1.25, 1], x: [0, -10, 0], y: [0, 5, 0] }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute rounded-full w-14 h-14 bg-accent-primary opacity-95"
+                        />
+                        <motion.div
+                            animate={{ scale: [1, 1.3, 1], x: [0, 12, 0], y: [0, -8, 0] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                            className="absolute rounded-full w-12 h-12 bg-accent-primary opacity-95"
+                        />
+                        <motion.button
+                            className="relative z-10 w-16 h-16 rounded-full bg-accent-primary flex items-center justify-center shadow-glow-accent pointer-events-auto"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.75 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                            onClick={() => {
+                                setIsMobileMenuOpen(!isMobileMenuOpen);
+                            }}
+                        >
+                            <RssIcon className="w-7 h-7 text-white stroke-[2.5]" />
+                        </motion.button>
+                    </div>
+                </div>
             </main>
 
             {/* Modal para guardar artículo con etiquetas */}
