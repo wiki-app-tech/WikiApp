@@ -42,13 +42,6 @@
         "category": "tecnologia"
     },
     {
-        "id": "krebs-on-security",
-        "name": "Krebs on Security",
-        "url": "https://krebsonsecurity.com/feed/",
-        "type": "rss",
-        "category": "tecnologia"
-    },
-    {
         "id": "noticias-de-criptomonedas",
         "name": "Noticias de criptomonedas",
         "url": "https://es.investing.com/rss/news_301.rss",
@@ -84,13 +77,6 @@
         "category": "tecnologia"
     },
     {
-        "id": "the-hacker-news",
-        "name": "The Hacker News",
-        "url": "https://thehackernews.com/feeds/posts/default",
-        "type": "rss",
-        "category": "tecnologia"
-    },
-    {
         "id": "xataka",
         "name": "Xataka",
         "url": "https://www.xataka.com/feedburner.xml",
@@ -119,13 +105,6 @@
         "category": "diseno"
     },
     {
-        "id": "muzli-design-inspiration",
-        "name": "Muzli -Design Inspiration",
-        "url": "https://medium.muz.li/feed",
-        "type": "rss",
-        "category": "diseno"
-    },
-    {
         "id": "piktochart-infographics",
         "name": "Piktochart Infographics",
         "url": "https://piktochart.com/feed/",
@@ -143,13 +122,6 @@
         "id": "criptonoticias-bitcoin-blockchain-y-criptomonedas",
         "name": "CriptoNoticias – Bitcoin, Blockchain y criptomonedas",
         "url": "https://www.criptonoticias.com/feed/",
-        "type": "rss",
-        "category": "economia"
-    },
-    {
-        "id": "cryptopotato",
-        "name": "CryptoPotato",
-        "url": "https://cryptopotato.com/feed/",
         "type": "rss",
         "category": "economia"
     },
@@ -266,13 +238,6 @@
         "category": "internacional"
     },
     {
-        "id": "argentina-google-news",
-        "name": "argentina - Google News",
-        "url": "http://news.google.com/news?hl=en&amp;gl=us&amp;q=argentina&amp;um=1&amp;ie=UTF-8&amp;output=rss",
-        "type": "rss",
-        "category": "internacional"
-    },
-    {
         "id": "bbcmundo-com-noticias",
         "name": "BBCMundo.com | Noticias",
         "url": "http://newsrss.bbc.co.uk/rss/spanish/news/rss.xml",
@@ -336,30 +301,9 @@
         "category": "internacional"
     },
     {
-        "id": "finance-and-economics",
-        "name": "Finance and economics",
-        "url": "https://www.economist.com/finance-and-economics/rss.xml",
-        "type": "rss",
-        "category": "internacional"
-    },
-    {
-        "id": "independent",
-        "name": "Independent",
-        "url": "https://www.independent.co.uk/rss",
-        "type": "rss",
-        "category": "internacional"
-    },
-    {
         "id": "internacional-reciente",
         "name": "Internacional - Reciente",
         "url": "https://news.google.com/rss/topics/CAAqLAgKIiZDQkFTRmdvSUwyMHZNRGx1YlY4U0JtVnpMVFF4T1JvQ1ZWTW9BQVAB?hl=es-419&amp;gl=US&amp;ceid=US%3Aes-419&amp;oc=11",
-        "type": "rss",
-        "category": "internacional"
-    },
-    {
-        "id": "international",
-        "name": "International",
-        "url": "https://www.economist.com/international/rss.xml",
         "type": "rss",
         "category": "internacional"
     },
@@ -423,13 +367,6 @@
         "id": "sputnik-mundo",
         "name": "Sputnik Mundo",
         "url": "http://sp.rian.ru/export/rss2/index.xml",
-        "type": "rss",
-        "category": "internacional"
-    },
-    {
-        "id": "top-stories-google-news",
-        "name": "Top stories - Google News",
-        "url": "https://news.google.com/rss?hl=en-US&amp;gl=US&amp;ceid=US%3Aen&amp;oc=11",
         "type": "rss",
         "category": "internacional"
     },
