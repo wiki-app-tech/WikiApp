@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -94,12 +94,6 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
             <span className="text-[9px] font-bold">Feeds</span>
           </button>
 
-          <button onClick={() => setActiveTab('saved')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'saved' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}`}>
-            {activeTab === 'saved' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
-            <Bookmark className="w-5 h-5" />
-            <span className="text-[9px] font-bold">Saved</span>
-          </button>
-
           <button onClick={() => setActiveTab('weather')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'weather' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}`}>
             {activeTab === 'weather' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
             <Cloud className="w-5 h-5" />
@@ -120,7 +114,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                    <h1 className="text-xl font-bold text-white tracking-tight">
-                       {activeTab === 'home' ? 'Dashboards' : activeTab === 'explore' ? 'Feeds' : activeTab === 'saved' ? 'Guardados' : 'Clima'}
+                       {activeTab === 'home' ? 'Dashboards' : activeTab === 'explore' ? 'Feeds' : 'Clima'}
                    </h1>
                    <ChevronRight className="w-4 h-4 text-gray-500" />
                 </div>
@@ -292,13 +286,31 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                       {isVid && <div className="absolute inset-0 flex items-center justify-center bg-black/30"><PlayCircle className="w-8 h-8 text-white drop-shadow-md" /></div>}
                                                    </div>
                                                 )}
-                                                <div className="p-4 flex-1 flex flex-col">
+                                                <div className="p-4 flex-1 flex flex-col z-10 w-full min-w-0">
                                                    <div className="text-[9px] font-black text-blue-500 uppercase tracking-widest mb-2 line-clamp-1">{sourceName}</div>
                                                    <h3 className="text-[14px] font-bold text-gray-200 line-clamp-2 leading-snug group-hover:text-blue-400 mb-2">{article.title}</h3>
                                                    <p className="text-[11px] text-gray-400 line-clamp-3 leading-relaxed mb-3 flex-1 flex-col justify-start">
                                                        {stripHtml(article.description || '')}
                                                    </p>
-                                                   <span className="text-[10px] text-gray-600 mt-auto">{getRelativeTime(article.pubDate)}</span>
+                                                   <div className="mt-auto flex items-center justify-between border-t border-[#1f1f1f] pt-3">
+                                                       <span className="text-[10px] text-gray-600">{getRelativeTime(article.pubDate)}</span>
+                                                       <div className="flex items-center gap-2 shrink-0">
+                                                            <button 
+                                                                onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }}
+                                                                className="text-gray-500 hover:text-green-500 transition-colors p-1 bg-[#1a1a1a] hover:bg-[#222] rounded shadow-sm"
+                                                                title="Compartir en WhatsApp"
+                                                            >
+                                                                <MessageCircle className="w-4 h-4" />
+                                                            </button>
+                                                            <button 
+                                                                onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }}
+                                                                className="text-gray-500 hover:text-blue-400 transition-colors p-1 bg-[#1a1a1a] hover:bg-[#222] rounded shadow-sm"
+                                                                title="Compartir en Telegram"
+                                                            >
+                                                               <Send className="w-4 h-4" />
+                                                            </button>
+                                                       </div>
+                                                   </div>
                                                 </div>
                                             </motion.div>
                                         );
@@ -412,10 +424,10 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
       {/* MOBILE FLOATING BOTTOM NAV (Si fuera necesario ajustar luego) */}
       <div className="lg:hidden fixed bottom-6 left-4 right-4 z-40">
         <nav className="bg-[#111]/90 backdrop-blur-xl border border-[#333] shadow-2xl rounded-2xl h-16 flex items-center justify-around px-2">
-            {['home', 'explore', 'saved', 'weather'].map((tab) => {
-               const icons: any = { home: LayoutDashboard, explore: Compass, saved: Bookmark, weather: Cloud };
+            {['home', 'explore', 'weather'].map((tab) => {
+               const icons: any = { home: LayoutDashboard, explore: Compass, weather: Cloud };
                const Icon = icons[tab];
-               const titles: any = { home: 'INICIO', explore: 'FEEDS', saved: 'SAVE', weather: 'CLIMA' };
+               const titles: any = { home: 'INICIO', explore: 'FEEDS', weather: 'CLIMA' };
                return (
                 <button 
                   key={tab}
