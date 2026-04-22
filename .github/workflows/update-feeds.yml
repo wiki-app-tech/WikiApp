@@ -1,0 +1,22 @@
+name: MediosWiki 15-Min Updater Cron
+
+on:
+  schedule:
+    # Se ejecuta cada 15 minutos (ej: 0, 15, 30, 45)
+    - cron: '*/15 * * * *'
+  # Permite ejecutarlo manualmente desde la pestaña Actions en GitHub
+  workflow_dispatch:
+
+jobs:
+  cron_revalidate:
+    name: Ping Next.js App for RSS Refresh
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llama al API de Revalidación de Vercel/Next.js
+        # Asegúrate de colocar tu URL real de Vercel o producción
+        # IMPORTANTE: Reemplaza TU-URL-WEB.com con el dominio si lo configuras para production
+        # O en Vercel puedes definir github secret VERCEL_URL  
+        run: |
+          URL="${{ secrets.PRODUCTION_URL }}/api/revalidate?secret=${{ secrets.REVALIDATE_SECRET }}"
+          # Si no seteaste los secrets, fallará elegantemente o usa el de fallback
+          curl -s "$URL" || echo "Please setup PRODUCTION_URL & REVALIDATE_SECRET secrets in GitHub Project."

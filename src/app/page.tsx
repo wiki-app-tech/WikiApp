@@ -5,7 +5,7 @@ import type { FeedSource } from '@/types';
 import { updateAllFeeds } from '@/services/rssService';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 900;
 
 async function getData() {
   const feedsPath = path.join(process.cwd(), 'public/data/feeds.json');
