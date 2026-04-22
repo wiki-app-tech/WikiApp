@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Cloud, CloudRain, CloudSnow, Sun, CloudFog, CloudLightning, Wind, Droplets, Thermometer, AlertCircle, Sunrise, Sunset, SunDim } from 'lucide-react';
+import { Cloud, CloudRain, CloudSnow, Sun, CloudFog, CloudLightning, Wind, Droplets, Thermometer, AlertCircle, Sunrise, Sunset, SunDim, AlertTriangle, Activity, ExternalLink } from 'lucide-react';
 
 interface DailyForecast {
   time: string[];
@@ -265,6 +265,48 @@ export default function WeatherDashboard() {
         </div>
       </div>
       
+      {/* Alertas Tempranas y Sismos */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pb-8">
+        
+        {/* SMN Alertas */}
+        <div className="bg-[#121212] border border-red-900/40 rounded-3xl p-6 relative overflow-hidden flex flex-col shadow-lg hover:border-red-500/50 transition-colors">
+           <div className="absolute top-0 right-0 p-12 bg-red-600/5 rounded-full blur-3xl"></div>
+           <div className="flex items-center gap-3 text-red-500 mb-4 z-10">
+              <AlertTriangle className="w-8 h-8" />
+              <h3 className="text-xl font-bold">Alertas Meteorológicas</h3>
+           </div>
+           <p className="text-gray-400 text-sm mb-8 flex-1 z-10 leading-relaxed">
+              Mantente informado con el Sistema de Alerta Temprana del Servicio Meteorológico Nacional. Revisa previsiones a corto y mediano plazo para toda la región.
+           </p>
+           <a href="https://www.smn.gob.ar/alertas" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 px-6 rounded-xl text-center transition-colors z-10">
+              Consultar Alertas del SMN <ExternalLink className="w-4 h-4" />
+           </a>
+        </div>
+
+        {/* Sismos y USGS */}
+        <div className="bg-[#121212] border border-[#222] rounded-3xl p-0 flex flex-col shadow-lg overflow-hidden group hover:border-[#444] transition-colors relative">
+           <div className="p-6 pb-4 flex items-center justify-between border-b border-[#222]">
+              <div className="flex items-center gap-3">
+                 <Activity className="w-6 h-6 text-blue-500" />
+                 <h3 className="text-lg font-bold text-white tracking-tight">Sismos en Tiempo Real</h3>
+              </div>
+              <div className="flex gap-2">
+                 <a href="https://www.inpres.gob.ar/desktop/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-black bg-[#1a1a1a] hover:bg-[#222] px-2.5 py-1.5 rounded-lg text-gray-400 transition-colors">INPRES</a>
+                 <a href="http://earg.fcaglp.unlp.edu.ar/sismologia/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-black bg-[#1a1a1a] hover:bg-[#222] px-2.5 py-1.5 rounded-lg text-gray-400 transition-colors">EARG</a>
+              </div>
+           </div>
+           <div className="w-full h-[320px] bg-[#0c0c0c] relative">
+              <iframe 
+                 src="https://earthquake.usgs.gov/earthquakes/map/?extent=-55.14121,-71.46606&extent=-53.38005,-65.75317"
+                 className="w-full h-full border-none opacity-80 group-hover:opacity-100 transition-opacity"
+                 title="USGS Earthquakes Map - Tierra del Fuego"
+                 loading="lazy"
+              />
+           </div>
+        </div>
+
+      </div>
+
     </div>
   );
 }
