@@ -152,7 +152,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
         {/* CONTENIDO SCROLL */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8">
-          <div className="max-w-[1400px] mx-auto h-full space-y-6">
+          <div className="max-w-[1400px] mx-auto space-y-6">
             
             {activeTab === 'weather' ? (
               <WeatherDashboard />
@@ -351,7 +351,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                       {/* RIGHT COLUMN (CHECKLIST) FOR HOME */}
                       {activeTab === 'home' && (
-                        <div className="hidden xl:flex xl:col-span-4 flex-col gap-6 sticky top-20">
+                        <div className="hidden xl:flex xl:col-span-4 flex-col gap-6">
                             <div className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl p-5 shadow-2xl flex flex-col gap-6">
                                 <div className="flex items-center justify-between text-gray-300">
                                     <h2 className="text-[13px] font-bold tracking-wide flex items-center gap-2">
@@ -363,35 +363,41 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                                     </span>
                                 </div>
-                                <div className="flex flex-col gap-2">
-                                    <h3 className="text-sm font-bold text-white mb-1">Ruta N° 3 y Complementarias</h3>
-                                    <p className="text-[11px] text-gray-400 leading-relaxed mb-4">
-                                        Tramo San Sebastián - Lapataia. Monitoreo en tiempo real de condiciones de transitabilidad.
-                                    </p>
+                                <div className="flex flex-col gap-4">
                                     
-                                    <div className="flex flex-col gap-3">
-                                        <a href="https://www.facebook.com/SuDefensaCivil/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 bg-[#161616] hover:bg-[#1a1a1a] rounded-xl border border-[#222] transition-colors group">
-                                            <div className="flex items-center gap-3">
-                                                <ShieldAlert className="w-4 h-4 text-blue-500" />
-                                                <span className="text-xs font-semibold text-gray-300 group-hover:text-white">Defensa Civil TDF</span>
-                                            </div>
-                                            <ExternalLink className="w-3 h-3 text-gray-600 group-hover:text-white" />
-                                        </a>
-                                        <a href="https://www.argentina.gob.ar/transporte/vialidad-nacional/estado-de-rutas" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 bg-[#161616] hover:bg-[#1a1a1a] rounded-xl border border-[#222] transition-colors group">
-                                            <div className="flex items-center gap-3">
-                                                <Car className="w-4 h-4 text-emerald-500" />
-                                                <span className="text-xs font-semibold text-gray-300 group-hover:text-white">Vialidad Nacional</span>
-                                            </div>
-                                            <ExternalLink className="w-3 h-3 text-gray-600 group-hover:text-white" />
-                                        </a>
-                                        <a href="https://www.facebook.com/direccionprovincialdevialidadTDF/?locale=es_LA" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 bg-[#161616] hover:bg-[#1a1a1a] rounded-xl border border-[#222] transition-colors group">
-                                            <div className="flex items-center gap-3">
-                                                <MapPin className="w-4 h-4 text-orange-400" />
-                                                <span className="text-xs font-semibold text-gray-300 group-hover:text-white">Vialidad Provincial</span>
-                                            </div>
-                                            <ExternalLink className="w-3 h-3 text-gray-600 group-hover:text-white" />
+                                    {/* TRAMO 1 */}
+                                    <div className="bg-[#161616] border border-[#222] rounded-xl p-4 flex flex-col gap-2 relative group hover:border-[#333] transition-colors">
+                                        <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-blue-500"/></div>
+                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-gray-500">Tramo Norte</h4>
+                                        <h3 className="text-[13px] font-bold text-white">San Sebastián - Río Grande</h3>
+                                        <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">Tránsito habilitado. Monitoreo oficial por condiciones climáticas de la zona.</p>
+                                        <a href="https://www.facebook.com/SuDefensaCivil/" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-blue-500 hover:text-blue-400">
+                                            Fuente: Defensa Civil <ExternalLink className="w-3 h-3"/>
                                         </a>
                                     </div>
+
+                                    {/* TRAMO 2 */}
+                                    <div className="bg-[#161616] border border-[#222] rounded-xl p-4 flex flex-col gap-2 relative group hover:border-[#333] transition-colors">
+                                        <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-emerald-500"/></div>
+                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-gray-500">Tramo Centro</h4>
+                                        <h3 className="text-[13px] font-bold text-white">Río Grande - Tolhuin</h3>
+                                        <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">Precaución permanente en zona geológica. Reportarse a los puestos de control.</p>
+                                        <a href="https://www.argentina.gob.ar/transporte/vialidad-nacional/estado-de-rutas" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-emerald-500 hover:text-emerald-400">
+                                            Fuente: Vialidad Nacional <ExternalLink className="w-3 h-3"/>
+                                        </a>
+                                    </div>
+
+                                    {/* TRAMO 3 */}
+                                    <div className="bg-[#161616] border border-[#222] rounded-xl p-4 flex flex-col gap-2 relative group hover:border-[#333] transition-colors">
+                                        <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-orange-400"/></div>
+                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-gray-500">Tramo Sur</h4>
+                                        <h3 className="text-[13px] font-bold text-white">Tolhuin - Lapataia</h3>
+                                        <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">Zona de montaña. Transitabilidad sujeta a condiciones de hielo y nieve diaria.</p>
+                                        <a href="https://www.facebook.com/direccionprovincialdevialidadTDF/?locale=es_LA" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-orange-400 hover:text-orange-300">
+                                            Fuente: Vialidad Pcial <ExternalLink className="w-3 h-3"/>
+                                        </a>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
