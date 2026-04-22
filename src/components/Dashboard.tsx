@@ -2,41 +2,58 @@
 
 import React, { useState, useMemo } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Clock, ChevronRight, Moon, Sun, Cloud, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Menu, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2 } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type ViewMode = 'grid' | 'list' | 'magazine';
+type ViewMode = 'list' | 'grid' | 'magazine';
 
 export default function Dashboard({ initialArticles, feeds }: { initialArticles: Article[], feeds: FeedSource[] }) {
   const [activeTab, setActiveTab] = useState('home');
   const [search, setSearch] = useState('');
-  const [viewMode, setViewMode] = useState<ViewMode>('list'); // Default a list en este nuevo diseño oscuro
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   
   const { theme, setTheme } = useTheme();
-  
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
 
-  // Filter Logic
-  const filteredArticles = useMemo(() => {
-    if (!search.trim()) return initialArticles.slice(0, 50); 
-    const lowerSearch = search.toLowerCase();
-    return initialArticles.filter(a => {
-      const sourceName = feeds.find(f => f.id === a.sourceId)?.name || '';
-      return (
-        a.title.toLowerCase().includes(lowerSearch) ||
-        (a.description && a.description.toLowerCase().includes(lowerSearch)) ||
-        sourceName.toLowerCase().includes(lowerSearch)
-      );
-    }).slice(0, 50);
-  }, [initialArticles, search, feeds]);
+  // Extraction of dynamic categories
+  const categories = useMemo(() => {
+     const cats = Array.from(new Set(feeds.map(f => f.category))).filter(Boolean);
+     return ['all', ...cats];
+  }, [feeds]);
 
-  const stripHtml = (html: string) => {
-    return html.replace(/<[^>]*>?/gm, '');
-  };
+  // Enhanced Filter Logic
+  const filteredArticles = useMemo(() => {
+    let result = initialArticles;
+    
+    // Category filter
+    if (activeCategory !== 'all') {
+        result = result.filter(a => {
+            const feed = feeds.find(f => f.id === a.sourceId);
+            return feed && feed.category === activeCategory;
+        });
+    }
+
+    // Keyword filter
+    if (search.trim()) {
+        const lowerSearch = search.toLowerCase();
+        result = result.filter(a => {
+          const sourceName = feeds.find(f => f.id === a.sourceId)?.name || '';
+          return (
+            a.title.toLowerCase().includes(lowerSearch) ||
+            (a.description && a.description.toLowerCase().includes(lowerSearch)) ||
+            sourceName.toLowerCase().includes(lowerSearch)
+          );
+        });
+    }
+    return result;
+  }, [initialArticles, search, feeds, activeCategory]);
+
+  const stripHtml = (html: string) => html.replace(/<[^>]*>?/gm, '');
 
   const getRelativeTime = (isoString: string) => {
     const diff = Date.now() - new Date(isoString).getTime();
@@ -46,21 +63,21 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
     return `${Math.floor(hours/24)}d`;
   };
 
+  const isYouTube = (url: string) => url?.includes('youtube.com') || url?.includes('youtu.be');
+
+  // Separating articles for the Top Visual Widget
+  const topVisualArticles = !search && activeCategory === 'all' ? filteredArticles.slice(0, 3) : [];
+  const feedArticlesToDisplay = topVisualArticles.length > 0 ? filteredArticles.slice(3, 50) : filteredArticles.slice(0, 50);
+
   return (
-    // Color base ultra-oscuro estilo Inoreader
     <div className="flex h-screen bg-[#070707] dark:bg-[#070707] text-[#e0e0e0] font-sans overflow-hidden transition-colors duration-200">
       
       {/* 1. ULTRA SLIM FIXED SIDEBAR */}
       <aside className="w-[72px] bg-[#0c0c0c] border-r border-[#1a1a1a] hidden lg:flex flex-col items-center shrink-0 z-20 py-4 gap-6">
-        
-        {/* LOGO */}
         <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold tracking-tighter shadow-md cursor-pointer group hover:scale-105 transition-transform">
           MW
         </div>
-
-        {/* NAV ITEMS */}
         <nav className="flex-1 w-full space-y-4 overflow-y-auto scrollbar-hide py-2">
-          
           <div className="text-[8px] font-black text-gray-600 uppercase tracking-widest text-center mt-2 mb-2 w-full">Principal</div>
           
           <button onClick={() => setActiveTab('home')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'home' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}`}>
@@ -69,42 +86,27 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
             <span className="text-[9px] font-bold">Home</span>
           </button>
           
-          <button onClick={() => setActiveTab('explore')} className={`w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'explore' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}`}>
+          <button onClick={() => setActiveTab('explore')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'explore' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}`}>
             {activeTab === 'explore' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
             <Compass className="w-5 h-5" />
             <span className="text-[9px] font-bold">Feeds</span>
           </button>
 
-          <button onClick={() => setActiveTab('saved')} className={`w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'saved' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}`}>
+          <button onClick={() => setActiveTab('saved')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'saved' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}`}>
             {activeTab === 'saved' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
             <Bookmark className="w-5 h-5" />
             <span className="text-[9px] font-bold">Saved</span>
           </button>
 
-          <button onClick={() => setActiveTab('weather')} className={`w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'weather' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}`}>
+          <button onClick={() => setActiveTab('weather')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'weather' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}`}>
             {activeTab === 'weather' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
             <Cloud className="w-5 h-5" />
             <span className="text-[9px] font-bold">Clima</span>
           </button>
-          
-          <div className="w-full flex justify-center py-4">
-             <div className="w-6 h-px bg-[#262626]"></div>
-          </div>
-          
-          <button className="w-full flex flex-col items-center justify-center gap-1.5 py-3 text-gray-500 hover:text-gray-300 transition-colors pointer-events-none">
-            <Plus className="w-5 h-5" />
-            <span className="text-[9px] font-bold">Add</span>
-          </button>
         </nav>
-
-        {/* BOTTOM ICONS */}
         <div className="w-full space-y-4 pb-4 border-t border-[#1a1a1a] pt-4">
-            <button className="w-full flex justify-center text-gray-500 hover:text-gray-300 transition-colors">
-              <Search className="w-5 h-5" />
-            </button>
-            <button className="w-full flex justify-center text-gray-500 hover:text-gray-300 transition-colors">
-              <Settings className="w-5 h-5" />
-            </button>
+            <button className="w-full flex justify-center text-gray-500 hover:text-gray-300 transition-colors"><Search className="w-5 h-5" /></button>
+            <button className="w-full flex justify-center text-gray-500 hover:text-gray-300 transition-colors"><Settings className="w-5 h-5" /></button>
         </div>
       </aside>
 
@@ -113,29 +115,37 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         
         {/* INOREADER STYLE TOP NAVIGATION */}
         <div className="px-4 py-3 md:px-8 shrink-0 z-30 sticky top-0 bg-[#070707]/90 backdrop-blur-xl border-b border-[#1a1a1a]">
-            {/* Header Level 1 */}
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                    <h1 className="text-xl font-bold text-white tracking-tight">Dashboards</h1>
-                   <ChevronRight className="w-4 h-4 text-gray-500 transform rotate-90" />
+                   <ChevronRight className="w-4 h-4 text-gray-500" />
                 </div>
                 <div className="flex items-center gap-4 text-gray-400">
-                    <button className="hover:text-white transition-colors"><div className="text-[14px] font-bold border border-gray-600 px-2 py-0.5 rounded text-gray-300">Aa</div></button>
-                    <button className="hover:text-white transition-colors"><Search className="w-4 h-4" /></button>
                     <button className="hover:text-white transition-colors"><Cloud className="w-4 h-4" /></button>
                     <button className="hover:text-white transition-colors"><MoreHorizontal className="w-4 h-4" /></button>
                 </div>
             </div>
             
-            {/* Header Tabs */}
-            <div className="flex items-center gap-6 text-[11px] font-black tracking-wider uppercase">
-                <button className={`pb-2 border-b-2 transition-colors ${!search ? 'border-blue-500 text-blue-500' : 'border-transparent text-gray-500 hover:text-gray-300'}`}>
-                    DEFAULT DASHBOARD
-                </button>
-                <button className={`pb-2 border-b-2 transition-colors ${search ? 'border-blue-500 text-blue-500' : 'border-transparent text-gray-500 hover:text-gray-300'}`}>
-                    EXPLOTACIÓN DE MEDIOS
-                </button>
-                <button className="pb-2 text-gray-600 hover:text-gray-300"><Plus className="w-4 h-4" /></button>
+            {/* Dynamic Category Tabs */}
+            <div className="flex gap-6 overflow-x-auto scrollbar-hide text-[11px] font-black tracking-wider uppercase items-center pb-2">
+                {categories.map(cat => (
+                   <button 
+                      key={cat} 
+                      onClick={() => setActiveCategory(cat)}
+                      className={`whitespace-nowrap pb-2 border-b-2 transition-colors ${activeCategory === cat ? 'border-blue-500 text-blue-500' : 'border-transparent text-gray-500 hover:text-gray-300'}`}
+                   >
+                       {cat === 'all' ? 'HOME' : cat}
+                   </button>
+                ))}
+                
+                {/* Visual View Toggles for Home */}
+                {activeTab === 'home' && (
+                   <div className="ml-auto flex bg-[#121212] border border-[#222] rounded-md p-0.5">
+                     <button onClick={() => setViewMode('list')} className={`p-1 rounded ${viewMode === 'list' ? 'bg-[#222] text-white' : 'text-gray-500 hover:text-gray-300'}`}><List className="w-3.5 h-3.5" /></button>
+                     <button onClick={() => setViewMode('grid')} className={`p-1 rounded ${viewMode === 'grid' ? 'bg-[#222] text-white' : 'text-gray-500 hover:text-gray-300'}`}><LayoutGrid className="w-3.5 h-3.5" /></button>
+                     <button onClick={() => setViewMode('magazine')} className={`p-1 rounded ${viewMode === 'magazine' ? 'bg-[#222] text-white' : 'text-gray-500 hover:text-gray-300'}`}><LayoutTemplate className="w-3.5 h-3.5" /></button>
+                   </div>
+                )}
             </div>
         </div>
 
@@ -143,216 +153,248 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8">
           <div className="max-w-[1400px] mx-auto h-full space-y-6">
             
-            {/* Si está en WEATHER */}
             {activeTab === 'weather' ? (
               <WeatherDashboard />
             ) : (
-              /* DASHBOARD LAYOUT (INOREADER STYLE) */
-              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+              <div className="flex flex-col gap-8">
                   
-                  {/* LEFT COLUMN (WIDGETS PRINCIPALES) */}
-                  <div className="xl:col-span-8 flex flex-col gap-6">
-                      
-                      {/* Búsqueda activa info (si la hay) */}
-                      {search && (
-                        <div className="w-full bg-[#121212] border border-[#222] rounded-xl p-4 flex items-center justify-between">
-                            <input 
-                                type="text"
-                                placeholder="Buscar en resultados..."
-                                value={search}
-                                onChange={e => setSearch(e.target.value)}
-                                className="bg-transparent text-white outline-none w-full text-sm font-medium"
-                                autoFocus
-                            />
-                            <Search className="w-4 h-4 text-gray-500" />
-                        </div>
-                      )}
+                  {/* Búsqueda activa info */}
+                  {search && (
+                    <div className="w-full bg-[#121212] border border-[#222] rounded-xl p-4 flex items-center justify-between">
+                        <input 
+                            type="text"
+                            placeholder="Buscar en el universo de feeds..."
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            className="bg-transparent text-white outline-none w-full text-sm font-medium"
+                            autoFocus
+                        />
+                        <Search className="w-4 h-4 text-gray-500" />
+                    </div>
+                  )}
 
-                      {/* WIDGET 1: LISTA DENSA DE NOTICIAS */}
-                      <div className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
-                          <div className="flex items-center justify-between p-4 border-b border-[#1f1f1f] bg-[#0e0e0e]/50 backdrop-blur-sm sticky top-0 z-10">
-                              <div className="flex items-center gap-3">
-                                  <div className="w-6 h-6 rounded bg-blue-600/20 flex items-center justify-center">
-                                      <BookmarkCheck className="w-3.5 h-3.5 text-blue-500" />
-                                  </div>
-                                  <h2 className="text-[13px] font-bold text-gray-200 tracking-wide">
-                                      Flujo Dinámico - Principales <span className="text-gray-500 ml-1 font-normal">{filteredArticles.length} <ChevronRight className="inline w-3 h-3"/></span>
-                                  </h2>
-                              </div>
-                              <div className="flex items-center gap-3 text-gray-500">
-                                  <button className="hover:text-white"><Share2 className="w-4 h-4" /></button>
-                                  <button className="hover:text-white"><MoreHorizontal className="w-4 h-4" /></button>
-                              </div>
-                          </div>
-                          
-                          <div className="flex flex-col">
-                              {filteredArticles.slice(0, 15).map(article => (
-                                  <div 
-                                      key={article.id} 
-                                      onClick={() => setSelectedArticle(article)}
-                                      className="group flex flex-col sm:flex-row sm:items-center px-4 py-2.5 border-b border-[#181818] hover:bg-[#161616] cursor-pointer transition-colors"
-                                  >
-                                      {/* Icon/Save button */}
-                                      <div className="hidden sm:flex w-6 shrink-0 items-center justify-center text-gray-600 group-hover:text-gray-400">
-                                          <Bookmark className="w-3.5 h-3.5" />
-                                      </div>
-                                      
-                                      {/* Contenido (Textos trancados) */}
-                                      <div className="flex-1 min-w-0 pr-4">
-                                          <h3 className="text-sm font-semibold text-gray-300 group-hover:text-white truncate">
-                                              {article.title}
-                                          </h3>
-                                          <div className="hidden sm:block text-[11px] text-gray-500 truncate mt-0.5">
-                                              {stripHtml(article.description || '').slice(0, 100)}...
-                                          </div>
-                                      </div>
-                                      
-                                      {/* Metadatos (Fuente y Tiempo) */}
-                                      <div className="flex items-center justify-between sm:justify-end gap-3 mt-2 sm:mt-0 shrink-0 w-full sm:w-48 text-[11px] text-gray-500">
-                                         <span className="truncate">{feeds.find(f => f.id === article.sourceId)?.name || 'Fuente'}</span>
-                                         <span className="shrink-0">{getRelativeTime(article.pubDate)}</span>
-                                         <MoreHorizontal className="w-3.5 h-3.5 hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity" />
-                                      </div>
-                                  </div>
-                              ))}
-                              {filteredArticles.length === 0 && (
-                                  <div className="p-8 text-center text-sm text-gray-500">No hay contenido con esos criterios.</div>
-                              )}
-                          </div>
-                      </div>
+                  {/* TOP VISUAL WIDGET (SOLO EN HOME SIN FILTRO) */}
+                  {!search && topVisualArticles.length > 0 && (
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {topVisualArticles.map((article, idx) => {
+                            const isVid = isYouTube(article.link);
+                            return (
+                               <motion.div 
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: idx * 0.1 }}
+                                  key={'top-'+article.id}
+                                  onClick={() => setSelectedArticle(article)}
+                                  className="group relative h-64 md:h-80 bg-[#111] rounded-2xl overflow-hidden border border-[#222] cursor-pointer shadow-2xl"
+                               >
+                                  {article.thumbnail ? (
+                                      <img src={article.thumbnail} className="w-full h-full object-cover opacity-60 group-hover:scale-105 group-hover:opacity-80 transition-all duration-700" alt="" />
+                                  ) : (
+                                      <div className="w-full h-full bg-gradient-to-br from-[#1a1a1a] to-black"></div>
+                                  )}
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                                  
+                                  {/* YouTube overlay if applicable */}
+                                  {isVid && (
+                                     <div className="absolute top-4 right-4 bg-red-600/90 text-white p-2 rounded-full backdrop-blur shadow-lg">
+                                        <PlayCircle className="w-6 h-6" />
+                                     </div>
+                                  )}
+                                  {idx === 0 && !isVid && (
+                                     <div className="absolute top-4 right-4 bg-orange-600/90 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-lg flex items-center gap-1 backdrop-blur">
+                                        <Flame className="w-3 h-3" /> Fuego
+                                     </div>
+                                  )}
 
-                      {/* WIDGET 2: LEER MÁS TARDE (TIRA HORIZONTAL) */}
-                      {!search && (
-                          <div className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col relative group">
-                              <div className="flex items-center justify-between p-4 border-b border-[#1f1f1f]">
-                                  <div className="flex items-center gap-2 text-gray-300">
-                                      <Bookmark className="w-4 h-4 ml-1" />
-                                      <h2 className="text-[13px] font-bold tracking-wide">Leer más tarde</h2>
+                                  <div className="absolute inset-x-0 bottom-0 p-5 flex flex-col gap-2 transform group-hover:-translate-y-2 transition-transform duration-300">
+                                      <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest bg-black/50 w-max px-2 py-1 rounded-md mb-1 border border-white/5 backdrop-blur-md">
+                                          {feeds.find(f => f.id === article.sourceId)?.name}
+                                      </span>
+                                      <h3 className="text-xl md:text-2xl font-bold text-white leading-tight line-clamp-3 text-shadow-md">
+                                          {article.title}
+                                      </h3>
                                   </div>
-                                  <div className="flex items-center gap-3 text-gray-500">
-                                      <button className="hover:text-white"><Share2 className="w-4 h-4" /></button>
-                                      <button className="hover:text-white"><MoreHorizontal className="w-4 h-4" /></button>
-                                  </div>
-                              </div>
-                              
-                              {/* Horizontal Scroll Area */}
-                              <div className="flex overflow-x-auto p-4 gap-4 scrollbar-hide snap-x relative">
-                                  {initialArticles.filter(a => a.thumbnail).slice(0, 6).map(article => (
-                                      <div key={'rml-'+article.id} onClick={() => setSelectedArticle(article)} className="shrink-0 w-64 flex flex-col gap-3 group/card cursor-pointer snap-start">
-                                          <div className="w-full h-36 bg-[#1a1a1a] rounded-lg overflow-hidden border border-[#2a2a2a] relative">
-                                              {article.thumbnail && <img src={article.thumbnail} alt="" className="w-full h-full object-cover opacity-80 group-hover/card:opacity-100 group-hover/card:scale-105 transition-all duration-500"/>}
-                                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                                          </div>
-                                          <h3 className="text-sm font-bold text-gray-300 group-hover/card:text-blue-400 line-clamp-2 leading-snug">{article.title}</h3>
-                                          <div className="flex items-center justify-between text-[11px] text-gray-500">
-                                              <span>{feeds.find(f => f.id === article.sourceId)?.name}</span>
-                                              <div className="flex gap-2">
-                                                  <Bookmark className="w-3 h-3 text-yellow-600" />
-                                                  <MoreHorizontal className="w-3 h-3" />
-                                              </div>
-                                          </div>
-                                      </div>
-                                  ))}
-                                  {/* Flechita flotante scroll */}
-                                  <div className="hidden group-hover:flex absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#2a2a2a] rounded-full items-center justify-center text-white shadow-lg cursor-pointer">
-                                      <ChevronRight className="w-5 h-5" />
-                                  </div>
-                              </div>
-                          </div>
-                      )}
+                               </motion.div>
+                            )
+                        })}
+                     </div>
+                  )}
 
-                  </div>
-
-
-                  {/* RIGHT COLUMN (CHECKLIST & TRENDING) */}
-                  <div className="xl:col-span-4 flex flex-col gap-6">
-                      
-                      {/* WIDGET CHECKLIST / PERFIL / ESTADO */}
-                      <div className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl p-5 shadow-2xl flex flex-col gap-6">
-                          <div className="flex items-center justify-between text-gray-300">
-                              <h2 className="text-[13px] font-bold tracking-wide">Estatus Operativo</h2>
-                              <button className="text-gray-500 hover:text-white"><MoreHorizontal className="w-4 h-4" /></button>
-                          </div>
-                          
-                          <div className="flex flex-col gap-1">
-                              <div className="flex items-center justify-between text-[11px] font-bold text-gray-400 mb-1">
-                                 <span>Todos los sistemas arriba</span>
-                                 <span>100%</span>
-                              </div>
-                              <div className="w-full h-1 bg-[#1a1a1a] rounded-full overflow-hidden">
-                                  <div className="h-full bg-emerald-500 w-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
-                              </div>
-                          </div>
-
-                          <div className="flex flex-col gap-4">
-                              <div className="flex items-center gap-3 text-[13px] group opacity-80 hover:opacity-100 cursor-pointer">
-                                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                                  <span className="text-emerald-50 text-decoration-line: line-through font-medium text-gray-400">Actualización ISR Vercel</span>
-                              </div>
-                              <div className="flex items-center gap-3 text-[13px] group opacity-80 hover:opacity-100 cursor-pointer">
-                                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                                  <span className="text-emerald-50 text-decoration-line: line-through font-medium text-gray-400">Rutas Tierra del Fuego - Transitables</span>
-                              </div>
-                              <div className="flex items-center justify-between text-[13px] group cursor-pointer">
-                                  <div className="flex items-center gap-3">
-                                      <div className="w-4 h-4 rounded-full border border-gray-600"></div>
-                                      <span className="text-gray-300 font-medium group-hover:text-white transition-colors">Efemérides Nacionales</span>
-                                  </div>
-                                  <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
-                              </div>
-                              <div className="flex items-center justify-between text-[13px] group cursor-pointer">
-                                  <div className="flex items-center gap-3">
-                                      <div className="w-4 h-4 rounded-full border border-gray-600"></div>
-                                      <span className="text-gray-300 font-medium group-hover:text-white transition-colors">Estado de Puertos (TDF)</span>
-                                  </div>
-                                  <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
-                              </div>
-                          </div>
-                      </div>
-
-                      {/* WIDGET TRENDING */}
-                      {!search && initialArticles[0] && (
-                        <div className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
-                            <div className="flex items-center justify-between p-4 border-b border-[#1f1f1f] text-gray-300">
-                                <h2 className="text-[13px] font-bold tracking-wide">Trending</h2>
-                                <button className="text-gray-500 hover:text-white"><MoreHorizontal className="w-4 h-4" /></button>
-                            </div>
-                            <div className="p-4 bg-[#111] flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-gray-500 border-b border-[#1a1a1a]">
-                                <span className="text-gray-300">CANDENTE</span>
-                                <span className="hover:text-gray-300 cursor-pointer">TOP HOY</span>
-                                <span className="hover:text-gray-300 cursor-pointer">TOP ESTA SEMANA</span>
-                            </div>
-                            <div 
-                                className="group relative w-full h-64 bg-[#1a1a1a] cursor-pointer overflow-hidden"
-                                onClick={() => setSelectedArticle(initialArticles[0])}
-                            >
-                                {initialArticles[0].thumbnail ? (
-                                    <img src={initialArticles[0].thumbnail} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-700" alt="Trending" />
-                                ) : (
-                                    <div className="w-full h-full bg-gradient-to-br from-blue-900/40 to-black"></div>
-                                )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
-                                <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col gap-2">
-                                    <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest break-words bg-black/50 w-max px-2 py-1 rounded">
-                                        {feeds.find(f => f.id === initialArticles[0].sourceId)?.name}
-                                    </span>
-                                    <h3 className="text-lg md:text-xl font-bold text-white leading-tight mt-1">
-                                        {initialArticles[0].title}
-                                    </h3>
+                  <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                      {/* MAIN CONTENT FEED LIST */}
+                      <div className="xl:col-span-8 flex flex-col gap-6">
+                         <div className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+                            <div className="flex items-center justify-between p-4 border-b border-[#1f1f1f] bg-[#0e0e0e]/90 backdrop-blur-sm sticky top-0 z-10">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-6 h-6 rounded bg-blue-600/20 flex items-center justify-center">
+                                        <BookmarkCheck className="w-3.5 h-3.5 text-blue-500" />
+                                    </div>
+                                    <h2 className="text-[13px] font-bold text-gray-200 tracking-wide uppercase">
+                                        {activeCategory === 'all' ? 'Flujo Dinámico' : activeCategory.replace(/-/g, ' ')}
+                                        <span className="text-gray-500 ml-2 font-normal text-[11px]">{feedArticlesToDisplay.length} resultados</span>
+                                    </h2>
                                 </div>
                             </div>
-                        </div>
-                      )}
+                            
+                            <motion.div layout className={`flex ${viewMode === 'list' ? 'flex-col' : viewMode === 'grid' ? 'flex-row flex-wrap p-4 gap-4' : 'flex-col p-4 gap-6'}`}>
+                                <AnimatePresence>
+                                    {feedArticlesToDisplay.map(article => {
+                                        const sourceName = feeds.find(f => f.id === article.sourceId)?.name || 'Fuente';
+                                        const isVid = isYouTube(article.link);
 
+                                        // VIEW: LIST
+                                        if (viewMode === 'list') return (
+                                            <motion.div 
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                key={article.id} 
+                                                onClick={() => setSelectedArticle(article)}
+                                                className="group flex flex-col sm:flex-row sm:items-center px-4 py-2.5 border-b border-[#181818] hover:bg-[#161616] cursor-pointer transition-colors"
+                                            >
+                                                <div className="hidden sm:flex w-6 shrink-0 items-center justify-center text-gray-600 group-hover:text-blue-500">
+                                                    {isVid ? <PlayCircle className="w-4 h-4 text-red-500/80 group-hover:text-red-500" /> : <ChevronRight className="w-4 h-4" />}
+                                                </div>
+                                                <div className="flex-1 min-w-0 pr-4 pl-2">
+                                                    <h3 className="text-sm font-semibold text-gray-300 group-hover:text-white truncate">
+                                                        {article.title}
+                                                    </h3>
+                                                    <div className="hidden sm:block text-[11px] text-gray-500 truncate mt-0.5">
+                                                        {stripHtml(article.description || '').slice(0, 100)}...
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center justify-between sm:justify-end gap-3 mt-2 sm:mt-0 shrink-0 w-full sm:w-48 text-[11px] text-gray-500 font-medium">
+                                                   <span className="truncate max-w-[100px] border border-[#222] px-2 py-0.5 rounded backdrop-blur bg-[#111]">{sourceName}</span>
+                                                   <span className="shrink-0">{getRelativeTime(article.pubDate)}</span>
+                                                </div>
+                                            </motion.div>
+                                        );
+
+                                        // VIEW: GRID
+                                        if (viewMode === 'grid') return (
+                                            <motion.div 
+                                                initial={{ scale: 0.9, opacity: 0 }}
+                                                animate={{ scale: 1, opacity: 1 }}
+                                                key={article.id}
+                                                onClick={() => setSelectedArticle(article)}
+                                                className="w-full sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] bg-[#141414] border border-[#222] rounded-xl overflow-hidden cursor-pointer hover:border-gray-600 transition-all flex flex-col group"
+                                            >
+                                                {article.thumbnail && (
+                                                   <div className="w-full h-32 relative overflow-hidden">
+                                                      <img src={article.thumbnail} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt=""/>
+                                                      {isVid && <div className="absolute inset-0 flex items-center justify-center bg-black/30"><PlayCircle className="w-8 h-8 text-white drop-shadow-md" /></div>}
+                                                   </div>
+                                                )}
+                                                <div className="p-4 flex-1 flex flex-col">
+                                                   <div className="text-[9px] font-bold text-gray-500 uppercase mb-2 line-clamp-1">{sourceName}</div>
+                                                   <h3 className="text-sm font-bold text-gray-200 line-clamp-3 leading-snug group-hover:text-blue-400">{article.title}</h3>
+                                                   <span className="text-[10px] text-gray-600 mt-auto pt-3">{getRelativeTime(article.pubDate)}</span>
+                                                </div>
+                                            </motion.div>
+                                        );
+
+                                        // VIEW: MAGAZINE
+                                        return (
+                                            <motion.div 
+                                                initial={{ y: 20, opacity: 0 }}
+                                                animate={{ y: 0, opacity: 1 }}
+                                                key={article.id}
+                                                onClick={() => setSelectedArticle(article)}
+                                                className="w-full group bg-transparent border-none cursor-pointer flex flex-col md:flex-row gap-6 mb-2 hover:bg-[#111] p-2 rounded-xl transition-colors"
+                                            >
+                                                {article.thumbnail && (
+                                                   <div className="w-full md:w-64 h-48 md:h-36 shrink-0 relative rounded-xl overflow-hidden">
+                                                      <img src={article.thumbnail} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt=""/>
+                                                      {isVid && <div className="absolute inset-0 flex items-center justify-center bg-black/40"><PlayCircle className="w-10 h-10 text-red-500 drop-shadow-lg" /></div>}
+                                                   </div>
+                                                )}
+                                                <div className="flex-1 py-1">
+                                                   <div className="flex items-center gap-2 mb-2">
+                                                      <span className="text-[10px] font-black text-blue-500 uppercase bg-blue-500/10 px-2 py-0.5 rounded">{sourceName}</span>
+                                                      <span className="text-[11px] text-gray-500">{getRelativeTime(article.pubDate)}</span>
+                                                   </div>
+                                                   <h3 className="text-xl font-bold text-gray-200 line-clamp-2 leading-tight group-hover:text-blue-400 mb-2">{article.title}</h3>
+                                                   <p className="text-sm text-gray-500 line-clamp-2">{stripHtml(article.description || '')}</p>
+                                                </div>
+                                            </motion.div>
+                                        );
+                                    })}
+                                </AnimatePresence>
+                                {feedArticlesToDisplay.length === 0 && (
+                                    <div className="p-8 text-center text-sm text-gray-500">Sin artículos recientes compatibles.</div>
+                                )}
+                            </motion.div>
+                         </div>
+                      </div>
+
+                      {/* RIGHT COLUMN (CHECKLIST) */}
+                      <div className="hidden xl:flex xl:col-span-4 flex-col gap-6 sticky top-20">
+                          <div className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl p-5 shadow-2xl flex flex-col gap-6">
+                              <div className="flex items-center justify-between text-gray-300">
+                                  <h2 className="text-[13px] font-bold tracking-wide">Estatus Operativo</h2>
+                                  <button className="text-gray-500 hover:text-white"><MoreHorizontal className="w-4 h-4" /></button>
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                  <div className="flex items-center justify-between text-[11px] font-bold text-gray-400 mb-1">
+                                     <span>Core Systems</span>
+                                     <span className="text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">ONLINE</span>
+                                  </div>
+                                  <div className="w-full h-1 bg-[#1a1a1a] rounded-full overflow-hidden">
+                                      <div className="h-full bg-emerald-500 w-full"></div>
+                                  </div>
+                              </div>
+                              <div className="flex flex-col gap-4">
+                                  <div className="flex items-center gap-3 text-[13px] group opacity-80 cursor-pointer">
+                                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                      <span className="line-through font-medium text-gray-400">Rutas Tierra del Fuego - Libres</span>
+                                  </div>
+                                  <div className="flex items-center justify-between text-[13px] group cursor-pointer">
+                                      <div className="flex items-center gap-3">
+                                          <div className="w-4 h-4 rounded-full border border-gray-600 flex items-center justify-center">
+                                            <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                                          </div>
+                                          <span className="text-gray-300 font-medium group-hover:text-white transition-colors">Alerta de Helada (Ushuaia)</span>
+                                      </div>
+                                  </div>
+                                  <div className="flex items-center justify-between text-[13px] group cursor-pointer">
+                                      <div className="flex items-center gap-3 text-emerald-500">
+                                          <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+                                          <span className="font-bold border-b border-emerald-500/30">Efemérides Nacionales</span>
+                                      </div>
+                                      <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                   </div>
               </div>
             )}
-
           </div>
         </div>
       </main>
+
+      {/* MOBILE FLOATING BOTTOM NAV (Si fuera necesario ajustar luego) */}
+      <div className="lg:hidden fixed bottom-6 left-4 right-4 z-40">
+        <nav className="bg-[#111]/90 backdrop-blur-xl border border-[#333] shadow-2xl rounded-2xl h-16 flex items-center justify-around px-2">
+            {['home', 'explore', 'saved', 'weather'].map((tab) => {
+               const icons: any = { home: LayoutDashboard, explore: Compass, saved: Bookmark, weather: Cloud };
+               const Icon = icons[tab];
+               const titles: any = { home: 'INICIO', explore: 'FEEDS', saved: 'SAVE', weather: 'CLIMA' };
+               return (
+                <button 
+                  key={tab}
+                  onClick={() => setActiveTab(tab)} 
+                  className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 w-16 ${activeTab === tab ? 'text-blue-500 bg-blue-500/10' : 'text-gray-500 hover:text-gray-300'}`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-[9px] font-bold mt-1">{titles[tab]}</span>
+                </button>
+               );
+            })}
+        </nav>
+      </div>
       
-      {/* 4. MODAL LECTOR (READER VIEW OSCURO) */}
+      {/* 4. MODAL LECTOR */}
       <AnimatePresence>
         {selectedArticle && (
            <motion.div 
@@ -367,41 +409,50 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                  animate={{ y: 0 }}
                  exit={{ y: "100%" }}
                  transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                 className="bg-[#0a0a0a] w-full max-w-4xl h-[90vh] sm:h-full max-h-[850px] rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col border border-[#222] overflow-hidden"
+                 className="bg-[#0a0a0a] w-full max-w-4xl h-[95vh] sm:h-full max-h-[900px] rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col border border-[#222] overflow-hidden"
                  onClick={e => e.stopPropagation()}
               >
                  <div className="flex items-center justify-between p-4 border-b border-[#1f1f1f] bg-[#0c0c0c]">
-                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest pl-2">Lector MediosWiki</span>
+                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest pl-2">Lector de Artículos</span>
                     <button onClick={() => setSelectedArticle(null)} className="p-2 rounded-lg hover:bg-[#1f1f1f] transition-colors text-gray-400">
                        <X className="w-5 h-5" />
                     </button>
                  </div>
-                 
                  <div className="flex-1 overflow-y-auto p-6 md:p-12 scrollbar-smooth bg-[#0a0a0a]">
                     <div className="max-w-2xl mx-auto">
-                       <span className="text-xs font-black text-blue-500 uppercase tracking-widest">
-                          {feeds.find(f => f.id === selectedArticle.sourceId)?.name || 'Central'}
-                       </span>
-                       <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mt-5 leading-tight text-white">
+                       <div className="flex items-center gap-3">
+                          <span className="text-xs font-black text-blue-500 uppercase tracking-widest">
+                            {feeds.find(f => f.id === selectedArticle.sourceId)?.name || 'Central'}
+                          </span>
+                          {isYouTube(selectedArticle.link) && (
+                              <span className="bg-red-600/20 text-red-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase border border-red-500/30 flex items-center gap-1">
+                                 <PlayCircle className="w-3 h-3"/> Video
+                              </span>
+                          )}
+                       </div>
+                       
+                       <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mt-5 leading-tight text-white mb-6">
                           {selectedArticle.title}
                        </h1>
-                       <div className="flex items-center gap-4 text-xs font-medium text-gray-500 mt-6 border-y border-[#1f1f1f] py-4">
-                          <span>{new Date(selectedArticle.pubDate).toLocaleString('es-AR')}</span>
-                       </div>
-
+                       
                        {selectedArticle.thumbnail && (
-                           <div className="w-full h-auto mt-8 rounded-xl overflow-hidden border border-[#1f1f1f]">
-                              <img src={selectedArticle.thumbnail} alt="Thumbnail" className="w-full h-full object-cover" />
+                           <div className="w-full h-auto mt-4 mb-8 rounded-xl overflow-hidden border border-[#222] relative group">
+                              <img src={selectedArticle.thumbnail} alt="" className="w-full h-full object-cover" />
+                              {isYouTube(selectedArticle.link) && (
+                                  <a href={selectedArticle.link} target="_blank" rel="noopener noreferrer" className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/60 transition-colors">
+                                      <PlayCircle className="w-16 h-16 text-red-500 drop-shadow-xl transform group-hover:scale-110 transition-transform" />
+                                  </a>
+                              )}
                            </div>
                        )}
 
-                       <div className="prose prose-invert prose-p:text-gray-300 prose-headings:text-white mt-8 leading-relaxed max-w-none text-[15px]" 
-                            dangerouslySetInnerHTML={{ __html: selectedArticle.description || '<p>Contenido no disponible.</p>' }} 
+                       <div className="prose prose-invert prose-p:text-gray-300 prose-headings:text-white mt-8 leading-relaxed max-w-none text-[16px] md:text-[18px]" 
+                            dangerouslySetInnerHTML={{ __html: selectedArticle.description || '<p>Contenido principal no provisto por la fuente.</p>' }} 
                        />
                        
                        <div className="mt-16 pt-8 border-t border-[#1f1f1f] flex justify-center">
-                          <a href={selectedArticle.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#1a1a1a] hover:bg-[#222] text-gray-200 border border-[#333] px-6 py-3 rounded-full text-sm font-bold transition-all">
-                            VISITAR SITIO ORIGINAL <ExternalLink className="w-4 h-4 ml-2" />
+                          <a href={selectedArticle.link} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 ${isYouTube(selectedArticle.link) ? 'bg-red-600 hover:bg-red-700 text-white border-transparent' : 'bg-[#1a1a1a] hover:bg-[#222] text-gray-200 border border-[#333]'} px-8 py-4 rounded-full text-sm font-bold transition-all shadow-lg`}>
+                            {isYouTube(selectedArticle.link) ? 'VER EN YOUTUBE' : 'LEER EN ORIGEN'} <ExternalLink className="w-4 h-4 ml-2" />
                           </a>
                        </div>
                     </div>
