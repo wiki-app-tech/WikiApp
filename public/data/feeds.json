@@ -84,41 +84,6 @@
         "category": "tecnologia"
     },
     {
-        "id": "blog-de-diseno-grafico-roc21",
-        "name": "Blog de diseño gráfico roc21",
-        "url": "https://www.roc21.com/feed/",
-        "type": "rss",
-        "category": "diseno"
-    },
-    {
-        "id": "blog-de-diseno-grafico-y-creatividad",
-        "name": "Blog de diseño gráfico y creatividad.",
-        "url": "https://www.machodominante.es/feed/",
-        "type": "rss",
-        "category": "diseno"
-    },
-    {
-        "id": "brandemia",
-        "name": "Brandemia",
-        "url": "https://brandemia.org/feed/rss",
-        "type": "rss",
-        "category": "diseno"
-    },
-    {
-        "id": "piktochart-infographics",
-        "name": "Piktochart Infographics",
-        "url": "https://piktochart.com/feed/",
-        "type": "rss",
-        "category": "diseno"
-    },
-    {
-        "id": "rayitas-azules-diseno-editorial-y-tipografia",
-        "name": "Rayitas Azules | Diseño Editorial y Tipografía",
-        "url": "https://www.rayitasazules.com/feed/",
-        "type": "rss",
-        "category": "diseno"
-    },
-    {
         "id": "criptonoticias-bitcoin-blockchain-y-criptomonedas",
         "name": "CriptoNoticias – Bitcoin, Blockchain y criptomonedas",
         "url": "https://www.criptonoticias.com/feed/",
@@ -137,7 +102,7 @@
         "name": "Olé - Futbol Primera",
         "url": "https://www.ole.com.ar/rss/futbol-primera/",
         "type": "rss",
-        "category": "economia"
+        "category": "deporte"
     },
     {
         "id": "adelante-la-fe",
@@ -270,7 +235,7 @@
         "name": "economiapolitica // expansion.com",
         "url": "https://estaticos.expansion.com/rss/economiapolitica.xml",
         "type": "rss",
-        "category": "internacional"
+        "category": "politica"
     },
     {
         "id": "el-mundo",
@@ -480,7 +445,7 @@
         "name": "Mundo Gremial",
         "url": "https://mundogremial.com/feed/",
         "type": "rss",
-        "category": "nacional"
+        "category": "gremial"
     },
     {
         "id": "news",
@@ -501,7 +466,7 @@
         "name": "Política Argentina",
         "url": "https://www.politicargentina.com/feed/ultimasnoticias.xml",
         "type": "rss",
-        "category": "nacional"
+        "category": "politica"
     },
     {
         "id": "radio-nacional-argentina",
@@ -634,7 +599,7 @@
         "name": "Gremiales del sur",
         "url": "https://www.gremialesdelsur.com.ar/rss/get_rss.php",
         "type": "rss",
-        "category": "provincial"
+        "category": "gremial"
     },
     {
         "id": "infofueguina",
