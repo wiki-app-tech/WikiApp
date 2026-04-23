@@ -394,6 +394,74 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                         title="Marine Traffic - Puerto de Ushuaia"
                                         loading="lazy"
                                     />
+                                    
+                                    {/* FLOATING ARRIVALS OVERLAY */}
+                                    <div className="absolute top-4 left-4 z-10 w-64 bg-[#0e0e0e]/95 backdrop-blur-xl border border-[#1f1f1f] rounded-2xl shadow-2xl p-4 pointer-events-auto">
+                                        <div className="flex items-center gap-2 mb-3 border-b border-[#1f1f1f] pb-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Estado de Arribos</h3>
+                                        </div>
+                                        
+                                        <div className="flex flex-col gap-4">
+                                            {/* CURRENT / IN PORT */}
+                                            <div className="flex flex-col gap-1.5">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-[8px] font-bold text-emerald-500 uppercase">En Puerto</span>
+                                                    <span className="text-[8px] font-bold text-gray-500">22 Abr, 17:51</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                                                        <Anchor className="w-4 h-4 text-emerald-500" />
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[11px] font-black text-white leading-tight uppercase">EZEQUIEL MB</span>
+                                                        <span className="text-[9px] text-gray-400">Catamarán de Pasajeros</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="h-px bg-[#1f1f1f]"></div>
+
+                                            {/* UPCOMING / NEXT */}
+                                            <div className="flex flex-col gap-3">
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[8px] font-bold text-blue-500 uppercase">Próximo Arribo</span>
+                                                        <span className="text-[8px] font-bold text-gray-500">28 Abr, 06:00</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 group cursor-default">
+                                                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                                                        <span className="text-[11px] font-bold text-gray-200 group-hover:text-white transition-colors">ASTURIANO III</span>
+                                                        <span className="text-[9px] text-gray-500 ml-auto">Portacontenedores</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex flex-col gap-1 opacity-70">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[8px] font-bold text-gray-400 uppercase">Reciente</span>
+                                                        <span className="text-[8px] font-bold text-gray-500">22 Abr, 17:39</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 group cursor-default">
+                                                        <div className="w-2 h-2 rounded-full bg-gray-600"></div>
+                                                        <span className="text-[11px] font-bold text-gray-300">LM</span>
+                                                        <span className="text-[9px] text-gray-500 ml-auto">Catamarán</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex flex-col gap-1 opacity-70">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[8px] font-bold text-gray-400 uppercase">Reciente</span>
+                                                        <span className="text-[8px] font-bold text-gray-500">21 Abr, 18:05</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 group cursor-default">
+                                                        <div className="w-2 h-2 rounded-full bg-gray-600"></div>
+                                                        <span className="text-[11px] font-bold text-gray-300">ONASHAGA</span>
+                                                        <span className="text-[9px] text-gray-500 ml-auto">Pasajeros</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                              </div>
                            )}
