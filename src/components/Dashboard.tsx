@@ -2,10 +2,32 @@
 
 import React, { useState, useMemo } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
 import { motion, AnimatePresence } from 'framer-motion';
+
+import dynamic from 'next/dynamic';
+
+const WeatherAlertMap = dynamic(() => import('./WeatherAlertMap'), {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-[#0a0a0a] text-gray-500 rounded-xl border border-[#222]">
+        <ShieldAlert className="w-8 h-8 mb-4 animate-pulse text-yellow-500" /> 
+        <span className="text-xs font-bold uppercase tracking-widest">Sincronizando Alertas...</span>
+      </div>
+    )
+  });
+
+const SecurityHeatMap = dynamic(() => import('./SecurityHeatMap'), {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-[#0a0a0a] text-gray-500 rounded-xl border border-[#222]">
+        <ShieldAlert className="w-8 h-8 mb-4 animate-pulse text-red-500" /> 
+        <span className="text-xs font-bold uppercase tracking-widest">Cargando Inteligencia Crítica...</span>
+      </div>
+    )
+  });
 
 type ViewMode = 'list' | 'grid' | 'magazine';
 
@@ -14,7 +36,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+   const [activeCategory, setActiveCategory] = useState<string>('all');
+   const [blocklist, setBlocklist] = useState<string[]>(['pautas', 'anuncio', 'publicidad', 'clickbait']);
+   const [isFilterOpen, setIsFilterOpen] = useState(false);
   
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
@@ -40,7 +64,24 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         });
     }
 
-    // Keyword filter
+    // 1. DUPLICATE DETECTION: Keep only the first unique title (normalized)
+    const seen = new Set<string>();
+    result = result.filter(a => {
+        const signature = a.title.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+        if (seen.has(signature)) return false;
+        seen.add(signature);
+        return true;
+    });
+
+    // 2. CONTENT FILTER: Remove articles with blocklisted words
+    if (blocklist.length > 0) {
+        result = result.filter(a => {
+            const content = (a.title + ' ' + (a.description || '')).toLowerCase();
+            return !blocklist.some(word => word.length > 2 && content.includes(word.toLowerCase()));
+        });
+    }
+
+    // 3. Keyword/Search filter
     if (search.trim()) {
         const lowerSearch = search.toLowerCase();
         result = result.filter(a => {
@@ -53,7 +94,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         });
     }
     return result;
-  }, [initialArticles, search, feeds, activeCategory]);
+  }, [initialArticles, search, feeds, activeCategory, blocklist]);
 
   const stripHtml = (html: string) => html.replace(/<[^>]*>?/gm, '');
 
@@ -117,6 +158,18 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
             {activeTab === 'weather' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
             <Cloud className="w-5 h-5" />
             <span className="text-[9px] font-bold">Clima</span>
+          </button>
+
+          <button onClick={() => setActiveTab('reports')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'reports' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}`}>
+            {activeTab === 'reports' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
+            <FileText className="w-5 h-5" />
+            <span className="text-[9px] font-bold">Resúmenes</span>
+          </button>
+
+          <button onClick={() => setActiveTab('security')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'security' ? 'text-red-500' : 'text-gray-500 hover:text-gray-300'}`}>
+            {activeTab === 'security' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-red-600 rounded-r-md"></div>}
+            <ShieldCheck className="w-5 h-5" />
+            <span className="text-[9px] font-bold">Seguridad</span>
           </button>
         </nav>
         <div className="w-full space-y-4 pb-4 border-t border-[#1a1a1a] pt-4">
@@ -383,6 +436,219 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                           </div>
 
                    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-6 mt-6 mb-10">
+                          {/* 4. WEATHER DASHBOARD */}
+                  {activeTab === 'weather' && <WeatherDashboard />}
+
+                  {/* 5. REPORTS DASHBOARD (NEW) */}
+                  {activeTab === 'reports' && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex flex-col gap-8 pb-10"
+                    >
+                        <header className="flex flex-col gap-2">
+                           <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-2xl bg-orange-600/20 flex items-center justify-center">
+                                 <ShieldAlert className="w-5 h-5 text-orange-500" />
+                              </div>
+                              <h1 className="text-3xl font-black text-white tracking-tighter uppercase">Seguridad y Realidad Social</h1>
+                           </div>
+                           <p className="text-gray-500 text-sm max-w-2xl">Panorama estratégico integral desde la geopolítica internacional hasta la estabilidad social provincial.</p>
+                        </header>
+
+                        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+                            {/* CONFIGURATION COLUMN */}
+                            <div className="xl:col-span-4 flex flex-col gap-6">
+                                <section className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-3xl p-6 flex flex-col gap-6 shadow-2xl">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-gray-400">Configuración</h3>
+                                        <div className="flex h-2 w-2 relative">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-4">
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Frecuencia de Envío</label>
+                                            <div className="grid grid-cols-2 gap-2 bg-[#161616] p-1 rounded-xl">
+                                                <button className="py-2 rounded-lg bg-blue-600 text-white text-[11px] font-black uppercase">Diario</button>
+                                                <button className="py-2 rounded-lg text-gray-500 text-[11px] font-black uppercase hover:bg-white/5 transition-colors">Semanal</button>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Destino</label>
+                                            <div className="flex items-center gap-3 px-4 py-3 bg-[#161616] border border-[#222] rounded-xl">
+                                                <Bell className="w-4 h-4 text-orange-500" />
+                                                <span className="text-[11px] font-bold text-gray-300">Notificación en App y Email</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col gap-3 mt-2">
+                                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Ejes de Monitoreo</label>
+                                            <div className="space-y-2">
+                                                {['Seguridad Internacional', 'Paz Social Nacional', 'Resguardo Provincial', 'Conflictos Sociales'].map(cat => (
+                                                    <div key={cat} className="flex items-center justify-between px-3 py-2 bg-white/5 border border-white/5 rounded-lg">
+                                                        <span className="text-[11px] font-bold text-gray-300">{cat}</span>
+                                                        <div className="w-8 h-4 bg-orange-600 rounded-full relative"><div className="absolute right-1 top-1 w-2 h-2 bg-white rounded-full"></div></div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <button className="mt-4 w-full py-4 bg-white text-black font-black uppercase tracking-widest text-[11px] rounded-2xl hover:bg-blue-500 hover:text-white transition-all shadow-xl shadow-blue-900/10 active:scale-95">
+                                            Generar Reporte Ahora
+                                        </button>
+                                    </div>
+                                </section>
+                            </div>
+
+                            {/* PREVIEW/HISTORY COLUMN */}
+                            <div className="xl:col-span-8 flex flex-col gap-6">
+                                <section className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-3xl p-8 flex flex-col gap-6 shadow-2xl relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                                        <FileText className="w-48 h-48 text-blue-500" />
+                                    </div>
+
+                                    <div className="flex flex-col gap-1 z-10">
+                                        <span className="text-[10px] font-black text-orange-500 uppercase tracking-[0.2em]">Informe Semanal de Riesgos y Estabilidad</span>
+                                        <h2 className="text-2xl font-bold text-white tracking-tight">Análisis de Realidad Social Tierrafueguina</h2>
+                                        <p className="text-gray-500 text-xs mt-1">Sintetizado el {new Date().toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                    </div>
+
+                                    <div className="h-px bg-gradient-to-r from-orange-500/50 to-transparent z-10"></div>
+
+                                    <div className="flex flex-col gap-6 z-10">
+                                        {[1, 2, 3].map(i => (
+                                            <div key={i} className="flex gap-4 group/item">
+                                                <div className="text-orange-500 text-lg font-black italic">0{i}</div>
+                                                <div className="flex flex-col gap-1">
+                                                    <h4 className="text-[14px] font-bold text-gray-200 group-hover/item:text-orange-400 transition-colors">
+                                                        {i === 1 ? 'Amenazas Geopolíticas y Fronterizas' : i === 2 ? 'Indicadores de Conflictividad Social' : 'Seguridad en Infraestructura Crítica'}
+                                                    </h4>
+                                                    <p className="text-[11px] text-gray-400 leading-relaxed max-w-xl">
+                                                        {i === 1 ? 'Evaluación de los movimientos en los pasos fronterizos y dinámica migratoria regional.' : 
+                                                         i === 2 ? 'Análisis de paritarias y movimientos gremiales que impactan la estabilidad local.' : 
+                                                         'Detección de vulnerabilidades en servicios esenciales y logística estratégica.'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="mt-6 flex gap-4 z-10">
+                                        <button className="flex items-center gap-2 px-6 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-white/5 rounded-xl text-[10px] font-black uppercase text-gray-400 transition-all">
+                                            <ExternalLink className="w-3.5 h-3.5" /> Descargar PDF
+                                        </button>
+                                        <button className="flex items-center gap-2 px-6 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-white/5 rounded-xl text-[10px] font-black uppercase text-gray-400 transition-all">
+                                            <Share2 className="w-3.5 h-3.5" /> Compartir Informe
+                                        </button>
+                                    </div>
+                                </section>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="p-6 bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl flex flex-col gap-2">
+                                        <h4 className="text-[10px] font-black text-gray-500 uppercase">Integración IA</h4>
+                                        <p className="text-[11px] text-gray-400">El motor de IA analiza sentimientos y tendencias automáticamente antes de compilar el informe.</p>
+                                    </div>
+                                    <div className="p-6 bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl flex flex-col gap-2">
+                                        <h4 className="text-[10px] font-black text-gray-500 uppercase">Alertas Críticas</h4>
+                                        <p className="text-[11px] text-gray-400">Si se detecta una noticia de alta volatilidad, se genera un reporte extraordinario fuera de ciclo.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                  )}
+
+                  {/* 6. SECURITY CENTER */}
+                  {activeTab === 'security' && (
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex flex-col gap-8 pb-10 h-full"
+                    >
+                        <header className="flex flex-col gap-2">
+                           <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-2xl bg-red-600/20 flex items-center justify-center shadow-[0_0_20px_rgba(220,38,38,0.2)]" id="security-icon-container">
+                                 <ShieldCheck className="w-6 h-6 text-red-500" />
+                              </div>
+                              <div className="flex flex-col">
+                                <h1 className="text-3xl font-black text-white tracking-tighter uppercase leading-none">Security Audit Center</h1>
+                                <span className="text-[10px] font-bold text-red-500/80 uppercase tracking-[0.3em] mt-1">División Estratégica Regional (30A-EXP)</span>
+                              </div>
+                           </div>
+                        </header>
+
+                        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 flex-1 min-h-[700px]">
+                            {/* MAP COLUMN */}
+                            <div className="xl:col-span-8 h-full min-h-[500px]">
+                                <SecurityHeatMap />
+                            </div>
+
+                            {/* EXPERT ANALYSIS COLUMN */}
+                            <div className="xl:col-span-4 flex flex-col gap-6 overflow-y-auto pr-2 scrollbar-hide h-full max-h-[700px]">
+                                <section className="bg-gradient-to-br from-[#111] to-[#0a0a0a] border border-[#222] rounded-3xl p-7 flex flex-col gap-6 shadow-2xl relative border-t-red-600/50">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
+                                            <h3 className="text-xs font-black uppercase tracking-widest text-white">Dictamen de Auditoría</h3>
+                                        </div>
+                                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">REF: TDF-2026-X</span>
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        <div className="flex flex-col gap-3">
+                                            <p className="text-[11px] text-gray-400 leading-relaxed italic border-l-2 border-red-800 pl-4 bg-red-950/10 py-2 rounded-r-lg">
+                                                "Argentina hoy no permite improvisación. Tras 30 años en seguridad, observo una mutación del crimen hacia nodos logísticos. Tierra del Fuego, por su valor estratégico, requiere una compartimentación de seguridad por ciudad y un enfoque preventivo dinámico."
+                                            </p>
+                                        </div>
+
+                                        <div className="flex flex-col gap-4">
+                                           <h4 className="text-[12px] font-black text-white uppercase tracking-tight flex items-center gap-2">
+                                              <MapPin className="w-4 h-4 text-red-500" /> Desglose Operativo por Nodo
+                                           </h4>
+                                           <div className="space-y-5">
+                                              <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5 group hover:bg-orange-600/5 transition-colors">
+                                                 <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Río Grande: Foco Logístico</span>
+                                                 <p className="text-[11px] text-gray-400 leading-relaxed mt-1">Alta densidad industrial. Riesgo de infiltración y robo logístico. Necesidad de control biométrico y patrullaje predictivo en parques industriales.</p>
+                                              </div>
+                                              <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5 group hover:bg-blue-600/5 transition-colors">
+                                                 <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Ushuaia: Foco Turístico/Nocturno</span>
+                                                 <p className="text-[11px] text-gray-400 leading-relaxed mt-1">Vulnerabilidad por flujo estacional. Conflictividad en nocturnidad. Propuesta: Unidades satélites de respuesta rápida.</p>
+                                              </div>
+                                              <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5 group hover:bg-emerald-600/5 transition-colors">
+                                                 <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Tolhuin: Nodo de Filtrado Regional</span>
+                                                 <p className="text-[11px] text-gray-400 leading-relaxed mt-1">Punto táctico de control de arterias. Vital para prevenir el desplazamiento delictivo entre cabeceras.</p>
+                                              </div>
+                                           </div>
+                                        </div>
+
+                                        <div className="bg-white/5 p-5 rounded-2xl border border-white/5 flex flex-col gap-4">
+                                            <h4 className="text-[11px] font-black text-white uppercase tracking-widest flex items-center gap-2">
+                                                <TrendingUp className="w-4 h-4 text-emerald-500" /> Plan de Acción Preventivo
+                                            </h4>
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {[
+                                                    { t: 'Prevención', d: 'Patrullaje dinámico basado en hotspots de calor.' },
+                                                    { t: 'Estrategia', d: 'Protocolo de cierre de rutas USH/RGA ante incidentes.' },
+                                                    { t: 'Tecnología', d: 'Sensores de movimiento en perímetros críticos.' }
+                                                ].map(item => (
+                                                    <div key={item.t} className="flex flex-col p-2 bg-black/40 rounded-lg">
+                                                        <span className="text-[9px] font-black text-gray-300 uppercase underline decoration-emerald-500/50">{item.t}</span>
+                                                        <span className="text-[10px] text-gray-500 leading-tight">{item.d}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </motion.div>
+                  )}
+
                           {/* SHIP TRAFFIC SECTION */}
                           {activeTab === 'home' && !search && (
                              <div className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
