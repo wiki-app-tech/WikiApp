@@ -14,6 +14,16 @@ const EarthquakeMap = dynamic(() => import('./EarthquakeMap'), {
   )
 });
 
+const WeatherAlertMap = dynamic(() => import('./WeatherAlertMap'), {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-[#0a0a0a] text-gray-500 rounded-xl border border-[#222]">
+        <AlertTriangle className="w-8 h-8 mb-4 animate-pulse text-yellow-500" /> 
+        <span className="text-xs font-bold uppercase tracking-widest">Sincronizando Alertas SMN...</span>
+      </div>
+    )
+  });
+
 interface DailyForecast {
   time: string[];
   weatherCode: number[];
@@ -279,23 +289,20 @@ export default function WeatherDashboard() {
       {/* Alertas Tempranas y Sismos */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pb-8">
         
-        {/* SMN Alertas */}
-        <div className="bg-[#121212] border border-red-900/40 rounded-3xl p-6 relative overflow-hidden flex flex-col shadow-lg">
-           <div className="flex items-center gap-3 text-red-500 mb-4 z-10 shrink-0">
-              <AlertTriangle className="w-8 h-8" />
-              <h3 className="text-xl font-bold">Alertas Meteorológicas (SMN)</h3>
+        {/* SMN Alertas Custom Map */}
+        <div className="bg-[#121212] border border-[#222] rounded-3xl p-0 relative overflow-hidden flex flex-col shadow-lg group hover:border-[#333] transition-colors">
+           <div className="p-6 pb-4 flex items-center justify-between border-b border-[#222] bg-[#121212] z-10 shrink-0">
+              <div className="flex items-center gap-3 text-yellow-500">
+                 <AlertTriangle className="w-6 h-6" />
+                 <h3 className="text-lg font-bold text-white tracking-tight">Alertas Meteorológicas</h3>
+              </div>
+              <div className="flex gap-2">
+                 <span className="text-[9px] uppercase font-black bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded border border-yellow-500/20">Mapa Activo</span>
+              </div>
            </div>
-           <div className="flex-1 w-full bg-white rounded-xl overflow-hidden border border-[#333] min-h-[350px]">
-              <iframe 
-                 src="https://www.smn.gob.ar/alertas" 
-                 className="w-full h-full border-none"
-                 title="Alertas Oficiales SMN"
-                 sandbox="allow-scripts allow-same-origin allow-popups"
-              />
+           <div className="w-full h-[500px] bg-[#0c0c0c] relative isolate">
+              <WeatherAlertMap />
            </div>
-           <a href="https://www.smn.gob.ar/alertas" target="_blank" rel="noopener noreferrer" className="mt-4 flex items-center justify-center gap-2 bg-red-600/10 hover:bg-red-600/20 text-red-500 font-bold py-2 px-4 rounded-xl text-center transition-colors text-xs border border-red-500/20">
-              Ver alertas a pantalla completa <ExternalLink className="w-3 h-3" />
-           </a>
         </div>
 
         {/* Sismos y USGS */}

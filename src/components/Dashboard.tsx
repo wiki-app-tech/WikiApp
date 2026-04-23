@@ -75,8 +75,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
     <div className="flex h-screen bg-[#070707] dark:bg-[#070707] text-[#e0e0e0] font-sans overflow-hidden transition-colors duration-200">
       
       {/* 1. ULTRA SLIM FIXED SIDEBAR */}
-      <aside className="w-[72px] bg-[#0c0c0c] border-r border-[#1a1a1a] hidden lg:flex flex-col items-center shrink-0 z-20 py-4 gap-6">
-        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold tracking-tighter shadow-md cursor-pointer group hover:scale-105 transition-transform">
+      <aside className="w-[72px] bg-[#0c0c0c]/80 backdrop-blur-xl border-r border-[#1a1a1a] hidden lg:flex flex-col items-center shrink-0 z-20 py-4 gap-6">
+        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold tracking-tighter shadow-[0_0_15px_rgba(59,130,246,0.3)] cursor-pointer group hover:scale-105 transition-transform">
           MW
         </div>
         <nav className="flex-1 w-full space-y-4 overflow-y-auto scrollbar-hide py-2">
@@ -366,34 +366,34 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                 <div className="flex flex-col gap-4">
                                     
                                     {/* TRAMO 1 */}
-                                    <div className="bg-[#161616] border border-[#222] rounded-xl p-4 flex flex-col gap-2 relative group hover:border-[#333] transition-colors">
+                                    <div className="bg-[#161616]/40 backdrop-blur-md border border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative group hover:border-blue-500/50 hover:bg-[#1a1a1a]/60 cursor-pointer transition-all shadow-sm">
                                         <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-blue-500"/></div>
                                         <h4 className="text-[10px] uppercase font-black tracking-widest text-gray-500">Tramo Norte</h4>
                                         <h3 className="text-[13px] font-bold text-white">San Sebastián - Río Grande</h3>
-                                        <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">Tránsito habilitado. Monitoreo oficial por condiciones climáticas de la zona.</p>
-                                        <a href="https://www.facebook.com/SuDefensaCivil/" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-blue-500 hover:text-blue-400">
+                                        <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed opacity-80 group-hover:opacity-100">Tránsito habilitado. Monitoreo oficial por condiciones climáticas de la zona.</p>
+                                        <a href="https://www.facebook.com/SuDefensaCivil/" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-blue-500 hover:text-blue-400 transition-colors">
                                             Fuente: Defensa Civil <ExternalLink className="w-3 h-3"/>
                                         </a>
                                     </div>
 
                                     {/* TRAMO 2 */}
-                                    <div className="bg-[#161616] border border-[#222] rounded-xl p-4 flex flex-col gap-2 relative group hover:border-[#333] transition-colors">
+                                    <div className="bg-[#161616]/40 backdrop-blur-md border border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative group hover:border-emerald-500/50 hover:bg-[#1a1a1a]/60 cursor-pointer transition-all shadow-sm">
                                         <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-emerald-500"/></div>
                                         <h4 className="text-[10px] uppercase font-black tracking-widest text-gray-500">Tramo Centro</h4>
                                         <h3 className="text-[13px] font-bold text-white">Río Grande - Tolhuin</h3>
-                                        <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">Precaución permanente en zona geológica. Reportarse a los puestos de control.</p>
-                                        <a href="https://www.argentina.gob.ar/transporte/vialidad-nacional/estado-de-rutas" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-emerald-500 hover:text-emerald-400">
+                                        <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed opacity-80 group-hover:opacity-100">Precaución permanente en zona geológica. Reportarse a los puestos de control.</p>
+                                        <a href="https://www.argentina.gob.ar/transporte/vialidad-nacional/estado-de-rutas" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-emerald-500 hover:text-emerald-400 transition-colors">
                                             Fuente: Vialidad Nacional <ExternalLink className="w-3 h-3"/>
                                         </a>
                                     </div>
 
                                     {/* TRAMO 3 */}
-                                    <div className="bg-[#161616] border border-[#222] rounded-xl p-4 flex flex-col gap-2 relative group hover:border-[#333] transition-colors">
+                                    <div className="bg-[#161616]/40 backdrop-blur-md border border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative group hover:border-orange-500/50 hover:bg-[#1a1a1a]/60 cursor-pointer transition-all shadow-sm">
                                         <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-orange-400"/></div>
                                         <h4 className="text-[10px] uppercase font-black tracking-widest text-gray-500">Tramo Sur</h4>
                                         <h3 className="text-[13px] font-bold text-white">Tolhuin - Lapataia</h3>
-                                        <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">Zona de montaña. Transitabilidad sujeta a condiciones de hielo y nieve diaria.</p>
-                                        <a href="https://www.facebook.com/direccionprovincialdevialidadTDF/?locale=es_LA" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-orange-400 hover:text-orange-300">
+                                        <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed opacity-80 group-hover:opacity-100">Zona de montaña. Transitabilidad sujeta a condiciones de hielo y nieve diaria.</p>
+                                        <a href="https://www.facebook.com/direccionprovincialdevialidadTDF/?locale=es_LA" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-orange-400 hover:text-orange-300 transition-colors">
                                             Fuente: Vialidad Pcial <ExternalLink className="w-3 h-3"/>
                                         </a>
                                     </div>
