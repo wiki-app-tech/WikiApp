@@ -2,6 +2,17 @@
 
 import React, { useEffect, useState } from 'react';
 import { Cloud, CloudRain, CloudSnow, Sun, CloudFog, CloudLightning, Wind, Droplets, Thermometer, AlertCircle, Sunrise, Sunset, SunDim, AlertTriangle, Activity, ExternalLink } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const EarthquakeMap = dynamic(() => import('./EarthquakeMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-[#0a0a0a] text-gray-500 rounded-b-3xl border-t border-[#222]">
+      <Activity className="w-8 h-8 mb-4 animate-pulse text-blue-500" /> 
+      <span className="text-xs font-bold uppercase tracking-widest">Iniciando Motor Geológico...</span>
+    </div>
+  )
+});
 
 interface DailyForecast {
   time: string[];
@@ -289,7 +300,7 @@ export default function WeatherDashboard() {
 
         {/* Sismos y USGS */}
         <div className="bg-[#121212] border border-[#222] rounded-3xl p-0 flex flex-col shadow-lg overflow-hidden group hover:border-[#444] transition-colors relative">
-           <div className="p-6 pb-4 flex items-center justify-between border-b border-[#222]">
+           <div className="p-6 pb-4 flex items-center justify-between border-b border-[#222] bg-[#121212] z-10 shrink-0">
               <div className="flex items-center gap-3">
                  <Activity className="w-6 h-6 text-blue-500" />
                  <h3 className="text-lg font-bold text-white tracking-tight">Sismos en Tiempo Real</h3>
@@ -299,13 +310,8 @@ export default function WeatherDashboard() {
                  <a href="http://earg.fcaglp.unlp.edu.ar/sismologia/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-black bg-[#1a1a1a] hover:bg-[#222] px-2.5 py-1.5 rounded-lg text-gray-400 transition-colors">EARG</a>
               </div>
            </div>
-           <div className="w-full h-[320px] bg-[#0c0c0c] relative">
-              <iframe 
-                 src="https://earthquake.usgs.gov/earthquakes/map/?extent=-55.14121,-71.46606&extent=-53.38005,-65.75317"
-                 className="w-full h-full border-none opacity-80 group-hover:opacity-100 transition-opacity"
-                 title="USGS Earthquakes Map - Tierra del Fuego"
-                 loading="lazy"
-              />
+           <div className="w-full h-[500px] bg-[#0c0c0c] relative isolate">
+              <EarthquakeMap />
            </div>
         </div>
 
