@@ -67,12 +67,25 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
   const isYouTube = (url: string) => url?.includes('youtube.com') || url?.includes('youtu.be');
 
-  // Separating articles for the Top Visual Widget
-  const topVisualArticles = !search && activeCategory === 'all' ? filteredArticles.slice(0, 3) : [];
+  // Separating articles for the Top Visual Widget: 1 International, 1 National, 1 Provincial
+  const topVisualArticles = useMemo(() => {
+    if (search || activeTab !== 'home' || activeCategory !== 'all') return [];
+    
+    const findByCategory = (cat: string) => 
+        initialArticles.find(a => feeds.find(f => f.id === a.sourceId)?.category === cat);
+
+    const inter = findByCategory('internacional');
+    const nac = findByCategory('nacional');
+    const prov = findByCategory('provincial');
+    
+    return [inter, nac, prov].filter(Boolean) as Article[];
+  }, [initialArticles, search, activeTab, activeCategory, feeds]);
   
   // Logic for the main feed display: on home we show less, on explore we show more
+  // Also exclude top visual articles from the main list
   const feedArticlesToDisplay = useMemo(() => {
-    const base = topVisualArticles.length > 0 ? filteredArticles.slice(3) : filteredArticles;
+    const topIds = new Set(topVisualArticles.map(a => a.id));
+    const base = filteredArticles.filter(a => !topIds.has(a.id));
     if (activeTab === 'home' && !search) return base.slice(0, 10);
     return base.slice(0, 50);
   }, [filteredArticles, topVisualArticles, activeTab, search]);
@@ -207,9 +220,12 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                         <PlayCircle className="w-6 h-6" />
                                      </div>
                                   )}
-                                  {idx === 0 && !isVid && (
-                                     <div className="absolute top-4 right-4 bg-orange-600/90 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-lg flex items-center gap-1 backdrop-blur">
-                                        <Flame className="w-3 h-3" /> Fuego
+                                  {/* Category Badge with Fire Icon */}
+                                  {!isVid && (
+                                     <div className="absolute top-4 right-4 bg-orange-600/90 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-lg flex items-center gap-1 backdrop-blur ring-1 ring-white/20">
+                                        <Flame className="w-3 h-3" /> 
+                                        {feeds.find(f => f.id === article.sourceId)?.category === 'internacional' ? 'Internacional' : 
+                                         feeds.find(f => f.id === article.sourceId)?.category === 'nacional' ? 'Argentina' : 'TDF'}
                                      </div>
                                   )}
 
