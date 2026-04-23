@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -382,9 +382,10 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                              </motion.div>
                           </div>
 
-                          {/* SHIP TRAFFIC SECTION - NEW */}
+                   <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-6 mt-6 mb-10">
+                          {/* SHIP TRAFFIC SECTION */}
                           {activeTab === 'home' && !search && (
-                             <div className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col mb-10">
+                             <div className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
                                 <div className="flex items-center justify-between px-6 py-5 border-b border-[#1f1f1f] bg-[#0e0e0e]/90 backdrop-blur-sm">
                                     <div className="flex items-center gap-3">
                                         <div className="w-6 h-6 rounded bg-blue-600/20 flex items-center justify-center">
@@ -473,6 +474,93 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         <div className="w-2 h-2 rounded-full bg-gray-600"></div>
                                                         <span className="text-[11px] font-bold text-gray-300">ONASHAGA</span>
                                                         <span className="text-[9px] text-gray-500 ml-auto">Pasajeros</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                             </div>
+                           )}
+
+                           {/* FLIGHT TRAFFIC SECTION - NEW */}
+                           {activeTab === 'home' && !search && (
+                             <div className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+                                <div className="flex items-center justify-between px-6 py-5 border-b border-[#1f1f1f] bg-[#0e0e0e]/90 backdrop-blur-sm">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-6 h-6 rounded bg-orange-600/20 flex items-center justify-center">
+                                            <Plane className="w-3.5 h-3.5 text-orange-500" />
+                                        </div>
+                                        <h2 className="text-[13px] font-bold text-gray-200 tracking-wide uppercase">
+                                            Control de Arribos y Salidas (Aéreo)
+                                        </h2>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <a href="https://www.aeropuertoushuaia.com/" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-gray-500 hover:text-white flex items-center gap-1 transition-colors">
+                                            USH <ExternalLink className="w-3 h-3" />
+                                        </a>
+                                        <a href="https://www.aeropuertosdelmundo.com.ar/aeropuerto-RGA-llegadas/" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-gray-500 hover:text-white flex items-center gap-1 transition-colors">
+                                            RGA <ExternalLink className="w-3 h-3" />
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className="w-full h-[450px] relative bg-[#0c0c0c]">
+                                    <iframe 
+                                        src="https://www.radarbox.com/widget?lat=-54.8&lon=-68.3&z=8&theme=dark"
+                                        className="w-full h-full border-none opacity-90 hover:opacity-100 transition-opacity"
+                                        title="RadarBox - Tierra del Fuego"
+                                        loading="lazy"
+                                    />
+                                    
+                                    {/* FLOATING FLIGHT OVERLAY */}
+                                    <div className="absolute top-4 left-4 z-10 w-72 bg-[#0e0e0e]/95 backdrop-blur-xl border border-[#1f1f1f] rounded-2xl shadow-2xl p-4 pointer-events-auto">
+                                        <div className="flex items-center gap-2 mb-3 border-b border-[#1f1f1f] pb-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></div>
+                                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Tráfico Aéreo USH/RGA</h3>
+                                        </div>
+                                        
+                                        <div className="flex flex-col gap-4 max-h-[350px] overflow-y-auto scrollbar-hide pr-1">
+                                            {/* USH ARRIVALS */}
+                                            <div className="flex flex-col gap-2">
+                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-widest border-b border-white/5 pb-1">Ushuaia - Arribos</span>
+                                                <div className="flex flex-col gap-2.5">
+                                                    <div className="flex items-center justify-between group">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[11px] font-black text-white uppercase italic">AR 1886 <span className="text-[9px] font-normal text-gray-500 not-italic ml-1">AEP</span></span>
+                                                            <span className="text-[9px] text-emerald-500 font-bold">Llegó 14:23</span>
+                                                        </div>
+                                                        <div className="px-2 py-1 bg-emerald-500/10 rounded text-emerald-500 text-[9px] font-black">EN PISTA</div>
+                                                    </div>
+                                                    <div className="flex items-center justify-between group">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[11px] font-black text-white uppercase italic">AR 1898 <span className="text-[9px] font-normal text-gray-500 not-italic ml-1">FTE</span></span>
+                                                            <span className="text-[9px] text-blue-500 font-bold">Previsto 15:40</span>
+                                                        </div>
+                                                        <div className="px-2 py-1 bg-blue-500/10 rounded text-blue-500 text-[9px] font-black uppercase">En Vuelo</div>
+                                                    </div>
+                                                    <div className="flex items-center justify-between group">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[11px] font-black text-white uppercase italic">AR 1926 <span className="text-[9px] font-normal text-gray-500 not-italic ml-1">EZE</span></span>
+                                                            <span className="text-[9px] text-gray-400">Prog. 16:55</span>
+                                                        </div>
+                                                        <div className="px-2 py-1 bg-white/5 rounded text-gray-500 text-[9px] font-black uppercase">A Tiempo</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="h-px bg-[#1f1f1f]"></div>
+
+                                            {/* RGA STATUS */}
+                                            <div className="flex flex-col gap-2">
+                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-widest border-b border-white/5 pb-1">Río Grande - Próximo</span>
+                                                <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[11px] font-black text-white">AR 1866</span>
+                                                        <span className="text-[9px] text-gray-400">Desde AEP</span>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <span className="text-[10px] font-black text-gray-300">Mañana 02:20</span>
+                                                        <div className="text-[8px] text-gray-500 uppercase font-black">Programado</div>
                                                     </div>
                                                 </div>
                                             </div>
