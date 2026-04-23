@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -69,7 +69,13 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
   // Separating articles for the Top Visual Widget
   const topVisualArticles = !search && activeCategory === 'all' ? filteredArticles.slice(0, 3) : [];
-  const feedArticlesToDisplay = topVisualArticles.length > 0 ? filteredArticles.slice(3, 50) : filteredArticles.slice(0, 50);
+  
+  // Logic for the main feed display: on home we show less, on explore we show more
+  const feedArticlesToDisplay = useMemo(() => {
+    const base = topVisualArticles.length > 0 ? filteredArticles.slice(3) : filteredArticles;
+    if (activeTab === 'home' && !search) return base.slice(0, 10);
+    return base.slice(0, 50);
+  }, [filteredArticles, topVisualArticles, activeTab, search]);
 
   return (
     <div className="flex h-screen bg-[#070707] dark:bg-[#070707] text-[#e0e0e0] font-sans overflow-hidden transition-colors duration-200">
@@ -345,8 +351,52 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                  {feedArticlesToDisplay.length === 0 && (
                                     <div className="p-8 text-center text-sm text-gray-500">Sin artículos recientes compatibles.</div>
                                  )}
+                                 
+                                 {/* VER + BUTTON FOR HOME */}
+                                 {activeTab === 'home' && !search && (filteredArticles.length - topVisualArticles.length) > 10 && (
+                                    <div className="p-6 border-t border-[#1f1f1f] flex justify-center bg-[#0e0e0e]/50">
+                                        <button 
+                                            onClick={() => setActiveTab('explore')}
+                                            className="flex items-center gap-2 px-6 py-2.5 bg-[#1a1a1a] hover:bg-[#222] border border-[#333] rounded-full text-[11px] font-black uppercase tracking-widest text-blue-500 hover:text-blue-400 transition-all group font-bold"
+                                        >
+                                            Ver + Noticias <ChevronRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+                                        </button>
+                                    </div>
+                                 )}
                              </motion.div>
                           </div>
+
+                          {/* SHIP TRAFFIC SECTION - NEW */}
+                          {activeTab === 'home' && !search && (
+                             <div className="bg-[#0e0e0e] border border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col mb-10">
+                                <div className="flex items-center justify-between px-6 py-5 border-b border-[#1f1f1f] bg-[#0e0e0e]/90 backdrop-blur-sm">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-6 h-6 rounded bg-blue-600/20 flex items-center justify-center">
+                                            <Anchor className="w-3.5 h-3.5 text-blue-500" />
+                                        </div>
+                                        <h2 className="text-[13px] font-bold text-gray-200 tracking-wide uppercase">
+                                            Arribo de Barcos y Cruceros
+                                        </h2>
+                                    </div>
+                                    <a 
+                                        href="https://www.argentina.gob.ar/economia/agencia-nacional-de-puertos-y-navegacion/puertos/puerto-de-ushuaia" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-[10px] font-bold text-gray-500 hover:text-white flex items-center gap-1 transition-colors"
+                                    >
+                                        INFO OFICIAL <ExternalLink className="w-3 h-3" />
+                                    </a>
+                                </div>
+                                <div className="w-full h-[450px] relative bg-[#0c0c0c]">
+                                    <iframe 
+                                        src="https://www.marinetraffic.com/en/ais/embed/zoom:9/centery:-54.7/centerx:-67.5/maptype:0/shownames:false"
+                                        className="w-full h-full border-none opacity-90 hover:opacity-100 transition-opacity"
+                                        title="Marine Traffic - Puerto de Ushuaia"
+                                        loading="lazy"
+                                    />
+                                </div>
+                             </div>
+                           )}
                       </div>
 
                       {/* RIGHT COLUMN (CHECKLIST) FOR HOME */}
