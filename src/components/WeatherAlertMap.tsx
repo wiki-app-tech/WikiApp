@@ -62,27 +62,33 @@ const WeatherAlertMap = () => {
   return (
     <div className="relative w-full h-full rounded-xl overflow-hidden bg-[#0c0c0c] border border-[#222]">
       
-      {/* Panel de Alertas en Tiempo Real */}
-      <div className="absolute top-4 left-4 z-[400] w-72 pointer-events-none hidden md:block">
-         <div className="bg-black/80 backdrop-blur-xl border border-[#333] rounded-2xl p-4 shadow-2xl pointer-events-auto">
-            <div className="flex items-center gap-2 mb-3 border-b border-[#333] pb-2 text-yellow-500">
-               <AlertTriangle className="w-4 h-4" />
-               <h3 className="text-[10px] font-black uppercase tracking-widest">Alertas SMN</h3>
+      {/* Panel de Alertas en Tiempo Real - Responsive */}
+      <div className="absolute top-4 left-4 z-[400] w-[calc(100%-32px)] sm:w-72 pointer-events-none">
+         <div className="bg-black/70 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-5 shadow-[0_8px_32px_rgba(0,0,0,0.5)] pointer-events-auto overflow-hidden">
+            <div className="flex items-center gap-3 mb-4 border-b border-white/5 pb-3 text-yellow-500">
+               <div className="w-8 h-8 rounded-xl bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
+                  <AlertTriangle className="w-4 h-4 shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
+               </div>
+               <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90">Alertas SMN</h3>
             </div>
-            <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
+            <div className="flex flex-col gap-4 max-h-[350px] overflow-y-auto pr-2 scrollbar-hide">
                {tdfAlerts.length > 0 ? tdfAlerts.map((alert, i) => (
-                  <div key={i} className="flex flex-col gap-1 border-b border-white/5 pb-2 last:border-0 hover:bg-white/5 p-1 rounded transition-colors group cursor-default">
-                     <span className="text-[11px] font-bold text-white group-hover:text-yellow-400 leading-tight">
+                  <div key={i} className="flex flex-col gap-2 border-b border-white/5 pb-4 last:border-0 hover:bg-white/[0.02] p-2 rounded-2xl transition-all group cursor-default">
+                     <span className="text-[12px] font-black text-white group-hover:text-yellow-400 leading-tight tracking-tight uppercase">
                         {alert.title}
                      </span>
-                     <span className="text-[9px] text-gray-500">{alert.date}</span>
-                     <p className="text-[10px] text-gray-400 line-clamp-2 mt-1 italic leading-snug">
+                     <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-gray-500">
+                        <span>{alert.date}</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></div>
+                     </div>
+                     <p className="text-[11px] text-gray-400 line-clamp-3 mt-1 font-medium leading-relaxed italic opacity-70 group-hover:opacity-100 transition-opacity">
                         {alert.description}
                      </p>
                   </div>
                )) : (
-                <div className="py-2 text-center">
-                    <span className="text-[10px] font-bold text-gray-500 uppercase italic">Sin alertas vigentes en TDF</span>
+                <div className="py-6 text-center flex flex-col items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Territorio Sin Alertas Activas</span>
                 </div>
                )}
             </div>

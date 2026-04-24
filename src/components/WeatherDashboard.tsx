@@ -166,15 +166,15 @@ export default function WeatherDashboard() {
         </div>
         
         {/* City Tabs */}
-        <div className="flex overflow-x-auto scrollbar-hide gap-2 p-1 bg-[var(--color-surface-elevated)] border border-[var(--color-border-subtle)] rounded-2xl w-full md:w-auto">
+        <div className="flex overflow-x-auto scrollbar-hide gap-1 p-1 bg-black/20 backdrop-blur-xl border border-white/5 rounded-2xl w-full md:w-auto">
           {dataList.map((loc, idx) => (
             <button
               key={loc.id}
               onClick={() => setSelectedIndex(idx)}
-              className={`whitespace-nowrap px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 ${
+              className={`whitespace-nowrap px-6 py-2.5 text-[11px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${
                 selectedIndex === idx 
-                  ? 'bg-[var(--color-accent-primary)] text-white shadow-md' 
-                  : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-sunken)] hover:text-[var(--color-text-primary)]'
+                  ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]' 
+                  : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'
               }`}
             >
               {loc.name}
@@ -209,8 +209,8 @@ export default function WeatherDashboard() {
                 </p>
               </div>
 
-              <div className="flex items-baseline mt-8 gap-3">
-                <span className="text-8xl md:text-9xl font-black tracking-tighter drop-shadow-md">
+              <div className="flex items-baseline mt-8 gap-4">
+                <span className="text-[120px] md:text-[140px] font-black tracking-tighter leading-none drop-shadow-2xl">
                   {currentData.current.temperature.toFixed(0)}°
                 </span>
               </div>
@@ -263,18 +263,20 @@ export default function WeatherDashboard() {
               </div>
 
               {/* 7-Day Forecast */}
-              <div className="bg-black/10 backdrop-blur-xl border border-white/10 rounded-3xl p-6 flex-1">
-                <h3 className="text-sm font-black uppercase tracking-widest text-white/70 mb-4">Pronóstico {currentData.daily.time.length} Días</h3>
-                <div className="grid grid-cols-7 gap-2 h-full">
-                  {currentData.daily.time.map((timeString, idx) => (
-                    <div key={timeString} className="flex flex-col items-center justify-between pb-2 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors cursor-default">
-                      <span className="text-[11px] font-bold mt-3 uppercase text-white/80">{getDayName(timeString, idx)}</span>
-                      <div className="my-2">
-                        {getWeatherIcon(currentData.daily.weatherCode[idx], "w-6 h-6")}
+              <div className="bg-black/20 backdrop-blur-3xl border border-white/5 rounded-[2rem] p-6 flex-1 shadow-inner">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-6 flex items-center gap-2">
+                    <Cloud className="w-3.5 h-3.5 opacity-50" /> Pronóstico {currentData.daily.time.length} Días
+                </h3>
+                <div className="grid grid-cols-4 md:grid-cols-7 gap-3 h-full">
+                  {currentData.daily.time.slice(0, 7).map((timeString, idx) => (
+                    <div key={timeString} className={`flex flex-col items-center justify-between py-4 rounded-2xl transition-all duration-300 border border-white/0 hover:border-white/10 ${idx === 0 ? 'bg-white/10 ring-1 ring-white/20' : 'bg-white/5 hover:bg-white/10'}`}>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-white/70">{getDayName(timeString, idx)}</span>
+                      <div className="my-3 transform hover:scale-110 transition-transform">
+                        {getWeatherIcon(currentData.daily.weatherCode[idx], "w-8 h-8")}
                       </div>
-                      <div className="flex flex-col items-center gap-1">
-                        <span className="text-sm font-bold">{currentData.daily.temperatureMax[idx].toFixed(0)}°</span>
-                        <span className="text-xs font-semibold text-white/50">{currentData.daily.temperatureMin[idx].toFixed(0)}°</span>
+                      <div className="flex flex-col items-center gap-0.5">
+                        <span className="text-lg font-black tracking-tight">{currentData.daily.temperatureMax[idx].toFixed(0)}°</span>
+                        <span className="text-[10px] font-bold text-white/40">{currentData.daily.temperatureMin[idx].toFixed(0)}°</span>
                       </div>
                     </div>
                   ))}

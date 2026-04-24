@@ -336,9 +336,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                     </h2>
                                 </div>
                             </div>
-                            
-                            <motion.div layout className={`flex ${viewMode === 'list' ? 'flex-col' : viewMode === 'grid' ? 'flex-row flex-wrap p-4 gap-4' : 'flex-col p-4 gap-6'}`}>
-                                <AnimatePresence>
+                                                   <motion.div layout className={`flex ${viewMode === 'list' ? 'flex-col shadow-inner' : viewMode === 'grid' ? 'flex-row flex-wrap p-4 md:p-6 gap-6' : 'flex-col p-2 md:p-4'}`}>
+                                <AnimatePresence mode="popLayout">
                                     {feedArticlesToDisplay.map(article => {
                                         const sourceName = feeds.find(f => f.id === article.sourceId)?.name || 'Fuente';
                                         const isVid = isYouTube(article.link);
@@ -346,27 +345,31 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                         // VIEW: LIST
                                         if (viewMode === 'list') return (
                                             <motion.div 
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                exit={{ opacity: 0 }}
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: 10 }}
                                                 key={article.id} 
                                                 onClick={() => setSelectedArticle(article)}
-                                                className="group flex flex-col sm:flex-row sm:items-center px-4 py-2.5 border-b border-[#181818] hover:bg-[#161616] cursor-pointer transition-colors"
+                                                className="group flex flex-col sm:flex-row sm:items-center px-6 py-4 border-b border-white/5 hover:bg-white/[0.03] cursor-pointer transition-all border-l-2 border-l-transparent hover:border-l-blue-600 shadow-sm"
                                             >
-                                                <div className="hidden sm:flex w-6 shrink-0 items-center justify-center text-gray-600 group-hover:text-blue-500">
-                                                    {isVid ? <PlayCircle className="w-4 h-4 text-red-500/80 group-hover:text-red-500" /> : <ChevronRight className="w-4 h-4" />}
-                                                </div>
-                                                <div className="flex-1 min-w-0 pr-4 pl-2">
-                                                    <h3 className="text-sm font-semibold text-gray-300 group-hover:text-white truncate">
-                                                        {article.title}
-                                                    </h3>
-                                                    <div className="hidden sm:block text-[11px] text-gray-500 truncate mt-0.5">
-                                                        {stripHtml(article.description || '').slice(0, 100)}...
+                                                <div className="hidden sm:flex w-10 shrink-0 items-center justify-center">
+                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isVid ? 'bg-red-500/10' : 'bg-blue-500/10'}`}>
+                                                        {isVid ? <PlayCircle className="w-4 h-4 text-red-500" /> : <ChevronRight className="w-4 h-4 text-blue-500" />}
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center justify-between sm:justify-end gap-3 mt-2 sm:mt-0 shrink-0 w-full sm:w-48 text-[11px] text-gray-500 font-medium">
-                                                   <span className="truncate max-w-[100px] border border-[#222] px-2 py-0.5 rounded backdrop-blur bg-[#111]">{sourceName}</span>
-                                                   <span className="shrink-0">{getRelativeTime(article.pubDate)}</span>
+                                                <div className="flex-1 min-w-0 pr-4 pl-2 space-y-1">
+                                                    <h3 className="text-[14px] font-bold text-gray-200 group-hover:text-white truncate tracking-tight transition-colors">
+                                                        {article.title}
+                                                    </h3>
+                                                    <div className="hidden md:flex items-center gap-2 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                                                       <span className="text-blue-500/80">{sourceName}</span>
+                                                       <span className="opacity-30">•</span>
+                                                       <span>{getRelativeTime(article.pubDate)}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3 mt-2 sm:mt-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-gray-400 hover:text-green-500 rounded-lg transition-all"><MessageCircle className="w-4 h-4" /></button>
+                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 rounded-lg transition-all"><Send className="w-4 h-4" /></button>
                                                 </div>
                                             </motion.div>
                                         );
@@ -374,72 +377,78 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                         // VIEW: GRID
                                         if (viewMode === 'grid') return (
                                             <motion.div 
-                                                initial={{ scale: 0.9, opacity: 0 }}
-                                                animate={{ scale: 1, opacity: 1 }}
-                                                key={article.id}
+                                                initial={{ opacity: 0, scale: 0.95 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                key={article.id} 
                                                 onClick={() => setSelectedArticle(article)}
-                                                className="w-full sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] bg-[#141414] border border-[#222] rounded-xl overflow-hidden cursor-pointer hover:border-gray-600 transition-all flex flex-col group"
+                                                className="group relative w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-white/[0.02] border border-white/5 rounded-[1.5rem] overflow-hidden hover:border-blue-600/30 hover:bg-white/[0.04] transition-all cursor-pointer flex flex-col shadow-lg"
                                             >
                                                 {article.thumbnail && (
-                                                   <div className="w-full h-32 relative overflow-hidden">
-                                                      <img src={article.thumbnail} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt=""/>
-                                                      {isVid && <div className="absolute inset-0 flex items-center justify-center bg-black/30"><PlayCircle className="w-8 h-8 text-white drop-shadow-md" /></div>}
-                                                   </div>
+                                                    <div className="aspect-[16/10] overflow-hidden relative">
+                                                        <img src={article.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] to-transparent opacity-80"></div>
+                                                        {isVid && (
+                                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                                <div className="w-12 h-12 rounded-full bg-red-600/20 backdrop-blur-md flex items-center justify-center border border-red-500/30 group-hover:scale-110 transition-transform">
+                                                                    <PlayCircle className="w-6 h-6 text-red-500" />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 )}
-                                                <div className="p-4 flex-1 flex flex-col z-10 w-full min-w-0">
-                                                   <div className="text-[9px] font-black text-blue-500 uppercase tracking-widest mb-2 line-clamp-1">{sourceName}</div>
-                                                   <h3 className="text-[14px] font-bold text-gray-200 line-clamp-2 leading-snug group-hover:text-blue-400 mb-2">{article.title}</h3>
-                                                   <p className="text-[11px] text-gray-400 line-clamp-3 leading-relaxed mb-3 flex-1 flex-col justify-start">
-                                                       {stripHtml(article.description || '')}
-                                                   </p>
-                                                   <div className="mt-auto flex items-center justify-between border-t border-[#1f1f1f] pt-3">
-                                                       <span className="text-[10px] text-gray-600">{getRelativeTime(article.pubDate)}</span>
-                                                       <div className="flex items-center gap-2 shrink-0">
-                                                            <button 
-                                                                onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }}
-                                                                className="text-gray-500 hover:text-green-500 transition-colors p-1 bg-[#1a1a1a] hover:bg-[#222] rounded shadow-sm"
-                                                                title="Compartir en WhatsApp"
-                                                            >
-                                                                <MessageCircle className="w-4 h-4" />
-                                                            </button>
-                                                            <button 
-                                                                onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }}
-                                                                className="text-gray-500 hover:text-blue-400 transition-colors p-1 bg-[#1a1a1a] hover:bg-[#222] rounded shadow-sm"
-                                                                title="Compartir en Telegram"
-                                                            >
-                                                               <Send className="w-4 h-4" />
-                                                            </button>
-                                                       </div>
-                                                   </div>
+                                                <div className="p-5 flex flex-col flex-1 gap-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-600/10 px-2 py-0.5 rounded border border-blue-500/20">{sourceName}</span>
+                                                        <span className="text-[9px] text-gray-500 font-bold">{getRelativeTime(article.pubDate)}</span>
+                                                    </div>
+                                                    <h3 className="text-[13px] font-bold text-gray-200 group-hover:text-white leading-[1.4] line-clamp-2 transition-colors">
+                                                        {article.title}
+                                                    </h3>
                                                 </div>
                                             </motion.div>
                                         );
 
                                         // VIEW: MAGAZINE
-                                        return (
+                                        if (viewMode === 'magazine') return (
                                             <motion.div 
-                                                initial={{ y: 20, opacity: 0 }}
-                                                animate={{ y: 0, opacity: 1 }}
-                                                key={article.id}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: 20 }}
+                                                key={article.id} 
                                                 onClick={() => setSelectedArticle(article)}
-                                                className="w-full group bg-transparent border-none cursor-pointer flex flex-col md:flex-row gap-6 mb-2 hover:bg-[#111] p-2 rounded-xl transition-colors"
+                                                className="group flex flex-col lg:flex-row gap-6 md:gap-8 p-4 md:p-8 border-b border-white/5 hover:bg-white/[0.01] transition-all cursor-pointer relative overflow-hidden"
                                             >
-                                                {article.thumbnail && (
-                                                   <div className="w-full md:w-64 h-48 md:h-36 shrink-0 relative rounded-xl overflow-hidden">
-                                                      <img src={article.thumbnail} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt=""/>
-                                                      {isVid && <div className="absolute inset-0 flex items-center justify-center bg-black/40"><PlayCircle className="w-10 h-10 text-red-500 drop-shadow-lg" /></div>}
-                                                   </div>
-                                                )}
-                                                <div className="flex-1 py-1">
-                                                   <div className="flex items-center gap-2 mb-2">
-                                                      <span className="text-[10px] font-black text-blue-500 uppercase bg-blue-500/10 px-2 py-0.5 rounded">{sourceName}</span>
-                                                      <span className="text-[11px] text-gray-500">{getRelativeTime(article.pubDate)}</span>
-                                                   </div>
-                                                   <h3 className="text-xl font-bold text-gray-200 line-clamp-2 leading-tight group-hover:text-blue-400 mb-2">{article.title}</h3>
-                                                   <p className="text-sm text-gray-500 line-clamp-2">{stripHtml(article.description || '')}</p>
+                                                <div className="w-full lg:w-[350px] aspect-[16/9] lg:h-[200px] shrink-0 overflow-hidden rounded-[2rem] relative shadow-2xl">
+                                                    <img src={article.thumbnail || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=600'} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                                                    {isVid && (
+                                                        <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-red-600/80 backdrop-blur-md px-3 py-1 rounded-full border border-red-500/50">
+                                                            <PlayCircle className="w-4 h-4 text-white" />
+                                                            <span className="text-[10px] font-black text-white uppercase tracking-widest">Video</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-col flex-1 justify-center gap-4">
+                                                    <div className="flex items-center gap-4">
+                                                       <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">{sourceName}</span>
+                                                       <div className="w-1.5 h-1.5 rounded-full bg-blue-500/20"></div>
+                                                       <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{getRelativeTime(article.pubDate)}</span>
+                                                    </div>
+                                                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-gray-100 group-hover:text-white leading-[1.1] tracking-tighter transition-colors max-w-3xl">
+                                                        {article.title}
+                                                    </h3>
+                                                    <p className="text-[15px] text-gray-400 line-clamp-2 leading-relaxed font-medium max-w-2xl">
+                                                        {stripHtml(article.description || '').slice(0, 250)}...
+                                                    </p>
+                                                    <div className="flex items-center gap-3 mt-2">
+                                                        <span className="text-[11px] font-black text-blue-500 uppercase tracking-widest border border-blue-500/30 px-4 py-2 rounded-full hover:bg-blue-500 hover:text-white transition-all">Leer Articulo Completo</span>
+                                                    </div>
                                                 </div>
                                             </motion.div>
                                         );
+
+                                        return null;
                                     })}
                                 </AnimatePresence>
                                  {feedArticlesToDisplay.length === 0 && (
