@@ -26,16 +26,16 @@ const SecurityHeatMap = () => {
   return (
     <div className="relative w-full h-full rounded-2xl overflow-hidden bg-[#0c0c0c] border border-[#222] shadow-2xl">
       
-      {/* Resumen Táctico Flotante */}
-      <div className="absolute top-6 left-6 z-[400] w-80 pointer-events-none">
-         <div className="bg-black/90 backdrop-blur-2xl border border-orange-500/30 rounded-3xl p-6 shadow-[0_0_50px_rgba(249,115,22,0.15)] pointer-events-auto">
-            <div className="flex items-center gap-3 mb-4 border-b border-orange-500/20 pb-3">
-               <div className="w-10 h-10 rounded-xl bg-orange-600/20 flex items-center justify-center">
+      {/* Resumen Táctico Flotante - Responsive */}
+      <div className="absolute top-4 left-4 z-[400] w-[calc(100%-32px)] sm:w-80 pointer-events-none">
+         <div className="bg-black/80 backdrop-blur-3xl border border-white/10 rounded-3xl p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)] pointer-events-auto">
+            <div className="flex items-center gap-3 mb-4 border-b border-white/5 pb-3">
+               <div className="w-10 h-10 rounded-xl bg-orange-600/20 flex items-center justify-center shrink-0">
                   <TrendingUp className="w-5 h-5 text-orange-500" />
                </div>
-               <div className="flex flex-col">
-                  <h3 className="text-[12px] font-black text-white uppercase tracking-widest">Mapa de Calor</h3>
-                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tight italic text-orange-500/80 underline decoration-orange-500/40 underline-offset-4">Topografía de Riesgos 2026</span>
+               <div className="flex flex-col min-w-0">
+                  <h3 className="text-[11px] font-black text-white uppercase tracking-widest truncate">Mapa de Riesgos Tácticos</h3>
+                  <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tight italic text-orange-500/80">Auditoría 2026-Q2</span>
                </div>
             </div>
             

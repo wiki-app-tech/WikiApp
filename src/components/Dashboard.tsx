@@ -132,7 +132,14 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   }, [filteredArticles, topVisualArticles, activeTab, search]);
 
   return (
-    <div className="flex h-screen bg-[#070707] dark:bg-[#070707] text-[#e0e0e0] font-sans overflow-hidden transition-colors duration-200">
+    <div className="flex h-screen bg-[#070707] dark:bg-[#070707] text-[#e0e0e0] font-sans overflow-hidden transition-colors duration-200 relative">
+      {/* Animated Mesh Gradient Background */}
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none overflow-hidden">
+        <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-blue-600/30 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-orange-600/20 rounded-full blur-[100px] animate-pulse [animation-delay:2s]"></div>
+        <div className="absolute -bottom-[20%] left-[20%] w-[50%] h-[50%] bg-red-600/20 rounded-full blur-[100px] animate-pulse [animation-delay:4s]"></div>
+      </div>
+
       
       {/* 1. ULTRA SLIM FIXED SIDEBAR */}
       <aside className="w-[72px] bg-[#0c0c0c]/80 backdrop-blur-xl border-r border-[#1a1a1a] hidden lg:flex flex-col items-center shrink-0 z-20 py-4 gap-6">
@@ -182,19 +189,37 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
       <main className="flex-1 flex flex-col min-w-0 relative">
         
         {/* INOREADER STYLE TOP NAVIGATION */}
-        <div className="px-4 py-3 md:px-8 shrink-0 z-30 sticky top-0 bg-[#070707]/90 backdrop-blur-xl border-b border-[#1a1a1a]">
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                   <h1 className="text-xl font-bold text-white tracking-tight">
-                       {activeTab === 'home' ? 'Dashboards' : activeTab === 'explore' ? 'Feeds' : 'Clima'}
-                   </h1>
-                   <ChevronRight className="w-4 h-4 text-gray-500" />
+        <div className="px-4 py-4 md:px-8 shrink-0 z-30 sticky top-0 bg-[#070707]/60 backdrop-blur-2xl border-b border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                   <div className="lg:hidden w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.4)] mr-2 shrink-0">
+                      <LayoutDashboard className="w-4 h-4 text-white" />
+                   </div>
+                   <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                      <h1 className="text-lg md:text-xl font-black text-white tracking-widest uppercase">
+                         WikiApp <span className="text-[9px] bg-blue-500/20 px-2 py-0.5 rounded-full text-blue-400 font-black border border-blue-500/20 ml-1">PRO-V2</span>
+                      </h1>
+                      <div className="flex items-center gap-2">
+                        <ChevronRight className="w-3 h-3 text-gray-700 hidden md:block" />
+                        <span className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest">
+                            {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'security' ? 'Centro de Auditoría' : 'Sistema'}
+                        </span>
+                      </div>
+                   </div>
                 </div>
-                <div className="flex items-center gap-4 text-gray-400">
-                    <button className="hover:text-white transition-colors"><Cloud className="w-4 h-4" /></button>
-                    <button className="hover:text-white transition-colors"><MoreHorizontal className="w-4 h-4" /></button>
+                <div className="flex items-center gap-2 md:gap-6">
+                    <div className="hidden sm:flex items-center gap-1 text-[9px] font-black text-gray-500 uppercase tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1"></span>
+                        Sincronización <span className="text-emerald-500/80 ml-1">OK</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <button className="p-2 text-gray-500 hover:text-white transition-all hover:bg-white/5 rounded-xl"><Cloud className="w-4 h-4 md:w-5 md:h-5" /></button>
+                        <button className="p-2 text-gray-500 hover:text-white transition-all hover:bg-white/5 rounded-xl"><Search className="w-4 h-4 md:w-5 md:h-5" /></button>
+                        <button className="p-2 text-gray-500 hover:text-white transition-all hover:bg-white/5 rounded-xl"><MoreHorizontal className="w-4 h-4 md:w-5 md:h-5" /></button>
+                    </div>
                 </div>
             </div>
+        </div>
             
             {/* Dynamic Category Tabs for Home */}
             {activeTab === 'home' && (
@@ -223,8 +248,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         </div>
 
         {/* CONTENIDO SCROLL */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8">
-          <div className="max-w-[1400px] mx-auto space-y-6">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8 relative z-10 scrollbar-hide">
+          <div className="max-w-[1600px] mx-auto space-y-6">
             
             {activeTab === 'weather' ? (
               <WeatherDashboard />
@@ -581,14 +606,14 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                            </div>
                         </header>
 
-                        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 flex-1 min-h-[700px]">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1 min-h-[500px] lg:min-h-[700px]">
                             {/* MAP COLUMN */}
-                            <div className="xl:col-span-8 h-full min-h-[500px]">
+                            <div className="lg:col-span-12 xl:col-span-8 h-[400px] sm:h-[500px] xl:h-full">
                                 <SecurityHeatMap />
                             </div>
 
                             {/* EXPERT ANALYSIS COLUMN */}
-                            <div className="xl:col-span-4 flex flex-col gap-6 overflow-y-auto pr-2 scrollbar-hide h-full max-h-[700px]">
+                            <div className="lg:col-span-12 xl:col-span-4 flex flex-col gap-6 overflow-y-auto pr-2 scrollbar-hide h-full max-h-[700px]">
                                 <section className="bg-gradient-to-br from-[#111] to-[#0a0a0a] border border-[#222] rounded-3xl p-7 flex flex-col gap-6 shadow-2xl relative border-t-red-600/50">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
@@ -924,19 +949,23 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
       {/* MOBILE FLOATING BOTTOM NAV (Si fuera necesario ajustar luego) */}
       <div className="lg:hidden fixed bottom-6 left-4 right-4 z-40">
-        <nav className="bg-[#111]/90 backdrop-blur-xl border border-[#333] shadow-2xl rounded-2xl h-16 flex items-center justify-around px-2">
-            {['home', 'explore', 'weather'].map((tab) => {
-               const icons: any = { home: LayoutDashboard, explore: Compass, weather: Cloud };
-               const Icon = icons[tab];
-               const titles: any = { home: 'INICIO', explore: 'FEEDS', weather: 'CLIMA' };
+        <nav className="bg-[#0c0c0c]/90 backdrop-blur-3xl border border-white/10 shadow-[0_-8px_32px_rgba(0,0,0,0.5)] rounded-2xl h-18 flex items-center justify-around px-4">
+            {[
+              { id: 'home', icon: LayoutDashboard, label: 'Inicio' },
+              { id: 'explore', icon: Compass, label: 'Feeds' },
+              { id: 'weather', icon: Cloud, label: 'Clima' },
+              { id: 'reports', icon: FileText, label: 'Reportes' },
+              { id: 'security', icon: ShieldCheck, label: 'Seguridad' }
+            ].map((item) => {
+               const Icon = item.icon;
                return (
                 <button 
-                  key={tab}
-                  onClick={() => setActiveTab(tab)} 
-                  className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 w-16 ${activeTab === tab ? 'text-blue-500 bg-blue-500/10' : 'text-gray-500 hover:text-gray-300'}`}
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)} 
+                  className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 w-full ${activeTab === item.id ? 'text-blue-500 scale-110' : 'text-gray-500 hover:text-gray-300'}`}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-[9px] font-bold mt-1">{titles[tab]}</span>
+                  <Icon className={`w-5 h-5 ${activeTab === item.id ? 'drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]' : ''}`} />
+                  <span className={`text-[8px] font-black mt-1 uppercase tracking-tighter ${activeTab === item.id ? 'opacity-100' : 'opacity-60'}`}>{item.label}</span>
                 </button>
                );
             })}
