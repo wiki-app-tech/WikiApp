@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -220,28 +220,65 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                 </div>
             </div>
         </div>
-            
-            {/* Dynamic Category Tabs for Home */}
+                     {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
             {activeTab === 'home' && (
-                <div className="flex gap-6 overflow-x-auto scrollbar-hide text-[11px] font-black tracking-wider uppercase items-center pb-2">
-                    {dashboardCats.map(cat => {
-                        const label = cat === 'all' ? 'HOME' : cat === 'internacional' ? 'INTERNACIONALES' : cat === 'nacional' ? 'ARGENTINAS' : cat === 'provincial' ? 'TIERRA DEL FUEGO' : cat;
-                        return (
-                           <button 
-                              key={cat} 
-                              onClick={() => setActiveCategory(cat)}
-                              className={`whitespace-nowrap pb-2 border-b-2 transition-colors ${activeCategory === cat ? 'border-blue-500 text-blue-500' : 'border-transparent text-gray-500 hover:text-gray-300'}`}
-                           >
-                               {label}
-                           </button>
-                        )
-                    })}
+                <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-6 py-5 px-4 md:px-8 border-b border-white/5 bg-white/[0.02] backdrop-blur-3xl sticky top-[80px] z-20">
                     
-                    {/* Visual View Toggles for Home */}
-                    <div className="ml-auto flex bg-[#121212] border border-[#222] rounded-md p-0.5">
-                      <button onClick={() => setViewMode('list')} className={`p-1 rounded ${viewMode === 'list' ? 'bg-[#222] text-white' : 'text-gray-500 hover:text-gray-300'}`}><List className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => setViewMode('grid')} className={`p-1 rounded ${viewMode === 'grid' ? 'bg-[#222] text-white' : 'text-gray-500 hover:text-gray-300'}`}><LayoutGrid className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => setViewMode('magazine')} className={`p-1 rounded ${viewMode === 'magazine' ? 'bg-[#222] text-white' : 'text-gray-500 hover:text-gray-300'}`}><LayoutTemplate className="w-3.5 h-3.5" /></button>
+                    {/* CUADRO DE BÚSQUEDA PRO */}
+                    <div className="relative w-full xl:w-80 group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                        <input 
+                            type="text" 
+                            placeholder="Buscar noticias..." 
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full bg-black/40 border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-xs font-bold text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                        />
+                    </div>
+
+                    {/* FILTRO DE CATEGORÍAS (DROPDOWN) */}
+                    <div className="flex items-center gap-3 w-full xl:w-auto">
+                        <div className="px-3 py-2 bg-white/5 rounded-xl border border-white/10 flex items-center gap-2 shrink-0">
+                            <ListFilter className="w-3.5 h-3.5 text-blue-500" />
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest hidden sm:inline">Filtrar</span>
+                        </div>
+                        <select 
+                            value={activeCategory}
+                            onChange={(e) => setActiveCategory(e.target.value)}
+                            className="flex-1 xl:w-48 bg-black/40 border border-white/10 rounded-xl py-2 px-3 text-[11px] font-black uppercase text-gray-300 focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer"
+                        >
+                            <option value="all">Todas las Categorías</option>
+                            <option value="tecnologia">Tecnología</option>
+                            <option value="economia">Economía</option>
+                            <option value="seguridad">Seguridad</option>
+                            <option value="educacion">Educación</option>
+                            <option value="transporte">Transporte</option>
+                        </select>
+                    </div>
+
+                    {/* PESTAÑAS GEOGRÁFICAS FIJAS */}
+                    <div className="flex bg-black/40 p-1 rounded-2xl border border-white/5 items-center">
+                        {[
+                            { id: 'all', label: 'Panorama' },
+                            { id: 'internacional', label: 'Internacional' },
+                            { id: 'nacional', label: 'Argentina' },
+                            { id: 'provincial', label: 'Tierra del Fuego' }
+                        ].map((item) => (
+                            <button 
+                              key={item.id} 
+                              onClick={() => setActiveCategory(item.id)}
+                              className={`px-4 md:px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all duration-300 ${activeCategory === item.id ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'}`}
+                            >
+                                {item.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* SELECTORES DE VISTA */}
+                    <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/5 ml-auto">
+                      <button onClick={() => setViewMode('list')} className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-blue-600/20 text-blue-500 ring-1 ring-blue-500/30' : 'text-gray-600 hover:text-gray-300'}`}><List className="w-4 h-4" /></button>
+                      <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-blue-600/20 text-blue-500 ring-1 ring-blue-500/30' : 'text-gray-600 hover:text-gray-300'}`}><LayoutGrid className="w-4 h-4" /></button>
+                      <button onClick={() => setViewMode('magazine')} className={`p-2 rounded-lg transition-all ${viewMode === 'magazine' ? 'bg-blue-600/20 text-blue-500 ring-1 ring-blue-500/30' : 'text-gray-600 hover:text-gray-300'}`}><LayoutTemplate className="w-4 h-4" /></button>
                     </div>
                 </div>
             )}
