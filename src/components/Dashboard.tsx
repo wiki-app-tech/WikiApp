@@ -366,6 +366,10 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                       <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight line-clamp-3 text-shadow-md">
                                           {article.title}
                                       </h3>
+                                      <div className="flex items-center gap-3 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 bg-black/50 hover:bg-green-500 text-white rounded-lg transition-all backdrop-blur-md" title="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
+                                          <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 bg-black/50 hover:bg-blue-500 text-white rounded-lg transition-all backdrop-blur-md" title="Compartir en Telegram"><Send className="w-4 h-4" /></button>
+                                      </div>
                                   </div>
                                </motion.div>
                             )
@@ -458,6 +462,10 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         {article.title}
                                                     </h3>
                                                 </div>
+                                                <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-100/90 dark:bg-black/80 backdrop-blur-md p-1.5 rounded-xl border border-slate-200 dark:border-white/10">
+                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-lg transition-all" title="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
+                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-400 rounded-lg transition-all" title="Compartir en Telegram"><Send className="w-4 h-4" /></button>
+                                                </div>
                                             </motion.div>
                                         );
 
@@ -495,6 +503,10 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                     </p>
                                                     <div className="flex items-center gap-3 mt-2">
                                                         <span className="text-[11px] font-black text-blue-500 uppercase tracking-widest border border-blue-500/30 px-4 py-2 rounded-full hover:bg-blue-500 hover:text-slate-900 dark:text-white transition-all">Leer Articulo Completo</span>
+                                                        <div className="flex items-center gap-2 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-lg transition-all border border-slate-200 dark:border-white/5" title="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-400 rounded-lg transition-all border border-slate-200 dark:border-white/5" title="Compartir en Telegram"><Send className="w-4 h-4" /></button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </motion.div>
