@@ -288,7 +288,6 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     </div>
                 </div>
             )}
-        </div>
 
         {/* CONTENIDO SCROLL */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8 relative z-10 scrollbar-hide">
@@ -512,8 +511,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                              </motion.div>
                           </div>
 
-                   <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-6 mt-6 mb-10">
-                          {/* 4. WEATHER DASHBOARD */}
+                  {/* 4. WEATHER DASHBOARD */}
                   {activeTab === 'weather' && <WeatherDashboard />}
 
                   {/* 5. REPORTS DASHBOARD (NEW) */}
@@ -726,9 +724,6 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     </motion.div>
                   )}
 
-                            )}
-                      </div>
-
                       {/* 7. LOGISTICS CENTER (SHIPS & FLIGHTS) */}
                       {activeTab === 'logistics' && (
                         <motion.div 
@@ -901,7 +896,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                         </motion.div>
                       )}
                       </div>
 
@@ -984,11 +979,10 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                       )}
                   </div>
                 </div>
-              </div>
-            )}
+             )}
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
 
       {/* MOBILE FLOATING BOTTOM NAV (Si fuera necesario ajustar luego) */}
       <div className="lg:hidden fixed bottom-6 left-4 right-4 z-40">
