@@ -2,9 +2,10 @@
 
 import React, { useState, useMemo } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
+import RadioDashboard from './RadioDashboard';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import dynamic from 'next/dynamic';
@@ -179,6 +180,12 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
             <span className="text-[9px] font-bold">Seguridad</span>
           </button>
 
+          <button onClick={() => setActiveTab('radio')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'radio' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}`}>
+            {activeTab === 'radio' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
+            <Radio className="w-5 h-5" />
+            <span className="text-[9px] font-bold">Radio</span>
+          </button>
+
           <button onClick={() => setActiveTab('logistics')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'logistics' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}`}>
             {activeTab === 'logistics' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
             <Anchor className="w-5 h-5" />
@@ -208,7 +215,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                       <div className="flex items-center gap-2">
                         <ChevronRight className="w-3 h-3 text-gray-700 hidden md:block" />
                         <span className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest">
-                            {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'security' ? 'Centro de Auditoría' : activeTab === 'logistics' ? 'Control de Tráfico' : 'Sistema'}
+                            {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'security' ? 'Centro de Auditoría' : activeTab === 'logistics' ? 'Control de Tráfico' : activeTab === 'radio' ? 'Dial Fueguino' : 'Sistema'}
                         </span>
                       </div>
                    </div>
@@ -513,6 +520,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                   {/* 4. WEATHER DASHBOARD */}
                   {activeTab === 'weather' && <WeatherDashboard />}
+
+                  {/* RADIO DASHBOARD */}
+                  {activeTab === 'radio' && <RadioDashboard />}
 
                   {/* 5. REPORTS DASHBOARD (NEW) */}
                   {activeTab === 'reports' && (
@@ -993,7 +1003,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
               { id: 'weather', icon: Cloud, label: 'Clima' },
               { id: 'logistics', icon: Anchor, label: 'Arribos' },
               { id: 'reports', icon: FileText, label: 'Reportes' },
-              { id: 'security', icon: ShieldCheck, label: 'Seguridad' }
+              { id: 'security', icon: ShieldCheck, label: 'Seguridad' },
+              { id: 'radio', icon: Radio, label: 'Radio' }
             ].map((item) => {
                const Icon = item.icon;
                return (
