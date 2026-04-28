@@ -24,48 +24,48 @@ const securityHotspots = [
 
 const SecurityHeatMap = () => {
   return (
-    <div className="relative w-full h-full rounded-2xl overflow-hidden bg-[#0c0c0c] border border-[#222] shadow-2xl">
+    <div className="relative w-full h-full rounded-2xl overflow-hidden bg-white dark:bg-[#0c0c0c] border border-slate-300 dark:border-[#222] shadow-2xl">
       
       {/* Resumen Táctico Flotante - Responsive */}
       <div className="absolute top-4 left-4 z-[400] w-[calc(100%-32px)] sm:w-80 pointer-events-none">
-         <div className="bg-black/80 backdrop-blur-3xl border border-white/10 rounded-3xl p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)] pointer-events-auto">
-            <div className="flex items-center gap-3 mb-4 border-b border-white/5 pb-3">
+         <div className="bg-black/80 backdrop-blur-3xl border border-slate-300 dark:border-white/10 rounded-3xl p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)] pointer-events-auto">
+            <div className="flex items-center gap-3 mb-4 border-b border-slate-200 dark:border-white/5 pb-3">
                <div className="w-10 h-10 rounded-xl bg-orange-600/20 flex items-center justify-center shrink-0">
                   <TrendingUp className="w-5 h-5 text-orange-500" />
                </div>
                <div className="flex flex-col min-w-0">
-                  <h3 className="text-[11px] font-black text-white uppercase tracking-widest truncate">Mapa de Riesgos Tácticos</h3>
-                  <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tight italic text-orange-500/80">Auditoría 2026-Q2</span>
+                  <h3 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest truncate">Mapa de Riesgos Tácticos</h3>
+                  <span className="text-[9px] text-slate-500 dark:text-gray-500 font-bold uppercase tracking-tight italic text-orange-500/80">Auditoría 2026-Q2</span>
                </div>
             </div>
             
             <div className="flex flex-col gap-4">
-               <div className="flex justify-between items-end border-b border-white/5 pb-2">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase">Riesgo Promedio TDF</span>
-                  <span className="text-xl font-black text-white">64%</span>
+               <div className="flex justify-between items-end border-b border-slate-200 dark:border-white/5 pb-2">
+                  <span className="text-[10px] font-bold text-slate-600 dark:text-gray-400 uppercase">Riesgo Promedio TDF</span>
+                  <span className="text-xl font-black text-slate-900 dark:text-white">64%</span>
                </div>
                <div className="flex flex-col gap-2">
                   <div className="flex justify-between text-[10px] uppercase font-black tracking-tight">
                      <span className="text-orange-500">Rio Grande</span>
-                     <span className="text-gray-400 font-bold">Crítico</span>
+                     <span className="text-slate-600 dark:text-gray-400 font-bold">Crítico</span>
                   </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
                      <div className="h-full bg-orange-600 w-[78%] shadow-[0_0_10px_rgba(234,88,12,0.5)]"></div>
                   </div>
                </div>
                <div className="flex flex-col gap-2">
                   <div className="flex justify-between text-[10px] uppercase font-black tracking-tight">
                      <span className="text-blue-500">Ushuaia</span>
-                     <span className="text-gray-400 font-bold">Moderado</span>
+                     <span className="text-slate-600 dark:text-gray-400 font-bold">Moderado</span>
                   </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
                      <div className="h-full bg-blue-600 w-[45%]"></div>
                   </div>
                </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5">
-                <p className="text-[10px] text-gray-500 leading-relaxed italic">
+            <div className="mt-6 pt-4 border-t border-slate-200 dark:border-white/5">
+                <p className="text-[10px] text-slate-500 dark:text-gray-500 leading-relaxed italic">
                     "La prevención eficaz requiere despliegue dinámico en los puntos de calor detectados. El análisis muestra una correlación directa entre zonas industriales y vulnerabilidad periférica."
                 </p>
                 <div className="mt-2 text-[9px] font-black text-gray-600 uppercase tracking-widest">— Reporte Auditor 30A-EXP</div>
@@ -128,11 +128,11 @@ const SecurityHeatMap = () => {
                   </div>
                   <div className="py-1">
                     <div className="flex justify-between text-[10px] font-bold">
-                        <span className="text-gray-500 uppercase">Nivel de Riesgo:</span>
+                        <span className="text-slate-500 dark:text-gray-500 uppercase">Nivel de Riesgo:</span>
                         <span className={spot.intensity > 0.7 ? 'text-red-500' : 'text-orange-500'}>{Math.round(spot.intensity * 100)}%</span>
                     </div>
-                    <div className="text-[11px] font-bold text-gray-200 mt-1 uppercase italic">{spot.type}</div>
-                    <p className="text-[10px] text-gray-500 mt-1 leading-relaxed">{spot.detail}</p>
+                    <div className="text-[11px] font-bold text-slate-800 dark:text-gray-200 mt-1 uppercase italic">{spot.type}</div>
+                    <p className="text-[10px] text-slate-500 dark:text-gray-500 mt-1 leading-relaxed">{spot.detail}</p>
                   </div>
                 </div>
               </Popup>

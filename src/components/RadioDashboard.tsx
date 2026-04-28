@@ -108,7 +108,7 @@ export default function RadioDashboard() {
             <RadioIcon className="w-7 h-7 text-blue-500" />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-3xl font-black text-white tracking-tighter uppercase">Dial Fueguino</h1>
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Dial Fueguino</h1>
             <span className="text-[10px] font-bold text-blue-500 uppercase tracking-[0.3em] flex items-center gap-1 mt-1">
                <Activity className="w-3 h-3" /> Transmisión en Vivo
             </span>
@@ -116,13 +116,13 @@ export default function RadioDashboard() {
         </div>
 
         <div className="relative w-full md:w-72 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-gray-500 group-focus-within:text-blue-500 transition-colors" />
           <input 
             type="text" 
             placeholder="Buscar emisora o ciudad..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#111] border border-white/10 rounded-2xl py-3.5 pl-11 pr-4 text-xs font-bold text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-blue-500/50 focus:bg-[#151515] transition-all shadow-inner"
+            className="w-full bg-white dark:bg-[#111] border border-slate-300 dark:border-white/10 rounded-2xl py-3.5 pl-11 pr-4 text-xs font-bold text-slate-800 dark:text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-blue-500/50 focus:bg-[#151515] transition-all shadow-inner"
           />
         </div>
       </motion.div>
@@ -142,10 +142,10 @@ export default function RadioDashboard() {
               onClick={() => handleStationClick(station)}
               className={`relative overflow-hidden rounded-3xl p-5 flex flex-col justify-between h-40 transition-all duration-300 ${
                 noStream 
-                  ? 'bg-[#111] border border-[#222] opacity-70 cursor-not-allowed' 
+                  ? 'bg-white dark:bg-[#111] border border-slate-300 dark:border-[#222] opacity-70 cursor-not-allowed' 
                   : isSelected 
                     ? 'bg-gradient-to-br from-blue-900/40 to-[#111] border border-blue-500/50 shadow-[0_0_30px_rgba(37,99,235,0.15)] cursor-pointer' 
-                    : 'bg-[#111] border border-[#222] hover:border-white/20 hover:bg-[#151515] cursor-pointer'
+                    : 'bg-white dark:bg-[#111] border border-slate-300 dark:border-[#222] hover:border-white/20 hover:bg-[#151515] cursor-pointer'
               }`}
             >
               {/* Background subtle decoration */}
@@ -155,14 +155,14 @@ export default function RadioDashboard() {
 
               <div className="flex justify-between items-start z-10">
                 <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${
-                  noStream ? 'bg-red-500/10 text-red-500' : 'bg-white/5 text-gray-400'
+                  noStream ? 'bg-red-500/10 text-red-500' : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-gray-400'
                 }`}>
                   {noStream ? 'Sin Enlace' : station.frequency}
                 </span>
                 
                 {!noStream && (
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                    isSelected ? 'bg-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]' : 'bg-white/5 text-gray-400'
+                    isSelected ? 'bg-blue-500 text-slate-900 dark:text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]' : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-gray-400'
                   }`}>
                     {isSelected && isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
                   </div>
@@ -170,10 +170,10 @@ export default function RadioDashboard() {
               </div>
 
               <div className="flex flex-col z-10">
-                <h3 className={`font-black text-lg tracking-tight ${isSelected ? 'text-white' : 'text-gray-200'}`}>
+                <h3 className={`font-black text-lg tracking-tight ${isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-gray-200'}`}>
                   {station.name}
                 </h3>
-                <span className="text-[10px] uppercase text-gray-500 tracking-wider flex items-center gap-1 mt-1">
+                <span className="text-[10px] uppercase text-slate-500 dark:text-gray-500 tracking-wider flex items-center gap-1 mt-1">
                   <Activity className={`w-3 h-3 ${isSelected && isPlaying ? 'text-blue-500 animate-pulse' : 'text-gray-600'}`} />
                   {station.city}
                 </span>
@@ -188,7 +188,7 @@ export default function RadioDashboard() {
         <motion.div 
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[800px] bg-[#0c0c0c]/90 backdrop-blur-3xl border border-white/10 p-4 rounded-3xl flex items-center justify-between shadow-[0_-10px_40px_rgba(0,0,0,0.5)] z-50"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[800px] bg-white dark:bg-[#0c0c0c]/90 backdrop-blur-3xl border border-slate-300 dark:border-white/10 p-4 rounded-3xl flex items-center justify-between shadow-[0_-10px_40px_rgba(0,0,0,0.5)] z-50"
         >
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-blue-600/20 flex items-center justify-center border border-blue-500/30 relative">
@@ -202,7 +202,7 @@ export default function RadioDashboard() {
             </div>
             <div className="flex flex-col hidden sm:flex">
               <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Transmitiendo</span>
-              <span className="text-sm font-bold text-white">{currentStation.name}</span>
+              <span className="text-sm font-bold text-slate-900 dark:text-white">{currentStation.name}</span>
             </div>
           </div>
 
@@ -216,7 +216,7 @@ export default function RadioDashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button onClick={toggleMute} className="text-gray-400 hover:text-white transition-colors">
+            <button onClick={toggleMute} className="text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:text-white transition-colors">
               {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
             </button>
             {/* Visualizer bars */}

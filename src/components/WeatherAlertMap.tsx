@@ -60,28 +60,28 @@ const WeatherAlertMap = () => {
   };
 
   return (
-    <div className="relative w-full h-full rounded-xl overflow-hidden bg-[#0c0c0c] border border-[#222]">
+    <div className="relative w-full h-full rounded-xl overflow-hidden bg-white dark:bg-[#0c0c0c] border border-slate-300 dark:border-[#222]">
       
       {/* Panel de Alertas en Tiempo Real - Responsive */}
       <div className="absolute top-4 left-4 z-[400] w-[calc(100%-32px)] sm:w-72 pointer-events-none">
-         <div className="bg-black/70 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-5 shadow-[0_8px_32px_rgba(0,0,0,0.5)] pointer-events-auto overflow-hidden">
-            <div className="flex items-center gap-3 mb-4 border-b border-white/5 pb-3 text-yellow-500">
+         <div className="bg-black/70 backdrop-blur-3xl border border-slate-300 dark:border-white/10 rounded-[2rem] p-5 shadow-[0_8px_32px_rgba(0,0,0,0.5)] pointer-events-auto overflow-hidden">
+            <div className="flex items-center gap-3 mb-4 border-b border-slate-200 dark:border-white/5 pb-3 text-yellow-500">
                <div className="w-8 h-8 rounded-xl bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
                   <AlertTriangle className="w-4 h-4 shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
                </div>
-               <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90">Alertas SMN</h3>
+               <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white/90">Alertas SMN</h3>
             </div>
             <div className="flex flex-col gap-4 max-h-[350px] overflow-y-auto pr-2 scrollbar-hide">
                {tdfAlerts.length > 0 ? tdfAlerts.map((alert, i) => (
-                  <div key={i} className="flex flex-col gap-2 border-b border-white/5 pb-4 last:border-0 hover:bg-white/[0.02] p-2 rounded-2xl transition-all group cursor-default">
-                     <span className="text-[12px] font-black text-white group-hover:text-yellow-400 leading-tight tracking-tight uppercase">
+                  <div key={i} className="flex flex-col gap-2 border-b border-slate-200 dark:border-white/5 pb-4 last:border-0 hover:bg-white dark:bg-white/[0.02] p-2 rounded-2xl transition-all group cursor-default">
+                     <span className="text-[12px] font-black text-slate-900 dark:text-white group-hover:text-yellow-400 leading-tight tracking-tight uppercase">
                         {alert.title}
                      </span>
-                     <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-gray-500">
+                     <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-gray-500">
                         <span>{alert.date}</span>
                         <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></div>
                      </div>
-                     <p className="text-[11px] text-gray-400 line-clamp-3 mt-1 font-medium leading-relaxed italic opacity-70 group-hover:opacity-100 transition-opacity">
+                     <p className="text-[11px] text-slate-600 dark:text-gray-400 line-clamp-3 mt-1 font-medium leading-relaxed italic opacity-70 group-hover:opacity-100 transition-opacity">
                         {alert.description}
                      </p>
                   </div>
@@ -167,7 +167,7 @@ const WeatherAlertMap = () => {
                             <strong className="text-sm font-bold">{node.name}</strong>
                         </div>
                         <span className="text-[10px] text-gray-600 font-medium">Fuente oficial de información regional.</span>
-                        <a href={node.url} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded text-center hover:bg-blue-700 transition-colors mt-1">
+                        <a href={node.url} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-slate-900 dark:text-white text-[10px] font-bold px-3 py-1.5 rounded text-center hover:bg-blue-700 transition-colors mt-1">
                             ACCEDER A LA FUENTE
                         </a>
                     </div>
