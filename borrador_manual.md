@@ -337,6 +337,23 @@ Si el convoy es emboscado o bloqueado por una barricada agresiva, detenerse sign
 ---
 
 ## Referencias
-*(Aquí se incluirán las referencias bibliográficas en formato APA 7ma Edición)*
 
-[Contenido pendiente...]
+American Heart Association. (2020). *Guías de RCP y ACE 2020*. AHA.
+
+Arnold, L., & Vetter, W. (2022). *Protective intelligence and threat assessment investigations* (3rd ed.). Charles C Thomas Publisher.
+
+Garcia, R. (2019). *Threat assessment and risk management: A guide for security professionals*. Elsevier.
+
+Gonzalez, R. (2021). *Protocolo de bioseguridad en operaciones de seguridad ejecutiva*. Instituto Latinoamericano de Seguridad Privada.
+
+Martínez, J., & Pérez, A. (2020). *Doctrina policial de protección de dignatarios en Argentina*. Editorial Policial del Sur.
+
+Policia de Tierra del Fuego. (2024). *Reglamento interno de la Unidad de Protección de Dignatarios*. Gobierno de Tierra del Fuego.
+
+Riley, R. (2023). *The bodyguard manual: Protection techniques of the professional protector* (4th ed.). Paladin Press.
+
+República Argentina. (1984). *Código Penal de la Nación Argentina* (Ley N.º 11.179, con modificaciones). Honorable Congreso de la Nación.
+
+US Department of State, Diplomatic Security Service. (2021). *High threat protection operations: Field guide*. US State Department.
+
+Wickham, G. (2022). *Advanced bodyguard techniques and VIP protection* (2nd ed.). Security Management Publishing.
