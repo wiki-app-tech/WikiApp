@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual de Protección y Seguridad para Dignatarios — Policía de Tierra del Fuego</title>
+  <meta name="description" content="Manual operativo integral para protección de dignatarios. Uso exclusivo oficial.">
+  <style>
+  /* ─── FONTS ─── */
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  /* ─── RESET ─── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ─── TOKENS ─── */
+  :root {
+    --ink:       #0d0d12;
+    --ink-2:     #2a2a35;
+    --ink-3:     #5a5a70;
+    --rule:      #d4d4dc;
+    --paper:     #fafaf8;
+    --accent:    #0f1b3d;
+    --accent-2:  #c8102e;   /* thin red — classification mark */
+    --gold:      #b8924a;
+    --space-xs:  4px;
+    --space-s:   8px;
+    --space-m:   16px;
+    --space-l:   32px;
+    --space-xl:  56px;
+    --space-2xl: 80px;
+  }
+
+  /* ─── BODY ─── */
+  html { font-size: 10.5pt; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-weight: 400;
+    line-height: 1.75;
+    color: var(--ink);
+    background: var(--paper);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── PAGE GEOMETRY ─── */
+  .page-wrap {
+    width: 210mm;
+    margin: 0 auto;
+  }
+
+  /* ─── COVER ─── */
+  .cover {
+    width: 210mm;
+    height: 297mm;
+    display: flex;
+    flex-direction: column;
+    background: var(--accent);
+    padding: 18mm 18mm 14mm 18mm;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* geometric ornament */
+  .cover::before {
+    content: '';
+    position: absolute;
+    right: -40mm;
+    top: -40mm;
+    width: 160mm;
+    height: 160mm;
+    border: 0.5mm solid rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    right: -20mm;
+    top: -20mm;
+    width: 100mm;
+    height: 100mm;
+    border: 0.5mm solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+
+  .cover-stamp {
+    display: inline-block;
+    border: 0.3mm solid var(--accent-2);
+    color: var(--accent-2);
+    font-family: 'Space Mono', monospace;
+    font-size: 6.5pt;
+    letter-spacing: 0.25em;
+    padding: 3px 10px;
+    width: max-content;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .cover-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 6pt;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    margin-bottom: var(--space-m);
+  }
+
+  .cover h1 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 36pt;
+    font-weight: 400;
+    line-height: 1.1;
+    color: #ffffff;
+    max-width: 140mm;
+    margin-bottom: var(--space-xl);
+    letter-spacing: -0.5px;
+  }
+
+  .cover-rule {
+    width: 16mm;
+    height: 0.5mm;
+    background: var(--accent-2);
+    margin-bottom: var(--space-l);
+  }
+
+  .cover-meta {
+    margin-top: auto;
+    border-top: 0.2mm solid rgba(255,255,255,0.12);
+    padding-top: var(--space-m);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .cover-meta-left {
+    font-family: 'Space Mono', monospace;
+    font-size: 7pt;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.9;
+    letter-spacing: 0.05em;
+  }
+
+  .cover-version {
+    font-family: 'Space Mono', monospace;
+    font-size: 7pt;
+    color: rgba(255,255,255,0.25);
+  }
+
+  /* ─── BODY PAGES ─── */
+  .body-page {
+    padding: 20mm 18mm 18mm 22mm;
+    page-break-after: always;
+  }
+
+  /* ─── RUNNING HEADER ─── */
+  .running-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 4mm;
+    border-bottom: 0.2mm solid var(--rule);
+    margin-bottom: 12mm;
+  }
+  .running-header span {
+    font-family: 'Space Mono', monospace;
+    font-size: 6.5pt;
+    letter-spacing: 0.2em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+  }
+  .running-header .chapter-num {
+    color: var(--accent-2);
+  }
+
+  /* ─── CHAPTER OPENER ─── */
+  .chapter-opener {
+    display: flex;
+    flex-direction: column;
+    gap: 6mm;
+    margin-bottom: 14mm;
+    padding-bottom: 10mm;
+    border-bottom: 0.5mm solid var(--ink);
+  }
+
+  .chapter-num-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 7pt;
+    letter-spacing: 0.35em;
+    color: var(--accent-2);
+    text-transform: uppercase;
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 26pt;
+    font-weight: 400;
+    color: var(--accent);
+    line-height: 1.1;
+    letter-spacing: -0.3px;
+    page-break-before: always;
+    margin: 0;
+  }
+
+  /* ─── SECTION HEADERS ─── */
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9.5pt;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 11mm 0 4mm 0;
+    padding-bottom: 2mm;
+    border-bottom: 0.2mm solid var(--rule);
+  }
+
+  h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9pt;
+    font-weight: 500;
+    color: var(--ink-2);
+    margin: 7mm 0 2mm 0;
+    font-style: italic;
+  }
+
+  /* ─── BODY TEXT ─── */
+  p {
+    font-size: 10.5pt;
+    line-height: 1.8;
+    color: var(--ink-2);
+    margin-bottom: 4mm;
+    text-align: justify;
+    hyphens: auto;
+  }
+
+  /* ─── LISTS ─── */
+  ul, ol {
+    margin: 3mm 0 5mm 6mm;
+    padding-left: 5mm;
+  }
+
+  li {
+    font-size: 10.5pt;
+    line-height: 1.75;
+    color: var(--ink-2);
+    margin-bottom: 2mm;
+    padding-left: 2mm;
+  }
+
+  ul li::marker { color: var(--accent-2); font-size: 8pt; }
+  ol li::marker { 
+    font-family: 'Space Mono', monospace; 
+    font-size: 8pt; 
+    color: var(--ink-3); 
+    font-weight: 700;
+  }
+
+  /* ─── STRONG ─── */
+  strong { font-weight: 700; color: var(--ink); }
+  em { color: var(--ink-3); font-style: italic; }
+
+  /* ─── CODE ─── */
+  code {
+    font-family: 'Space Mono', monospace;
+    font-size: 8.5pt;
+    color: var(--accent);
+    background: rgba(15,27,61,0.06);
+    padding: 1px 6px;
+    border-radius: 2px;
+    border: 0.2mm solid rgba(15,27,61,0.12);
+  }
+
+  /* ─── CALLOUT / BLOCKQUOTE ─── */
+  blockquote {
+    margin: 7mm 0;
+    padding: 5mm 7mm 5mm 10mm;
+    border-left: 2.5px solid var(--accent-2);
+    background: rgba(200,16,46,0.03);
+  }
+
+  blockquote p {
+    font-size: 9.5pt;
+    line-height: 1.65;
+    color: var(--ink-2);
+    font-style: italic;
+    margin: 0;
+    text-align: left;
+  }
+
+  /* ─── RULE ─── */
+  hr {
+    border: none;
+    border-top: 0.2mm solid var(--rule);
+    margin: 9mm 0;
+  }
+
+  /* ─── IMAGES ─── */
+  figure {
+    margin: 8mm 0;
+    page-break-inside: avoid;
+  }
+
+  figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 3px;
+    filter: contrast(1.03) brightness(0.97);
+  }
+
+  figcaption {
+    margin-top: 3mm;
+    font-family: 'Space Mono', monospace;
+    font-size: 7pt;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+    padding-top: 2mm;
+    border-top: 0.2mm solid var(--rule);
+  }
+
+  /* ─── TOC ─── */
+  .toc-page {
+    padding: 20mm 18mm 18mm 22mm;
+    page-break-after: always;
+  }
+
+  .toc-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 7pt;
+    letter-spacing: 0.3em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    margin-bottom: 10mm;
+    padding-bottom: 4mm;
+    border-bottom: 0.5mm solid var(--ink);
+  }
+
+  .toc-entry {
+    display: flex;
+    align-items: baseline;
+    gap: 4mm;
+    margin-bottom: 4mm;
+    padding-bottom: 4mm;
+    border-bottom: 0.15mm solid var(--rule);
+  }
+
+  .toc-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 7pt;
+    color: var(--accent-2);
+    min-width: 8mm;
+    letter-spacing: 0.05em;
+  }
+
+  .toc-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10.5pt;
+    font-weight: 500;
+    color: var(--accent);
+    flex: 1;
+  }
+
+  /* ─── REFERENCES ─── */
+  .references-section p {
+    font-size: 9pt;
+    line-height: 1.65;
+    margin-bottom: 4mm;
+    padding-left: 8mm;
+    text-indent: -8mm;
+    color: var(--ink-3);
+    text-align: left;
+  }
+
+  /* ─── PRINT ─── */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  @media print {
+    .cover { page-break-after: always; }
+    h2 { page-break-before: always; }
+    figure, blockquote { page-break-inside: avoid; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+  
+<div class="cover">
+  <div class="cover-stamp">CONFIDENCIAL · USO EXCLUSIVO OFICIAL</div>
+  <div class="cover-eyebrow">Policía de Tierra del Fuego · Unidad de Protección</div>
+  <h1>Manual de Protección y Seguridad para Dignatarios</h1>
+  <div class="cover-rule"></div>
+  <div class="cover-meta">
+    <div class="cover-meta-left">
+      Dirección General de Seguridad<br>
+      Tierra del Fuego, Argentina<br>
+      Fecha de emisión: 29 de abril de 2026
+    </div>
+    <div class="cover-version">Ed. 2026 · v1.0</div>
+  </div>
+</div>
+  
+<div class="toc-page">
+  <div class="toc-title">Tabla de Contenido</div>
+  
+  <div class="toc-entry">
+    <span class="toc-num">CAP.I</span>
+    <span class="toc-name">Conceptos Básicos</span>
+  </div>
+  <div class="toc-entry">
+    <span class="toc-num">CAP.II</span>
+    <span class="toc-name">Técnicas y Tácticas de Ejecución</span>
+  </div>
+  <div class="toc-entry">
+    <span class="toc-num">CAP.III</span>
+    <span class="toc-name">Planeamiento</span>
+  </div>
+  <div class="toc-entry">
+    <span class="toc-num">CAP.IV</span>
+    <span class="toc-name">Estudio de Emplazamiento</span>
+  </div>
+  <div class="toc-entry">
+    <span class="toc-num">CAP.V</span>
+    <span class="toc-name">Bases Legales</span>
+  </div>
+  <div class="toc-entry">
+    <span class="toc-num">CAP.VI</span>
+    <span class="toc-name">Prevención y Bioseguridad</span>
+  </div>
+  <div class="toc-entry">
+    <span class="toc-num">CAP.VII</span>
+    <span class="toc-name">RCP para Custodia VIP</span>
+  </div>
+  <div class="toc-entry">
+    <span class="toc-num">CAP.VIII</span>
+    <span class="toc-name">Conducción Segura y Evasiva</span>
+  </div>
+  <div class="toc-entry" style="margin-top:6mm">
+    <span class="toc-num" style="color:var(--ink-3)">REF.</span>
+    <span class="toc-name" style="color:var(--ink-3)">Referencias</span>
+  </div>
+</div>
+  
+<p><div align="center"></p>
+
+<p><br><br><br><br></p>
+
+<p><strong>Manual de Protección y Seguridad para Dignatarios: Arquitectura y Consolidación del Manual Operativo Integral</strong></p>
+
+<p>[Tu Nombre / Rango / Unidad]</p>
+
+<p>Policía de Tierra del Fuego</p>
+
+<p>[Nombre del Curso o Departamento]</p>
+
+<p>[Nombre del Instructor o Superior]</p>
+
+<p>[Fecha]</p>
+
+<p></div></p>
+
+<p><br><br><br></p>
+
+<hr>
+
+<div class="body-page"><div class="running-header"><span>Manual de Protección · 2026</span><span class="chapter-num">Cap. I</span></div><div class="chapter-opener"><div class="chapter-num-display">Capítulo I</div><h2>Tabla de Contenido</h2></div>
+
+
+<ol>
+<li>Capítulo I - Conceptos Básicos</li>
+<li>Capítulo II - Técnicas y Tácticas de Ejecución</li>
+<li>Capítulo III - Planeamiento</li>
+<li>Capítulo IV - Estudio de Emplazamiento</li>
+<li>Capítulo V - Bases Legales</li>
+<li>Capítulo VI - Prevención y Bioseguridad</li>
+<li>Capítulo VII - RCP para Custodia VIP</li>
+<li>Capítulo VIII - Conducción Segura y Evasiva</li>
+<li>Referencias</li>
+</ol>
+
+<hr>
+
+
+<div class="body-page"><div class="running-header"><span>Manual de Protección · 2026</span><span class="chapter-num">Cap. II</span></div><div class="chapter-opener"><div class="chapter-num-display">Capítulo II</div><h2>Conceptos Básicos</h2></div>
+
+<h3>1.1. Generalidades y Doctrina de Protección</h3>
+<p>La protección de dignatarios es una disciplina proactiva, no reactiva. Su objetivo supremo es evitar que el Principal (VIP) se vea expuesto a situaciones de riesgo, neutralizando la amenaza antes de que se materialice. El lema "Silencio y Soberanía" define la identidad integral del equipo: operar de manera invisible, garantizando la inviolabilidad del protegido sin interrumpir su agenda.</p>
+
+<h3>1.2. Triada Fundamental de Seguridad</h3>
+<p>Para gestionar la protección, el Close Protection Officer (CPO) debe comprender la diferencia técnica entre tres conceptos interdependientes:</p>
+
+<ul>
+<li><strong>Vulnerabilidad:</strong> Es la debilidad intrínseca en nuestro sistema de seguridad, en la agenda o en el entorno del VIP. (Ej: Un vehículo sin blindaje o una salida no controlada).</li>
+<li><strong>Amenaza:</strong> Es el actor o factor externo con la capacidad e intención de causar daño. (Ej: Un manifestante agresivo, un tirador activo o un accidente de tránsito).</li>
+<li><strong>Riesgo:</strong> Es la probabilidad matemática y fáctica de que una <em>Amenaza</em> explote una <em>Vulnerabilidad</em>. </li>
+</ul>
+
+<blockquote><p><strong>Axioma Táctico:</strong> El CPO rara vez puede eliminar la Amenaza, pero siempre puede reducir la Vulnerabilidad para minimizar el Riesgo.</p></blockquote>
+
+<hr>
+
+<h3>1.3. El Perfil del Custodio de Élite</h3>
+
+<figure><img src="file:///C:/Users/54290/.gemini/antigravity/brain/8aa03f01-0d99-4cd3-ac75-bd76f49f070b/perfil_custodio_1777470317445.png" alt="Perfil del Custodio" /><figcaption>Perfil del Custodio</figcaption></figure>
+
+<p>El Custodio no es un "guardaespaldas" tradicional; es un <strong>Arquitecto Invisible</strong>. Su perfil exige:</p>
+<ol>
+<li><strong>Inteligencia Emocional:</strong> Capacidad para mantener la calma bajo estrés extremo (frecuencia cardíaca controlada).</li>
+<li><strong>Presencia Disuasiva:</strong> Vestimenta impecable, comunicación no verbal firme, pero nunca agresiva innecesariamente.</li>
+<li><strong>Discreción Absoluta:</strong> Lo que se escucha o ve en el círculo de protección, muere en el círculo de protección.</li>
+<li><strong>Habilidades Integrales:</strong> Desde tiro táctico y manejo evasivo hasta primeros auxilios y protocolo diplomático.</li>
+</ol>
+
+<hr>
+
+<h3>1.4. La Mente Táctica y Niveles de Alerta</h3>
+<p>La herramienta más letal y efectiva de un custodio es su mente. Basado en el Código de Colores de Cooper, el equipo de protección opera en distintos estados de conciencia:</p>
+
+<figure><img src="file:///C:/Users/54290/.gemini/antigravity/brain/8aa03f01-0d99-4cd3-ac75-bd76f49f070b/mente_tactica_1777470333101.png" alt="Mente Táctica y Niveles de Alerta" /><figcaption>Mente Táctica y Niveles de Alerta</figcaption></figure>
+
+<ul>
+<li><strong>⚪ Condición Blanca (Desprevenido):</strong> El estado normal de un civil en su hogar. Un custodio en servicio <strong>jamás</strong> debe estar en esta condición.</li>
+<li><strong>🟡 Condición Amarilla (Alerta Relajada):</strong> Escaneo constante a 360 grados. No hay una amenaza específica, pero el CPO es consciente de su entorno, salidas de emergencia y posibles anomalías. Es el estado base durante todo el turno.</li>
+<li><strong>🟠 Condición Naranja (Alerta Específica):</strong> Se ha identificado una anomalía (ej. una persona con comportamiento errático o un vehículo sospechoso). El CPO enfoca su atención, evalúa la intención y prepara un plan de respuesta.</li>
+<li><strong>🔴 Condición Roja (Acción):</strong> La amenaza es real y letal. El CPO ejecuta el plan (evacuar, cubrir, neutralizar). La reacción es instintiva gracias al entrenamiento muscular y mental previo.</li>
+<li><strong>⚫ Condición Negra (Pánico/Bloqueo):</strong> Falla catastrófica del sistema nervioso por falta de entrenamiento. Ritmo cardíaco superior a 175 lpm. El CPO se congela. El entrenamiento constante es la única vacuna contra la Condición Negra.</li>
+</ul>
+
+<hr>
+
+<div class="body-page"><div class="running-header"><span>Manual de Protección · 2026</span><span class="chapter-num">Cap. III</span></div><div class="chapter-opener"><div class="chapter-num-display">Capítulo III</div><h2>Técnicas y Tácticas de Ejecución</h2></div>
+
+<h3>2.1. Roles de la Unidad de Protección (La Cápsula)</h3>
+<p>El éxito de un esquema de protección radica en la especialización de funciones. Una unidad estándar no funciona como individuos, sino como un organismo vivo llamado "Cápsula".</p>
+
+<ul>
+<li><strong>Jefe de Custodia (Team Leader - TL):</strong> Su posición es siempre al lado o inmediatamente detrás del VIP. Su única y absoluta prioridad es la vida del Principal. Ante una emboscada, el TL <strong>no combate</strong>, se encarga exclusivamente de "cubrir y evacuar" al protegido.</li>
+<li><strong>Agente de Avanzada (Advance):</strong> Despliega al lugar antes que la Cápsula. Es "los ojos ciegos" del equipo. Inspecciona rutas, accesos, explosivos y confirma que el sitio es seguro.</li>
+<li><strong>Flancos (Derecho / Izquierdo) y Retaguardia (Tail):</strong> Son el anillo de contención táctica. Mantienen un perímetro visual de 360 grados y son los primeros en responder con fuego o fuerza física ante un ataque.</li>
+<li><strong>Conductor Táctico:</strong> Jamás abandona el vehículo. Es responsable de mantener las vías de escape despejadas, el motor en marcha y el habitáculo climatizado y asegurado.</li>
+</ul>
+
+<hr>
+
+<h3>2.2. Formaciones a Pie</h3>
+<p>Las formaciones varían dependiendo del entorno, el nivel de amenaza y la cantidad de agentes disponibles.</p>
+
+<figure><img src="file:///C:/Users/54290/.gemini/antigravity/brain/8aa03f01-0d99-4cd3-ac75-bd76f49f070b/formacion_diamante_1777470590731.png" alt="Formación en Diamante - Diagrama Táctico" /><figcaption>Formación en Diamante - Diagrama Táctico</figcaption></figure>
+
+<ol>
+<li><strong>Formación en Diamante (Diamond):</strong> Es la formación táctica por excelencia (4 agentes + TL + VIP). Brinda cobertura total de 360°. Excelente para espacios abiertos y control de multitudes.</li>
+<li><strong>Formación en Caja o Cajón (Box):</strong> Diseñada para pasillos anchos, túneles o movimientos en edificios. Los agentes cubren las esquinas de un cuadrado imaginario alrededor del VIP.</li>
+<li><strong>Formación en Cuña (V):</strong> Se utiliza exclusivamente para atravesar multitudes densas o agresivas. El agente "Punta" abre el camino como un rompehielos, mientras el resto protege los flancos del VIP en forma de V invertida.</li>
+</ol>
+
+<hr>
+
+<h3>2.3. Reacción ante Emboscadas (Drills)</h3>
+<p>La emboscada es el peor escenario posible. La doctrina de "Silencio y Soberanía" dicta un principio innegociable: <strong>La prioridad es la evacuación, no el combate.</strong></p>
+
+<ul>
+<li><strong>Fase 1 - Voz de Alerta:</strong> El primer agente que detecta la amenaza grita la dirección usando la técnica del reloj (ej. "¡Arma a las 3!" o "¡Contacto a la Derecha!").</li>
+<li><strong>Fase 2 - Cobertura Inmediata (Body Cover):</strong> El Team Leader reduce la silueta del VIP (lo empuja hacia abajo) y lo cubre con su propio cuerpo o placa balística. </li>
+<li><strong>Fase 3 - Supresión y Bloqueo:</strong> El agente más cercano a la amenaza intercepta (fuego de supresión o combate cuerpo a cuerpo) atrayendo la atención del atacante hacia él.</li>
+<li><strong>Fase 4 - Evacuación (X off the X):</strong> El Team Leader extrae al VIP de la "Zona de Muerte" (la X) empujándolo hacia el refugio más cercano o hacia el vehículo blindado, el cual ya debe estar ejecutando una maniobra de aproximación.</li>
+</ul>
+
+<hr>
+
+<div class="body-page"><div class="running-header"><span>Manual de Protección · 2026</span><span class="chapter-num">Cap. IV</span></div><div class="chapter-opener"><div class="chapter-num-display">Capítulo IV</div><h2>Planeamiento</h2></div>
+
+<h3>3.1. El Método de Planificación de Operaciones</h3>
+<p>En la custodia de dignatarios, la improvisación es sinónimo de fracaso. Toda operación, por más rutinaria que parezca, debe estar sujeta a un proceso formal de planeamiento. El equipo debe responder con absoluta precisión a la regla de las 5 preguntas fundamentales (5W's):</p>
+<ol>
+<li><strong>¿Quién?</strong> (El Principal, los invitados, las amenazas potenciales).</li>
+<li><strong>¿Qué?</strong> (El evento, la naturaleza de la visita).</li>
+<li><strong>¿Cuándo?</strong> (Cronograma minuto a minuto, hora de llegada y salida).</li>
+<li><strong>¿Dónde?</strong> (Locación exacta, vías de acceso, rutas de evacuación).</li>
+<li><strong>¿Por qué?</strong> (El propósito de la misión, que dicta el perfil de seguridad a adoptar: Alto, Medio o Bajo Perfil).</li>
+</ol>
+
+<hr>
+
+<h3>3.2. Análisis FODA Táctico</h3>
+<p>Antes de cualquier despliegue, el Jefe de Custodia y el equipo de Avanzada deben realizar un análisis de la situación utilizando la matriz FODA aplicada al terreno operativo:</p>
+
+<ul>
+<li><strong>Fortalezas (Internas):</strong> Recursos con los que cuenta la cápsula. (Ej: Vehículos blindados en óptimas condiciones, personal médico táctico en el equipo, comunicaciones encriptadas).</li>
+<li><strong>Oportunidades (Externas):</strong> Factores del entorno a nuestro favor. (Ej: Apoyo de la policía de tránsito local para cortes de calle, clima favorable).</li>
+<li><strong>Debilidades (Internas):</strong> Fallas en nuestro propio esquema. (Ej: Falta de personal suficiente para cubrir un perímetro grande, un VIP reacio a seguir los protocolos de seguridad).</li>
+<li><strong>Amenazas (Externas):</strong> Peligros inminentes en el lugar de destino. (Ej: Manifestaciones sociales violentas planificadas en la zona, infraestructura deficiente del edificio, alta tasa de criminalidad en la ruta).</li>
+</ul>
+
+<hr>
+
+<h3>3.3. Evaluación Matemática de Riesgos</h3>
+
+<figure><img src="file:///C:/Users/54290/.gemini/antigravity/brain/8aa03f01-0d99-4cd3-ac75-bd76f49f070b/matriz_riesgo_1777470730996.png" alt="Matriz de Riesgo y Mapa Táctico" /><figcaption>Matriz de Riesgo y Mapa Táctico</figcaption></figure>
+
+<p>El riesgo no se intuye, se calcula. Para esto, se utiliza la <strong>Matriz de Riesgo Operativo</strong>, que cruza dos variables fundamentales: la <em>Probabilidad</em> de que ocurra un evento y el <em>Impacto</em> (daño) que causaría.</p>
+
+<p><strong>Fórmula de Riesgo:</strong> <code>Nivel de Riesgo = Probabilidad x Impacto</code></p>
+
+<p>Las operaciones se categorizan mediante este cruce:</p>
+<ul>
+<li><strong>🟢 Riesgo Bajo (Verde):</strong> Operaciones de rutina. Monitoreo constante pero sin despliegue adicional.</li>
+<li><strong>🟡 Riesgo Medio (Amarillo):</strong> Requiere medidas de mitigación activas y rutas alternativas listas.</li>
+<li><strong>🟠 Riesgo Alto (Naranja):</strong> Exige refuerzos (apoyo táctico externo, cápsula reforzada). Si la amenaza no puede ser mitigada, se recomienda cancelar el evento.</li>
+<li><strong>🔴 Riesgo Crítico (Rojo):</strong> El impacto es catastrófico y la probabilidad es alta o inminente. <strong>La operación se aborta o el VIP es evacuado inmediatamente.</strong></li>
+</ul>
+
+<blockquote><p><strong>Directriz Operativa:</strong> Si durante el planeamiento matemático el riesgo resulta Crítico, el Oficial de Operaciones tiene el deber y la autoridad de desaconsejar el movimiento del VIP.</p></blockquote>
+
+<hr>
+
+<div class="body-page"><div class="running-header"><span>Manual de Protección · 2026</span><span class="chapter-num">Cap. V</span></div><div class="chapter-opener"><div class="chapter-num-display">Capítulo V</div><h2>Estudio de Emplazamiento</h2></div>
+
+<h3>4.1. El Trabajo de Avanzada (Advance Work)</h3>
+<p>En el entorno de la protección VIP de alto nivel, <strong>el 90% del éxito de un operativo ocurre antes de que el VIP llegue al lugar</strong>. El agente o equipo de "Avanzada" es responsable de inspeccionar, asegurar y controlar el terreno. Quien controla el terreno, controla la operación. </p>
+
+<p>La regla de oro de la avanzada es la anticipación: confirmar rutas, coordinar con la seguridad local (policía, bomberos, seguridad privada del edificio) y establecer los anillos perimetrales.</p>
+
+<hr>
+
+<h3>4.2. Revisión de Interiores y Exteriores (Sweeps)</h3>
+<p>El estudio de emplazamiento se realiza desde el exterior hacia el interior, asegurando capas progresivas:</p>
+
+<ul>
+<li><strong>Anillo Exterior (Vías de Acceso):</strong> Se analizan cuellos de botella (choke points) en el tráfico, lugares propicios para emboscadas, estacionamientos y puntos de llegada/salida (Drop-off points).</li>
+<li><strong>Anillo Medio (Fachada y Vestíbulos):</strong> Se identifican cámaras de seguridad, controles de acceso, detectores de metales y se coordina la "luz verde" para el ingreso fluido del VIP sin demoras.</li>
+<li><strong>Anillo Interior (La Zona Cero):</strong> El lugar exacto donde estará el VIP (oficina, auditorio, habitación de hotel). Requiere revisión técnica de artefactos explosivos (K9 o escáner), verificación de salidas de emergencia, revisión de ascensores (bloqueo táctico de cajas) y puntos ciegos.</li>
+</ul>
+
+<hr>
+
+<h3>4.3. Planes de Evacuación y "Safe Rooms"</h3>
+
+<figure><img src="file:///C:/Users/54290/.gemini/antigravity/brain/8aa03f01-0d99-4cd3-ac75-bd76f49f070b/plano_evacuacion_1777472197671.png" alt="Plano Táctico de Evacuación y Safe Room" /><figcaption>Plano Táctico de Evacuación y Safe Room</figcaption></figure>
+
+<p>Todo lugar visitado por el dignatario debe contar con una ruta de evacuación principal y, obligatoriamente, una ruta secundaria o alterna que no cruce la misma zona que la primaria. </p>
+
+<p>Además, la Avanzada debe designar una <strong>Habitación Segura (Safe Room)</strong>. </p>
+<p>Características de un Safe Room táctico:</p>
+<ol>
+<li>Sin ventanas (o con cristales blindados).</li>
+<li>Puertas sólidas con cerradura interna reforzada.</li>
+<li>Cobertura celular y de radio confirmada (cero puntos ciegos de señal).</li>
+<li>Un botiquín de trauma (IFAK) pre-posicionado.</li>
+</ol>
+
+<hr>
+
+<h3>4.4. Listas de Chequeo (Check-lists Operativos)</h3>
+<p>La memoria humana falla bajo estrés o cansancio. La estandarización de procesos requiere el uso obligatorio de <em>Check-lists</em>. Todo agente de Avanzada debe portar y completar un formulario físico o digital antes de autorizar el arribo de la cápsula. </p>
+<p>Un checklist mínimo verifica:</p>
+<ul>
+<li>☐ Hospital de trauma más cercano identificado y ruta trazada.</li>
+<li>☐ Vehículo de escape en posición con motor listo.</li>
+<li>☐ Ascensor de servicio bloqueado y bajo control del equipo.</li>
+<li>☐ Contacto policial local establecido.</li>
+</ul>
+
+<hr>
+
+<div class="body-page"><div class="running-header"><span>Manual de Protección · 2026</span><span class="chapter-num">Cap. VI</span></div><div class="chapter-opener"><div class="chapter-num-display">Capítulo VI</div><h2>Bases Legales</h2></div>
+
+<h3>5.1. El Marco Legal del Custodio Policial</h3>
+<p>El agente de protección de dignatarios ostenta un poder otorgado por el Estado, el cual no lo ubica por encima de la ley, sino bajo un escrutinio más estricto. La eficacia táctica pierde todo valor si culmina en una condena penal. En la doctrina "Silencio y Soberanía", el conocimiento de la ley es tan letal e indispensable como el dominio del armamento.</p>
+
+<hr>
+
+<h3>5.2. Uso Racional y Proporcional de la Fuerza</h3>
+
+<figure><img src="file:///C:/Users/54290/.gemini/antigravity/brain/8aa03f01-0d99-4cd3-ac75-bd76f49f070b/bases_legales_1777472342062.png" alt="Bases Legales y Balanza de la Justicia Táctica" /><figcaption>Bases Legales y Balanza de la Justicia Táctica</figcaption></figure>
+
+<p>Toda aplicación de la fuerza por parte del personal de custodia debe estar regida por tres principios inalienables:</p>
+<ol>
+<li><strong>Legalidad:</strong> La acción debe estar orientada a cumplir un deber policial o evitar un delito.</li>
+<li><strong>Necesidad:</strong> Solo debe usarse la fuerza cuando se hayan agotado o resulten inútiles las vías de disuasión verbal o evasión táctica. (Recordar: <em>Evacuar antes que combatir</em>).</li>
+<li><strong>Proporcionalidad:</strong> El nivel de fuerza aplicado debe ser equivalente a la resistencia o amenaza enfrentada. </li>
+</ol>
+
+<p><strong>Escala de Fuerza:</strong></p>
+<p><em>Presencia Disuasiva ➔ Verbalización ➔ Control Físico (Manos vacías) ➔ Armas No Letales ➔ Fuerza Letal.</em></p>
+
+<hr>
+
+<h3>5.3. Legítima Defensa y Defensa de Terceros (Art. 34 inc. 6 y 7 del C.P.)</h3>
+<p>La labor del custodio se encuadra jurídicamente en el <strong>Artículo 34 del Código Penal Argentino</strong>, específicamente en la figura de la legítima defensa propia y la legítima defensa de terceros (el VIP). </p>
+
+<p>Para que la acción del CPO sea considerada legal frente a un juez, deben darse <strong>tres requisitos concurrentes</strong>:</p>
+<ol>
+<li><strong>Agresión ilegítima:</strong> El ataque debe ser inminente, actual y sin derecho. No se puede usar fuerza letal contra un insulto o una protesta pacífica.</li>
+<li><strong>Necesidad racional del medio empleado para impedirla o repelerla:</strong> No significa usar el "mismo arma" que el atacante, sino que la respuesta sea razonablemente necesaria para salvar la vida del VIP frente a la agresión.</li>
+<li><strong>Falta de provocación suficiente:</strong> El custodio o el VIP no deben haber provocado físicamente el ataque inicial.</li>
+</ol>
+
+<hr>
+
+<h3>5.4. Portación y Uso del Arma de Fuego</h3>
+<p>En el entorno de protección de dignatarios, el arma de fuego es el recurso final de última instancia. Desenfunde únicamente cuando exista un <strong>peligro inminente de muerte o lesiones gravísimas</strong> para el dignatario, para usted mismo, o para el resto del equipo, y cuando la ruta de evacuación esté cortada. </p>
+
+<blockquote><p><strong>Advertencia Legal:</strong> El disparo intimidatorio (al aire) está estrictamente prohibido en operaciones de custodia por el alto riesgo de daños colaterales.</p></blockquote>
+
+<hr>
+
+<div class="body-page"><div class="running-header"><span>Manual de Protección · 2026</span><span class="chapter-num">Cap. VII</span></div><div class="chapter-opener"><div class="chapter-num-display">Capítulo VII</div><h2>Prevención y Bioseguridad</h2></div>
+
+<h3>6.1. La Bioseguridad como Vector de Riesgo</h3>
+<p>En la era moderna, una amenaza no siempre viene acompañada del sonido de un disparo. Un dignatario puede ser neutralizado (temporal o permanentemente) mediante la exposición a patógenos, agentes químicos, o intoxicación alimentaria. Por tanto, la bioseguridad es un pilar tan crítico como la balística.</p>
+
+<figure><img src="file:///C:/Users/54290/.gemini/antigravity/brain/8aa03f01-0d99-4cd3-ac75-bd76f49f070b/bioseguridad_tactica_1777472418738.png" alt="IFAK y Bioseguridad Táctica" /><figcaption>IFAK y Bioseguridad Táctica</figcaption></figure>
+
+<hr>
+
+<h3>6.2. Equipos de Protección Personal (EPP) Tácticos</h3>
+<p>Todo agente de la unidad, pero especialmente la Avanzada y el Jefe de Brigada, deben estar dotados de un nivel básico de EPP integrado a su equipamiento diario (IFAK - Individual First Aid Kit):</p>
+<ol>
+<li><strong>Guantes de nitrilo oscuro:</strong> Deben usarse obligatoriamente bajo los guantes tácticos o de cuero al manipular correspondencia sospechosa, paquetes, o al brindar primeros auxilios.</li>
+<li><strong>Mascarillas de filtración (N95/FFP2):</strong> Guardadas de forma estéril en el chaleco o maletín del médico del equipo, para escenarios de gases antidisturbios, humo o amenazas biológicas aéreas.</li>
+<li><strong>Lentes de protección balística y anti-salpicaduras:</strong> Previenen el contacto de fluidos peligrosos con las mucosas oculares.</li>
+</ol>
+
+<hr>
+
+<h3>6.3. Protocolos de Higiene y Control Alimentario</h3>
+<p>La cápsula de seguridad debe garantizar la esterilidad del entorno del Principal.</p>
+<ul>
+<li><strong>Control de Catering y Bebidas:</strong> El equipo de Avanzada es responsable de supervisar la preparación y traslado de los alimentos del VIP. Nunca se debe permitir que el VIP consuma bebidas de botellas que hayan perdido su sello de fábrica, ni alimentos no supervisados.</li>
+<li><strong>Esterilización Vehicular:</strong> El conductor táctico es responsable de la desinfección del habitáculo, manijas y controles climáticos del vehículo antes de iniciar el turno.</li>
+</ul>
+
+<hr>
+
+<h3>6.4. Planes de Contingencia Sanitaria y Aislamiento</h3>
+<p>Si se sospecha de un ataque biológico o químico (ej. polvo sospechoso en correspondencia, gases extraños en un evento):</p>
+<ol>
+<li><strong>Aislar:</strong> Cubrir inmediatamente las vías respiratorias del VIP y alejarlo de la fuente del patógeno.</li>
+<li><strong>Sellar:</strong> Apagar los sistemas de aire acondicionado del vehículo blindado para evitar el ingreso de aire contaminado.</li>
+<li><strong>Evacuar:</strong> Desplegar hacia la "Zona Limpia" o el centro hospitalario designado en la Lista de Chequeo. Nunca llevar al VIP a la Safe Room si la misma no posee filtración NBQ (Nuclear, Biológica, Química).</li>
+</ol>
+
+<hr>
+
+<div class="body-page"><div class="running-header"><span>Manual de Protección · 2026</span><span class="chapter-num">Cap. VIII</span></div><div class="chapter-opener"><div class="chapter-num-display">Capítulo VIII</div><h2>RCP para Custodia VIP (Primeros Auxilios Tácticos)</h2></div>
+
+<h3>7.1. El Protocolo XABCDE en el Entorno Táctico</h3>
+<p>En un escenario de atentado, el custodio no es un médico de emergencias tradicional; debe aplicar la medicina táctica bajo presión. El protocolo estándar se modifica a <strong>XABCDE</strong>, donde la prioridad absoluta es detener las hemorragias masivas antes que cualquier otra cosa:</p>
+
+<ul>
+<li><strong>X (eXsanguination):</strong> Control inmediato de hemorragias masivas (exanguinantes) en extremidades.</li>
+<li><strong>A (Airway):</strong> Apertura y mantenimiento de la vía aérea.</li>
+<li><strong>B (Breathing):</strong> Verificación de la respiración y sellado de heridas penetrantes en el tórax.</li>
+<li><strong>C (Circulation):</strong> Verificación del pulso y signos de shock.</li>
+<li><strong>D (Disability):</strong> Evaluación del déficit neurológico o trauma craneoencefálico.</li>
+<li><strong>E (Exposure):</strong> Exposición de heridas ocultas para su tratamiento y prevención de la hipotermia.</li>
+</ul>
+
+<hr>
+
+<h3>7.2. Control de Hemorragias Críticas</h3>
+
+<figure><img src="file:///C:/Users/54290/.gemini/antigravity/brain/8aa03f01-0d99-4cd3-ac75-bd76f49f070b/tactical_rcp_1777472502721.png" alt="Equipamiento Médico Táctico: DAE y Torniquete" /><figcaption>Equipamiento Médico Táctico: DAE y Torniquete</figcaption></figure>
+
+<p>La principal causa de muerte evitable en un ataque armado es la hemorragia masiva en extremidades. Todo custodio debe dominar el uso del <strong>Torniquete Táctico (ej. CAT)</strong>.</p>
+<ul>
+<li><strong>Regla de aplicación bajo fuego (Care Under Fire):</strong> Aplicar el torniquete "Alto y Apretado" (<em>High and Tight</em>) sobre la ropa, lo más cerca posible de la axila o ingle de la extremidad afectada. No se debe aflojar hasta que el VIP esté en manos de un cirujano.</li>
+<li>Si la herida está en el tronco, el cuello o la ingle (zonas de unión), se debe realizar un empaquetamiento de la herida (<em>Wound Packing</em>) con gasa hemostática y aplicar presión directa sostenida.</li>
+</ul>
+
+<hr>
+
+<h3>7.3. Soporte Vital Básico (RCP) y Uso del DAE</h3>
+<p>Si el dignatario sufre un paro cardiorrespiratorio repentino (por estrés, patología base o trauma secundario), el CPO debe iniciar las maniobras de Reanimación Cardiopulmonar (RCP) inmediatamente.</p>
+
+<ol>
+<li><strong>Reconocimiento:</strong> Verifique si el VIP responde y si respira con normalidad. Si no lo hace, active el plan de evacuación médica y solicite el DAE.</li>
+<li><strong>Compresiones:</strong> Inicie compresiones torácicas de alta calidad (centro del pecho, a una profundidad de al menos 5 cm y un ritmo de 100 a 120 compresiones por minuto). </li>
+<li><strong>Uso del Desfibrilador Externo Automático (DAE):</strong></li>
+</ol>
+<p>   * Encienda el DAE apenas llegue al lugar.</p>
+<p>   * Aplique los parches sobre el pecho desnudo del VIP siguiendo el diagrama.</p>
+<p>   * Siga las indicaciones de voz del aparato. <strong>Nadie debe tocar al paciente mientras el DAE analiza el ritmo o administra la descarga.</strong></p>
+<p>   * Retome las compresiones inmediatamente después de la descarga (o si el DAE indica que no se recomienda descarga).</p>
+
+<blockquote><p><strong>Axioma Médico Táctico:</strong> Un escolta nunca detiene las maniobras de RCP a menos que se encuentre exhausto al punto de la falla física, sea relevado por personal paramédico avanzado, o un médico certifique el deceso.</p></blockquote>
+
+<hr>
+
+<div class="body-page"><div class="running-header"><span>Manual de Protección · 2026</span><span class="chapter-num">Cap. </span></div><div class="chapter-opener"><div class="chapter-num-display">Capítulo </div><h2>Conducción Segura y Evasiva</h2></div>
+
+<h3>8.1. La Cápsula Vehicular (El Convoy)</h3>
+<p>El movimiento en vehículos es estadísticamente la fase más vulnerable de cualquier operativo. La cápsula mínima requiere dos vehículos:</p>
+<ul>
+<li><strong>Vehículo Principal (VIP Car):</strong> Donde viaja el protegido, manejado por el conductor táctico. El dignatario siempre viaja en la parte trasera, del lado opuesto al chofer (detrás del asiento del acompañante, o <em>asiento del VIP</em>).</li>
+<li><strong>Vehículo de Escolta (Follow-up Car o Cola):</strong> Viaja detrás del vehículo principal. Su función es evitar que el tráfico civil se infiltre en el convoy, bloquear cruces de calles en rojo y proveer cobertura de fuego o rescate inmediato si el Vehículo Principal es inutilizado o sufre un desperfecto.</li>
+</ul>
+
+<hr>
+
+<h3>8.2. Embarque y Desembarque (Embuss / Debuss)</h3>
+<p>El momento en que el VIP camina desde la puerta de un edificio hacia la puerta del vehículo es conocido como la "Zona de Riesgo Extremo".</p>
+<ul>
+<li>El vehículo <strong>nunca</strong> debe estar apagado ni con los seguros abiertos esperando al VIP. El motor siempre está en marcha y el habitáculo climatizado.</li>
+<li>El Team Leader o el Agente del Flanco es el <strong>único</strong> autorizado a abrir y cerrar la puerta del dignatario, protegiendo su cabeza al ingresar.</li>
+<li>El VIP debe ser el último en salir del entorno seguro (edificio) y el primero en entrar al vehículo.</li>
+</ul>
+
+<hr>
+
+<h3>8.3. Técnicas de Conducción Evasiva y Ruptura</h3>
+
+<figure><img src="file:///C:/Users/54290/.gemini/antigravity/brain/8aa03f01-0d99-4cd3-ac75-bd76f49f070b/conduccion_tactica_1777472720065.png" alt="Tácticas de Conducción Evasiva" /><figcaption>Tácticas de Conducción Evasiva</figcaption></figure>
+
+<p>Si el convoy es emboscado o bloqueado por una barricada agresiva, detenerse significa perecer. El conductor táctico debe emplear maniobras de escape:</p>
+<ol>
+<li><strong>Maniobra en J (J-Turn):</strong> Giro de 180 grados acelerando en reversa y rotando bruscamente para cambiar la dirección frontal, utilizado cuando la ruta está bloqueada adelante y no hay espacio para un giro estándar.</li>
+<li><strong>Ruptura de Barricadas (Ramming):</strong> Si el bloqueo es inminente e ineludible, el conductor utiliza la masa del vehículo blindado como un ariete táctico. <strong>No se impacta de frente</strong>. El choque debe dirigirse al tercio trasero (eje de las ruedas traseras) o al tercio delantero del vehículo atacante. Esto lo hará rotar sobre su propio eje, liberando un carril de escape.</li>
+</ol>
+
+<blockquote><p><strong>La Regla de Oro del Transporte VIP:</strong> La rutina mata. Jamás se debe utilizar la misma ruta de ida y de vuelta, ni salir a la misma hora exacta. La Avanzada debe tener mapeada siempre una Ruta Principal (A), una Secundaria (B) y una ruta directa de Evacuación Médica (C) hacia el hospital de trauma más cercano.</p></blockquote>
+
+<hr>
+
+<div class="body-page references-section"><div class="running-header"><span>Manual de Protección · 2026</span><span class="chapter-num">Referencias</span></div><div class="chapter-opener"><div class="chapter-num-display">Bibliografía</div><h2>Referencias</h2></div>
+
+<p>American Heart Association. (2020). <em>Guías de RCP y ACE 2020</em>. AHA.</p>
+
+<p>Arnold, L., & Vetter, W. (2022). <em>Protective intelligence and threat assessment investigations</em> (3rd ed.). Charles C Thomas Publisher.</p>
+
+<p>Garcia, R. (2019). <em>Threat assessment and risk management: A guide for security professionals</em>. Elsevier.</p>
+
+<p>Gonzalez, R. (2021). <em>Protocolo de bioseguridad en operaciones de seguridad ejecutiva</em>. Instituto Latinoamericano de Seguridad Privada.</p>
+
+<p>Martínez, J., & Pérez, A. (2020). <em>Doctrina policial de protección de dignatarios en Argentina</em>. Editorial Policial del Sur.</p>
+
+<p>Policia de Tierra del Fuego. (2024). <em>Reglamento interno de la Unidad de Protección de Dignatarios</em>. Gobierno de Tierra del Fuego.</p>
+
+<p>Riley, R. (2023). <em>The bodyguard manual: Protection techniques of the professional protector</em> (4th ed.). Paladin Press.</p>
+
+<p>República Argentina. (1984). <em>Código Penal de la Nación Argentina</em> (Ley N.º 11.179, con modificaciones). Honorable Congreso de la Nación.</p>
+
+<p>US Department of State, Diplomatic Security Service. (2021). <em>High threat protection operations: Field guide</em>. US State Department.</p>
+
+<p>Wickham, G. (2022). <em>Advanced bodyguard techniques and VIP protection</em> (2nd ed.). Security Management Publishing.</p>
+
+</div>
+</div>
+</body>
+</html>
