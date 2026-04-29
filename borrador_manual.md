@@ -308,9 +308,31 @@ Si el dignatario sufre un paro cardiorrespiratorio repentino (por estrés, patol
 ---
 
 ## Capítulo VIII - Conducción Segura y Evasiva
-*(Aquí se desarrollarán las tácticas de convoy, escape de barricadas y conducción de vehículos blindados)*
 
-[Contenido pendiente de redacción...]
+### 8.1. La Cápsula Vehicular (El Convoy)
+El movimiento en vehículos es estadísticamente la fase más vulnerable de cualquier operativo. La cápsula mínima requiere dos vehículos:
+* **Vehículo Principal (VIP Car):** Donde viaja el protegido, manejado por el conductor táctico. El dignatario siempre viaja en la parte trasera, del lado opuesto al chofer (detrás del asiento del acompañante, o *asiento del VIP*).
+* **Vehículo de Escolta (Follow-up Car o Cola):** Viaja detrás del vehículo principal. Su función es evitar que el tráfico civil se infiltre en el convoy, bloquear cruces de calles en rojo y proveer cobertura de fuego o rescate inmediato si el Vehículo Principal es inutilizado o sufre un desperfecto.
+
+---
+
+### 8.2. Embarque y Desembarque (Embuss / Debuss)
+El momento en que el VIP camina desde la puerta de un edificio hacia la puerta del vehículo es conocido como la "Zona de Riesgo Extremo".
+* El vehículo **nunca** debe estar apagado ni con los seguros abiertos esperando al VIP. El motor siempre está en marcha y el habitáculo climatizado.
+* El Team Leader o el Agente del Flanco es el **único** autorizado a abrir y cerrar la puerta del dignatario, protegiendo su cabeza al ingresar.
+* El VIP debe ser el último en salir del entorno seguro (edificio) y el primero en entrar al vehículo.
+
+---
+
+### 8.3. Técnicas de Conducción Evasiva y Ruptura
+
+![Tácticas de Conducción Evasiva](C:\Users\54290\.gemini\antigravity\brain\8aa03f01-0d99-4cd3-ac75-bd76f49f070b\conduccion_tactica_1777472720065.png)
+
+Si el convoy es emboscado o bloqueado por una barricada agresiva, detenerse significa perecer. El conductor táctico debe emplear maniobras de escape:
+1. **Maniobra en J (J-Turn):** Giro de 180 grados acelerando en reversa y rotando bruscamente para cambiar la dirección frontal, utilizado cuando la ruta está bloqueada adelante y no hay espacio para un giro estándar.
+2. **Ruptura de Barricadas (Ramming):** Si el bloqueo es inminente e ineludible, el conductor utiliza la masa del vehículo blindado como un ariete táctico. **No se impacta de frente**. El choque debe dirigirse al tercio trasero (eje de las ruedas traseras) o al tercio delantero del vehículo atacante. Esto lo hará rotar sobre su propio eje, liberando un carril de escape.
+
+> **La Regla de Oro del Transporte VIP:** La rutina mata. Jamás se debe utilizar la misma ruta de ida y de vuelta, ni salir a la misma hora exacta. La Avanzada debe tener mapeada siempre una Ruta Principal (A), una Secundaria (B) y una ruta directa de Evacuación Médica (C) hacia el hospital de trauma más cercano.
 
 ---
 
