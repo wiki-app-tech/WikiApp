@@ -237,16 +237,73 @@ En el entorno de protección de dignatarios, el arma de fuego es el recurso fina
 ---
 
 ## Capítulo VI - Prevención y Bioseguridad
-*(Aquí se desarrollarán los protocolos de higiene, uso de EPP y planes de contingencia)*
 
-[Contenido pendiente de redacción...]
+### 6.1. La Bioseguridad como Vector de Riesgo
+En la era moderna, una amenaza no siempre viene acompañada del sonido de un disparo. Un dignatario puede ser neutralizado (temporal o permanentemente) mediante la exposición a patógenos, agentes químicos, o intoxicación alimentaria. Por tanto, la bioseguridad es un pilar tan crítico como la balística.
+
+![IFAK y Bioseguridad Táctica](C:\Users\54290\.gemini\antigravity\brain\8aa03f01-0d99-4cd3-ac75-bd76f49f070b\bioseguridad_tactica_1777472418738.png)
 
 ---
 
-## Capítulo VII - RCP para Custodia VIP
-*(Aquí se desarrollará la identificación de emergencias, control de hemorragias y uso del DAE)*
+### 6.2. Equipos de Protección Personal (EPP) Tácticos
+Todo agente de la unidad, pero especialmente la Avanzada y el Jefe de Brigada, deben estar dotados de un nivel básico de EPP integrado a su equipamiento diario (IFAK - Individual First Aid Kit):
+1. **Guantes de nitrilo oscuro:** Deben usarse obligatoriamente bajo los guantes tácticos o de cuero al manipular correspondencia sospechosa, paquetes, o al brindar primeros auxilios.
+2. **Mascarillas de filtración (N95/FFP2):** Guardadas de forma estéril en el chaleco o maletín del médico del equipo, para escenarios de gases antidisturbios, humo o amenazas biológicas aéreas.
+3. **Lentes de protección balística y anti-salpicaduras:** Previenen el contacto de fluidos peligrosos con las mucosas oculares.
 
-[Contenido pendiente de redacción...]
+---
+
+### 6.3. Protocolos de Higiene y Control Alimentario
+La cápsula de seguridad debe garantizar la esterilidad del entorno del Principal.
+* **Control de Catering y Bebidas:** El equipo de Avanzada es responsable de supervisar la preparación y traslado de los alimentos del VIP. Nunca se debe permitir que el VIP consuma bebidas de botellas que hayan perdido su sello de fábrica, ni alimentos no supervisados.
+* **Esterilización Vehicular:** El conductor táctico es responsable de la desinfección del habitáculo, manijas y controles climáticos del vehículo antes de iniciar el turno.
+
+---
+
+### 6.4. Planes de Contingencia Sanitaria y Aislamiento
+Si se sospecha de un ataque biológico o químico (ej. polvo sospechoso en correspondencia, gases extraños en un evento):
+1. **Aislar:** Cubrir inmediatamente las vías respiratorias del VIP y alejarlo de la fuente del patógeno.
+2. **Sellar:** Apagar los sistemas de aire acondicionado del vehículo blindado para evitar el ingreso de aire contaminado.
+3. **Evacuar:** Desplegar hacia la "Zona Limpia" o el centro hospitalario designado en la Lista de Chequeo. Nunca llevar al VIP a la Safe Room si la misma no posee filtración NBQ (Nuclear, Biológica, Química).
+
+---
+
+## Capítulo VII - RCP para Custodia VIP (Primeros Auxilios Tácticos)
+
+### 7.1. El Protocolo XABCDE en el Entorno Táctico
+En un escenario de atentado, el custodio no es un médico de emergencias tradicional; debe aplicar la medicina táctica bajo presión. El protocolo estándar se modifica a **XABCDE**, donde la prioridad absoluta es detener las hemorragias masivas antes que cualquier otra cosa:
+
+* **X (eXsanguination):** Control inmediato de hemorragias masivas (exanguinantes) en extremidades.
+* **A (Airway):** Apertura y mantenimiento de la vía aérea.
+* **B (Breathing):** Verificación de la respiración y sellado de heridas penetrantes en el tórax.
+* **C (Circulation):** Verificación del pulso y signos de shock.
+* **D (Disability):** Evaluación del déficit neurológico o trauma craneoencefálico.
+* **E (Exposure):** Exposición de heridas ocultas para su tratamiento y prevención de la hipotermia.
+
+---
+
+### 7.2. Control de Hemorragias Críticas
+
+![Equipamiento Médico Táctico: DAE y Torniquete](C:\Users\54290\.gemini\antigravity\brain\8aa03f01-0d99-4cd3-ac75-bd76f49f070b\tactical_rcp_1777472502721.png)
+
+La principal causa de muerte evitable en un ataque armado es la hemorragia masiva en extremidades. Todo custodio debe dominar el uso del **Torniquete Táctico (ej. CAT)**.
+* **Regla de aplicación bajo fuego (Care Under Fire):** Aplicar el torniquete "Alto y Apretado" (*High and Tight*) sobre la ropa, lo más cerca posible de la axila o ingle de la extremidad afectada. No se debe aflojar hasta que el VIP esté en manos de un cirujano.
+* Si la herida está en el tronco, el cuello o la ingle (zonas de unión), se debe realizar un empaquetamiento de la herida (*Wound Packing*) con gasa hemostática y aplicar presión directa sostenida.
+
+---
+
+### 7.3. Soporte Vital Básico (RCP) y Uso del DAE
+Si el dignatario sufre un paro cardiorrespiratorio repentino (por estrés, patología base o trauma secundario), el CPO debe iniciar las maniobras de Reanimación Cardiopulmonar (RCP) inmediatamente.
+
+1. **Reconocimiento:** Verifique si el VIP responde y si respira con normalidad. Si no lo hace, active el plan de evacuación médica y solicite el DAE.
+2. **Compresiones:** Inicie compresiones torácicas de alta calidad (centro del pecho, a una profundidad de al menos 5 cm y un ritmo de 100 a 120 compresiones por minuto). 
+3. **Uso del Desfibrilador Externo Automático (DAE):**
+   * Encienda el DAE apenas llegue al lugar.
+   * Aplique los parches sobre el pecho desnudo del VIP siguiendo el diagrama.
+   * Siga las indicaciones de voz del aparato. **Nadie debe tocar al paciente mientras el DAE analiza el ritmo o administra la descarga.**
+   * Retome las compresiones inmediatamente después de la descarga (o si el DAE indica que no se recomienda descarga).
+
+> **Axioma Médico Táctico:** Un escolta nunca detiene las maniobras de RCP a menos que se encuentre exhausto al punto de la falla física, sea relevado por personal paramédico avanzado, o un médico certifique el deceso.
 
 ---
 
