@@ -36,10 +36,13 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   const [activeTab, setActiveTab] = useState('home');
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [density, setDensity] = useState<'compact' | 'comfortable'>('comfortable');
+  const [showSearchModal, setShowSearchModal] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
    const [activeCategory, setActiveCategory] = useState<string>('all');
    const [blocklist, setBlocklist] = useState<string[]>(['pautas', 'anuncio', 'publicidad', 'clickbait']);
    const [isFilterOpen, setIsFilterOpen] = useState(false);
+   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
@@ -125,6 +128,21 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   
   // Logic for the main feed display: on home we show less, on explore we show more
   // Also exclude top visual articles from the main list
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowSearchModal(prev => !prev);
+      }
+      if (e.key === 'Escape') {
+        setShowSearchModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const feedArticlesToDisplay = useMemo(() => {
     const topIds = new Set(topVisualArticles.map(a => a.id));
     const base = filteredArticles.filter(a => !topIds.has(a.id));
@@ -133,168 +151,213 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   }, [filteredArticles, topVisualArticles, activeTab, search]);
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-[#070707] dark:bg-slate-50 dark:bg-[#070707] text-slate-800 dark:text-[#e0e0e0] font-sans overflow-hidden transition-colors duration-200 relative">
+    <div className="flex h-screen bg-slate-50 dark:bg-[#070707] text-slate-800 dark:text-[#e0e0e0] font-sans overflow-hidden transition-colors duration-200 relative">
       {/* Animated Mesh Gradient Background */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none overflow-hidden">
-        <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-blue-600/30 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-orange-600/20 rounded-full blur-[100px] animate-pulse [animation-delay:2s]"></div>
-        <div className="absolute -bottom-[20%] left-[20%] w-[50%] h-[50%] bg-red-600/20 rounded-full blur-[100px] animate-pulse [animation-delay:4s]"></div>
+      <div className="absolute inset-0 z-0 opacity-[0.08] dark:opacity-20 pointer-events-none overflow-hidden">
+        <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-blue-600/40 dark:bg-blue-600/30 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-orange-600/30 dark:bg-orange-600/20 rounded-full blur-[100px] animate-pulse [animation-delay:2s]"></div>
+        <div className="absolute -bottom-[20%] left-[20%] w-[50%] h-[50%] bg-indigo-600/30 dark:bg-red-600/20 rounded-full blur-[100px] animate-pulse [animation-delay:4s]"></div>
       </div>
 
+
       
-      {/* 1. ULTRA SLIM FIXED SIDEBAR */}
-      <aside className="w-[72px] bg-white dark:bg-[#0c0c0c]/80 backdrop-blur-xl border-r border-slate-200 dark:border-[#1a1a1a] hidden lg:flex flex-col items-center shrink-0 z-20 py-4 gap-6">
-        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-slate-900 dark:text-white font-bold tracking-tighter shadow-[0_0_15px_rgba(59,130,246,0.3)] cursor-pointer group hover:scale-105 transition-transform">
-          MW
+      {/* 1. ULTRA SLIM DYNAMIC SIDEBAR */}
+      <motion.aside 
+        initial={false}
+        animate={{ width: isSidebarExpanded ? 240 : 72 }}
+        onMouseEnter={() => setIsSidebarExpanded(true)}
+        onMouseLeave={() => setIsSidebarExpanded(false)}
+        className="bg-white/80 dark:bg-[#0c0c0c]/80 backdrop-blur-2xl border-r border-slate-200 dark:border-white/5 hidden lg:flex flex-col items-center shrink-0 z-50 py-4 gap-6 overflow-hidden shadow-2xl transition-all duration-300 ease-in-out"
+      >
+        <div className="flex items-center gap-4 w-full px-4 mb-4">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold tracking-tighter shadow-lg shadow-blue-500/20 cursor-pointer group hover:scale-105 transition-transform shrink-0">
+            MW
+          </div>
+          <AnimatePresence>
+            {isSidebarExpanded && (
+              <motion.span 
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                className="text-lg font-black tracking-tighter text-slate-900 dark:text-white whitespace-nowrap font-display"
+              >
+                WIKIAPP <span className="text-blue-500">PRO</span>
+              </motion.span>
+            )}
+          </AnimatePresence>
         </div>
-        <nav className="flex-1 w-full space-y-4 overflow-y-auto scrollbar-hide py-2">
-          <div className="text-[8px] font-black text-gray-600 uppercase tracking-widest text-center mt-2 mb-2 w-full">Principal</div>
-          
-          <button onClick={() => setActiveTab('home')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'home' ? 'text-blue-500' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300'}`}>
-            {activeTab === 'home' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
-            <LayoutDashboard className="w-5 h-5" />
-            <span className="text-[9px] font-bold">Home</span>
-          </button>
-          
-          <button onClick={() => setActiveTab('explore')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'explore' ? 'text-blue-500' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300'}`}>
-            {activeTab === 'explore' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
-            <Compass className="w-5 h-5" />
-            <span className="text-[9px] font-bold">Feeds</span>
-          </button>
 
-          <button onClick={() => setActiveTab('weather')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'weather' ? 'text-blue-500' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300'}`}>
-            {activeTab === 'weather' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
-            <Cloud className="w-5 h-5" />
-            <span className="text-[9px] font-bold">Clima</span>
-          </button>
-
-          <button onClick={() => setActiveTab('reports')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'reports' ? 'text-blue-500' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300'}`}>
-            {activeTab === 'reports' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
-            <FileText className="w-5 h-5" />
-            <span className="text-[9px] font-bold">Resúmenes</span>
-          </button>
-
-          <button onClick={() => setActiveTab('security')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'security' ? 'text-red-500' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300'}`}>
-            {activeTab === 'security' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-red-600 rounded-r-md"></div>}
-            <ShieldCheck className="w-5 h-5" />
-            <span className="text-[9px] font-bold">Seguridad</span>
-          </button>
-
-          <button onClick={() => setActiveTab('radio')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'radio' ? 'text-blue-500' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300'}`}>
-            {activeTab === 'radio' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
-            <Radio className="w-5 h-5" />
-            <span className="text-[9px] font-bold">Radio</span>
-          </button>
-
-          <button onClick={() => setActiveTab('logistics')} className={`relative w-full flex flex-col items-center justify-center gap-1.5 py-3 group transition-colors ${activeTab === 'logistics' ? 'text-blue-500' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300'}`}>
-            {activeTab === 'logistics' && <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-blue-500 rounded-r-md"></div>}
-            <Anchor className="w-5 h-5" />
-            <span className="text-[9px] font-bold">Arribos</span>
-          </button>
+        <nav className="flex-1 w-full space-y-1 overflow-y-auto scrollbar-hide py-2 px-2">
+          {[
+            { id: 'home', icon: LayoutDashboard, label: 'Panel de Control', sub: 'Home' },
+            { id: 'explore', icon: Compass, label: 'Fuentes de Inteligencia', sub: 'Feeds' },
+            { id: 'weather', icon: Cloud, label: 'Clima & Alertas', sub: 'Clima' },
+            { id: 'reports', icon: FileText, label: 'Análisis Estratégico', sub: 'Informes' },
+            { id: 'security', icon: ShieldCheck, label: 'Centro de Seguridad', sub: 'Seguridad', color: 'text-red-500', activeBg: 'bg-red-500' },
+            { id: 'radio', icon: Radio, label: 'Dial Fueguino', sub: 'Radio' },
+            { id: 'logistics', icon: Anchor, label: 'Tráfico Regional', sub: 'Arribos' }
+          ].map((item) => (
+            <button 
+              key={item.id}
+              onClick={() => setActiveTab(item.id)} 
+              className={`relative w-full flex items-center gap-4 px-3 py-3 rounded-xl group transition-all duration-200 ${activeTab === item.id ? (item.id === 'security' ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-500') : 'text-slate-500 dark:text-gray-500 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+            >
+              <item.icon className={`w-5 h-5 shrink-0 ${activeTab === item.id ? (item.color || 'text-blue-500') : 'group-hover:scale-110 transition-transform'}`} />
+              
+              <AnimatePresence>
+                {isSidebarExpanded && (
+                  <motion.div 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="flex flex-col items-start overflow-hidden"
+                  >
+                    <span className="text-[13px] font-bold whitespace-nowrap">{item.label}</span>
+                    <span className="text-[10px] font-medium opacity-60 uppercase tracking-widest">{item.sub}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              
+              {activeTab === item.id && (
+                <motion.div 
+                  layoutId="active-nav-indicator"
+                  className={`absolute left-0 w-1 h-6 rounded-r-full ${item.id === 'security' ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]'}`} 
+                />
+              )}
+            </button>
+          ))}
         </nav>
-        <div className="w-full space-y-4 pb-4 border-t border-slate-200 dark:border-[#1a1a1a] pt-4">
-            <button onClick={() => setSearch(search ? '' : ' ')} className="w-full flex justify-center text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300 transition-colors"><Search className="w-5 h-5" /></button>
-            <button className="w-full flex justify-center text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300 transition-colors"><Settings className="w-5 h-5" /></button>
+
+        <div className="w-full px-2 space-y-1 pb-4 border-t border-slate-200 dark:border-white/5 pt-4">
+            <button className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-slate-500 dark:text-gray-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-all group">
+              <Search className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
+              {isSidebarExpanded && <span className="text-[13px] font-bold">Búsqueda Rápida</span>}
+            </button>
+            <button className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-slate-500 dark:text-gray-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-all group">
+              <Settings className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
+              {isSidebarExpanded && <span className="text-[13px] font-bold">Configuración</span>}
+            </button>
         </div>
-      </aside>
+      </motion.aside>
 
       {/* 2. MAIN CONTENT AREA */}
       <main className="flex-1 flex flex-col min-w-0 relative">
         
-        {/* INOREADER STYLE TOP NAVIGATION */}
-        <div className="px-4 py-4 md:px-8 shrink-0 z-30 sticky top-0 bg-slate-50 dark:bg-[#070707]/60 backdrop-blur-2xl border-b border-slate-200 dark:border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+        {/* PREMIUM TOP NAVIGATION */}
+        <div className="px-4 py-4 md:px-8 shrink-0 z-30 sticky top-0 bg-white/60 dark:bg-[#070707]/60 backdrop-blur-2xl border-b border-slate-200 dark:border-white/10 shadow-glass">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                   <div className="lg:hidden w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.4)] mr-2 shrink-0">
-                      <LayoutDashboard className="w-4 h-4 text-slate-900 dark:text-white" />
+                   <div className="lg:hidden w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30 mr-2 shrink-0">
+                      <LayoutDashboard className="w-5 h-5 text-white" />
                    </div>
-                   <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                      <h1 className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-widest uppercase">
-                         WikiApp <span className="text-[9px] bg-blue-500/20 px-2 py-0.5 rounded-full text-blue-400 font-black border border-blue-500/20 ml-1">PRO-V2</span>
+                   <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3">
+                      <h1 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase font-display">
+                         WikiApp <span className="text-[10px] bg-blue-500/20 px-2 py-0.5 rounded-full text-blue-500 font-black border border-blue-500/20 ml-1">PRO V2</span>
                       </h1>
                       <div className="flex items-center gap-2">
-                        <ChevronRight className="w-3 h-3 text-gray-700 hidden md:block" />
-                        <span className="text-[10px] md:text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest">
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 hidden md:block" />
+                        <span className="text-[10px] md:text-[11px] font-bold text-slate-500 dark:text-gray-400 uppercase tracking-[0.2em] font-mono">
                             {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'security' ? 'Centro de Auditoría' : activeTab === 'logistics' ? 'Control de Tráfico' : activeTab === 'radio' ? 'Dial Fueguino' : 'Sistema'}
                         </span>
                       </div>
                    </div>
                 </div>
-                <div className="flex items-center gap-2 md:gap-6">
-                    <div className="hidden sm:flex items-center gap-1 text-[9px] font-black text-slate-500 dark:text-gray-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-white/5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1"></span>
-                        Sincronización <span className="text-emerald-500/80 ml-1">OK</span>
+                <div className="flex items-center gap-2 md:gap-4">
+                    <div className="hidden sm:flex items-center gap-2 text-[10px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-4 py-2 rounded-full border border-slate-200 dark:border-white/5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Sincronización <span className="text-emerald-500 ml-1">Estable</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                        <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2 text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:text-white transition-all hover:bg-slate-100 dark:bg-white/5 rounded-xl" title="Cambiar Tema">
-                            {mounted && theme === 'dark' ? <Sun className="w-4 h-4 md:w-5 md:h-5 text-yellow-500" /> : mounted ? <Moon className="w-4 h-4 md:w-5 md:h-5 text-slate-600" /> : <div className="w-4 h-4 md:w-5 md:h-5" />}
+                    <div className="flex items-center gap-1.5">
+                        <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2.5 text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all" title="Cambiar Tema">
+                            {mounted && theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-500" /> : mounted ? <Moon className="w-5 h-5" /> : <div className="w-5 h-5" />}
                         </button>
-                        <button className="p-2 text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:text-white transition-all hover:bg-slate-100 dark:bg-white/5 rounded-xl"><Cloud className="w-4 h-4 md:w-5 md:h-5" /></button>
-                        <button className="p-2 text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:text-white transition-all hover:bg-slate-100 dark:bg-white/5 rounded-xl"><Search className="w-4 h-4 md:w-5 md:h-5" /></button>
-                        <button className="p-2 text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:text-white transition-all hover:bg-slate-100 dark:bg-white/5 rounded-xl"><MoreHorizontal className="w-4 h-4 md:w-5 md:h-5" /></button>
+                        <button className="p-2.5 text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"><Bell className="w-5 h-5" /></button>
+                        <button className="p-2.5 text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"><Settings className="w-5 h-5" /></button>
                     </div>
                 </div>
             </div>
         </div>
                      {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
+             {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
             {activeTab === 'home' && (
-                <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-6 py-5 px-4 md:px-8 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] backdrop-blur-3xl sticky top-[80px] z-20">
+                <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-6 py-6 px-4 md:px-8 border-b border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.01] backdrop-blur-3xl sticky top-[80px] z-20">
                     
                     {/* CUADRO DE BÚSQUEDA PRO */}
-                    <div className="relative w-full xl:w-80 group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                    <div className="relative w-full xl:w-96 group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                         <input 
                             type="text" 
-                            placeholder="Buscar noticias..." 
+                            placeholder="Buscar en el flujo de noticias..." 
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-2xl py-3 pl-11 pr-4 text-xs font-bold text-slate-800 dark:text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                            className="w-full bg-slate-100/50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-[13px] font-medium text-slate-800 dark:text-gray-200 placeholder:text-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm"
                         />
                     </div>
 
                     {/* FILTRO DE CATEGORÍAS (DROPDOWN) */}
                     <div className="flex items-center gap-3 w-full xl:w-auto">
-                        <div className="px-3 py-2 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-300 dark:border-white/10 flex items-center gap-2 shrink-0">
-                            <ListFilter className="w-3.5 h-3.5 text-blue-500" />
-                            <span className="text-[10px] font-black text-slate-600 dark:text-gray-400 uppercase tracking-widest hidden sm:inline">Filtrar</span>
+                        <div className="px-4 py-3 bg-slate-100/50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 flex items-center gap-2 shrink-0">
+                            <ListFilter className="w-4 h-4 text-blue-500" />
+                            <span className="text-[11px] font-bold text-slate-600 dark:text-gray-400 uppercase tracking-widest hidden sm:inline">Categoría</span>
                         </div>
-                        <select 
-                            value={activeCategory}
-                            onChange={(e) => setActiveCategory(e.target.value)}
-                            className="flex-1 xl:w-48 bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl py-2 px-3 text-[11px] font-black uppercase text-slate-700 dark:text-gray-300 focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer"
-                        >
-                            <option value="all">Todas las Categorías</option>
-                            <option value="tecnologia">Tecnología</option>
-                            <option value="economia">Economía</option>
-                            <option value="seguridad">Seguridad</option>
-                            <option value="educacion">Educación</option>
-                            <option value="transporte">Transporte</option>
-                        </select>
+                        <div className="relative flex-1 xl:w-56 group">
+                            <select 
+                                value={activeCategory}
+                                onChange={(e) => setActiveCategory(e.target.value)}
+                                className="w-full bg-slate-100/50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-[12px] font-bold uppercase text-slate-700 dark:text-gray-300 focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer"
+                            >
+                                <option value="all">Todo el Panorama</option>
+                                <option value="tecnologia">Tecnología</option>
+                                <option value="economia">Economía</option>
+                                <option value="seguridad">Seguridad</option>
+                                <option value="educacion">Educación</option>
+                                <option value="transporte">Transporte</option>
+                            </select>
+                            <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 rotate-90 pointer-events-none" />
+                        </div>
                     </div>
 
                     {/* PESTAÑAS GEOGRÁFICAS FIJAS */}
-                    <div className="flex bg-slate-100 dark:bg-black/40 p-1 rounded-2xl border border-slate-200 dark:border-white/5 items-center">
+                    <div className="flex bg-slate-100/50 dark:bg-black/40 p-1.5 rounded-[1.25rem] border border-slate-200 dark:border-white/5 items-center">
                         {[
                             { id: 'all', label: 'Panorama' },
-                            { id: 'internacional', label: 'Internacional' },
-                            { id: 'nacional', label: 'Argentina' },
-                            { id: 'provincial', label: 'Tierra del Fuego' }
+                            { id: 'internacional', label: 'Global' },
+                            { id: 'nacional', label: 'Nacional' },
+                            { id: 'provincial', label: 'Provincial' }
                         ].map((item) => (
                             <button 
                               key={item.id} 
                               onClick={() => setActiveCategory(item.id)}
-                              className={`px-4 md:px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all duration-300 ${activeCategory === item.id ? 'bg-blue-600 text-slate-900 dark:text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300 hover:bg-slate-100 dark:bg-white/5'}`}
+                              className={`px-5 md:px-7 py-2.5 rounded-[1rem] text-[11px] font-black uppercase tracking-tight transition-all duration-300 ${activeCategory === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'}`}
                             >
                                 {item.label}
                             </button>
                         ))}
                     </div>
 
-                    {/* SELECTORES DE VISTA */}
-                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-black/40 p-1 rounded-xl border border-slate-200 dark:border-white/5 ml-auto">
-                      <button onClick={() => setViewMode('list')} className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-blue-600/20 text-blue-500 ring-1 ring-blue-500/30' : 'text-gray-600 hover:text-slate-700 dark:text-gray-300'}`}><List className="w-4 h-4" /></button>
-                      <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-blue-600/20 text-blue-500 ring-1 ring-blue-500/30' : 'text-gray-600 hover:text-slate-700 dark:text-gray-300'}`}><LayoutGrid className="w-4 h-4" /></button>
-                      <button onClick={() => setViewMode('magazine')} className={`p-2 rounded-lg transition-all ${viewMode === 'magazine' ? 'bg-blue-600/20 text-blue-500 ring-1 ring-blue-500/30' : 'text-gray-600 hover:text-slate-700 dark:text-gray-300'}`}><LayoutTemplate className="w-4 h-4" /></button>
+                    {/* SELECTORES DE VISTA Y DENSIDAD */}
+                    <div className="flex items-center gap-3 ml-auto">
+                        {/* Density Toggle */}
+                        <div className="hidden md:flex bg-slate-100/50 dark:bg-black/40 p-1 rounded-xl border border-slate-200 dark:border-white/5 items-center">
+                            <button 
+                                onClick={() => setDensity('compact')} 
+                                className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${density === 'compact' ? 'bg-white dark:bg-white/10 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                Compacto
+                            </button>
+                            <button 
+                                onClick={() => setDensity('comfortable')} 
+                                className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${density === 'comfortable' ? 'bg-white dark:bg-white/10 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                Amplio
+                            </button>
+                        </div>
+
+                        <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-black/40 p-1.5 rounded-2xl border border-slate-200 dark:border-white/5">
+                          <button onClick={() => setViewMode('list')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'list' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'}`} title="Vista de Lista"><List className="w-5 h-5" /></button>
+                          <button onClick={() => setViewMode('grid')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'}`} title="Vista de Galería"><LayoutGrid className="w-5 h-5" /></button>
+                          <button onClick={() => setViewMode('magazine')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'magazine' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'}`} title="Vista de Revista"><LayoutTemplate className="w-5 h-5" /></button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -395,7 +458,6 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                    <motion.div layout className={`flex ${viewMode === 'list' ? 'flex-col shadow-inner' : viewMode === 'grid' ? 'flex-row flex-wrap p-4 md:p-6 gap-6' : 'flex-col p-2 md:p-4'}`}>
                                 <AnimatePresence mode="popLayout">
                                     {feedArticlesToDisplay.map(article => {
-                                        const sourceName = feeds.find(f => f.id === article.sourceId)?.name || 'Fuente';
                                         const isVid = isYouTube(article.link);
 
                                         // VIEW: LIST
@@ -406,111 +468,124 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                 exit={{ opacity: 0, x: 10 }}
                                                 key={article.id} 
                                                 onClick={() => setSelectedArticle(article)}
-                                                className="group flex flex-col sm:flex-row sm:items-center px-6 py-4 border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:bg-white/[0.03] cursor-pointer transition-all border-l-2 border-l-transparent hover:border-l-blue-600 shadow-sm"
+                                                className={`group flex flex-col sm:flex-row sm:items-center px-6 ${density === 'compact' ? 'py-3' : 'py-5'} border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.03] cursor-pointer transition-all border-l-4 border-l-transparent hover:border-l-blue-600 relative overflow-hidden`}
                                             >
-                                                <div className="hidden sm:flex w-10 shrink-0 items-center justify-center">
-                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isVid ? 'bg-red-500/10' : 'bg-blue-500/10'}`}>
-                                                        {isVid ? <PlayCircle className="w-4 h-4 text-red-500" /> : <ChevronRight className="w-4 h-4 text-blue-500" />}
+                                                {/* Reading Indicator Placeholder */}
+                                                <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-600/0 group-hover:bg-blue-600/20 transition-all"></div>
+                                                
+                                                <div className={`hidden sm:flex ${density === 'compact' ? 'w-10' : 'w-12'} shrink-0 items-center justify-center`}>
+                                                    <div className={`${density === 'compact' ? 'w-8 h-8 rounded-lg' : 'w-10 h-10 rounded-xl'} flex items-center justify-center transition-all ${isVid ? 'bg-red-500/10 text-red-500 group-hover:bg-red-500 group-hover:text-white' : 'bg-blue-500/10 text-blue-500 group-hover:bg-blue-600 group-hover:text-white'}`}>
+                                                        {isVid ? <PlayCircle className={density === 'compact' ? 'w-4 h-4' : 'w-5 h-5'} /> : <FileText className={density === 'compact' ? 'w-4 h-4' : 'w-5 h-5'} />}
                                                     </div>
                                                 </div>
-                                                <div className="flex-1 min-w-0 pr-4 pl-2 space-y-1">
-                                                    <h3 className="text-[14px] font-bold text-slate-800 dark:text-gray-200 group-hover:text-slate-900 dark:text-white truncate tracking-tight transition-colors">
+                                                <div className={`flex-1 min-w-0 px-4 ${density === 'compact' ? 'space-y-0.5' : 'space-y-1.5'}`}>
+                                                    <h3 className={`${density === 'compact' ? 'text-[13px]' : 'text-[15px]'} font-bold text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-snug transition-colors font-display`}>
                                                         {article.title}
                                                     </h3>
-                                                    <div className="hidden md:flex items-center gap-2 text-[10px] text-slate-500 dark:text-gray-500 font-bold uppercase tracking-widest">
-                                                       <span className="text-blue-500/80">{sourceName}</span>
-                                                       <span className="opacity-30">•</span>
-                                                       <span>{getRelativeTime(article.pubDate)}</span>
+                                                    <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest">
+                                                       <span className="text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded">{sourceName}</span>
+                                                       <span className="text-slate-400 dark:text-gray-500 font-mono">{getRelativeTime(article.pubDate)}</span>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-3 mt-2 sm:mt-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="flex items-center gap-2 mt-3 sm:mt-0 shrink-0 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className={`${density === 'compact' ? 'p-2' : 'p-2.5'} bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-500 dark:text-gray-400 hover:text-green-500 rounded-xl transition-all`}><MessageCircle className="w-4 h-4" /></button>
+                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className={`${density === 'compact' ? 'p-2' : 'p-2.5'} bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-500 dark:text-gray-400 hover:text-blue-400 rounded-xl transition-all`}><Send className="w-4 h-4" /></button>
+                                                </div>
+                                            </motion.div>
+                                        );
+                              );
+
+                                        // VIEW: GRID
+                                        if (viewMode === 'grid') return (
+                                            <motion.div 
+                                                initial={{ opacity: 0, scale: 0.95 }}
+                                                whileHover={{ y: -5 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                key={article.id} 
+                                                onClick={() => setSelectedArticle(article)}
+                                                className={`group relative w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all cursor-pointer flex flex-col`}
+                                            >
+                                                {article.thumbnail && (
+                                                    <div className="aspect-[16/10] overflow-hidden relative">
+                                                        <img src={article.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent opacity-60"></div>
+                                                        {isVid && (
+                                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                                <div className={`${density === 'compact' ? 'w-10 h-10' : 'w-14 h-14'} rounded-full bg-red-600/20 backdrop-blur-xl flex items-center justify-center border border-red-500/30 group-hover:scale-110 transition-transform`}>
+                                                                    <PlayCircle className={density === 'compact' ? 'w-6 h-6' : 'w-8 h-8'} text-white />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        <div className="absolute top-4 left-4">
+                                                            <span className="text-[9px] font-black text-white uppercase tracking-widest bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10">{sourceName}</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {!article.thumbnail && (
+                                                    <div className={`aspect-[16/10] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-black flex items-center justify-center`}>
+                                                        <FileText className={`${density === 'compact' ? 'w-8 h-8' : 'w-10 h-10'} text-slate-300 dark:text-slate-800`} />
+                                                    </div>
+                                                )}
+                                                <div className={`${density === 'compact' ? 'p-4' : 'p-6'} flex flex-col flex-1 gap-3`}>
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[10px] text-slate-400 dark:text-gray-500 font-black uppercase tracking-widest font-mono">{getRelativeTime(article.pubDate)}</span>
+                                                        <Bookmark className="w-3.5 h-3.5 text-slate-300 dark:text-gray-700 hover:text-blue-500 transition-colors" />
+                                                    </div>
+                                                    <h3 className={`${density === 'compact' ? 'text-[13px]' : 'text-[15px]'} font-bold text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-tight line-clamp-3 transition-colors font-display`}>
+                                                        {article.title}
+                                                    </h3>
+                                                </div>
+                                                <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 bg-white dark:bg-black/80 backdrop-blur-xl p-2 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl">
                                                     <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-lg transition-all"><MessageCircle className="w-4 h-4" /></button>
                                                     <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-400 rounded-lg transition-all"><Send className="w-4 h-4" /></button>
                                                 </div>
                                             </motion.div>
                                         );
 
-                                        // VIEW: GRID
-                                        if (viewMode === 'grid') return (
-                                            <motion.div 
-                                                initial={{ opacity: 0, scale: 0.95 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                exit={{ opacity: 0, scale: 0.95 }}
-                                                key={article.id} 
-                                                onClick={() => setSelectedArticle(article)}
-                                                className="group relative w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 rounded-[1.5rem] overflow-hidden hover:border-blue-600/30 hover:bg-slate-100 dark:bg-white/[0.04] transition-all cursor-pointer flex flex-col shadow-lg"
-                                            >
-                                                {article.thumbnail && (
-                                                    <div className="aspect-[16/10] overflow-hidden relative">
-                                                        <img src={article.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] to-transparent opacity-80"></div>
-                                                        {isVid && (
-                                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                                <div className="w-12 h-12 rounded-full bg-red-600/20 backdrop-blur-md flex items-center justify-center border border-red-500/30 group-hover:scale-110 transition-transform">
-                                                                    <PlayCircle className="w-6 h-6 text-red-500" />
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                                <div className="p-5 flex flex-col flex-1 gap-3">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-600/10 px-2 py-0.5 rounded border border-blue-500/20">{sourceName}</span>
-                                                        <span className="text-[9px] text-slate-500 dark:text-gray-500 font-bold">{getRelativeTime(article.pubDate)}</span>
-                                                    </div>
-                                                    <h3 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 group-hover:text-slate-900 dark:text-white leading-[1.4] line-clamp-2 transition-colors">
-                                                        {article.title}
-                                                    </h3>
-                                                </div>
-                                                <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-100/90 dark:bg-black/80 backdrop-blur-md p-1.5 rounded-xl border border-slate-200 dark:border-white/10">
-                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-lg transition-all" title="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
-                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-400 rounded-lg transition-all" title="Compartir en Telegram"><Send className="w-4 h-4" /></button>
-                                                </div>
-                                            </motion.div>
-                                        );
 
                                         // VIEW: MAGAZINE
                                         if (viewMode === 'magazine') return (
                                             <motion.div 
-                                                initial={{ opacity: 0, y: 20 }}
+                                                initial={{ opacity: 0, y: 30 }}
                                                 animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: 20 }}
+                                                exit={{ opacity: 0, y: 30 }}
                                                 key={article.id} 
                                                 onClick={() => setSelectedArticle(article)}
-                                                className="group flex flex-col lg:flex-row gap-6 md:gap-8 p-4 md:p-8 border-b border-slate-200 dark:border-white/5 hover:bg-white/[0.01] transition-all cursor-pointer relative overflow-hidden"
+                                                className="group flex flex-col lg:flex-row gap-8 md:gap-12 p-6 md:p-10 border-b border-slate-200 dark:border-white/5 hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-all cursor-pointer relative overflow-hidden"
                                             >
-                                                <div className="w-full lg:w-[350px] aspect-[16/9] lg:h-[200px] shrink-0 overflow-hidden rounded-[2rem] relative shadow-2xl">
-                                                    <img src={article.thumbnail || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=600'} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                                                <div className="w-full lg:w-[450px] aspect-[16/10] lg:h-[280px] shrink-0 overflow-hidden rounded-[2.5rem] relative shadow-2xl">
+                                                    <img src={article.thumbnail || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=600'} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2000ms]" />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                                                     {isVid && (
-                                                        <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-red-600/80 backdrop-blur-md px-3 py-1 rounded-full border border-red-500/50">
-                                                            <PlayCircle className="w-4 h-4 text-slate-900 dark:text-white" />
-                                                            <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Video</span>
+                                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center border border-white/30 opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100">
+                                                            <PlayCircle className="w-10 h-10 text-white" />
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div className="flex flex-col flex-1 justify-center gap-4">
+                                                <div className="flex flex-col flex-1 justify-center gap-6">
                                                     <div className="flex items-center gap-4">
-                                                       <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">{sourceName}</span>
-                                                       <div className="w-1.5 h-1.5 rounded-full bg-blue-500/20"></div>
-                                                       <span className="text-[10px] font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest">{getRelativeTime(article.pubDate)}</span>
+                                                       <span className="text-[11px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.25em] font-mono">{sourceName}</span>
+                                                       <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+                                                       <span className="text-[11px] font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest font-mono">{getRelativeTime(article.pubDate)}</span>
                                                     </div>
-                                                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-gray-100 group-hover:text-slate-900 dark:text-white leading-[1.1] tracking-tighter transition-colors max-w-3xl">
+                                                    <h3 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white leading-[1.05] tracking-tight transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400 font-display">
                                                         {article.title}
                                                     </h3>
-                                                    <p className="text-[15px] text-slate-600 dark:text-gray-400 line-clamp-2 leading-relaxed font-medium max-w-2xl">
-                                                        {stripHtml(article.description || '').slice(0, 250)}...
+                                                    <p className="text-[17px] text-slate-600 dark:text-gray-400 line-clamp-3 leading-relaxed font-medium max-w-3xl">
+                                                        {stripHtml(article.description || '').slice(0, 300)}...
                                                     </p>
-                                                    <div className="flex items-center gap-3 mt-2">
-                                                        <span className="text-[11px] font-black text-blue-500 uppercase tracking-widest border border-blue-500/30 px-4 py-2 rounded-full hover:bg-blue-500 hover:text-slate-900 dark:text-white transition-all">Leer Articulo Completo</span>
-                                                        <div className="flex items-center gap-2 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-lg transition-all border border-slate-200 dark:border-white/5" title="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-400 rounded-lg transition-all border border-slate-200 dark:border-white/5" title="Compartir en Telegram"><Send className="w-4 h-4" /></button>
+                                                    <div className="flex items-center gap-4 mt-2">
+                                                        <span className="text-[12px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest border-b-2 border-blue-600/20 group-hover:border-blue-600 transition-all pb-1">Seguir leyendo</span>
+                                                        <div className="flex items-center gap-3 ml-auto opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en WhatsApp"><MessageCircle className="w-5 h-5" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-400 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en Telegram"><Send className="w-5 h-5" /></button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </motion.div>
                                         );
+
 
                                         return null;
                                     })}
@@ -1037,70 +1112,174 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
       </div>
       
       {/* 4. MODAL LECTOR */}
+      {/* 5. OVERLAYS & HUD */}
+      
+      {/* GLOBAL SEARCH MODAL (Cmd+K) */}
+      <AnimatePresence>
+        {showSearchModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] px-4 bg-slate-900/40 backdrop-blur-sm"
+            onClick={() => setShowSearchModal(false)}
+          >
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -20 }}
+              className="w-full max-w-2xl bg-white dark:bg-[#121212] rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="relative p-6 border-b border-slate-200 dark:border-white/5">
+                <Search className="absolute left-10 top-1/2 -translate-y-1/2 w-6 h-6 text-blue-500" />
+                <input 
+                  autoFocus
+                  type="text" 
+                  placeholder="Comando rápido: Busca cualquier noticia..." 
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full bg-slate-100 dark:bg-white/5 border-none rounded-2xl py-5 pl-14 pr-6 text-xl font-medium text-slate-800 dark:text-white placeholder:text-slate-400 focus:ring-0"
+                />
+                <div className="absolute right-10 top-1/2 -translate-y-1/2 px-2 py-1 bg-slate-200 dark:bg-white/10 rounded-md text-[10px] font-black text-slate-500 uppercase">ESC</div>
+              </div>
+              <div className="max-h-[50vh] overflow-y-auto p-4 custom-scrollbar">
+                {search.length > 0 ? (
+                  <div className="space-y-2">
+                    {filteredArticles.slice(0, 10).map(article => (
+                      <div 
+                        key={article.id} 
+                        onClick={() => { setSelectedArticle(article); setShowSearchModal(false); }}
+                        className="p-4 hover:bg-blue-600/10 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-blue-500/20 group"
+                      >
+                        <h4 className="text-sm font-bold text-slate-800 dark:text-gray-200 group-hover:text-blue-500 transition-colors">{article.title}</h4>
+                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest mt-1 block">{(feeds.find(f => f.id === article.sourceId)?.name || 'Fuente')}</span>
+                      </div>
+                    ))}
+                    {filteredArticles.length === 0 && (
+                      <div className="p-12 text-center">
+                        <p className="text-slate-500">No se encontraron resultados para "{search}"</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-12 text-center opacity-40">
+                    <LayoutDashboard className="w-12 h-12 mx-auto mb-4" />
+                    <p className="text-sm font-bold uppercase tracking-[0.3em]">Buscador de Inteligencia WikiApp</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* LIVE SYNC HUD */}
+      <div className="fixed bottom-8 right-8 z-[60] flex flex-col items-end gap-3 pointer-events-none">
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-2xl flex items-center gap-4"
+        >
+          <div className="relative">
+            <div className="w-3 h-3 bg-emerald-500 rounded-full animate-ping absolute inset-0"></div>
+            <div className="w-3 h-3 bg-emerald-500 rounded-full relative"></div>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Estado del Sistema</span>
+            <span className="text-xs font-bold text-white tracking-tight">Sincronizado: {new Date().toLocaleTimeString()}</span>
+          </div>
+        </motion.div>
+      </div>
+
       <AnimatePresence>
         {selectedArticle && (
-           <motion.div 
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             exit={{ opacity: 0 }}
-             className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-4 md:p-12"
-             onClick={() => setSelectedArticle(null)}
-           >
-              <motion.div 
-                 initial={{ y: "100%" }}
-                 animate={{ y: 0 }}
-                 exit={{ y: "100%" }}
-                 transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                 className="bg-slate-50 dark:bg-[#0a0a0a] w-full max-w-4xl h-[95vh] sm:h-full max-h-[900px] rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col border border-slate-300 dark:border-[#222] overflow-hidden"
-                 onClick={e => e.stopPropagation()}
-              >
-                 <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0c0c0c]">
-                    <span className="text-[11px] font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest pl-2">Lector de Artículos</span>
-                    <button onClick={() => setSelectedArticle(null)} className="p-2 rounded-lg hover:bg-[#1f1f1f] transition-colors text-slate-600 dark:text-gray-400">
-                       <X className="w-5 h-5" />
-                    </button>
-                 </div>
-                 <div className="flex-1 overflow-y-auto p-6 md:p-12 scrollbar-smooth bg-slate-50 dark:bg-[#0a0a0a]">
-                    <div className="max-w-2xl mx-auto">
-                       <div className="flex items-center gap-3">
-                          <span className="text-xs font-black text-blue-500 uppercase tracking-widest">
-                            {feeds.find(f => f.id === selectedArticle.sourceId)?.name || 'Central'}
-                          </span>
-                          {isYouTube(selectedArticle.link) && (
-                              <span className="bg-red-600/20 text-red-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase border border-red-500/30 flex items-center gap-1">
-                                 <PlayCircle className="w-3 h-3"/> Video
-                              </span>
-                          )}
-                       </div>
-                       
-                       <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mt-5 leading-tight text-slate-900 dark:text-white mb-6">
-                          {selectedArticle.title}
-                       </h1>
-                       
-                       {selectedArticle.thumbnail && (
-                           <div className="w-full h-auto mt-4 mb-8 rounded-xl overflow-hidden border border-slate-300 dark:border-[#222] relative group">
-                              <img src={selectedArticle.thumbnail} alt="" className="w-full h-full object-cover" />
-                              {isYouTube(selectedArticle.link) && (
-                                  <a href={selectedArticle.link} target="_blank" rel="noopener noreferrer" className="absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-black/40 group-hover:bg-black/60 transition-colors">
-                                      <PlayCircle className="w-16 h-16 text-red-500 drop-shadow-xl transform group-hover:scale-110 transition-transform" />
-                                  </a>
-                              )}
-                           </div>
-                       )}
-
-                       <div className="prose prose-invert prose-p:text-slate-700 dark:text-gray-300 prose-headings:text-slate-900 dark:text-white mt-8 leading-relaxed max-w-none text-[16px] md:text-[18px]" 
-                            dangerouslySetInnerHTML={{ __html: selectedArticle.description || '<p>Contenido principal no provisto por la fuente.</p>' }} 
-                       />
-                       
-                       <div className="mt-16 pt-8 border-t border-slate-200 dark:border-[#1f1f1f] flex justify-center">
-                          <a href={selectedArticle.link} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 ${isYouTube(selectedArticle.link) ? 'bg-red-600 hover:bg-red-700 text-slate-900 dark:text-white border-transparent' : 'bg-slate-100 dark:bg-[#1a1a1a] hover:bg-slate-200 dark:bg-[#222] text-slate-800 dark:text-gray-200 border border-slate-300 dark:border-[#333]'} px-8 py-4 rounded-full text-sm font-bold transition-all shadow-lg`}>
-                            {isYouTube(selectedArticle.link) ? 'VER EN YOUTUBE' : 'LEER EN ORIGEN'} <ExternalLink className="w-4 h-4 ml-2" />
-                          </a>
-                       </div>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-md p-0 sm:p-4 md:p-12"
+            onClick={() => setSelectedArticle(null)}
+          >
+            <motion.div 
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-white dark:bg-[#0a0a0a] w-full max-w-4xl h-[95vh] sm:h-full max-h-[900px] rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl flex flex-col border border-slate-200 dark:border-white/10 overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#0c0c0c]">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-blue-600/10 flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-blue-500" />
+                  </div>
+                  <span className="text-[11px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-[0.2em]">Inteligencia Operativa</span>
+                </div>
+                <button onClick={() => setSelectedArticle(null)} className="p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-slate-600 dark:text-gray-400">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-6 md:p-16 custom-scrollbar bg-white dark:bg-[#0a0a0a]">
+                <div className="max-w-2xl mx-auto">
+                  <div className="flex items-center gap-4 mb-6">
+                    <span className="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] bg-blue-600/10 px-3 py-1.5 rounded-lg border border-blue-500/20">
+                      {feeds.find(f => f.id === selectedArticle.sourceId)?.name || 'Central'}
+                    </span>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">{new Date(selectedArticle.pubDate).toLocaleDateString()}</span>
+                    {isYouTube(selectedArticle.link) && (
+                      <span className="bg-red-600/10 text-red-500 px-3 py-1 rounded-lg text-[10px] font-black uppercase border border-red-500/20 flex items-center gap-1.5">
+                        <PlayCircle className="w-3.5 h-3.5" /> Video
+                      </span>
+                    )}
+                  </div>
+                  
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] text-slate-900 dark:text-white mb-10 font-display">
+                    {selectedArticle.title}
+                  </h1>
+                  
+                  {selectedArticle.thumbnail && (
+                    <div className="w-full aspect-[16/10] mb-12 rounded-[2rem] overflow-hidden border border-slate-200 dark:border-white/10 relative group shadow-2xl">
+                      <img src={selectedArticle.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[3000ms]" />
+                      {isYouTube(selectedArticle.link) && (
+                        <a href={selectedArticle.link} target="_blank" rel="noopener noreferrer" className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                          <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center border border-white/30 transform group-hover:scale-110 transition-all">
+                            <PlayCircle className="w-10 h-10 text-white" />
+                          </div>
+                        </a>
+                      )}
                     </div>
-                 </div>
-              </motion.div>
-           </motion.div>
+                  )}
+
+                  <div 
+                    className="prose prose-slate dark:prose-invert max-w-none 
+                      prose-p:text-lg prose-p:leading-relaxed prose-p:text-slate-600 dark:prose-p:text-gray-300
+                      prose-headings:font-black prose-headings:tracking-tight prose-headings:font-display
+                      prose-a:text-blue-600 prose-img:rounded-3xl prose-img:shadow-xl" 
+                    dangerouslySetInnerHTML={{ __html: selectedArticle.description || '<p>Contenido principal no provisto por la fuente.</p>' }} 
+                  />
+                  
+                  <div className="mt-20 pt-10 border-t border-slate-200 dark:border-white/5 flex flex-col items-center gap-6">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Continúa leyendo la versión completa en el sitio oficial</p>
+                    <a 
+                      href={selectedArticle.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className={`flex items-center gap-3 px-10 py-5 rounded-2xl text-[13px] font-black tracking-widest transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 ${
+                        isYouTube(selectedArticle.link) 
+                          ? 'bg-red-600 text-white hover:bg-red-700 shadow-red-600/20' 
+                          : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-600/20'
+                      }`}
+                    >
+                      {isYouTube(selectedArticle.link) ? 'VER EN YOUTUBE' : 'ACCEDER AL SITIO WEB'} 
+                      <ExternalLink className="w-4.5 h-4.5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
       

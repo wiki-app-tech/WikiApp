@@ -159,22 +159,22 @@ export default function WeatherDashboard() {
     <div className="w-full flex flex-col gap-6">
       
       {/* Header Selector */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">Clima Regional</h2>
-          <p className="text-sm text-[var(--color-text-tertiary)] mt-1 font-medium">Condiciones meteorológicas y pronóstico extendido.</p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-1">
+          <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white font-display uppercase">Clima Regional</h2>
+          <p className="text-[13px] text-slate-500 dark:text-gray-400 font-medium">Condiciones meteorológicas y monitoreo geológico en tiempo real.</p>
         </div>
         
         {/* City Tabs */}
-        <div className="flex overflow-x-auto scrollbar-hide gap-1 p-1 bg-black/20 backdrop-blur-xl border border-slate-200 dark:border-white/5 rounded-2xl w-full md:w-auto">
+        <div className="flex bg-slate-100/50 dark:bg-black/40 p-1.5 rounded-[1.25rem] border border-slate-200 dark:border-white/5 items-center w-full md:w-auto overflow-x-auto scrollbar-hide">
           {dataList.map((loc, idx) => (
             <button
               key={loc.id}
               onClick={() => setSelectedIndex(idx)}
-              className={`whitespace-nowrap px-6 py-2.5 text-[11px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${
+              className={`whitespace-nowrap px-6 py-2.5 text-[11px] font-black uppercase tracking-tight rounded-[1rem] transition-all duration-300 ${
                 selectedIndex === idx 
-                  ? 'bg-blue-600 text-slate-900 dark:text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]' 
-                  : 'text-slate-500 dark:text-gray-500 hover:bg-slate-100 dark:bg-white/5 hover:text-slate-700 dark:text-gray-300'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' 
+                  : 'text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'
               }`}
             >
               {loc.name}
@@ -209,10 +209,11 @@ export default function WeatherDashboard() {
                 </p>
               </div>
 
-              <div className="flex items-baseline mt-8 gap-4">
-                <span className="text-[120px] md:text-[140px] font-black tracking-tighter leading-none drop-shadow-2xl">
+              <div className="flex flex-col gap-2 mt-12">
+                <span className="text-[110px] md:text-[130px] font-black tracking-tighter leading-none drop-shadow-2xl font-display">
                   {currentData.current.temperature.toFixed(0)}°
                 </span>
+                <div className="w-20 h-1.5 bg-white/20 rounded-full"></div>
               </div>
               
               <div className="flex flex-wrap gap-4 mt-8">

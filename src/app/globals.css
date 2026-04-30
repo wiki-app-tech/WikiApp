@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
 @import "tailwindcss";
 
 @theme inline {
@@ -7,20 +9,25 @@
   
   --color-text-primary: #0f172a;           /* slate-900 */
   --color-text-secondary: #334155;         /* slate-700 */
-  --color-text-tertiary: #475569;          /* slate-600 (MINIMUM CONTRAST RECOMMENDED) */
+  --color-text-tertiary: #64748b;          /* slate-500 (REFINED CONTRAST) */
   
-  --color-accent-primary: #3b82f6;         /* blue-500 */
-  --color-accent-primary-hover: #2563eb;   /* blue-600 */
+  --color-accent-primary: #2563eb;         /* blue-600 */
+  --color-accent-primary-hover: #1d4ed8;   /* blue-700 */
   --color-accent-secondary: #10b981;       /* emerald-500 */
   
   --color-border-subtle: #e2e8f0;          /* slate-200 */
   --color-border-hover: #cbd5e1;           /* slate-300 */
   
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
 [data-theme='dark'] {
@@ -34,6 +41,9 @@
 
   --color-border-subtle: #1e293b;          /* slate-800 */
   --color-border-hover: #334155;           /* slate-700 */
+  
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
 /* Base Rest CSS */
@@ -48,7 +58,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Typography Utilities */
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
 }
 
 /* Scrollbar Hide UIUX rule */
@@ -62,7 +81,46 @@ body {
 
 /* Premium Focus States */
 :focus-visible {
-  outline: 2px solid var(--color-accent-primary);
+  outline: 2px solid #3b82f6;
   outline-offset: 2px;
-  border-radius: 4px;
+}
+
+/* Skeleton Loading Utility */
+@keyframes skeleton-loading {
+  0% { background-color: rgba(0, 0, 0, 0.05); }
+  50% { background-color: rgba(0, 0, 0, 0.1); }
+  100% { background-color: rgba(0, 0, 0, 0.05); }
+}
+
+.dark .skeleton {
+  animation: skeleton-loading-dark 2s infinite ease-in-out;
+}
+
+@keyframes skeleton-loading-dark {
+  0% { background-color: rgba(255, 255, 255, 0.03); }
+  50% { background-color: rgba(255, 255, 255, 0.08); }
+  100% { background-color: rgba(255, 255, 255, 0.03); }
+}
+
+.skeleton {
+  animation: skeleton-loading 2s infinite ease-in-out;
+  border-radius: 0.75rem;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.125);
+}
+
+[data-theme='dark'] .glass {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
 }
