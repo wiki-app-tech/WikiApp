@@ -279,7 +279,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         </div>
                      {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
              {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
-            {activeTab === 'home' && (
+            {(activeTab === 'home' || activeTab === 'explore') && (
                 <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-6 py-6 px-4 md:px-8 border-b border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.01] backdrop-blur-3xl sticky top-[80px] z-20">
                     
                     {/* CUADRO DE BÚSQUEDA PRO */}
@@ -307,33 +307,45 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                 className="w-full bg-slate-100/50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-[12px] font-bold uppercase text-slate-700 dark:text-gray-300 focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer"
                             >
                                 <option value="all">Todo el Panorama</option>
-                                <option value="tecnologia">Tecnología</option>
-                                <option value="economia">Economía</option>
-                                <option value="seguridad">Seguridad</option>
-                                <option value="educacion">Educación</option>
-                                <option value="transporte">Transporte</option>
+                                {activeTab === 'home' ? (
+                                    <>
+                                        <option value="tecnologia">Tecnología</option>
+                                        <option value="economia">Economía</option>
+                                        <option value="seguridad">Seguridad</option>
+                                        <option value="educacion">Educación</option>
+                                        <option value="transporte">Transporte</option>
+                                    </>
+                                ) : (
+                                    feedSideCats.map(cat => (
+                                        <option key={cat} value={cat as string}>
+                                            {(cat as string).replace(/-/g, ' ')}
+                                        </option>
+                                    ))
+                                )}
                             </select>
                             <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 rotate-90 pointer-events-none" />
                         </div>
                     </div>
 
                     {/* PESTAÑAS GEOGRÁFICAS FIJAS */}
-                    <div className="flex bg-slate-100/50 dark:bg-black/40 p-1.5 rounded-[1.25rem] border border-slate-200 dark:border-white/5 items-center">
-                        {[
-                            { id: 'all', label: 'Panorama' },
-                            { id: 'internacional', label: 'Global' },
-                            { id: 'nacional', label: 'Nacional' },
-                            { id: 'provincial', label: 'Provincial' }
-                        ].map((item) => (
-                            <button 
-                              key={item.id} 
-                              onClick={() => setActiveCategory(item.id)}
-                              className={`px-5 md:px-7 py-2.5 rounded-[1rem] text-[11px] font-black uppercase tracking-tight transition-all duration-300 ${activeCategory === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'}`}
-                            >
-                                {item.label}
-                            </button>
-                        ))}
-                    </div>
+                    {activeTab === 'home' && (
+                        <div className="flex bg-slate-100/50 dark:bg-black/40 p-1.5 rounded-[1.25rem] border border-slate-200 dark:border-white/5 items-center">
+                            {[
+                                { id: 'all', label: 'Panorama' },
+                                { id: 'internacional', label: 'Global' },
+                                { id: 'nacional', label: 'Nacional' },
+                                { id: 'provincial', label: 'Provincial' }
+                            ].map((item) => (
+                                <button 
+                                key={item.id} 
+                                onClick={() => setActiveCategory(item.id)}
+                                className={`px-5 md:px-7 py-2.5 rounded-[1rem] text-[11px] font-black uppercase tracking-tight transition-all duration-300 ${activeCategory === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'}`}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
 
                     {/* SELECTORES DE VISTA Y DENSIDAD */}
                     <div className="flex items-center gap-3 ml-auto">
@@ -442,7 +454,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                   <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
                       {/* MAIN CONTENT FEED LIST */}
-                      <div className="xl:col-span-8 flex flex-col gap-6">
+                      <div className={`${activeTab === 'explore' ? 'xl:col-span-12' : 'xl:col-span-8'} flex flex-col gap-6`}>
                          <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
                             <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm sticky top-0 z-10">
                                 <div className="flex items-center gap-3">
@@ -1054,29 +1066,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                         </div>
                       )}
 
-                      {/* SIDE PANEL FOR EXPLORE (FEEDS) */}
-                      {activeTab === 'explore' && (
-                        <div className="hidden xl:flex xl:col-span-4 flex-col gap-6 sticky top-20">
-                            <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
-                                <h2 className="text-[13px] font-bold text-slate-700 dark:text-gray-300 tracking-wide uppercase mb-2">Categorías Feeds</h2>
-                                <button 
-                                   onClick={() => setActiveCategory('all')}
-                                   className={`text-left px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all ${activeCategory === 'all' ? 'bg-blue-600/10 text-blue-500 border border-blue-500/20' : 'text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:bg-[#1a1a1a] hover:text-slate-800 dark:text-gray-200 border border-transparent'}`}
-                                >
-                                   Todos los Feeds
-                                </button>
-                                {feedSideCats.map(cat => (
-                                   <button 
-                                      key={cat}
-                                      onClick={() => setActiveCategory(cat as string)}
-                                      className={`text-left px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all capitalize ${activeCategory === cat ? 'bg-blue-600/10 text-blue-500 border border-blue-500/20' : 'text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:bg-[#1a1a1a] hover:text-slate-800 dark:text-gray-200 border border-transparent'}`}
-                                   >
-                                      {(cat as string).replace(/-/g, ' ')}
-                                   </button>
-                                ))}
-                            </div>
-                        </div>
-                      )}
+                      {/* SIDE PANEL REMOVED AND MOVED TO TOP DROPDOWN */}
                   </div>
                 </div>
              )}
