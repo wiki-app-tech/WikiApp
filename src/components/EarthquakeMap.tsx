@@ -77,30 +77,6 @@ const EarthquakeMap = () => {
   return (
     <div className="relative w-full h-full rounded-b-3xl overflow-hidden bg-[#0c0c0c]">
       
-      {/* Overlay Flotante de top sismos - Premium */}
-      <div className="absolute top-4 left-4 z-[400] w-[calc(100%-32px)] sm:w-64 pointer-events-none">
-         <div className="bg-black/70 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-5 shadow-[0_8px_32px_rgba(0,0,0,0.5)] pointer-events-auto overflow-hidden">
-            <div className="flex items-center gap-3 mb-4 border-b border-white/5 pb-3">
-               <div className="w-8 h-8 rounded-xl bg-red-600/10 flex items-center justify-center border border-red-500/20">
-                  <Activity className="w-4 h-4 text-red-500 shadow-[0_0_10px_rgba(239, 68, 68, 0.5)]" />
-               </div>
-               <h3 className="text-[11px] font-black text-white/90 uppercase tracking-[0.2em]">Últimos Sismos</h3>
-            </div>
-            <div className="flex flex-col gap-5">
-               {displayTop3.length > 0 ? displayTop3.map(eq => (
-                  <div key={eq.id} className="flex flex-col gap-2 cursor-pointer group hover:translate-x-1 transition-transform">
-                     <div className="flex items-center justify-between">
-                        <div className={`px-2.5 py-1 rounded-full text-[10px] font-black border ${eq.properties.mag > 6 ? 'bg-red-500/10 border-red-500/30 text-red-500' : eq.properties.mag > 4.5 ? 'bg-orange-500/10 border-orange-500/30 text-orange-400' : 'bg-blue-500/10 border-blue-500/30 text-blue-400'}`}>
-                           {eq.properties.mag.toFixed(1)} M
-                        </div>
-                        <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{new Date(eq.properties.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                     </div>
-                     <span className="text-[12px] font-bold text-gray-300 leading-snug group-hover:text-white transition-colors tracking-tight line-clamp-2">{eq.properties.place}</span>
-                  </div>
-               )) : <div className="py-4 text-center text-[10px] font-black text-gray-500 uppercase italic animate-pulse">Sincronizando USGS...</div>}
-            </div>
-         </div>
-      </div>
 
       <MapContainer 
         center={[-54.8019, -68.3030]} // Tierra del Fuego / Ushuaia

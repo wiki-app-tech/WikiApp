@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Cloud, CloudRain, CloudSnow, Sun, CloudFog, CloudLightning, Wind, Droplets, Thermometer, AlertCircle, Sunrise, Sunset, SunDim, AlertTriangle, Activity, ExternalLink } from 'lucide-react';
+import { Cloud, CloudRain, CloudSnow, Sun, CloudFog, CloudLightning, Wind, Droplets, Thermometer, AlertCircle, Sunrise, Sunset, SunDim, AlertTriangle, Activity, ExternalLink, ChevronRight } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const EarthquakeMap = dynamic(() => import('./EarthquakeMap'), {
   ssr: false,
@@ -101,11 +102,63 @@ const getDayName = (isoString: string, index: number) => {
   return date.toLocaleDateString('es-AR', { weekday: 'short' }).replace('.', '');
 };
 
+const StatusCarousel = ({ items, type }: { items: any[], type: 'alert' | 'quake' }) => {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (items.length <= 1) return;
+    const timer = setInterval(() => {
+      setIndex(prev => (prev + 1) % items.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [items]);
+
+  if (items.length === 0) {
+    return (
+      <div className="flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-500 text-[9px] font-black uppercase tracking-widest backdrop-blur-md">
+        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+        {type === 'alert' ? 'Sin Alertas Activas' : 'Sismicidad Estable'}
+      </div>
+    );
+  }
+
+  const current = items[index];
+
+  return (
+    <div className="flex items-center gap-3 px-4 py-1.5 bg-slate-100/80 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-full backdrop-blur-xl transition-all h-8 min-w-[200px] max-w-[300px] overflow-hidden group hover:border-blue-500/30">
+       <AnimatePresence mode="wait">
+          <motion.div
+            key={`${type}-${index}`}
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="flex items-center gap-3 w-full"
+          >
+             {type === 'alert' ? <AlertTriangle className="w-3.5 h-3.5 text-yellow-500 shrink-0" /> : <Activity className="w-3.5 h-3.5 text-red-500 shrink-0" />}
+             <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-[9px] font-black text-slate-800 dark:text-white/90 uppercase truncate tracking-tight">
+                    {type === 'alert' ? current.title : `${current.properties.mag.toFixed(1)}M - ${current.properties.place}`}
+                </span>
+             </div>
+             <span className="text-[8px] font-black text-slate-400 dark:text-gray-500 uppercase shrink-0">
+                {type === 'alert' ? current.date : new Date(current.properties.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+             </span>
+          </motion.div>
+       </AnimatePresence>
+    </div>
+  );
+};
+
 export default function WeatherDashboard() {
   const [dataList, setDataList] = useState<WeatherData[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // New States for Alerts/Quakes
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [quakes, setQuakes] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -124,8 +177,40 @@ export default function WeatherDashboard() {
       }
     };
 
+    const fetchAlerts = async () => {
+        try {
+            const res = await fetch('/api/alerts');
+            const data = await res.json();
+            const tdfAlerts = Array.isArray(data) ? data.filter((a: any) => 
+                Object.values(a.zones || {}).some((z: any) => z.toLowerCase().includes('tierra del fuego'))
+            ) : [];
+            setAlerts(tdfAlerts);
+        } catch (e) { console.error(e); }
+    };
+
+    const fetchQuakes = async () => {
+        try {
+            const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson');
+            const data = await res.json();
+            const features = data.features || [];
+            const southAmEqs = features.filter((eq: any) => eq.geometry.coordinates[1] < 0 && eq.geometry.coordinates[0] < -30);
+            const top3 = [...(southAmEqs.length >= 3 ? southAmAmEqs : features)]
+                .sort((a, b) => b.properties.time - a.properties.time)
+                .slice(0, 5);
+            setQuakes(top3);
+        } catch (e) { console.error(e); }
+    };
+
     fetchWeather();
-    const interval = setInterval(fetchWeather, 15 * 60 * 1000); // 15 mins
+    fetchAlerts();
+    fetchQuakes();
+
+    const interval = setInterval(() => {
+        fetchWeather();
+        fetchAlerts();
+        fetchQuakes();
+    }, 15 * 60 * 1000); // 15 mins
+
     return () => clearInterval(interval);
   }, []);
 
@@ -299,8 +384,9 @@ export default function WeatherDashboard() {
                  <AlertTriangle className="w-6 h-6" />
                  <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Alertas Meteorológicas</h3>
               </div>
-              <div className="flex gap-2">
-                 <span className="text-[9px] uppercase font-black bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded border border-yellow-500/20">Mapa Activo</span>
+              <div className="flex gap-3 items-center">
+                 <StatusCarousel items={alerts} type="alert" />
+                 <span className="text-[9px] uppercase font-black bg-yellow-500/10 text-yellow-500 px-2.5 py-1.5 rounded-lg border border-yellow-500/20 hidden sm:block">Mapa Activo</span>
               </div>
            </div>
            <div className="w-full h-[350px] md:h-[500px] bg-white dark:bg-[#0c0c0c] relative isolate">
@@ -315,9 +401,12 @@ export default function WeatherDashboard() {
                  <Activity className="w-6 h-6 text-blue-500" />
                  <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Sismos en Tiempo Real</h3>
               </div>
-              <div className="flex gap-2">
-                 <a href="https://www.inpres.gob.ar/desktop/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-black bg-slate-100 dark:bg-[#1a1a1a] hover:bg-slate-200 dark:bg-[#222] px-2.5 py-1.5 rounded-lg text-slate-600 dark:text-gray-400 transition-colors">INPRES</a>
-                 <a href="http://earg.fcaglp.unlp.edu.ar/sismologia/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-black bg-slate-100 dark:bg-[#1a1a1a] hover:bg-slate-200 dark:bg-[#222] px-2.5 py-1.5 rounded-lg text-slate-600 dark:text-gray-400 transition-colors">EARG</a>
+              <div className="flex gap-3 items-center">
+                 <StatusCarousel items={quakes} type="quake" />
+                 <div className="flex gap-1.5 hidden sm:flex">
+                    <a href="https://www.inpres.gob.ar/desktop/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-black bg-slate-100 dark:bg-[#1a1a1a] hover:bg-slate-200 dark:bg-[#222] px-2.5 py-1.5 rounded-lg text-slate-600 dark:text-gray-400 transition-colors">INPRES</a>
+                    <a href="http://earg.fcaglp.unlp.edu.ar/sismologia/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-black bg-slate-100 dark:bg-[#1a1a1a] hover:bg-slate-200 dark:bg-[#222] px-2.5 py-1.5 rounded-lg text-slate-600 dark:text-gray-400 transition-colors">EARG</a>
+                 </div>
               </div>
            </div>
            <div className="w-full h-[350px] md:h-[500px] bg-white dark:bg-[#0c0c0c] relative isolate">
