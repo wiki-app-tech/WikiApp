@@ -472,6 +472,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                 <AnimatePresence mode="popLayout">
                                     {feedArticlesToDisplay.map(article => {
                                         const isVid = isYouTube(article.link);
+                                        const sourceName = feeds.find(f => f.id === article.sourceId)?.name || 'Fuente';
 
                                         // VIEW: LIST
                                         if (viewMode === 'list') return (
