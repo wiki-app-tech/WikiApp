@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { Article, FeedSource } from '@/types';
 import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
@@ -506,8 +506,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                     <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className={`${density === 'compact' ? 'p-2' : 'p-2.5'} bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-500 dark:text-gray-400 hover:text-blue-400 rounded-xl transition-all`}><Send className="w-4 h-4" /></button>
                                                 </div>
                                             </motion.div>
-                                        );
-                              );
+                                         );
 
                                         // VIEW: GRID
                                         if (viewMode === 'grid') return (
