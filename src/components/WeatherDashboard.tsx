@@ -194,7 +194,7 @@ export default function WeatherDashboard() {
             const data = await res.json();
             const features = data.features || [];
             const southAmEqs = features.filter((eq: any) => eq.geometry.coordinates[1] < 0 && eq.geometry.coordinates[0] < -30);
-            const top3 = [...(southAmEqs.length >= 3 ? southAmAmEqs : features)]
+            const top3 = [...(southAmEqs.length >= 3 ? southAmEqs : features)]
                 .sort((a, b) => b.properties.time - a.properties.time)
                 .slice(0, 5);
             setQuakes(top3);
