@@ -57,14 +57,14 @@ export default function RadioDashboard() {
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
       >
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-blue-600/20 flex items-center justify-center border border-blue-500/30 shadow-[0_0_30px_rgba(37,99,235,0.2)]">
-            <RadioIcon className="w-7 h-7 text-blue-500" />
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-blue-600/20 flex items-center justify-center border border-blue-500/30 shadow-[0_0_30px_rgba(37,99,235,0.2)]">
+            <RadioIcon className="w-6 h-6 md:w-7 md:h-7 text-blue-500" />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Dial Fueguino</h1>
-            <span className="text-[10px] font-bold text-blue-500 uppercase tracking-[0.3em] flex items-center gap-1 mt-1">
-               <Activity className="w-3 h-3" /> Transmisión en Vivo
+            <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Dial Fueguino</h1>
+            <span className="text-[9px] md:text-[10px] font-bold text-blue-500 uppercase tracking-[0.2em] flex items-center gap-1 mt-1">
+               <Activity className="w-3 h-3" /> En Vivo
             </span>
           </div>
         </div>
@@ -73,10 +73,10 @@ export default function RadioDashboard() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-gray-500 group-focus-within:text-blue-500 transition-colors" />
           <input 
             type="text" 
-            placeholder="Buscar emisora o ciudad..." 
+            placeholder="Buscar emisora..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white dark:bg-[#111] border border-slate-300 dark:border-white/10 rounded-2xl py-3.5 pl-11 pr-4 text-xs font-bold text-slate-800 dark:text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-blue-500/50 focus:bg-[#151515] transition-all shadow-inner"
+            className="w-full bg-white dark:bg-[#111] border border-slate-300 dark:border-white/10 rounded-2xl py-3 pl-11 pr-4 text-[11px] font-bold text-slate-800 dark:text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-blue-500/50 transition-all shadow-inner"
           />
         </div>
       </motion.div>
@@ -99,19 +99,19 @@ export default function RadioDashboard() {
               }`}
             >
               <div className="flex justify-between items-start z-10">
-                <div className="flex flex-col gap-1">
-                  <h3 className="font-black text-xl tracking-tight text-slate-900 dark:text-white">
+                <div className="flex flex-col gap-0.5">
+                  <h3 className="font-black text-lg md:text-xl tracking-tight text-slate-900 dark:text-white">
                     {station.name}
                   </h3>
-                  <span className="text-[10px] uppercase text-slate-500 dark:text-gray-500 tracking-wider flex items-center gap-1">
-                    <Activity className="w-3 h-3 text-gray-500" />
+                  <span className="text-[9px] md:text-[10px] uppercase text-slate-500 dark:text-gray-500 tracking-wider flex items-center gap-1">
+                    <Activity className="w-2.5 h-2.5 text-gray-500" />
                     {station.city}
                   </span>
                 </div>
-                <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg ${
+                <span className={`text-[9px] md:text-[10px] font-black uppercase tracking-widest px-2 py-1 md:px-3 md:py-1.5 rounded-lg ${
                   noStream ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
                 }`}>
-                  {noStream ? 'Sin Enlace' : station.frequency}
+                  {noStream ? 'Offline' : station.frequency}
                 </span>
               </div>
 

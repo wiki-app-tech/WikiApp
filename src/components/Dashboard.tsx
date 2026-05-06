@@ -151,7 +151,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   }, [filteredArticles, topVisualArticles, activeTab, search]);
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-[#070707] text-slate-800 dark:text-[#e0e0e0] font-sans overflow-hidden transition-colors duration-200 relative">
+    <div className="flex h-screen bg-slate-50 dark:bg-[#070707] text-slate-800 dark:text-[#e0e0e0] font-sans overflow-hidden transition-colors duration-200 relative selection:bg-blue-500/30">
       {/* Animated Mesh Gradient Background */}
       <div className="absolute inset-0 z-0 opacity-[0.08] dark:opacity-20 pointer-events-none overflow-hidden">
         <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-blue-600/40 dark:bg-blue-600/30 rounded-full blur-[120px] animate-pulse"></div>
@@ -255,8 +255,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                          WikiApp <span className="text-[10px] bg-blue-500/20 px-2 py-0.5 rounded-full text-blue-500 font-black border border-blue-500/20 ml-1">PRO V2</span>
                       </h1>
                       <div className="flex items-center gap-2">
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 hidden md:block" />
-                        <span className="text-[10px] md:text-[11px] font-bold text-slate-500 dark:text-gray-400 uppercase tracking-[0.2em] font-mono">
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 hidden lg:block" />
+                        <span className="text-[10px] md:text-[11px] font-bold text-slate-500 dark:text-gray-400 uppercase tracking-[0.2em] font-mono hidden sm:block">
                             {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'security' ? 'Centro de Auditoría' : activeTab === 'logistics' ? 'Control de Tráfico' : activeTab === 'radio' ? 'Dial Fueguino' : 'Sistema'}
                         </span>
                       </div>
@@ -267,12 +267,12 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         Sincronización <span className="text-emerald-500 ml-1">Estable</span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                        <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2.5 text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all" title="Cambiar Tema">
+                    <div className="flex items-center gap-0.5 md:gap-1.5">
+                        <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2 md:p-2.5 text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all" title="Cambiar Tema">
                             {mounted && theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-500" /> : mounted ? <Moon className="w-5 h-5" /> : <div className="w-5 h-5" />}
                         </button>
-                        <button className="p-2.5 text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"><Bell className="w-5 h-5" /></button>
-                        <button className="p-2.5 text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"><Settings className="w-5 h-5" /></button>
+                        <button className="hidden sm:block p-2.5 text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"><Bell className="w-5 h-5" /></button>
+                        <button className="p-2 md:p-2.5 text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"><Settings className="w-5 h-5" /></button>
                     </div>
                 </div>
             </div>
@@ -280,7 +280,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                      {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
              {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
             {(activeTab === 'home' || activeTab === 'explore') && (
-                <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-6 py-6 px-4 md:px-8 border-b border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.01] backdrop-blur-3xl sticky top-[80px] z-20">
+                <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-4 xl:gap-6 py-4 md:py-6 px-4 md:px-8 border-b border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.01] backdrop-blur-3xl sticky top-[72px] md:top-[80px] z-20 transition-all duration-300">
                     
                     {/* CUADRO DE BÚSQUEDA PRO */}
                     <div className="relative w-full xl:w-96 group">
@@ -295,10 +295,10 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     </div>
 
                     {/* FILTRO DE CATEGORÍAS (DROPDOWN) */}
-                    <div className="flex items-center gap-3 w-full xl:w-auto">
-                        <div className="px-4 py-3 bg-slate-100/50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-2 md:gap-3 w-full xl:w-auto">
+                        <div className="px-3 py-2.5 md:px-4 md:py-3 bg-slate-100/50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 flex items-center gap-2 shrink-0">
                             <ListFilter className="w-4 h-4 text-blue-500" />
-                            <span className="text-[11px] font-bold text-slate-600 dark:text-gray-400 uppercase tracking-widest hidden sm:inline">Categoría</span>
+                            <span className="text-[10px] md:text-[11px] font-bold text-slate-600 dark:text-gray-400 uppercase tracking-widest hidden xs:inline">Categoría</span>
                         </div>
                         <div className="relative flex-1 xl:w-56 group">
                             <select 
@@ -329,7 +329,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                     {/* PESTAÑAS GEOGRÁFICAS FIJAS */}
                     {activeTab === 'home' && (
-                        <div className="flex bg-slate-100/50 dark:bg-black/40 p-1.5 rounded-[1.25rem] border border-slate-200 dark:border-white/5 items-center">
+                        <div className="flex bg-slate-100/50 dark:bg-black/40 p-1 rounded-[1.25rem] border border-slate-200 dark:border-white/5 items-center overflow-x-auto scrollbar-hide">
                             {[
                                 { id: 'all', label: 'Panorama' },
                                 { id: 'internacional', label: 'Global' },
@@ -339,7 +339,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                 <button 
                                 key={item.id} 
                                 onClick={() => setActiveCategory(item.id)}
-                                className={`px-5 md:px-7 py-2.5 rounded-[1rem] text-[11px] font-black uppercase tracking-tight transition-all duration-300 ${activeCategory === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'}`}
+                                className={`px-4 md:px-7 py-2 md:py-2.5 rounded-[1rem] text-[10px] md:text-[11px] font-black uppercase tracking-tight transition-all duration-300 whitespace-nowrap ${activeCategory === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'}`}
                                 >
                                     {item.label}
                                 </button>
@@ -400,17 +400,18 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                   {/* TOP VISUAL WIDGET (SOLO EN HOME SIN FILTRO) */}
                   {!search && activeTab === 'home' && topVisualArticles.length > 0 && (
-                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         {topVisualArticles.map((article, idx) => {
                             const isVid = isYouTube(article.link);
                             return (
                                <motion.div 
                                   initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
+                                  whileInView={{ opacity: 1, y: 0 }}
+                                  viewport={{ once: true }}
                                   transition={{ delay: idx * 0.1 }}
                                   key={'top-'+article.id}
                                   onClick={() => setSelectedArticle(article)}
-                                  className="group relative h-64 md:h-80 bg-white dark:bg-[#111] rounded-2xl overflow-hidden border border-slate-300 dark:border-[#222] cursor-pointer shadow-2xl"
+                                  className="group relative h-56 md:h-80 bg-white dark:bg-[#111] rounded-2xl overflow-hidden border border-slate-300 dark:border-[#222] cursor-pointer shadow-2xl transition-transform hover:scale-[1.01]"
                                >
                                   {article.thumbnail ? (
                                       <img src={article.thumbnail} className="w-full h-full object-cover opacity-60 group-hover:scale-105 group-hover:opacity-80 transition-all duration-700" alt="" />
@@ -421,14 +422,14 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                   
                                   {/* YouTube overlay if applicable */}
                                   {isVid && (
-                                     <div className="absolute top-4 right-4 bg-red-600/90 text-slate-900 dark:text-white p-2 rounded-full backdrop-blur shadow-lg">
-                                        <PlayCircle className="w-6 h-6" />
+                                     <div className="absolute top-3 right-3 md:top-4 md:right-4 bg-red-600/90 text-white p-1.5 md:p-2 rounded-full backdrop-blur shadow-lg">
+                                        <PlayCircle className="w-5 h-5 md:w-6 md:h-6" />
                                      </div>
                                   )}
                                   {/* Category Badge with Fire Icon */}
                                   {!isVid && (
-                                     <div className="absolute top-4 right-4 bg-orange-600/90 text-slate-900 dark:text-white px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-lg flex items-center gap-1 backdrop-blur ring-1 ring-white/20">
-                                        <Flame className="w-3 h-3" /> 
+                                     <div className="absolute top-3 right-3 md:top-4 md:right-4 bg-orange-600/90 text-white px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[8px] md:text-[10px] font-black uppercase shadow-lg flex items-center gap-1 backdrop-blur ring-1 ring-white/20">
+                                        <Flame className="w-2.5 h-2.5 md:w-3 md:h-3" /> 
                                         {feeds.find(f => f.id === article.sourceId)?.category === 'internacional' ? 'Internacional' : 
                                          feeds.find(f => f.id === article.sourceId)?.category === 'nacional' ? 'Argentina' : 'TDF'}
                                      </div>
@@ -1075,26 +1076,28 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         </main>
 
       {/* MOBILE FLOATING BOTTOM NAV (Si fuera necesario ajustar luego) */}
-      <div className="lg:hidden fixed bottom-6 left-4 right-4 z-40">
-        <nav className="bg-white dark:bg-[#0c0c0c]/90 backdrop-blur-3xl border border-slate-300 dark:border-white/10 shadow-[0_-8px_32px_rgba(0,0,0,0.5)] rounded-2xl h-18 flex items-center justify-around px-4">
+      <div className="lg:hidden fixed bottom-6 left-4 right-4 z-50">
+        <nav className="bg-white/80 dark:bg-[#0c0c0c]/80 backdrop-blur-3xl border border-slate-200 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-[2rem] h-16 flex items-center justify-between px-2 overflow-hidden">
             {[
               { id: 'home', icon: LayoutDashboard, label: 'Inicio' },
               { id: 'explore', icon: Compass, label: 'Feeds' },
               { id: 'weather', icon: Cloud, label: 'Clima' },
-              { id: 'logistics', icon: Anchor, label: 'Arribos' },
-              { id: 'reports', icon: FileText, label: 'Reportes' },
+              { id: 'radio', icon: Radio, label: 'Radio' },
               { id: 'security', icon: ShieldCheck, label: 'Seguridad' },
-              { id: 'radio', icon: Radio, label: 'Radio' }
+              { id: 'logistics', icon: Anchor, label: 'Arribos' }
             ].map((item) => {
                const Icon = item.icon;
                return (
                 <button 
                   key={item.id}
                   onClick={() => setActiveTab(item.id)} 
-                  className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 w-full ${activeTab === item.id ? 'text-blue-500 scale-110' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300'}`}
+                  className={`flex flex-col items-center justify-center py-2 rounded-2xl transition-all duration-300 flex-1 relative ${activeTab === item.id ? 'text-blue-500' : 'text-slate-400 dark:text-gray-500'}`}
                 >
-                  <Icon className={`w-5 h-5 ${activeTab === item.id ? 'drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]' : ''}`} />
-                  <span className={`text-[8px] font-black mt-1 uppercase tracking-tighter ${activeTab === item.id ? 'opacity-100' : 'opacity-60'}`}>{item.label}</span>
+                  <Icon className={`w-5 h-5 ${activeTab === item.id ? 'drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]' : ''}`} />
+                  <span className={`text-[7px] font-black mt-1 uppercase tracking-tighter ${activeTab === item.id ? 'opacity-100' : 'opacity-40'}`}>{item.label}</span>
+                  {activeTab === item.id && (
+                    <motion.div layoutId="mobile-nav-indicator" className="absolute -bottom-1 w-1 h-1 bg-blue-500 rounded-full" />
+                  )}
                 </button>
                );
             })}
@@ -1196,18 +1199,18 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: "100%", opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-white dark:bg-[#0a0a0a] w-full max-w-4xl h-[95vh] sm:h-full max-h-[900px] rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl flex flex-col border border-slate-200 dark:border-white/10 overflow-hidden"
+              className="bg-white dark:bg-[#0a0a0a] w-full max-w-4xl h-full sm:h-[95vh] sm:max-h-[900px] rounded-none sm:rounded-[2.5rem] shadow-2xl flex flex-col border-none sm:border border-slate-200 dark:border-white/10 overflow-hidden"
               onClick={e => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#0c0c0c]">
+              <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#0c0c0c]">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-blue-600/10 flex items-center justify-center">
                     <FileText className="w-4 h-4 text-blue-500" />
                   </div>
-                  <span className="text-[11px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-[0.2em]">Inteligencia Operativa</span>
+                  <span className="text-[10px] md:text-[11px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-[0.2em]">Inteligencia Operativa</span>
                 </div>
-                <button onClick={() => setSelectedArticle(null)} className="p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-slate-600 dark:text-gray-400">
-                  <X className="w-6 h-6" />
+                <button onClick={() => setSelectedArticle(null)} className="p-2 md:p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-slate-600 dark:text-gray-400">
+                  <X className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
               </div>
               
@@ -1225,7 +1228,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     )}
                   </div>
                   
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] text-slate-900 dark:text-white mb-10 font-display">
+                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-slate-900 dark:text-white mb-6 md:mb-10 font-display">
                     {selectedArticle.title}
                   </h1>
                   
@@ -1250,20 +1253,20 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     dangerouslySetInnerHTML={{ __html: selectedArticle.description || '<p>Contenido principal no provisto por la fuente.</p>' }} 
                   />
                   
-                  <div className="mt-20 pt-10 border-t border-slate-200 dark:border-white/5 flex flex-col items-center gap-6">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Continúa leyendo la versión completa en el sitio oficial</p>
+                  <div className="mt-12 md:mt-20 pt-10 border-t border-slate-200 dark:border-white/5 flex flex-col items-center gap-6">
+                    <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Continúa leyendo la versión completa en el sitio oficial</p>
                     <a 
                       href={selectedArticle.link} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className={`flex items-center gap-3 px-10 py-5 rounded-2xl text-[13px] font-black tracking-widest transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 ${
+                      className={`flex items-center gap-3 px-8 py-4 md:px-10 md:py-5 rounded-2xl text-[11px] md:text-[13px] font-black tracking-widest transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 w-full md:w-max justify-center ${
                         isYouTube(selectedArticle.link) 
                           ? 'bg-red-600 text-white hover:bg-red-700 shadow-red-600/20' 
                           : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-600/20'
                       }`}
                     >
                       {isYouTube(selectedArticle.link) ? 'VER EN YOUTUBE' : 'ACCEDER AL SITIO WEB'} 
-                      <ExternalLink className="w-4.5 h-4.5" />
+                      <ExternalLink className="w-4 h-4 md:w-4.5 md:h-4.5" />
                     </a>
                   </div>
                 </div>

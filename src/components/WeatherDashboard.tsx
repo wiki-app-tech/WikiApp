@@ -189,7 +189,7 @@ export default function WeatherDashboard() {
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-slate-200 dark:bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 bg-black/10 rounded-full blur-2xl"></div>
 
-        <div className="relative z-10 p-6 md:p-10">
+        <div className="relative z-10 p-5 md:p-10">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
@@ -202,7 +202,7 @@ export default function WeatherDashboard() {
                   </span>
                   <span className="text-sm font-semibold text-slate-900 dark:text-white/80">Hoy, {new Date().toLocaleDateString('es-AR')}</span>
                 </div>
-                <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mt-4 drop-shadow-sm">{currentData.name}</h1>
+                <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mt-4 drop-shadow-sm leading-none">{currentData.name}</h1>
                 <p className="text-xl md:text-2xl font-medium text-slate-900 dark:text-white/90 mt-2 flex items-center gap-3">
                   {getWeatherIcon(currentData.current.weatherCode, "w-8 h-8")} 
                   {getWeatherDescription(currentData.current.weatherCode)}
@@ -210,32 +210,32 @@ export default function WeatherDashboard() {
               </div>
 
               <div className="flex flex-col gap-2 mt-12">
-                <span className="text-[110px] md:text-[130px] font-black tracking-tighter leading-none drop-shadow-2xl font-display">
+                <span className="text-[90px] md:text-[130px] font-black tracking-tighter leading-none drop-shadow-2xl font-display">
                   {currentData.current.temperature.toFixed(0)}°
                 </span>
-                <div className="w-20 h-1.5 bg-white/20 rounded-full"></div>
+                <div className="w-16 md:w-20 h-1 md:h-1.5 bg-white/20 rounded-full"></div>
               </div>
               
-              <div className="flex flex-wrap gap-4 mt-8">
-                <div className="flex items-center gap-2 bg-black/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-300 dark:border-white/10">
-                  <Thermometer className="w-5 h-5 text-slate-900 dark:text-white/80" />
+              <div className="flex flex-wrap gap-2 md:gap-4 mt-8">
+                <div className="flex items-center gap-2 bg-black/10 backdrop-blur-md px-3 py-2 md:px-4 md:py-2.5 rounded-2xl border border-slate-300 dark:border-white/10 flex-1 min-w-[120px]">
+                  <Thermometer className="w-4 h-4 md:w-5 md:h-5 text-slate-900 dark:text-white/80" />
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase font-bold text-slate-900 dark:text-white/70">Sensación</span>
-                    <span className="text-sm font-bold">{currentData.current.apparentTemperature.toFixed(0)}°C</span>
+                    <span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-900 dark:text-white/70">Sensación</span>
+                    <span className="text-xs md:text-sm font-bold">{currentData.current.apparentTemperature.toFixed(0)}°C</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 bg-black/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-300 dark:border-white/10">
-                  <Wind className="w-5 h-5 text-slate-900 dark:text-white/80" />
+                <div className="flex items-center gap-2 bg-black/10 backdrop-blur-md px-3 py-2 md:px-4 md:py-2.5 rounded-2xl border border-slate-300 dark:border-white/10 flex-1 min-w-[120px]">
+                  <Wind className="w-4 h-4 md:w-5 md:h-5 text-slate-900 dark:text-white/80" />
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase font-bold text-slate-900 dark:text-white/70">Viento</span>
-                    <span className="text-sm font-bold">{currentData.current.windSpeed.toFixed(1)} km/h</span>
+                    <span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-900 dark:text-white/70">Viento</span>
+                    <span className="text-xs md:text-sm font-bold">{currentData.current.windSpeed.toFixed(1)} km/h</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 bg-black/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-300 dark:border-white/10">
-                  <Droplets className="w-5 h-5 text-slate-900 dark:text-white/80" />
+                <div className="flex items-center gap-2 bg-black/10 backdrop-blur-md px-3 py-2 md:px-4 md:py-2.5 rounded-2xl border border-slate-300 dark:border-white/10 flex-1 min-w-[120px]">
+                  <Droplets className="w-4 h-4 md:w-5 md:h-5 text-slate-900 dark:text-white/80" />
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase font-bold text-slate-900 dark:text-white/70">Humedad</span>
-                    <span className="text-sm font-bold">{currentData.current.humidity}%</span>
+                    <span className="text-[9px] md:text-[10px] uppercase font-bold text-slate-900 dark:text-white/70">Humedad</span>
+                    <span className="text-xs md:text-sm font-bold">{currentData.current.humidity}%</span>
                   </div>
                 </div>
               </div>
@@ -245,21 +245,21 @@ export default function WeatherDashboard() {
             <div className="lg:col-span-7 flex flex-col gap-6">
               
               {/* Extra info cards */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-black/10 backdrop-blur-xl border border-slate-300 dark:border-white/10 p-4 rounded-3xl flex flex-col items-center justify-center text-center">
-                  <Sunrise className="w-6 h-6 text-yellow-300 mb-2" />
-                  <span className="text-xs font-bold text-slate-900 dark:text-white/70 uppercase">Amanecer</span>
-                  <span className="text-lg font-bold">{formatTime(currentData.daily.sunrise[0])}</span>
+              <div className="grid grid-cols-3 gap-2 md:gap-4">
+                <div className="bg-black/10 backdrop-blur-xl border border-slate-300 dark:border-white/10 p-3 md:p-4 rounded-3xl flex flex-col items-center justify-center text-center">
+                  <Sunrise className="w-5 h-5 md:w-6 md:h-6 text-yellow-300 mb-1 md:mb-2" />
+                  <span className="text-[9px] md:text-xs font-bold text-slate-900 dark:text-white/70 uppercase">Salida</span>
+                  <span className="text-sm md:text-lg font-bold">{formatTime(currentData.daily.sunrise[0])}</span>
                 </div>
-                <div className="bg-black/10 backdrop-blur-xl border border-slate-300 dark:border-white/10 p-4 rounded-3xl flex flex-col items-center justify-center text-center">
-                  <Sunset className="w-6 h-6 text-orange-400 mb-2" />
-                  <span className="text-xs font-bold text-slate-900 dark:text-white/70 uppercase">Atardecer</span>
-                  <span className="text-lg font-bold">{formatTime(currentData.daily.sunset[0])}</span>
+                <div className="bg-black/10 backdrop-blur-xl border border-slate-300 dark:border-white/10 p-3 md:p-4 rounded-3xl flex flex-col items-center justify-center text-center">
+                  <Sunset className="w-5 h-5 md:w-6 md:h-6 text-orange-400 mb-1 md:mb-2" />
+                  <span className="text-[9px] md:text-xs font-bold text-slate-900 dark:text-white/70 uppercase">Puesta</span>
+                  <span className="text-sm md:text-lg font-bold">{formatTime(currentData.daily.sunset[0])}</span>
                 </div>
-                <div className="bg-black/10 backdrop-blur-xl border border-slate-300 dark:border-white/10 p-4 rounded-3xl flex flex-col items-center justify-center text-center">
-                  <SunDim className="w-6 h-6 text-fuchsia-300 mb-2" />
-                  <span className="text-xs font-bold text-slate-900 dark:text-white/70 uppercase">UV Máx</span>
-                  <span className="text-lg font-bold">{currentData.daily.uvIndexMax[0]?.toFixed(1)}</span>
+                <div className="bg-black/10 backdrop-blur-xl border border-slate-300 dark:border-white/10 p-3 md:p-4 rounded-3xl flex flex-col items-center justify-center text-center">
+                  <SunDim className="w-5 h-5 md:w-6 md:h-6 text-fuchsia-300 mb-1 md:mb-2" />
+                  <span className="text-[9px] md:text-xs font-bold text-slate-900 dark:text-white/70 uppercase">UV Máx</span>
+                  <span className="text-sm md:text-lg font-bold">{currentData.daily.uvIndexMax[0]?.toFixed(1)}</span>
                 </div>
               </div>
 
@@ -268,9 +268,9 @@ export default function WeatherDashboard() {
                 <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white/40 mb-6 flex items-center gap-2">
                     <Cloud className="w-3.5 h-3.5 opacity-50" /> Pronóstico {currentData.daily.time.length} Días
                 </h3>
-                <div className="grid grid-cols-4 md:grid-cols-7 gap-3 h-full">
+                <div className="flex md:grid md:grid-cols-7 gap-3 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
                   {currentData.daily.time.slice(0, 7).map((timeString, idx) => (
-                    <div key={timeString} className={`flex flex-col items-center justify-between py-4 rounded-2xl transition-all duration-300 border border-white/0 hover:border-slate-300 dark:border-white/10 ${idx === 0 ? 'bg-slate-200 dark:bg-white/10 ring-1 ring-white/20' : 'bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10'}`}>
+                    <div key={timeString} className={`flex flex-col items-center justify-between py-4 px-4 min-w-[80px] md:min-w-0 rounded-2xl transition-all duration-300 border border-white/0 hover:border-slate-300 dark:border-white/10 ${idx === 0 ? 'bg-slate-200 dark:bg-white/10 ring-1 ring-white/20' : 'bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10'}`}>
                       <span className="text-[10px] font-black uppercase tracking-wider text-slate-900 dark:text-white/70">{getDayName(timeString, idx)}</span>
                       <div className="my-3 transform hover:scale-110 transition-transform">
                         {getWeatherIcon(currentData.daily.weatherCode[idx], "w-8 h-8")}
@@ -303,7 +303,7 @@ export default function WeatherDashboard() {
                  <span className="text-[9px] uppercase font-black bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded border border-yellow-500/20">Mapa Activo</span>
               </div>
            </div>
-           <div className="w-full h-[500px] bg-white dark:bg-[#0c0c0c] relative isolate">
+           <div className="w-full h-[350px] md:h-[500px] bg-white dark:bg-[#0c0c0c] relative isolate">
               <WeatherAlertMap />
            </div>
         </div>
@@ -320,7 +320,7 @@ export default function WeatherDashboard() {
                  <a href="http://earg.fcaglp.unlp.edu.ar/sismologia/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-black bg-slate-100 dark:bg-[#1a1a1a] hover:bg-slate-200 dark:bg-[#222] px-2.5 py-1.5 rounded-lg text-slate-600 dark:text-gray-400 transition-colors">EARG</a>
               </div>
            </div>
-           <div className="w-full h-[500px] bg-white dark:bg-[#0c0c0c] relative isolate">
+           <div className="w-full h-[350px] md:h-[500px] bg-white dark:bg-[#0c0c0c] relative isolate">
               <EarthquakeMap />
            </div>
         </div>
