@@ -919,9 +919,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                             { id: 'national', label: 'II. Panorama Nacional', icon: Flag },
                                             { id: 'provincial', label: 'III. Tierra del Fuego', icon: Map },
                                             { id: 'alerts_recs', label: 'Alertas & Recomendaciones', icon: AlertTriangle },
-                                            { id: 'methodology', label: 'Anexo Metodológico', icon: BookCheck }
+                                            { id: 'methodology', label: 'Anexo Metodológico', icon: BookmarkCheck }
                                         ].map(tab => {
-                                            const Icon = tab.icon === BookCheck ? BookmarkCheck : tab.icon;
+                                            const Icon = tab.icon;
                                             return (
                                                 <button
                                                     key={tab.id}
