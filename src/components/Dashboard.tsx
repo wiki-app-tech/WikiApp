@@ -43,10 +43,22 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
    const [blocklist, setBlocklist] = useState<string[]>(['pautas', 'anuncio', 'publicidad', 'clickbait']);
    const [isFilterOpen, setIsFilterOpen] = useState(false);
    const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+   const [showShipOverlay, setShowShipOverlay] = useState(true);
+   const [showFlightOverlay, setShowFlightOverlay] = useState(true);
   
-  const { theme, setTheme } = useTheme();
+   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
+  const [syncTime, setSyncTime] = useState('');
+  
+  React.useEffect(() => {
+    setMounted(true);
+    setTheme('light');
+    setSyncTime(new Date().toLocaleTimeString());
+    const interval = setInterval(() => {
+      setSyncTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [setTheme]);
 
   // Extraction of dynamic categories
   const allCategories = useMemo(() => {
@@ -263,16 +275,17 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                    </div>
                 </div>
                 <div className="flex items-center gap-2 md:gap-4">
-                    <div className="hidden sm:flex items-center gap-2 text-[10px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-4 py-2 rounded-full border border-slate-200 dark:border-white/5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Sincronización <span className="text-emerald-500 ml-1">Estable</span>
-                    </div>
-                    <div className="flex items-center gap-0.5 md:gap-1.5">
-                        <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2 md:p-2.5 text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all" title="Cambiar Tema">
-                            {mounted && theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-500" /> : mounted ? <Moon className="w-5 h-5" /> : <div className="w-5 h-5" />}
-                        </button>
-                        <button className="hidden sm:block p-2.5 text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"><Bell className="w-5 h-5" /></button>
-                        <button className="p-2 md:p-2.5 text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"><Settings className="w-5 h-5" /></button>
+                    <div className="flex items-center gap-3 bg-slate-100 dark:bg-white/5 px-4 py-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
+                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-widest border-r border-slate-200 dark:border-white/10 pr-3">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Sincronización <span className="text-emerald-500 ml-1">Estable</span>
+                        </div>
+                        <div className="flex flex-col text-left">
+                            <span className="text-[8px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest leading-none">Estado del Sistema</span>
+                            <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">
+                                Sincronizado: {syncTime || '...'}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -885,49 +898,79 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                             loading="lazy"
                                         />
                                         
-                                        {/* FLOATING ARRIVALS OVERLAY */}
-                                        <div className="absolute top-4 left-4 z-10 w-64 bg-white dark:bg-[#0e0e0e]/95 backdrop-blur-xl border border-slate-200 dark:border-[#1f1f1f] rounded-2xl shadow-2xl p-4 pointer-events-auto">
-                                            <div className="flex items-center gap-2 mb-3 border-b border-slate-200 dark:border-[#1f1f1f] pb-2">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                                <h3 className="text-[10px] font-black text-slate-600 dark:text-gray-400 uppercase tracking-widest">Estado de Arribos</h3>
-                                            </div>
-                                            
-                                            <div className="flex flex-col gap-4">
-                                                {/* CURRENT / IN PORT */}
-                                                <div className="flex flex-col gap-1.5">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-[8px] font-bold text-emerald-500 uppercase">En Puerto</span>
-                                                        <span className="text-[8px] font-bold text-slate-500 dark:text-gray-500">Hoy, 17:51</span>
+                                        {/* FLOATING ARRIVALS OVERLAY TOGGLE */}
+                                        <AnimatePresence mode="wait">
+                                            {!showShipOverlay ? (
+                                                <motion.button 
+                                                    key="ship-btn"
+                                                    initial={{ opacity: 0, scale: 0.9 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    exit={{ opacity: 0, scale: 0.9 }}
+                                                    onClick={() => setShowShipOverlay(true)}
+                                                    className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-white/95 dark:bg-[#0e0e0e]/95 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white text-slate-800 dark:text-gray-200 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 shadow-lg transition-all hover:scale-105 active:scale-95 font-black uppercase text-[10px] tracking-wider cursor-pointer"
+                                                >
+                                                    <Anchor className="w-4 h-4 text-blue-500 shrink-0" />
+                                                    <span>Ver Arribos</span>
+                                                </motion.button>
+                                            ) : (
+                                                <motion.div 
+                                                    key="ship-panel"
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: 10 }}
+                                                    className="absolute top-4 left-4 z-10 w-64 bg-white/95 dark:bg-[#0e0e0e]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 pointer-events-auto"
+                                                >
+                                                    <div className="flex items-center justify-between mb-3 border-b border-slate-200 dark:border-white/10 pb-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                                            <h3 className="text-[10px] font-black text-slate-600 dark:text-gray-400 uppercase tracking-widest">Estado de Arribos</h3>
+                                                        </div>
+                                                        <button 
+                                                            onClick={() => setShowShipOverlay(false)} 
+                                                            className="p-1 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                                        >
+                                                            <X className="w-3.5 h-3.5" />
+                                                        </button>
                                                     </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
-                                                            <Anchor className="w-4 h-4 text-emerald-500" />
+                                                    
+                                                    <div className="flex flex-col gap-4">
+                                                        {/* CURRENT / IN PORT */}
+                                                        <div className="flex flex-col gap-1.5">
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-[8px] font-bold text-emerald-500 uppercase">En Puerto</span>
+                                                                <span className="text-[8px] font-bold text-slate-500 dark:text-gray-500">Hoy, 17:51</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                                                                    <Anchor className="w-4 h-4 text-emerald-500" />
+                                                                </div>
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-[11px] font-black text-slate-900 dark:text-white leading-tight uppercase">EZEQUIEL MB</span>
+                                                                    <span className="text-[9px] text-slate-600 dark:text-gray-400">Catamarán de Pasajeros</span>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div className="flex flex-col">
-                                                            <span className="text-[11px] font-black text-slate-900 dark:text-white leading-tight uppercase">EZEQUIEL MB</span>
-                                                            <span className="text-[9px] text-slate-600 dark:text-gray-400">Catamarán de Pasajeros</span>
+                                                        
+                                                        <div className="h-px bg-slate-200 dark:bg-white/10"></div>
+                                                        
+                                                        {/* UPCOMING / NEXT */}
+                                                        <div className="flex flex-col gap-3">
+                                                            <div className="flex flex-col gap-1">
+                                                                <div className="flex items-center justify-between">
+                                                                    <span className="text-[8px] font-bold text-blue-500 uppercase">Próximo Arribo</span>
+                                                                    <span className="text-[8px] font-bold text-slate-500 dark:text-gray-500">Mañana, 06:00</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 group cursor-default">
+                                                                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                                                                    <span className="text-[11px] font-bold text-slate-800 dark:text-gray-200 group-hover:text-slate-900 dark:text-white transition-colors">ASTURIANO III</span>
+                                                                    <span className="text-[9px] text-slate-500 dark:text-gray-500 ml-auto font-medium">Portacontenedores</span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                <div className="h-px bg-[#1f1f1f]"></div>
-
-                                                {/* UPCOMING / NEXT */}
-                                                <div className="flex flex-col gap-3">
-                                                    <div className="flex flex-col gap-1">
-                                                        <div className="flex items-center justify-between">
-                                                            <span className="text-[8px] font-bold text-blue-500 uppercase">Próximo Arribo</span>
-                                                            <span className="text-[8px] font-bold text-slate-500 dark:text-gray-500">Mañana, 06:00</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-2 group cursor-default">
-                                                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                                                            <span className="text-[11px] font-bold text-slate-800 dark:text-gray-200 group-hover:text-slate-900 dark:text-white transition-colors">ASTURIANO III</span>
-                                                            <span className="text-[9px] text-slate-500 dark:text-gray-500 ml-auto">Portacontenedores</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
                                 </div>
 
@@ -959,53 +1002,83 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                             loading="lazy"
                                         />
                                         
-                                        {/* FLOATING FLIGHT OVERLAY */}
-                                        <div className="absolute top-4 left-4 z-10 w-72 bg-white dark:bg-[#0e0e0e]/95 backdrop-blur-xl border border-slate-200 dark:border-[#1f1f1f] rounded-2xl shadow-2xl p-4 pointer-events-auto">
-                                            <div className="flex items-center gap-2 mb-3 border-b border-slate-200 dark:border-[#1f1f1f] pb-2">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></div>
-                                                <h3 className="text-[10px] font-black text-slate-600 dark:text-gray-400 uppercase tracking-widest">Tráfico Aéreo USH/RGA</h3>
-                                            </div>
-                                            
-                                            <div className="flex flex-col gap-4 max-h-[450px] overflow-y-auto scrollbar-hide pr-1">
-                                                {/* USH ARRIVALS */}
-                                                <div className="flex flex-col gap-2">
-                                                    <span className="text-[9px] font-black text-slate-900 dark:text-white/40 uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-1">Ushuaia - Arribos</span>
-                                                    <div className="flex flex-col gap-2.5">
-                                                        <div className="flex items-center justify-between group">
-                                                            <div className="flex flex-col">
-                                                                <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase italic">AR 1886 <span className="text-[9px] font-normal text-slate-500 dark:text-gray-500 not-italic ml-1">AEP</span></span>
-                                                                <span className="text-[9px] text-emerald-500 font-bold">Llegó 14:23</span>
-                                                            </div>
-                                                            <div className="px-2 py-1 bg-emerald-500/10 rounded text-emerald-500 text-[9px] font-black">EN PISTA</div>
+                                        {/* FLOATING FLIGHT OVERLAY TOGGLE */}
+                                        <AnimatePresence mode="wait">
+                                            {!showFlightOverlay ? (
+                                                <motion.button 
+                                                    key="flight-btn"
+                                                    initial={{ opacity: 0, scale: 0.9 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    exit={{ opacity: 0, scale: 0.9 }}
+                                                    onClick={() => setShowFlightOverlay(true)}
+                                                    className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-white/95 dark:bg-[#0e0e0e]/95 hover:bg-orange-600 dark:hover:bg-orange-600 hover:text-white dark:hover:text-white text-slate-800 dark:text-gray-200 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 shadow-lg transition-all hover:scale-105 active:scale-95 font-black uppercase text-[10px] tracking-wider cursor-pointer"
+                                                >
+                                                    <Plane className="w-4 h-4 text-orange-500 shrink-0" />
+                                                    <span>Ver Tránsito Aéreo</span>
+                                                </motion.button>
+                                            ) : (
+                                                <motion.div 
+                                                    key="flight-panel"
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: 10 }}
+                                                    className="absolute top-4 left-4 z-10 w-72 bg-white/95 dark:bg-[#0e0e0e]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 pointer-events-auto"
+                                                >
+                                                    <div className="flex items-center justify-between mb-3 border-b border-slate-200 dark:border-white/10 pb-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></div>
+                                                            <h3 className="text-[10px] font-black text-slate-600 dark:text-gray-400 uppercase tracking-widest">Tráfico Aéreo USH/RGA</h3>
                                                         </div>
-                                                        <div className="flex items-center justify-between group">
-                                                            <div className="flex flex-col">
-                                                                <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase italic">AR 1898 <span className="text-[9px] font-normal text-slate-500 dark:text-gray-500 not-italic ml-1">FTE</span></span>
-                                                                <span className="text-[9px] text-blue-500 font-bold">Previsto 15:40</span>
+                                                        <button 
+                                                            onClick={() => setShowFlightOverlay(false)} 
+                                                            className="p-1 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                                        >
+                                                            <X className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <div className="flex flex-col gap-4 max-h-[450px] overflow-y-auto scrollbar-hide pr-1">
+                                                        {/* USH ARRIVALS */}
+                                                        <div className="flex flex-col gap-2">
+                                                            <span className="text-[9px] font-black text-slate-900 dark:text-white/40 uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-1">Ushuaia - Arribos</span>
+                                                            <div className="flex flex-col gap-2.5">
+                                                                <div className="flex items-center justify-between group">
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase italic">AR 1886 <span className="text-[9px] font-normal text-slate-500 dark:text-gray-500 not-italic ml-1">AEP</span></span>
+                                                                        <span className="text-[9px] text-emerald-500 font-bold">Llegó 14:23</span>
+                                                                    </div>
+                                                                    <div className="px-2 py-1 bg-emerald-500/10 rounded text-emerald-500 text-[9px] font-black">EN PISTA</div>
+                                                                </div>
+                                                                <div className="flex items-center justify-between group">
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase italic">AR 1898 <span className="text-[9px] font-normal text-slate-500 dark:text-gray-500 not-italic ml-1">FTE</span></span>
+                                                                        <span className="text-[9px] text-blue-500 font-bold">Previsto 15:40</span>
+                                                                    </div>
+                                                                    <div className="px-2 py-1 bg-blue-500/10 rounded text-blue-500 text-[9px] font-black uppercase">En Vuelo</div>
+                                                                </div>
                                                             </div>
-                                                            <div className="px-2 py-1 bg-blue-500/10 rounded text-blue-500 text-[9px] font-black uppercase">En Vuelo</div>
+                                                        </div>
+                                                        
+                                                        <div className="h-px bg-slate-200 dark:bg-white/10"></div>
+                                                        
+                                                        {/* RGA STATUS */}
+                                                        <div className="flex flex-col gap-2">
+                                                            <span className="text-[9px] font-black text-slate-900 dark:text-white/40 uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-1">Río Grande - Próximo</span>
+                                                            <div className="flex items-center justify-between p-2 bg-slate-100 dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/5">
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-[11px] font-black text-slate-900 dark:text-white">AR 1866</span>
+                                                                    <span className="text-[9px] text-slate-600 dark:text-gray-400">Desde AEP</span>
+                                                                </div>
+                                                                <div className="text-right">
+                                                                    <span className="text-[10px] font-black text-slate-700 dark:text-gray-300">Mañana 02:20</span>
+                                                                    <div className="text-[8px] text-slate-500 dark:text-gray-500 uppercase font-black">Programado</div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                <div className="h-px bg-[#1f1f1f]"></div>
-
-                                                {/* RGA STATUS */}
-                                                <div className="flex flex-col gap-2">
-                                                    <span className="text-[9px] font-black text-slate-900 dark:text-white/40 uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-1">Río Grande - Próximo</span>
-                                                    <div className="flex items-center justify-between p-2 bg-slate-100 dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/5">
-                                                        <div className="flex flex-col">
-                                                            <span className="text-[11px] font-black text-slate-900 dark:text-white">AR 1866</span>
-                                                            <span className="text-[9px] text-slate-600 dark:text-gray-400">Desde AEP</span>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <span className="text-[10px] font-black text-slate-700 dark:text-gray-300">Mañana 02:20</span>
-                                                            <div className="text-[8px] text-slate-500 dark:text-gray-500 uppercase font-black">Programado</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
                                 </div>
                             </div>
@@ -1167,23 +1240,6 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         )}
       </AnimatePresence>
 
-      {/* LIVE SYNC HUD */}
-      <div className="fixed bottom-8 right-8 z-[60] flex flex-col items-end gap-3 pointer-events-none">
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-2xl flex items-center gap-4"
-        >
-          <div className="relative">
-            <div className="w-3 h-3 bg-emerald-500 rounded-full animate-ping absolute inset-0"></div>
-            <div className="w-3 h-3 bg-emerald-500 rounded-full relative"></div>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Estado del Sistema</span>
-            <span className="text-xs font-bold text-white tracking-tight">Sincronizado: {new Date().toLocaleTimeString()}</span>
-          </div>
-        </motion.div>
-      </div>
 
       <AnimatePresence>
         {selectedArticle && (
