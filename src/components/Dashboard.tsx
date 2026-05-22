@@ -30,6 +30,30 @@ const SecurityHeatMap = dynamic(() => import('./SecurityHeatMap'), {
     )
   });
 
+const WikiAppLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
+  <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="logo-gradient-wa" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#3b82f6" />
+        <stop offset="100%" stopColor="#10b981" />
+      </linearGradient>
+    </defs>
+    <path 
+      d="M20 38 L35 72 L48 42 L61 72 L76 38" 
+      stroke="url(#logo-gradient-wa)" 
+      strokeWidth="10" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+    />
+    <path 
+      d="M52 53 L68 53" 
+      stroke="url(#logo-gradient-wa)" 
+      strokeWidth="10" 
+      strokeLinecap="round" 
+    />
+  </svg>
+);
+
 type ViewMode = 'list' | 'grid' | 'magazine';
 
 export default function Dashboard({ initialArticles, feeds }: { initialArticles: Article[], feeds: FeedSource[] }) {
@@ -228,8 +252,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         className="bg-white/80 dark:bg-[#0c0c0c]/80 backdrop-blur-2xl border-r border-slate-200 dark:border-white/5 hidden lg:flex flex-col items-center shrink-0 z-50 py-4 gap-6 overflow-hidden shadow-2xl transition-all duration-300 ease-in-out"
       >
         <div className="flex items-center gap-4 w-full px-4 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold tracking-tighter shadow-lg shadow-blue-500/20 cursor-pointer group hover:scale-105 transition-transform shrink-0">
-            MW
+          <div className="cursor-pointer group hover:scale-105 transition-transform shrink-0">
+            <WikiAppLogo className="w-10 h-10 drop-shadow-[0_0_10px_rgba(59,130,246,0.25)]" />
           </div>
           <AnimatePresence>
             {isSidebarExpanded && (
@@ -239,7 +263,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                 exit={{ opacity: 0, x: -10 }}
                 className="text-lg font-black tracking-tighter text-slate-900 dark:text-white whitespace-nowrap font-display"
               >
-                WIKIAPP <span className="text-blue-500">PRO</span>
+                WA <span className="text-blue-500">PRO</span>
               </motion.span>
             )}
           </AnimatePresence>
@@ -305,12 +329,12 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         <div className="px-4 py-4 md:px-8 shrink-0 z-30 sticky top-0 bg-white/60 dark:bg-[#070707]/60 backdrop-blur-2xl border-b border-slate-200 dark:border-white/10 shadow-glass">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                   <div className="lg:hidden w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30 mr-2 shrink-0">
-                      <LayoutDashboard className="w-5 h-5 text-white" />
+                   <div className="lg:hidden mr-2 shrink-0">
+                      <WikiAppLogo className="w-10 h-10" />
                    </div>
                    <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3">
                       <h1 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase font-display">
-                         WikiApp <span className="text-[10px] bg-blue-500/20 px-2 py-0.5 rounded-full text-blue-500 font-black border border-blue-500/20 ml-1">PRO V2</span>
+                         WA <span className="text-[10px] bg-blue-500/20 px-2 py-0.5 rounded-full text-blue-500 font-black border border-blue-500/20 ml-1">PRO</span>
                       </h1>
                       <div className="flex items-center gap-2">
                         <ChevronRight className="w-3.5 h-3.5 text-slate-400 hidden lg:block" />
@@ -1833,7 +1857,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                 ) : (
                   <div className="p-12 text-center opacity-40">
                     <LayoutDashboard className="w-12 h-12 mx-auto mb-4" />
-                    <p className="text-sm font-bold uppercase tracking-[0.3em]">Buscador de Inteligencia WikiApp</p>
+                    <p className="text-sm font-bold uppercase tracking-[0.3em]">Buscador de Inteligencia</p>
                   </div>
                 )}
               </div>
