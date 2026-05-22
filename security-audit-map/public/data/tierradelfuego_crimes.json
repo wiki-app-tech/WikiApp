@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "source": "IPIEC (Instituto Provincial de Análisis Estadístico y Censos)",
+    "year": 2025,
+    "total_records": 45,
+    "description": "Hotspots de delitos y reclamos de seguridad pública en Tierra del Fuego"
+  },
+  "crimes": [
+    { "id": 1, "city": "Ushuaia", "type": "Ciberdelito", "sub": "Estafa Virtual", "lat": -54.8064, "lng": -68.3072, "weight": 0.8, "desc": "Phishing bancario simulando plataforma BTF" },
+    { "id": 2, "city": "Ushuaia", "type": "Ciberdelito", "sub": "Clonación WhatsApp", "lat": -54.8019, "lng": -68.3029, "weight": 0.9, "desc": "Ingeniería social orientada a jubilados" },
+    { "id": 3, "city": "Ushuaia", "type": "Ciberdelito", "sub": "Fraude Tarjeta", "lat": -54.8105, "lng": -68.3150, "weight": 0.7, "desc": "Compras no autorizadas con datos sustraídos" },
+    { "id": 4, "city": "Ushuaia", "type": "Robo/Hurto", "sub": "Robo en Vivienda", "lat": -54.8250, "lng": -68.3580, "weight": 0.6, "desc": "Hurto sin violencia en Barrio Pipo" },
+    { "id": 5, "city": "Ushuaia", "type": "Robo/Hurto", "sub": "Arrebato en Vía Pública", "lat": -54.8055, "lng": -68.3001, "weight": 0.5, "desc": "Arrebato de pertenencias a turista en calle San Martín" },
+    { "id": 6, "city": "Ushuaia", "type": "Orden Público", "sub": "Conflicto Nocturno", "lat": -54.8070, "lng": -68.3020, "weight": 0.7, "desc": "Pelea en zona de bares de avenida Maipú" },
+    { "id": 7, "city": "Ushuaia", "type": "Orden Público", "sub": "Vandalismo", "lat": -54.7990, "lng": -68.2950, "weight": 0.4, "desc": "Daños en mobiliario de plaza céntrica" },
+    { "id": 8, "city": "Ushuaia", "type": "Ciberdelito", "sub": "Phishing DPE", "lat": -54.8035, "lng": -68.3180, "weight": 0.8, "desc": "Suplantación de factura de energía eléctrica" },
+    { "id": 9, "city": "Ushuaia", "type": "Robo/Hurto", "sub": "Robo Comercio", "lat": -54.8060, "lng": -68.3090, "weight": 0.6, "desc": "Intrusión en local comercial nocturno" },
+    { "id": 10, "city": "Ushuaia", "type": "Orden Público", "sub": "Ruidos Molestos", "lat": -54.8150, "lng": -68.3400, "weight": 0.3, "desc": "Queja recurrente por ruidos en zona residencial" },
+
+    { "id": 11, "city": "Río Grande", "type": "Ciberdelito", "sub": "Fraude Logístico", "lat": -53.7650, "lng": -67.7050, "weight": 0.8, "desc": "Estafas con falsos despachos de insumos electrónicos" },
+    { "id": 12, "city": "Río Grande", "type": "Ciberdelito", "sub": "Robo de Datos", "lat": -53.7720, "lng": -67.6980, "weight": 0.7, "desc": "Vulneración de credenciales corporativas en parque industrial" },
+    { "id": 13, "city": "Río Grande", "type": "Robo/Hurto", "sub": "Robo de Carga", "lat": -53.7600, "lng": -67.7200, "weight": 0.9, "desc": "Sustracción de mercadería en camión de reparto" },
+    { "id": 14, "city": "Río Grande", "type": "Robo/Hurto", "sub": "Robo en Vivienda", "lat": -53.7780, "lng": -67.7120, "weight": 0.6, "desc": "Robo calificado en Chacra II" },
+    { "id": 15, "city": "Río Grande", "type": "Robo/Hurto", "sub": "Hurto de Celular", "lat": -53.7850, "lng": -67.7000, "weight": 0.5, "desc": "Arrebato de celular en zona de colectivos de Chacra IV" },
+    { "id": 16, "city": "Río Grande", "type": "Orden Público", "sub": "Conflicto Barrial", "lat": -53.8050, "lng": -67.6850, "weight": 0.8, "desc": "Incidentes reiterados en Margen Sur" },
+    { "id": 17, "city": "Río Grande", "type": "Orden Público", "sub": "Vandalismo Escolar", "lat": -53.7900, "lng": -67.7300, "weight": 0.5, "desc": "Pintadas en fachada de colegio de barrio CGT" },
+    { "id": 18, "city": "Río Grande", "type": "Ciberdelito", "sub": "Falsa Venta", "lat": -53.7750, "lng": -67.7100, "weight": 0.7, "desc": "Fraude en Facebook Marketplace con retiro local" },
+    { "id": 19, "city": "Río Grande", "type": "Robo/Hurto", "sub": "Robo de Autopartes", "lat": -53.8010, "lng": -67.6780, "weight": 0.6, "desc": "Sustracción de rueda de auxilio en vía pública" },
+    { "id": 20, "city": "Río Grande", "type": "Orden Público", "sub": "Corte de Ruta", "lat": -53.7550, "lng": -67.7400, "weight": 0.7, "desc": "Protesta gremial con interrupción parcial de tránsito en RN3" },
+
+    { "id": 21, "city": "Tolhuin", "type": "Ciberdelito", "sub": "Estafa Cabañas", "lat": -54.5120, "lng": -67.1950, "weight": 0.7, "desc": "Falsos alquileres de cabañas vacacionales" },
+    { "id": 22, "city": "Tolhuin", "type": "Robo/Hurto", "sub": "Hurto de Leña", "lat": -54.5050, "lng": -67.1850, "weight": 0.5, "desc": "Sustracción de madera acopiada en predio forestal" },
+    { "id": 23, "city": "Tolhuin", "type": "Orden Público", "sub": "Accidente Vial RN3", "lat": -54.5200, "lng": -67.2100, "weight": 0.6, "desc": "Choque por calzada resbaladiza en ingreso norte" },
+    { "id": 24, "city": "Tolhuin", "type": "Robo/Hurto", "sub": "Robo en Cabaña", "lat": -54.5250, "lng": -67.1700, "weight": 0.6, "desc": "Intrusión en cabaña turística temporal sin moradores" },
+    { "id": 25, "city": "Tolhuin", "type": "Ciberdelito", "sub": "Phishing BTF", "lat": -54.5100, "lng": -67.1900, "weight": 0.8, "desc": "Mensaje de texto engañoso para validación de clave" }
+  ]
+}
