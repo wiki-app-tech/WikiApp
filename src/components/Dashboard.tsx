@@ -532,13 +532,11 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8 relative z-10 scrollbar-hide">
           <div className="max-w-[1600px] mx-auto space-y-6">
             
-            {activeTab === 'weather' ? (
-              <WeatherDashboard />
-            ) : (
+            {(activeTab === "home" || activeTab === "explore") && (
               <div className="flex flex-col gap-8">
                   
                   {/* Búsqueda activa info */}
-                  {search && (
+                  {search && (activeTab === "home" || activeTab === "explore") && (
                     <div className="w-full bg-white dark:bg-[#121212] border border-slate-300 dark:border-[#222] rounded-xl p-4 flex items-center justify-between">
                         <input 
                             type="text"
@@ -609,7 +607,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                   <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
                       {/* MAIN CONTENT FEED LIST */}
-                      <div className={`${activeTab === 'explore' ? 'xl:col-span-12' : 'xl:col-span-8'} flex flex-col gap-6`}>
+                      <div className={`${activeTab === "home" ? "xl:col-span-8" : "xl:col-span-12"} flex flex-col gap-6`}>
+                         {(activeTab === "home" || activeTab === "explore") && (
                          <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
                             <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm sticky top-0 z-10">
                                 <div className="flex items-center gap-3">
@@ -863,7 +862,195 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                     </div>
                                  )}
                              </motion.div>
-                          </div>
+                           </div>
+                         )}
+                      </div>
+
+                      {/* RIGHT COLUMN (CHECKLIST) FOR HOME */}
+                      {activeTab === 'home' && (
+                        <div className="hidden xl:flex xl:col-span-4 flex-col gap-6">
+                            <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-2xl p-5 shadow-2xl flex flex-col gap-6">
+                                <div className="flex items-center justify-between text-slate-700 dark:text-gray-300">
+                                    <h2 className="text-[13px] font-bold tracking-wide flex items-center gap-2">
+                                        <Map className="w-4 h-4 text-orange-500" />
+                                        Estado de Rutas TDF
+                                    </h2>
+                                    <span className="flex h-2 w-2 relative">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    </span>
+                                </div>
+                                <div className="flex flex-col gap-4">
+                                    
+                                    {/* TRAMO 1 */}
+                                    <div className="bg-slate-100 dark:bg-[#161616]/40 backdrop-blur-md border border-slate-300 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative group hover:border-blue-500/50 hover:bg-slate-100 dark:bg-[#1a1a1a]/60 cursor-pointer transition-all shadow-sm">
+                                        <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-blue-500"/></div>
+                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-gray-500">Tramo Norte</h4>
+                                        <h3 className="text-[13px] font-bold text-slate-900 dark:text-white">San Sebastián - Río Grande</h3>
+                                        <p className="text-[11px] text-slate-600 dark:text-gray-400 mt-1 mb-2 leading-relaxed opacity-80 group-hover:opacity-100">Tránsito habilitado. Monitoreo oficial por condiciones climáticas de la zona.</p>
+                                        <a href="https://www.facebook.com/SuDefensaCivil/" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-slate-300 dark:border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-blue-500 hover:text-blue-400 transition-colors">
+                                            Fuente: Defensa Civil <ExternalLink className="w-3 h-3"/>
+                                        </a>
+                                    </div>
+
+                                    {/* TRAMO 2 */}
+                                    <div className="bg-slate-100 dark:bg-[#161616]/40 backdrop-blur-md border border-slate-300 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative group hover:border-emerald-500/50 hover:bg-slate-100 dark:bg-[#1a1a1a]/60 cursor-pointer transition-all shadow-sm">
+                                        <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-emerald-500"/></div>
+                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-gray-500">Tramo Centro</h4>
+                                        <h3 className="text-[13px] font-bold text-slate-900 dark:text-white">Río Grande - Tolhuin</h3>
+                                        <p className="text-[11px] text-slate-600 dark:text-gray-400 mt-1 mb-2 leading-relaxed opacity-80 group-hover:opacity-100">Precaución permanente en zona geológica. Reportarse a los puestos de control.</p>
+                                        <a href="https://www.argentina.gob.ar/transporte/vialidad-nacional/estado-de-rutas" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-slate-300 dark:border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-emerald-500 hover:text-emerald-400 transition-colors">
+                                            Fuente: Vialidad Nacional <ExternalLink className="w-3 h-3"/>
+                                        </a>
+                                    </div>
+
+                                    {/* TRAMO 3 */}
+                                    <div className="bg-slate-100 dark:bg-[#161616]/40 backdrop-blur-md border border-slate-300 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative group hover:border-orange-500/50 hover:bg-slate-100 dark:bg-[#1a1a1a]/60 cursor-pointer transition-all shadow-sm">
+                                        <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-orange-400"/></div>
+                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-gray-500">Tramo Sur</h4>
+                                        <h3 className="text-[13px] font-bold text-slate-900 dark:text-white">Tolhuin - Lapataia</h3>
+                                        <p className="text-[11px] text-slate-600 dark:text-gray-400 mt-1 mb-2 leading-relaxed opacity-80 group-hover:opacity-100">Zona de montaña. Transitabilidad sujeta a condiciones de hielo y nieve diaria.</p>
+                                        <a href="https://www.facebook.com/direccionprovincialdevialidadTDF/?locale=es_LA" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-slate-300 dark:border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-orange-400 hover:text-orange-300 transition-colors">
+                                            Fuente: Vialidad Pcial <ExternalLink className="w-3 h-3"/>
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            {/* TARJETA DE FARMACIAS DE TURNO (UX PREMIUM & AUTO-UPDATE) */}
+                            <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
+                                <div className="flex items-center justify-between text-slate-700 dark:text-gray-300">
+                                    <h2 className="text-[13px] font-bold tracking-wide flex items-center gap-2">
+                                        <Plus className="w-4 h-4 text-emerald-500" />
+                                        Farmacias de Turno
+                                    </h2>
+                                    <div className="flex gap-1 bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/5">
+                                        {(['ushuaia', 'rio_grande', 'tolhuin'] as const).map(city => (
+                                            <button
+                                                key={city}
+                                                onClick={() => {
+                                                    setSelectedPharmacyCity(city);
+                                                    setActivePharmacyIndex(0);
+                                                }}
+                                                className={`text-[9px] font-black uppercase px-2.5 py-1.5 rounded-lg transition-all ${
+                                                    selectedPharmacyCity === city
+                                                        ? 'bg-blue-600 text-white shadow-md'
+                                                        : 'text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10'
+                                                }`}
+                                            >
+                                                {city === 'rio_grande' ? 'R. Grande' : city}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {pharmacies ? (
+                                    <div className="relative min-h-[140px] flex flex-col">
+                                        <AnimatePresence mode="wait">
+                                            {(() => {
+                                                const visibleList = getVisiblePharmacies(selectedPharmacyCity);
+                                                const pharmacy = visibleList[activePharmacyIndex];
+                                                if (!pharmacy) return null;
+
+                                                const isToday = parseInt(pharmacy.fecha) === new Date().getDate();
+                                                const formattedCityName = selectedPharmacyCity === 'ushuaia' ? 'Ushuaia' : selectedPharmacyCity === 'rio_grande' ? 'Río Grande' : 'Tolhuin';
+
+                                                return (
+                                                    <motion.div
+                                                        key={`${selectedPharmacyCity}-${activePharmacyIndex}`}
+                                                        initial={{ opacity: 0, x: 20 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        exit={{ opacity: 0, x: -20 }}
+                                                        transition={{ duration: 0.3 }}
+                                                        className="bg-slate-100 dark:bg-[#161616]/40 backdrop-blur-md border border-slate-300 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative shadow-sm"
+                                                    >
+                                                        <div className="flex items-center justify-between">
+                                                            <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
+                                                                isToday
+                                                                    ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 animate-pulse'
+                                                                    : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-gray-400'
+                                                            }`}>
+                                                                {isToday ? 'Hoy de Turno' : `${pharmacy.dia} ${pharmacy.fecha}`}
+                                                            </span>
+                                                            <span className="text-[9px] font-bold text-slate-500 dark:text-gray-500">
+                                                                {pharmacy.horario}
+                                                            </span>
+                                                        </div>
+
+                                                        <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase mt-1">
+                                                            {pharmacy.nombre}
+                                                        </h3>
+
+                                                        {/* Dirección Interactiva para GPS */}
+                                                        <a
+                                                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Farmacia ${pharmacy.nombre}, ${pharmacy.direccion}, ${formattedCityName}, Tierra del Fuego`)}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors w-fit group mt-1"
+                                                        >
+                                                            <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0 group-hover:scale-110 transition-transform" />
+                                                            <span className="underline underline-offset-2 decoration-dotted group-hover:decoration-solid">{pharmacy.direccion}</span>
+                                                        </a>
+
+                                                        {/* Teléfonos Interactivos */}
+                                                        <div className="flex flex-wrap gap-2 mt-2 pt-2 border-t border-slate-200 dark:border-white/5">
+                                                            {(() => {
+                                                                const rawPhones = pharmacy.telefono;
+                                                                const cleanPhones = rawPhones.replace(/(Tel\.|Cel\.|CEL\.)/gi, '').trim();
+                                                                const phoneParts = cleanPhones.split(/[\/\–]/).map((p: string) => p.trim()).filter(Boolean);
+                                                                
+                                                                return phoneParts.map((phone: string, idx: number) => {
+                                                                    const telLink = phone.replace(/[^\d+]/g, '');
+                                                                    return (
+                                                                        <a
+                                                                            key={idx}
+                                                                            href={`tel:${telLink}`}
+                                                                            className="flex items-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-emerald-500/20 transition-all cursor-pointer"
+                                                                        >
+                                                                            <svg className="w-3.5 h-3.5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                                                            </svg>
+                                                                            Llamar: {phone}
+                                                                        </a>
+                                                                    );
+                                                                });
+                                                            })()}
+                                                        </div>
+                                                    </motion.div>
+                                                );
+                                            })()}
+                                        </AnimatePresence>
+
+                                        {/* Indicadores de carrusel */}
+                                        <div className="flex justify-center gap-1.5 mt-3">
+                                            {[0, 1, 2, 3].map(idx => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => setActivePharmacyIndex(idx)}
+                                                    className={`w-1.5 h-1.5 rounded-full transition-all ${
+                                                        activePharmacyIndex === idx
+                                                            ? 'bg-blue-600 w-3'
+                                                            : 'bg-slate-300 dark:bg-[#333]'
+                                                    }`}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="h-[140px] flex flex-col items-center justify-center bg-slate-100 dark:bg-[#161616]/40 rounded-2xl border border-slate-300 dark:border-[#222]">
+                                        <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                        <span className="text-[10px] uppercase font-black text-slate-500 dark:text-gray-500 tracking-wider mt-3">Sincronizando farmacias...</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                      )}
+
+                      {/* SIDE PANEL REMOVED AND MOVED TO TOP DROPDOWN */}
+                  </div>
+                </div>
+            )}
 
                   {/* 4. WEATHER DASHBOARD */}
                   {activeTab === 'weather' && <WeatherDashboard />}
@@ -1660,193 +1847,6 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                             </div>
                          </motion.div>
                       )}
-                      </div>
-
-                      {/* RIGHT COLUMN (CHECKLIST) FOR HOME */}
-                      {activeTab === 'home' && (
-                        <div className="hidden xl:flex xl:col-span-4 flex-col gap-6">
-                            <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-2xl p-5 shadow-2xl flex flex-col gap-6">
-                                <div className="flex items-center justify-between text-slate-700 dark:text-gray-300">
-                                    <h2 className="text-[13px] font-bold tracking-wide flex items-center gap-2">
-                                        <Map className="w-4 h-4 text-orange-500" />
-                                        Estado de Rutas TDF
-                                    </h2>
-                                    <span className="flex h-2 w-2 relative">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                    </span>
-                                </div>
-                                <div className="flex flex-col gap-4">
-                                    
-                                    {/* TRAMO 1 */}
-                                    <div className="bg-slate-100 dark:bg-[#161616]/40 backdrop-blur-md border border-slate-300 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative group hover:border-blue-500/50 hover:bg-slate-100 dark:bg-[#1a1a1a]/60 cursor-pointer transition-all shadow-sm">
-                                        <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-blue-500"/></div>
-                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-gray-500">Tramo Norte</h4>
-                                        <h3 className="text-[13px] font-bold text-slate-900 dark:text-white">San Sebastián - Río Grande</h3>
-                                        <p className="text-[11px] text-slate-600 dark:text-gray-400 mt-1 mb-2 leading-relaxed opacity-80 group-hover:opacity-100">Tránsito habilitado. Monitoreo oficial por condiciones climáticas de la zona.</p>
-                                        <a href="https://www.facebook.com/SuDefensaCivil/" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-slate-300 dark:border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-blue-500 hover:text-blue-400 transition-colors">
-                                            Fuente: Defensa Civil <ExternalLink className="w-3 h-3"/>
-                                        </a>
-                                    </div>
-
-                                    {/* TRAMO 2 */}
-                                    <div className="bg-slate-100 dark:bg-[#161616]/40 backdrop-blur-md border border-slate-300 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative group hover:border-emerald-500/50 hover:bg-slate-100 dark:bg-[#1a1a1a]/60 cursor-pointer transition-all shadow-sm">
-                                        <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-emerald-500"/></div>
-                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-gray-500">Tramo Centro</h4>
-                                        <h3 className="text-[13px] font-bold text-slate-900 dark:text-white">Río Grande - Tolhuin</h3>
-                                        <p className="text-[11px] text-slate-600 dark:text-gray-400 mt-1 mb-2 leading-relaxed opacity-80 group-hover:opacity-100">Precaución permanente en zona geológica. Reportarse a los puestos de control.</p>
-                                        <a href="https://www.argentina.gob.ar/transporte/vialidad-nacional/estado-de-rutas" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-slate-300 dark:border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-emerald-500 hover:text-emerald-400 transition-colors">
-                                            Fuente: Vialidad Nacional <ExternalLink className="w-3 h-3"/>
-                                        </a>
-                                    </div>
-
-                                    {/* TRAMO 3 */}
-                                    <div className="bg-slate-100 dark:bg-[#161616]/40 backdrop-blur-md border border-slate-300 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative group hover:border-orange-500/50 hover:bg-slate-100 dark:bg-[#1a1a1a]/60 cursor-pointer transition-all shadow-sm">
-                                        <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-orange-400"/></div>
-                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-gray-500">Tramo Sur</h4>
-                                        <h3 className="text-[13px] font-bold text-slate-900 dark:text-white">Tolhuin - Lapataia</h3>
-                                        <p className="text-[11px] text-slate-600 dark:text-gray-400 mt-1 mb-2 leading-relaxed opacity-80 group-hover:opacity-100">Zona de montaña. Transitabilidad sujeta a condiciones de hielo y nieve diaria.</p>
-                                        <a href="https://www.facebook.com/direccionprovincialdevialidadTDF/?locale=es_LA" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-slate-300 dark:border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-orange-400 hover:text-orange-300 transition-colors">
-                                            Fuente: Vialidad Pcial <ExternalLink className="w-3 h-3"/>
-                                        </a>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            {/* TARJETA DE FARMACIAS DE TURNO (UX PREMIUM & AUTO-UPDATE) */}
-                            <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
-                                <div className="flex items-center justify-between text-slate-700 dark:text-gray-300">
-                                    <h2 className="text-[13px] font-bold tracking-wide flex items-center gap-2">
-                                        <Plus className="w-4 h-4 text-emerald-500" />
-                                        Farmacias de Turno
-                                    </h2>
-                                    <div className="flex gap-1 bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/5">
-                                        {(['ushuaia', 'rio_grande', 'tolhuin'] as const).map(city => (
-                                            <button
-                                                key={city}
-                                                onClick={() => {
-                                                    setSelectedPharmacyCity(city);
-                                                    setActivePharmacyIndex(0);
-                                                }}
-                                                className={`text-[9px] font-black uppercase px-2.5 py-1.5 rounded-lg transition-all ${
-                                                    selectedPharmacyCity === city
-                                                        ? 'bg-blue-600 text-white shadow-md'
-                                                        : 'text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10'
-                                                }`}
-                                            >
-                                                {city === 'rio_grande' ? 'R. Grande' : city}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {pharmacies ? (
-                                    <div className="relative min-h-[140px] flex flex-col">
-                                        <AnimatePresence mode="wait">
-                                            {(() => {
-                                                const visibleList = getVisiblePharmacies(selectedPharmacyCity);
-                                                const pharmacy = visibleList[activePharmacyIndex];
-                                                if (!pharmacy) return null;
-
-                                                const isToday = parseInt(pharmacy.fecha) === new Date().getDate();
-                                                const formattedCityName = selectedPharmacyCity === 'ushuaia' ? 'Ushuaia' : selectedPharmacyCity === 'rio_grande' ? 'Río Grande' : 'Tolhuin';
-
-                                                return (
-                                                    <motion.div
-                                                        key={`${selectedPharmacyCity}-${activePharmacyIndex}`}
-                                                        initial={{ opacity: 0, x: 20 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        exit={{ opacity: 0, x: -20 }}
-                                                        transition={{ duration: 0.3 }}
-                                                        className="bg-slate-100 dark:bg-[#161616]/40 backdrop-blur-md border border-slate-300 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative shadow-sm"
-                                                    >
-                                                        <div className="flex items-center justify-between">
-                                                            <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
-                                                                isToday
-                                                                    ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 animate-pulse'
-                                                                    : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-gray-400'
-                                                            }`}>
-                                                                {isToday ? 'Hoy de Turno' : `${pharmacy.dia} ${pharmacy.fecha}`}
-                                                            </span>
-                                                            <span className="text-[9px] font-bold text-slate-500 dark:text-gray-500">
-                                                                {pharmacy.horario}
-                                                            </span>
-                                                        </div>
-
-                                                        <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase mt-1">
-                                                            {pharmacy.nombre}
-                                                        </h3>
-
-                                                        {/* Dirección Interactiva para GPS */}
-                                                        <a
-                                                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Farmacia ${pharmacy.nombre}, ${pharmacy.direccion}, ${formattedCityName}, Tierra del Fuego`)}`}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors w-fit group mt-1"
-                                                        >
-                                                            <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0 group-hover:scale-110 transition-transform" />
-                                                            <span className="underline underline-offset-2 decoration-dotted group-hover:decoration-solid">{pharmacy.direccion}</span>
-                                                        </a>
-
-                                                        {/* Teléfonos Interactivos */}
-                                                        <div className="flex flex-wrap gap-2 mt-2 pt-2 border-t border-slate-200 dark:border-white/5">
-                                                            {(() => {
-                                                                const rawPhones = pharmacy.telefono;
-                                                                const cleanPhones = rawPhones.replace(/(Tel\.|Cel\.|CEL\.)/gi, '').trim();
-                                                                const phoneParts = cleanPhones.split(/[\/\–]/).map((p: string) => p.trim()).filter(Boolean);
-                                                                
-                                                                return phoneParts.map((phone: string, idx: number) => {
-                                                                    const telLink = phone.replace(/[^\d+]/g, '');
-                                                                    return (
-                                                                        <a
-                                                                            key={idx}
-                                                                            href={`tel:${telLink}`}
-                                                                            className="flex items-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-emerald-500/20 transition-all cursor-pointer"
-                                                                        >
-                                                                            <svg className="w-3.5 h-3.5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                                                                            </svg>
-                                                                            Llamar: {phone}
-                                                                        </a>
-                                                                    );
-                                                                });
-                                                            })()}
-                                                        </div>
-                                                    </motion.div>
-                                                );
-                                            })()}
-                                        </AnimatePresence>
-
-                                        {/* Indicadores de carrusel */}
-                                        <div className="flex justify-center gap-1.5 mt-3">
-                                            {[0, 1, 2, 3].map(idx => (
-                                                <button
-                                                    key={idx}
-                                                    onClick={() => setActivePharmacyIndex(idx)}
-                                                    className={`w-1.5 h-1.5 rounded-full transition-all ${
-                                                        activePharmacyIndex === idx
-                                                            ? 'bg-blue-600 w-3'
-                                                            : 'bg-slate-300 dark:bg-[#333]'
-                                                    }`}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="h-[140px] flex flex-col items-center justify-center bg-slate-100 dark:bg-[#161616]/40 rounded-2xl border border-slate-300 dark:border-[#222]">
-                                        <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                                        <span className="text-[10px] uppercase font-black text-slate-500 dark:text-gray-500 tracking-wider mt-3">Sincronizando farmacias...</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                      )}
-
-                      {/* SIDE PANEL REMOVED AND MOVED TO TOP DROPDOWN */}
-                  </div>
-                </div>
-             )}
             </div>
           </div>
         </main>
