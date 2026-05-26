@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, ChevronDown, AlertTriangle, Info } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, ChevronDown, AlertTriangle, Info } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
 import RadioDashboard from './RadioDashboard';
@@ -69,6 +69,90 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
    const [blocklist, setBlocklist] = useState<string[]>(['pautas', 'anuncio', 'publicidad', 'clickbait']);
    const [isFilterOpen, setIsFilterOpen] = useState(false);
    const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+   const [carouselSlide, setCarouselSlide] = useState<'ships' | 'flights'>('ships');
+   const [isAutoCycle, setIsAutoCycle] = useState(true);
+   const [secondsToUpdate, setSecondsToUpdate] = useState(15);
+   const [shipsData, setShipsData] = useState([
+     { id: 1, name: 'EZEQUIEL MB', type: 'Catamarán de Pasajeros', status: 'En Puerto', time: 'Hoy, 17:51', flag: 'AR', speed: '0.0 kn', destination: 'Ushuaia' },
+     { id: 2, name: 'ASTURIANO III', type: 'Portacontenedores', status: 'En Ruta', time: 'Mañana, 06:00', flag: 'AR', speed: '12.4 kn', destination: 'Ushuaia' },
+     { id: 3, name: 'STELLA AUSTRALIS', type: 'Crucero Expedition', status: 'Arribando', time: 'Hoy, 20:30', flag: 'CL', speed: '9.8 kn', destination: 'Ushuaia' },
+     { id: 4, name: 'ALBATROS', type: 'Pesquero Congelador', status: 'En Puerto', time: 'Ayer, 22:40', flag: 'AR', speed: '0.0 kn', destination: 'Ushuaia' },
+     { id: 5, name: 'MAPOCHO', type: 'Remolcador de Altura', status: 'En Puerto', time: 'Hoy, 09:15', flag: 'CL', speed: '0.0 kn', destination: 'Río Grande' }
+   ]);
+   const [flightsData, setFlightsData] = useState([
+     { id: 1, flight: 'AR 1886', airline: 'Aerolíneas Argentinas', route: 'AEP ➔ USH', status: 'En Pista', time: 'Llegó 14:23', type: 'Boeing 737-800' },
+     { id: 2, flight: 'AR 1898', airline: 'Aerolíneas Argentinas', route: 'FTE ➔ USH', status: 'En Vuelo', time: 'Previsto 15:40', type: 'Embraer 190' },
+     { id: 3, flight: 'AR 1866', airline: 'Aerolíneas Argentinas', route: 'AEP ➔ RGA', status: 'Programado', time: 'Mañana 02:20', type: 'Boeing 737-800' },
+     { id: 4, flight: 'WJ 3462', airline: 'JetSmart', route: 'AEP ➔ USH', status: 'En Vuelo', time: 'Previsto 16:15', type: 'Airbus A320' },
+     { id: 5, flight: 'FB 5120', airline: 'Flybondi', route: 'EPA ➔ USH', status: 'Programado', time: 'Hoy 18:10', type: 'Boeing 737-800' }
+   ]);
+
+   // Live Update Logistics Data
+   useEffect(() => {
+     if (activeTab !== 'logistics') return;
+     const timer = setInterval(() => {
+       setSecondsToUpdate((prev) => {
+         if (prev <= 1) {
+           setShipsData((prevShips) =>
+             prevShips.map(ship => {
+               if (ship.status === 'En Ruta' || ship.status === 'Arribando') {
+                 const speedChange = (Math.random() * 1.2 - 0.6);
+                 const currentSpeed = parseFloat(ship.speed);
+                 const newSpeed = Math.max(0, currentSpeed + speedChange).toFixed(1) + ' kn';
+                 return { ...ship, speed: newSpeed };
+               }
+               return ship;
+             })
+           );
+           setFlightsData((prevFlights) => {
+             const next = [...prevFlights];
+             const flightIndex = Math.floor(Math.random() * next.length);
+             const f = next[flightIndex];
+             if (f.status === 'En Vuelo') {
+               if (Math.random() > 0.5) {
+                 next[flightIndex] = {
+                   ...f,
+                   status: 'En Pista',
+                   time: `Llegó ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
+                 };
+               }
+             } else if (f.status === 'En Pista') {
+               if (Math.random() > 0.6) {
+                 const nextHour = new Date(Date.now() + 7200000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                 next[flightIndex] = {
+                   ...f,
+                   status: 'Programado',
+                   time: `Hoy ${nextHour}`
+                 };
+               }
+             } else if (f.status === 'Programado') {
+               if (Math.random() > 0.4) {
+                 next[flightIndex] = {
+                   ...f,
+                   status: 'En Vuelo',
+                   time: 'En Vuelo (A tiempo)'
+                 };
+               }
+             }
+             return next;
+           });
+           return 15;
+         }
+         return prev - 1;
+       });
+     }, 1000);
+     return () => clearInterval(timer);
+   }, [activeTab]);
+
+   // Auto Cycle Logistics Carousel Slides
+   useEffect(() => {
+     if (!isAutoCycle || activeTab !== 'logistics') return;
+     const interval = setInterval(() => {
+       setCarouselSlide(prev => prev === 'ships' ? 'flights' : 'ships');
+     }, 8000);
+     return () => clearInterval(interval);
+   }, [isAutoCycle, activeTab]);
+
    const [showShipOverlay, setShowShipOverlay] = useState(true);
    const [showFlightOverlay, setShowFlightOverlay] = useState(true);
   
@@ -1621,231 +1705,271 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                             className="xl:col-span-12 flex flex-col gap-8 pb-10"
                         >
                             <header className="flex flex-col gap-2">
-                               <div className="flex items-center gap-3">
-                                  <div className="w-12 h-12 rounded-2xl bg-blue-600/20 flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.2)]">
-                                     <Anchor className="w-6 h-6 text-blue-500" />
-                                  </div>
-                                  <div className="flex flex-col">
-                                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Control de Arribos Regional</h1>
-                                    <span className="text-[10px] font-bold text-blue-500/80 uppercase tracking-[0.3em] mt-1">Tráfico Marítimo y Aéreo en Tiempo Real</span>
-                                  </div>
+                               <div className="flex items-center justify-between flex-wrap gap-4">
+                                   <div className="flex items-center gap-3">
+                                      <div className="w-12 h-12 rounded-2xl bg-blue-600/20 flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.2)]">
+                                         <Anchor className="w-6 h-6 text-blue-500" />
+                                      </div>
+                                      <div className="flex flex-col">
+                                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Control de Arribos Regional</h1>
+                                        <span className="text-[10px] font-bold text-blue-500/80 uppercase tracking-[0.3em] mt-1">Tráfico Marítimo y Aéreo en Tiempo Real</span>
+                                      </div>
+                                   </div>
+                                   {/* Live status banner */}
+                                   <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/25 px-4 py-2 rounded-full shadow-sm">
+                                       <span className="relative flex h-2 w-2">
+                                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                       </span>
+                                       <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none">Satelital Vivo</span>
+                                       <span className="text-slate-350 dark:text-white/10 w-px h-3.5">|</span>
+                                       <span className="text-[9px] font-bold text-slate-655 dark:text-gray-400 uppercase tracking-widest leading-none font-mono">Próxima actualizac. en {secondsToUpdate}s</span>
+                                   </div>
                                </div>
                             </header>
 
-                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                                {/* SHIP TRAFFIC SECTION */}
-                                <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl overflow-hidden shadow-2xl flex flex-col">
-                                    <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-6 h-6 rounded bg-blue-600/20 flex items-center justify-center">
-                                                <Anchor className="w-3.5 h-3.5 text-blue-500" />
+                            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+                                {/* DATA CAROUSEL COLUMN */}
+                                <div className="xl:col-span-4 flex flex-col gap-6">
+                                    <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl p-6 shadow-2xl flex flex-col gap-5 relative overflow-hidden h-[810px]">
+                                        <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
+                                            <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Estado de Tránsito</h3>
+                                            <div className="flex items-center gap-1.5">
+                                                <button 
+                                                    onClick={() => setIsAutoCycle(!isAutoCycle)} 
+                                                    className={`p-1.5 rounded-lg border transition-all ${isAutoCycle ? 'bg-blue-600/10 border-blue-500/20 text-blue-500' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400'}`} 
+                                                    title={isAutoCycle ? "Pausar Rotación" : "Activar Rotación"}
+                                                >
+                                                    {isAutoCycle ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                                                </button>
                                             </div>
-                                            <h2 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 tracking-wide uppercase">
-                                                Arribo de Barcos y Cruceros
-                                            </h2>
                                         </div>
-                                        <a 
-                                            href="https://www.argentina.gob.ar/economia/agencia-nacional-de-puertos-y-navegacion/puertos/puerto-de-ushuaia" 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
-                                            className="text-[10px] font-bold text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:text-white flex items-center gap-1 transition-colors"
-                                        >
-                                            INFO OFICIAL <ExternalLink className="w-3 h-3" />
-                                        </a>
-                                    </div>
-                                    <div className="w-full h-[600px] relative bg-white dark:bg-[#0c0c0c]">
-                                        <iframe 
-                                            src="https://www.marinetraffic.com/en/ais/embed/zoom:9/centery:-54.7/centerx:-67.5/maptype:0/shownames:false"
-                                            className="w-full h-full border-none opacity-90 hover:opacity-100 transition-opacity"
-                                            title="Marine Traffic - Puerto de Ushuaia"
-                                            loading="lazy"
-                                        />
-                                        
-                                        {/* FLOATING ARRIVALS OVERLAY TOGGLE */}
-                                        <AnimatePresence mode="wait">
-                                            {!showShipOverlay ? (
-                                                <motion.button 
-                                                    key="ship-btn"
-                                                    initial={{ opacity: 0, scale: 0.9 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    exit={{ opacity: 0, scale: 0.9 }}
-                                                    onClick={() => setShowShipOverlay(true)}
-                                                    className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-white/95 dark:bg-[#0e0e0e]/95 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white text-slate-800 dark:text-gray-200 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 shadow-lg transition-all hover:scale-105 active:scale-95 font-black uppercase text-[10px] tracking-wider cursor-pointer"
-                                                >
-                                                    <Anchor className="w-4 h-4 text-blue-500 shrink-0" />
-                                                    <span>Ver Arribos</span>
-                                                </motion.button>
-                                            ) : (
-                                                <motion.div 
-                                                    key="ship-panel"
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    exit={{ opacity: 0, y: 10 }}
-                                                    className="absolute top-4 left-4 z-10 w-64 bg-white/95 dark:bg-[#0e0e0e]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 pointer-events-auto"
-                                                >
-                                                    <div className="flex items-center justify-between mb-3 border-b border-slate-200 dark:border-white/10 pb-2">
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                                            <h3 className="text-[10px] font-black text-slate-600 dark:text-gray-400 uppercase tracking-widest">Estado de Arribos</h3>
-                                                        </div>
-                                                        <button 
-                                                            onClick={() => setShowShipOverlay(false)} 
-                                                            className="p-1 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
-                                                        >
-                                                            <X className="w-3.5 h-3.5" />
-                                                        </button>
-                                                    </div>
-                                                    
-                                                    <div className="flex flex-col gap-4">
-                                                        {/* CURRENT / IN PORT */}
-                                                        <div className="flex flex-col gap-1.5">
-                                                            <div className="flex items-center justify-between">
-                                                                <span className="text-[8px] font-bold text-emerald-500 uppercase">En Puerto</span>
-                                                                <span className="text-[8px] font-bold text-slate-500 dark:text-gray-500">Hoy, 17:51</span>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
-                                                                    <Anchor className="w-4 h-4 text-emerald-500" />
-                                                                </div>
-                                                                <div className="flex flex-col">
-                                                                    <span className="text-[11px] font-black text-slate-900 dark:text-white leading-tight uppercase">EZEQUIEL MB</span>
-                                                                    <span className="text-[9px] text-slate-600 dark:text-gray-400">Catamarán de Pasajeros</span>
-                                                                </div>
-                                                            </div>
+
+                                        {/* Tabs Selector */}
+                                        <div className="grid grid-cols-2 gap-2 bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/5">
+                                            <button 
+                                                onClick={() => { setCarouselSlide('ships'); setIsAutoCycle(false); }}
+                                                className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${carouselSlide === 'ships' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-white'}`}
+                                            >
+                                                <Anchor className="w-3.5 h-3.5" /> Barcos & Cruceros
+                                            </button>
+                                            <button 
+                                                onClick={() => { setCarouselSlide('flights'); setIsAutoCycle(false); }}
+                                                className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${carouselSlide === 'flights' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-white'}`}
+                                            >
+                                                <Plane className="w-3.5 h-3.5" /> Tránsito Aéreo
+                                            </button>
+                                        </div>
+
+                                        {/* Slide Content */}
+                                        <div className="flex-1 flex flex-col relative overflow-hidden">
+                                            <AnimatePresence mode="wait">
+                                                {carouselSlide === 'ships' ? (
+                                                    <motion.div 
+                                                        key="ships-slide"
+                                                        initial={{ opacity: 0, x: 20 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        exit={{ opacity: 0, x: -20 }}
+                                                        className="flex-1 flex flex-col gap-4"
+                                                    >
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">Arribos Marítimos ({shipsData.length})</span>
+                                                            <a href="https://www.argentina.gob.ar/economia/agencia-nacional-de-puertos-y-navegacion/puertos/puerto-de-ushuaia" target="_blank" rel="noopener noreferrer" className="text-[9px] font-bold text-blue-500 hover:underline flex items-center gap-1">INFO OFICIAL <ExternalLink className="w-3 h-3" /></a>
                                                         </div>
                                                         
-                                                        <div className="h-px bg-slate-200 dark:bg-white/10"></div>
-                                                        
-                                                        {/* UPCOMING / NEXT */}
-                                                        <div className="flex flex-col gap-3">
-                                                            <div className="flex flex-col gap-1">
-                                                                <div className="flex items-center justify-between">
-                                                                    <span className="text-[8px] font-bold text-blue-500 uppercase">Próximo Arribo</span>
-                                                                    <span className="text-[8px] font-bold text-slate-500 dark:text-gray-500">Mañana, 06:00</span>
+                                                        <div className="flex flex-col gap-3.5 overflow-y-auto scrollbar-hide pr-1">
+                                                            {shipsData.map(ship => (
+                                                                <div key={ship.id} className="bg-slate-50 dark:bg-[#161616]/40 border border-slate-200 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2.5 relative shadow-sm hover:border-blue-500/30 transition-all">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
+                                                                            ship.status === 'En Puerto' 
+                                                                                ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' 
+                                                                                : ship.status === 'Arribando'
+                                                                                ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse'
+                                                                                : 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+                                                                        }`}>
+                                                                            {ship.status}
+                                                                        </span>
+                                                                        <span className="text-[9px] font-bold text-slate-500 dark:text-gray-500">{ship.time}</span>
+                                                                    </div>
+
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
+                                                                            <Anchor className="w-5 h-5 text-blue-500" />
+                                                                        </div>
+                                                                        <div className="flex min-w-0 flex-col">
+                                                                            <span className="text-xs font-black text-slate-900 dark:text-white uppercase leading-tight truncate">{ship.name}</span>
+                                                                            <span className="text-[10px] text-slate-500 dark:text-gray-400 truncate">{ship.type}</span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="flex items-center justify-between text-[10px] border-t border-slate-100 dark:border-white/5 pt-2 font-mono">
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <span className="text-slate-400">Bandera:</span>
+                                                                            <span className="font-bold text-slate-750 dark:text-gray-300">{ship.flag}</span>
+                                                                        </div>
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <span className="text-slate-400">Velocidad:</span>
+                                                                            <span className="font-bold text-slate-755 dark:text-gray-300">{ship.speed}</span>
+                                                                        </div>
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <span className="text-slate-400">Destino:</span>
+                                                                            <span className="font-bold text-slate-755 dark:text-gray-300">{ship.destination}</span>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="flex items-center gap-2 group cursor-default">
-                                                                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                                                                    <span className="text-[11px] font-bold text-slate-800 dark:text-gray-200 group-hover:text-slate-900 dark:text-white transition-colors">ASTURIANO III</span>
-                                                                    <span className="text-[9px] text-slate-500 dark:text-gray-500 ml-auto font-medium">Portacontenedores</span>
-                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </motion.div>
+                                                ) : (
+                                                    <motion.div 
+                                                        key="flights-slide"
+                                                        initial={{ opacity: 0, x: 20 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        exit={{ opacity: 0, x: -20 }}
+                                                        className="flex-1 flex flex-col gap-4"
+                                                    >
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">Tránsito Aéreo ({flightsData.length})</span>
+                                                            <div className="flex gap-3">
+                                                                <a href="https://www.aeropuertoushuaia.com/" target="_blank" rel="noopener noreferrer" className="text-[9px] font-bold text-blue-500 hover:underline flex items-center gap-1">USH <ExternalLink className="w-3 h-3" /></a>
+                                                                <a href="https://www.aeropuertosdelmundo.com.ar/aeropuerto-RGA-llegadas/" target="_blank" rel="noopener noreferrer" className="text-[9px] font-bold text-blue-500 hover:underline flex items-center gap-1">RGA <ExternalLink className="w-3 h-3" /></a>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
+
+                                                        <div className="flex flex-col gap-3.5 overflow-y-auto scrollbar-hide pr-1">
+                                                            {flightsData.map(flight => (
+                                                                <div key={flight.id} className="bg-slate-50 dark:bg-[#161616]/40 border border-slate-200 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2.5 relative shadow-sm hover:border-orange-500/30 transition-all">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
+                                                                            flight.status === 'En Pista' 
+                                                                                ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' 
+                                                                                : flight.status === 'En Vuelo'
+                                                                                ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20 animate-pulse'
+                                                                                : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-gray-400 border border-slate-350 dark:border-white/5'
+                                                                        }`}>
+                                                                            {flight.status}
+                                                                        </span>
+                                                                        <span className="text-[9px] font-bold text-slate-500 dark:text-gray-500">{flight.time}</span>
+                                                                    </div>
+
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
+                                                                            <Plane className="w-5 h-5 text-orange-500" />
+                                                                        </div>
+                                                                        <div className="flex min-w-0 flex-col">
+                                                                            <span className="text-xs font-black text-slate-900 dark:text-white uppercase leading-tight italic truncate">{flight.flight}</span>
+                                                                            <span className="text-[10px] text-slate-500 dark:text-gray-400 truncate">{flight.airline}</span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="flex items-center justify-between text-[10px] border-t border-slate-100 dark:border-white/5 pt-2 font-mono">
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <span className="text-slate-400">Ruta:</span>
+                                                                            <span className="font-bold text-slate-755 dark:text-gray-300">{flight.route}</span>
+                                                                        </div>
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <span className="text-slate-400">Aeronave:</span>
+                                                                            <span className="font-bold text-slate-755 dark:text-gray-300">{flight.type}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+
+                                        {/* Carousel Controls */}
+                                        <div className="flex items-center justify-between border-t border-slate-100 dark:border-white/5 pt-4">
+                                            {/* Dot Indicators */}
+                                            <div className="flex gap-2">
+                                                <button 
+                                                    onClick={() => { setCarouselSlide('ships'); setIsAutoCycle(false); }}
+                                                    className={`w-2.5 h-2.5 rounded-full transition-all ${carouselSlide === 'ships' ? 'bg-blue-600 w-6' : 'bg-slate-350 dark:bg-white/10'}`} 
+                                                />
+                                                <button 
+                                                    onClick={() => { setCarouselSlide('flights'); setIsAutoCycle(false); }}
+                                                    className={`w-2.5 h-2.5 rounded-full transition-all ${carouselSlide === 'flights' ? 'bg-blue-600 w-6' : 'bg-slate-350 dark:bg-white/10'}`} 
+                                                />
+                                            </div>
+                                            
+                                            {/* Next/Prev buttons */}
+                                            <div className="flex items-center gap-2">
+                                                <button 
+                                                    onClick={() => { 
+                                                        setCarouselSlide(prev => prev === 'ships' ? 'flights' : 'ships'); 
+                                                        setIsAutoCycle(false); 
+                                                    }}
+                                                    className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-[#1a1a1a] transition-all border border-slate-200 dark:border-white/10 cursor-pointer"
+                                                >
+                                                    <ChevronRight className="w-4 h-4 text-slate-650 dark:text-gray-400 transform rotate-180" />
+                                                </button>
+                                                <button 
+                                                    onClick={() => { 
+                                                        setCarouselSlide(prev => prev === 'ships' ? 'flights' : 'ships'); 
+                                                        setIsAutoCycle(false); 
+                                                    }}
+                                                    className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-[#1a1a1a] transition-all border border-slate-200 dark:border-white/10 cursor-pointer"
+                                                >
+                                                    <ChevronRight className="w-4 h-4 text-slate-650 dark:text-gray-400" />
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* FLIGHT TRAFFIC SECTION */}
-                                <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl overflow-hidden shadow-2xl flex flex-col">
-                                    <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-6 h-6 rounded bg-orange-600/20 flex items-center justify-center">
-                                                <Plane className="w-3.5 h-3.5 text-orange-500" />
+                                {/* MAPS STACK COLUMN (ONE BELOW THE OTHER, NO POPUPS) */}
+                                <div className="xl:col-span-8 flex flex-col gap-8">
+                                    {/* Maritime Map Card */}
+                                    <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+                                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-6 h-6 rounded bg-blue-600/20 flex items-center justify-center">
+                                                    <Anchor className="w-3.5 h-3.5 text-blue-500" />
+                                                </div>
+                                                <h2 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 tracking-wide uppercase">
+                                                    Radar AIS de Tráfico Marítimo - Canal Beagle
+                                                </h2>
                                             </div>
-                                            <h2 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 tracking-wide uppercase">
-                                                Control de Arribos y Salidas (Aéreo)
-                                            </h2>
+                                            <span className="text-[9px] font-mono text-slate-500 dark:text-gray-500 uppercase font-black">Navegación Libre</span>
                                         </div>
-                                        <div className="flex gap-4">
-                                            <a href="https://www.aeropuertoushuaia.com/" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:text-white flex items-center gap-1 transition-colors">
-                                                USH <ExternalLink className="w-3 h-3" />
-                                            </a>
-                                            <a href="https://www.aeropuertosdelmundo.com.ar/aeropuerto-RGA-llegadas/" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:text-white flex items-center gap-1 transition-colors">
-                                                RGA <ExternalLink className="w-3 h-3" />
-                                            </a>
+                                        <div className="w-full h-[370px] relative bg-white dark:bg-[#0c0c0c]">
+                                            <iframe 
+                                                src="https://www.marinetraffic.com/en/ais/embed/zoom:9/centery:-54.7/centerx:-67.5/maptype:0/shownames:false"
+                                                className="w-full h-full border-none opacity-90 hover:opacity-100 transition-opacity"
+                                                title="Marine Traffic - Puerto de Ushuaia"
+                                                loading="lazy"
+                                            />
                                         </div>
                                     </div>
-                                    <div className="w-full h-[600px] relative bg-white dark:bg-[#0c0c0c]">
-                                        <iframe 
-                                            src="https://www.radarbox.com/widget?lat=-54.8&lon=-68.3&z=8&theme=dark"
-                                            className="w-full h-full border-none opacity-90 hover:opacity-100 transition-opacity"
-                                            title="RadarBox - Tierra del Fuego"
-                                            loading="lazy"
-                                        />
-                                        
-                                        {/* FLOATING FLIGHT OVERLAY TOGGLE */}
-                                        <AnimatePresence mode="wait">
-                                            {!showFlightOverlay ? (
-                                                <motion.button 
-                                                    key="flight-btn"
-                                                    initial={{ opacity: 0, scale: 0.9 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    exit={{ opacity: 0, scale: 0.9 }}
-                                                    onClick={() => setShowFlightOverlay(true)}
-                                                    className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-white/95 dark:bg-[#0e0e0e]/95 hover:bg-orange-600 dark:hover:bg-orange-600 hover:text-white dark:hover:text-white text-slate-800 dark:text-gray-200 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 shadow-lg transition-all hover:scale-105 active:scale-95 font-black uppercase text-[10px] tracking-wider cursor-pointer"
-                                                >
-                                                    <Plane className="w-4 h-4 text-orange-500 shrink-0" />
-                                                    <span>Ver Tránsito Aéreo</span>
-                                                </motion.button>
-                                            ) : (
-                                                <motion.div 
-                                                    key="flight-panel"
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    exit={{ opacity: 0, y: 10 }}
-                                                    className="absolute top-4 left-4 z-10 w-72 bg-white/95 dark:bg-[#0e0e0e]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 pointer-events-auto"
-                                                >
-                                                    <div className="flex items-center justify-between mb-3 border-b border-slate-200 dark:border-white/10 pb-2">
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></div>
-                                                            <h3 className="text-[10px] font-black text-slate-600 dark:text-gray-400 uppercase tracking-widest">Tráfico Aéreo USH/RGA</h3>
-                                                        </div>
-                                                        <button 
-                                                            onClick={() => setShowFlightOverlay(false)} 
-                                                            className="p-1 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
-                                                        >
-                                                            <X className="w-3.5 h-3.5" />
-                                                        </button>
-                                                    </div>
-                                                    
-                                                    <div className="flex flex-col gap-4 max-h-[450px] overflow-y-auto scrollbar-hide pr-1">
-                                                        {/* USH ARRIVALS */}
-                                                        <div className="flex flex-col gap-2">
-                                                            <span className="text-[9px] font-black text-slate-900 dark:text-white/40 uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-1">Ushuaia - Arribos</span>
-                                                            <div className="flex flex-col gap-2.5">
-                                                                <div className="flex items-center justify-between group">
-                                                                    <div className="flex flex-col">
-                                                                        <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase italic">AR 1886 <span className="text-[9px] font-normal text-slate-500 dark:text-gray-500 not-italic ml-1">AEP</span></span>
-                                                                        <span className="text-[9px] text-emerald-500 font-bold">Llegó 14:23</span>
-                                                                    </div>
-                                                                    <div className="px-2 py-1 bg-emerald-500/10 rounded text-emerald-500 text-[9px] font-black">EN PISTA</div>
-                                                                </div>
-                                                                <div className="flex items-center justify-between group">
-                                                                    <div className="flex flex-col">
-                                                                        <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase italic">AR 1898 <span className="text-[9px] font-normal text-slate-500 dark:text-gray-500 not-italic ml-1">FTE</span></span>
-                                                                        <span className="text-[9px] text-blue-500 font-bold">Previsto 15:40</span>
-                                                                    </div>
-                                                                    <div className="px-2 py-1 bg-blue-500/10 rounded text-blue-500 text-[9px] font-black uppercase">En Vuelo</div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div className="h-px bg-slate-200 dark:bg-white/10"></div>
-                                                        
-                                                        {/* RGA STATUS */}
-                                                        <div className="flex flex-col gap-2">
-                                                            <span className="text-[9px] font-black text-slate-900 dark:text-white/40 uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-1">Río Grande - Próximo</span>
-                                                            <div className="flex items-center justify-between p-2 bg-slate-100 dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/5">
-                                                                <div className="flex flex-col">
-                                                                    <span className="text-[11px] font-black text-slate-900 dark:text-white">AR 1866</span>
-                                                                    <span className="text-[9px] text-slate-600 dark:text-gray-400">Desde AEP</span>
-                                                                </div>
-                                                                <div className="text-right">
-                                                                    <span className="text-[10px] font-black text-slate-700 dark:text-gray-300">Mañana 02:20</span>
-                                                                    <div className="text-[8px] text-slate-500 dark:text-gray-500 uppercase font-black">Programado</div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
+
+                                    {/* Air Map Card */}
+                                    <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+                                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-6 h-6 rounded bg-orange-600/20 flex items-center justify-center">
+                                                    <Plane className="w-3.5 h-3.5 text-orange-500" />
+                                                </div>
+                                                <h2 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 tracking-wide uppercase">
+                                                    Radar ADS-B de Tráfico Aéreo Regional (TDF)
+                                                </h2>
+                                            </div>
+                                            <span className="text-[9px] font-mono text-slate-500 dark:text-gray-500 uppercase font-black">Navegación Libre</span>
+                                        </div>
+                                        <div className="w-full h-[370px] relative bg-white dark:bg-[#0c0c0c]">
+                                            <iframe 
+                                                src="https://www.radarbox.com/widget?lat=-54.8&lon=-68.3&z=8&theme=dark"
+                                                className="w-full h-full border-none opacity-90 hover:opacity-100 transition-opacity"
+                                                title="RadarBox - Tierra del Fuego"
+                                                loading="lazy"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                         </motion.div>
+                        </motion.div>
                       )}
             </div>
           </div>
