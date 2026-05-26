@@ -345,11 +345,34 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                    </div>
                 </div>
                 <div className="flex items-center gap-2 md:gap-4">
+                    {/* Modo Vistas */}
+                    {(activeTab === 'home' || activeTab === 'explore') && (
+                      <div className="flex items-center gap-1 bg-slate-150/80 dark:bg-white/5 p-1 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
+                        <button 
+                          onClick={() => setViewMode('list')} 
+                          className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
+                          title="Vista de Lista"
+                        >
+                          <List className="w-3.5 h-3.5" />
+                        </button>
+                        <button 
+                          onClick={() => setViewMode('grid')} 
+                          className={`p-1.5 rounded-full transition-all ${viewMode === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
+                          title="Vista de Galería"
+                        >
+                          <LayoutGrid className="w-3.5 h-3.5" />
+                        </button>
+                        <button 
+                          onClick={() => setViewMode('magazine')} 
+                          className={`p-1.5 rounded-full transition-all ${viewMode === 'magazine' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
+                          title="Vista de Revista"
+                        >
+                          <LayoutTemplate className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
+                    
                     <div className="flex items-center gap-3 bg-slate-100 dark:bg-white/5 px-4 py-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
-                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-widest border-r border-slate-200 dark:border-white/10 pr-3">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Sincronización <span className="text-emerald-500 ml-1">Estable</span>
-                        </div>
                         <div className="flex flex-col text-left">
                             <span className="text-[8px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest leading-none">Estado del Sistema</span>
                             <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">
@@ -389,7 +412,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                 onChange={(e) => setActiveCategory(e.target.value)}
                                 className="w-full bg-slate-100/50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-[12px] font-bold uppercase text-slate-700 dark:text-gray-300 focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer"
                             >
-                                <option value="all">Todo el Panorama</option>
+                                <option value="all">Todas las Categorías</option>
                                 {activeTab === 'home' ? (
                                     <>
                                         <option value="tecnologia">Tecnología</option>
@@ -424,7 +447,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                 
                                 <span className="font-sans tracking-wide">
                                     Cobertura: {
-                                        activeCategory === 'all' ? 'Panorama' :
+                                        activeCategory === 'all' ? 'Todo el panorama' :
                                         activeCategory === 'internacional' ? 'Global' :
                                         activeCategory === 'nacional' ? 'Nacional' : 'Provincial'
                                     }
@@ -447,7 +470,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                             className="absolute left-0 mt-2 w-72 bg-white/95 dark:bg-[#0c0c0c]/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-2 z-40 flex flex-col gap-1"
                                         >
                                             {[
-                                                { id: 'all', label: 'Panorama', desc: 'Todo el universo de noticias', icon: LayoutGrid, color: 'text-blue-500 bg-blue-500/10' },
+                                                { id: 'all', label: 'Todo el panorama', desc: 'Todo el universo de noticias', icon: LayoutGrid, color: 'text-blue-500 bg-blue-500/10' },
                                                 { id: 'internacional', label: 'Global', desc: 'Cobertura internacional y exterior', icon: Globe, color: 'text-orange-500 bg-orange-500/10' },
                                                 { id: 'nacional', label: 'Nacional', desc: 'Noticias de toda Argentina', icon: Flag, color: 'text-sky-500 bg-sky-500/10' },
                                                 { id: 'provincial', label: 'Provincial', desc: 'Sucesos de Tierra del Fuego', icon: Map, color: 'text-emerald-500 bg-emerald-500/10' }
@@ -500,12 +523,6 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                             >
                                 Amplio
                             </button>
-                        </div>
-
-                        <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-black/40 p-1.5 rounded-2xl border border-slate-200 dark:border-white/5">
-                          <button onClick={() => setViewMode('list')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'list' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'}`} title="Vista de Lista"><List className="w-5 h-5" /></button>
-                          <button onClick={() => setViewMode('grid')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'}`} title="Vista de Galería"><LayoutGrid className="w-5 h-5" /></button>
-                          <button onClick={() => setViewMode('magazine')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'magazine' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'}`} title="Vista de Revista"><LayoutTemplate className="w-5 h-5" /></button>
                         </div>
                     </div>
                 </div>
