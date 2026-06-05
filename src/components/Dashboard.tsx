@@ -319,7 +319,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   }, [filteredArticles, topVisualArticles, activeTab, search]);
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-[#070707] text-slate-800 dark:text-[#e0e0e0] font-sans overflow-hidden transition-colors duration-200 relative selection:bg-blue-500/30">
+    <div className="flex h-screen max-w-[100vw] bg-slate-50 dark:bg-[#070707] text-slate-800 dark:text-[#e0e0e0] font-sans overflow-hidden transition-colors duration-200 relative selection:bg-blue-500/30">
       {/* Animated Mesh Gradient Background */}
       <div className="absolute inset-0 z-0 opacity-[0.08] dark:opacity-20 pointer-events-none overflow-hidden">
         <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-blue-600/40 dark:bg-blue-600/30 rounded-full blur-[120px] animate-pulse"></div>
@@ -412,8 +412,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
       <main className="flex-1 flex flex-col min-w-0 relative">
         
         {/* PREMIUM TOP NAVIGATION */}
-        <div className="px-4 py-4 md:px-8 shrink-0 z-30 sticky top-0 bg-white/60 dark:bg-[#070707]/60 backdrop-blur-2xl border-b border-slate-200 dark:border-white/10 shadow-glass">
-            <div className="flex items-center justify-between">
+        <div className="px-3 py-3 md:px-8 md:py-4 shrink-0 z-30 sticky top-0 bg-white/60 dark:bg-[#070707]/60 backdrop-blur-2xl border-b border-slate-200 dark:border-white/10 shadow-glass safe-top">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className="flex items-center gap-3">
                    <div className="lg:hidden mr-2 shrink-0">
                       <WikiAppLogo className="w-10 h-10" />
@@ -430,7 +430,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                       </div>
                    </div>
                 </div>
-                <div className="flex items-center gap-2 md:gap-4">
+                <div className="flex items-center gap-1.5 md:gap-4 flex-shrink-0">
                     {/* Modo Vistas */}
                     {(activeTab === 'home' || activeTab === 'explore') && (
                       <>
@@ -468,7 +468,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                       </>
                     )}
                     
-                    <div className="flex items-center gap-3 bg-slate-100 dark:bg-white/5 px-4 py-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
+                    <div className="hidden sm:flex items-center gap-3 bg-slate-100 dark:bg-white/5 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
                         <div className="flex flex-col text-left">
                             <span className="text-[8px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest leading-none">Estado del Sistema</span>
                             <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">
@@ -482,7 +482,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                      {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
              {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
             {(activeTab === 'home' || activeTab === 'explore') && (
-                <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-4 xl:gap-6 py-4 md:py-6 px-4 md:px-8 border-b border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.01] backdrop-blur-3xl sticky top-[72px] md:top-[80px] z-20 transition-all duration-300">
+                <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-3 xl:gap-6 py-3 md:py-6 px-3 md:px-8 border-b border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.01] backdrop-blur-3xl sticky top-[60px] md:top-[72px] z-20 transition-all duration-300">
                     
                     {/* CUADRO DE BÚSQUEDA PRO */}
                     <div className="relative w-full xl:w-96 group">
@@ -625,7 +625,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
             )}
 
         {/* CONTENIDO SCROLL */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8 relative z-10 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-6 lg:p-8 relative z-10 scrollbar-hide">
           <div className="max-w-[1600px] mx-auto space-y-6">
             
             {(activeTab === "home" || activeTab === "explore") && (
@@ -659,7 +659,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                   transition={{ delay: idx * 0.1 }}
                                   key={'top-'+article.id}
                                   onClick={() => setSelectedArticle(article)}
-                                  className="group relative h-56 md:h-80 bg-white dark:bg-[#111] rounded-2xl overflow-hidden border border-slate-300 dark:border-[#222] cursor-pointer shadow-2xl transition-transform hover:scale-[1.01]"
+                                  className="group relative h-48 sm:h-56 md:h-80 bg-white dark:bg-[#111] rounded-2xl overflow-hidden border border-slate-300 dark:border-[#222] cursor-pointer shadow-2xl press-effect hover-lift"
                                >
                                   {article.thumbnail ? (
                                       <img src={article.thumbnail} className="w-full h-full object-cover opacity-60 group-hover:scale-105 group-hover:opacity-80 transition-all duration-700" alt="" />
@@ -798,7 +798,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         exit={{ opacity: 0, scale: 0.95 }}
                                                         key={article.id} 
                                                         onClick={() => setSelectedArticle(article)}
-                                                        className="group relative w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm border border-slate-200 dark:border-white/5 rounded-2xl hover:border-blue-500/50 p-4 transition-all cursor-pointer flex flex-col justify-between min-h-[100px]"
+                                                        className="group relative w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm border border-slate-200 dark:border-white/5 rounded-2xl hover:border-blue-500/50 p-4 transition-all cursor-pointer flex flex-col justify-between min-h-[100px] press-effect"
                                                     >
                                                         <h3 className="text-[12.5px] font-bold text-slate-800 dark:text-gray-150 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-snug line-clamp-3 transition-colors font-display">
                                                             {article.title}
@@ -818,7 +818,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         exit={{ opacity: 0, scale: 0.95 }}
                                                         key={article.id} 
                                                         onClick={() => setSelectedArticle(article)}
-                                                        className="group relative w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/5 transition-all cursor-pointer flex flex-col"
+                                                        className="group relative w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden hover:border-blue-500/50 hover-lift transition-all cursor-pointer flex flex-col"
                                                     >
                                                         {article.thumbnail ? (
                                                             <div className="aspect-[16/10] overflow-hidden relative">
@@ -1743,7 +1743,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                             <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
                                 {/* DATA CAROUSEL COLUMN */}
                                 <div className="xl:col-span-4 flex flex-col gap-6">
-                                    <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl p-6 shadow-2xl flex flex-col gap-5 relative overflow-hidden h-[810px]">
+                                    <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl p-4 md:p-6 shadow-2xl flex flex-col gap-5 relative overflow-hidden h-auto xl:h-[810px]">
                                         <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
                                             <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Estado de Tránsito</h3>
                                             <div className="flex items-center gap-1.5">
@@ -1947,7 +1947,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                             </div>
                                             <span className="text-[9px] font-mono text-slate-500 dark:text-gray-500 uppercase font-black">Navegación Libre</span>
                                         </div>
-                                        <div className="w-full h-[370px] relative bg-white dark:bg-[#0c0c0c]">
+                                        <div className="w-full h-[260px] md:h-[370px] relative bg-white dark:bg-[#0c0c0c]">
                                             <iframe 
                                                 src="https://www.marinetraffic.com/en/ais/embed/zoom:9/centery:-54.7/centerx:-67.5/maptype:0/shownames:false"
                                                 className="w-full h-full border-none opacity-90 hover:opacity-100 transition-opacity"
@@ -1970,7 +1970,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                             </div>
                                             <span className="text-[9px] font-mono text-slate-500 dark:text-gray-500 uppercase font-black">Navegación Libre</span>
                                         </div>
-                                        <div className="w-full h-[370px] relative bg-white dark:bg-[#0c0c0c]">
+                                        <div className="w-full h-[260px] md:h-[370px] relative bg-white dark:bg-[#0c0c0c]">
                                             <iframe 
                                                 src="https://www.radarbox.com/widget?lat=-54.8&lon=-68.3&z=8&theme=dark"
                                                 className="w-full h-full border-none opacity-90 hover:opacity-100 transition-opacity"
@@ -1988,8 +1988,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         </main>
 
       {/* MOBILE FLOATING BOTTOM NAV (Si fuera necesario ajustar luego) */}
-      <div className="lg:hidden fixed bottom-6 left-4 right-4 z-50">
-        <nav className="bg-white/80 dark:bg-[#0c0c0c]/80 backdrop-blur-3xl border border-slate-200 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-[2rem] h-16 flex items-center justify-between px-2 overflow-hidden">
+      <div className="lg:hidden fixed bottom-4 left-3 right-3 z-50 safe-bottom">
+        <nav className="bg-white/80 dark:bg-[#0c0c0c]/80 backdrop-blur-3xl border border-slate-200 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-[2rem] h-[64px] flex items-center justify-around px-1 overflow-hidden">
             {[
               { id: 'home', icon: LayoutDashboard, label: 'Inicio' },
               { id: 'explore', icon: Compass, label: 'Feeds' },
@@ -2003,10 +2003,10 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                 <button 
                   key={item.id}
                   onClick={() => setActiveTab(item.id)} 
-                  className={`flex flex-col items-center justify-center py-2 rounded-2xl transition-all duration-300 flex-1 relative ${activeTab === item.id ? 'text-blue-500' : 'text-slate-400 dark:text-gray-500'}`}
+                  className={`flex flex-col items-center justify-center min-w-[48px] min-h-[48px] py-1 rounded-2xl transition-all duration-300 relative ${activeTab === item.id ? 'text-blue-500' : 'text-slate-400 dark:text-gray-500'}`}
                 >
                   <Icon className={`w-5 h-5 ${activeTab === item.id ? 'drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]' : ''}`} />
-                  <span className={`text-[7px] font-black mt-1 uppercase tracking-tighter ${activeTab === item.id ? 'opacity-100' : 'opacity-40'}`}>{item.label}</span>
+                  <span className={`text-[7px] font-black mt-0.5 uppercase tracking-tighter ${activeTab === item.id ? 'opacity-100' : 'opacity-40'}`}>{item.label}</span>
                   {activeTab === item.id && (
                     <motion.div layoutId="mobile-nav-indicator" className="absolute -bottom-1 w-1 h-1 bg-blue-500 rounded-full" />
                   )}

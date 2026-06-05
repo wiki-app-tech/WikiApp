@@ -108,7 +108,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
 
   // Mouse pan drag logic
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (zoom <= 1) return; // Only pan when zoomed in
+    if (zoom <= 1) return;
     e.preventDefault();
     setIsDragging(true);
     dragStart.current = { x: e.clientX - pan.x, y: e.clientY - pan.y };
@@ -123,6 +123,27 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
   };
 
   const handleMouseUpOrLeave = () => {
+    setIsDragging(false);
+  };
+
+  // Touch pan logic for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (zoom <= 1) return;
+    const touch = e.touches[0];
+    setIsDragging(true);
+    dragStart.current = { x: touch.clientX - pan.x, y: touch.clientY - pan.y };
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const touch = e.touches[0];
+    setPan({
+      x: touch.clientX - dragStart.current.x,
+      y: touch.clientY - dragStart.current.y
+    });
+  };
+
+  const handleTouchEnd = () => {
     setIsDragging(false);
   };
 
@@ -164,54 +185,65 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
           className="fixed inset-0 z-[100] flex flex-col bg-slate-950/95 dark:bg-black/95 backdrop-blur-xl text-white select-none overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40 backdrop-blur-md z-10 shrink-0">
-            <div className="flex items-center gap-3">
-              <span className="p-2 bg-blue-600/20 text-blue-400 rounded-xl border border-blue-500/20">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 py-3 md:px-6 md:py-4 border-b border-white/10 bg-black/40 backdrop-blur-md z-10 shrink-0 safe-top">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <span className="p-2 bg-blue-600/20 text-blue-400 rounded-xl border border-blue-500/20 shrink-0">
                 <Globe className="w-5 h-5" />
               </span>
-              <div>
-                <h2 className="text-base font-black uppercase tracking-wider leading-none">Tapas de Diarios</h2>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 block">Lectura e Impresión de Portadas</span>
+              <div className="min-w-0">
+                <h2 className="text-sm md:text-base font-black uppercase tracking-wider leading-none">Tapas de Diarios</h2>
+                <span className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5 block">Portadas del Día</span>
               </div>
+              {/* Close Button — mobile: top right */}
+              <button
+                onClick={onClose}
+                className="ml-auto sm:hidden p-2 bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 rounded-full border border-white/5 transition-all"
+                title="Cerrar"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Category tabs */}
-            <div className="flex items-center gap-1.5 bg-white/5 p-1 rounded-full border border-white/5">
-              {[
-                { id: 'internacionales', label: 'Internacionales', icon: Globe },
-                { id: 'nacionales', label: 'Nacionales', icon: Flag },
-                { id: 'provinciales', label: 'Provinciales', icon: Map }
-              ].map(cat => {
-                const Icon = cat.icon;
-                const active = activeCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => {
-                      setActiveCategory(cat.id as any);
-                      setSelectedItemIndex(null);
-                    }}
-                    className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase transition-all ${active ? 'bg-blue-600 text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    <span>{cat.label}</span>
-                  </button>
-                );
-              })}
-            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              {/* Category tabs */}
+              <div className="flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/5 flex-1 sm:flex-initial">
+                {[
+                  { id: 'internacionales', label: 'Internacional', shortLabel: 'INT', icon: Globe },
+                  { id: 'nacionales', label: 'Nacional', shortLabel: 'NAC', icon: Flag },
+                  { id: 'provinciales', label: 'Provincial', shortLabel: 'PROV', icon: Map }
+                ].map(cat => {
+                  const Icon = cat.icon;
+                  const active = activeCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        setActiveCategory(cat.id as any);
+                        setSelectedItemIndex(null);
+                      }}
+                      className={`flex items-center justify-center gap-1.5 px-2.5 md:px-4 py-1.5 rounded-full text-[10px] md:text-xs font-bold uppercase transition-all flex-1 sm:flex-initial ${active ? 'bg-blue-600 text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
+                    >
+                      <Icon className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                      <span className="hidden sm:inline">{cat.label}</span>
+                      <span className="sm:hidden">{cat.shortLabel}</span>
+                    </button>
+                  );
+                })}
+              </div>
 
-            {/* Close Button */}
-            <button
-              onClick={onClose}
-              className="p-2.5 bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 rounded-full border border-white/5 transition-all"
-              title="Cerrar Portadas (Esc)"
-            >
-              <X className="w-5 h-5" />
-            </button>
+              {/* Close Button — desktop */}
+              <button
+                onClick={onClose}
+                className="hidden sm:flex p-2.5 bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 rounded-full border border-white/5 transition-all"
+                title="Cerrar Portadas (Esc)"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 overflow-hidden relative flex flex-col items-center justify-center p-6">
+          <div className="flex-1 overflow-hidden relative flex flex-col items-center justify-center p-3 md:p-6">
             {loading ? (
               <div className="flex flex-col items-center justify-center gap-4 text-center">
                 <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
@@ -230,24 +262,24 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                 
                 {/* Arrow buttons for carousel layout (when not looking in details) */}
                 {selectedItemIndex === null && (
-                  <div className="w-full flex items-center justify-between absolute z-20 pointer-events-none px-4">
+                  <div className="hidden md:flex w-full items-center justify-between absolute z-20 pointer-events-none px-4">
                     <button
                       onClick={() => {
                         const el = document.getElementById('tapas-carousel');
                         if (el) el.scrollBy({ left: -320, behavior: 'smooth' });
                       }}
-                      className="p-4 bg-black/60 hover:bg-blue-600 text-white rounded-full border border-white/10 hover:border-blue-500 shadow-2xl transition-all pointer-events-auto"
+                      className="p-3 md:p-4 bg-black/60 hover:bg-blue-600 text-white rounded-full border border-white/10 hover:border-blue-500 shadow-2xl transition-all pointer-events-auto"
                     >
-                      <ChevronLeft className="w-6 h-6" />
+                      <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
                     </button>
                     <button
                       onClick={() => {
                         const el = document.getElementById('tapas-carousel');
                         if (el) el.scrollBy({ left: 320, behavior: 'smooth' });
                       }}
-                      className="p-4 bg-black/60 hover:bg-blue-600 text-white rounded-full border border-white/10 hover:border-blue-500 shadow-2xl transition-all pointer-events-auto"
+                      className="p-3 md:p-4 bg-black/60 hover:bg-blue-600 text-white rounded-full border border-white/10 hover:border-blue-500 shadow-2xl transition-all pointer-events-auto"
                     >
-                      <ChevronRight className="w-6 h-6" />
+                      <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                     </button>
                   </div>
                 )}
@@ -256,7 +288,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                   /* Cards Carousel Container */
                   <div
                     id="tapas-carousel"
-                    className="w-full flex gap-6 overflow-x-auto py-10 px-8 scroll-smooth snap-x scrollbar-hide"
+                    className="w-full flex gap-4 md:gap-6 overflow-x-auto py-6 md:py-10 px-4 md:px-8 scroll-smooth snap-x snap-mandatory scrollbar-hide"
                     style={{ scrollbarWidth: 'none' }}
                   >
                     {currentList.map((item, idx) => (
@@ -266,7 +298,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.05 }}
                         onClick={() => setSelectedItemIndex(idx)}
-                        className="flex-shrink-0 w-72 bg-white/5 border border-white/10 rounded-2xl overflow-hidden cursor-pointer hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 snap-center transition-all group flex flex-col"
+                        className="flex-shrink-0 w-52 sm:w-60 md:w-72 bg-white/5 border border-white/10 rounded-2xl overflow-hidden cursor-pointer hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 snap-center transition-all group flex flex-col press-effect"
                       >
                         <div className="aspect-[3/4] overflow-hidden bg-black relative">
                           <img
@@ -300,10 +332,10 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                   </div>
                 ) : (
                   /* Immersive Lightbox detail view with zoom controls */
-                  <div className="w-full h-full flex flex-col lg:flex-row gap-6 relative">
+                  <div className="w-full h-full flex flex-col lg:flex-row gap-4 md:gap-6 relative overflow-y-auto lg:overflow-hidden">
                     
                     {/* Left Panel: Big Image Viewer with Pan & Zoom */}
-                    <div className="flex-1 bg-black/60 border border-white/10 rounded-3xl overflow-hidden relative flex items-center justify-center min-h-[400px]">
+                    <div className="flex-1 bg-black/60 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden relative flex items-center justify-center min-h-[280px] md:min-h-[400px]">
                       
                       {/* Navigate Left */}
                       <button
@@ -324,7 +356,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                       </button>
 
                       {/* Zoom Controls Overlay */}
-                      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-black/80 backdrop-blur-xl border border-white/10 px-4 py-2.5 rounded-full shadow-2xl">
+                      <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 md:gap-1.5 bg-black/80 backdrop-blur-xl border border-white/10 px-3 md:px-4 py-2 md:py-2.5 rounded-full shadow-2xl">
                         <button
                           onClick={handleZoomOut}
                           disabled={zoom <= 1}
@@ -357,18 +389,21 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
 
                       {/* Cover Viewer Window */}
                       <div 
-                        className="w-full h-full flex items-center justify-center p-4 overflow-hidden relative"
+                        className="w-full h-full flex items-center justify-center p-2 md:p-4 overflow-hidden relative"
                         style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
                         onMouseDown={handleMouseDown}
                         onMouseMove={handleMouseMove}
                         onMouseUp={handleMouseUpOrLeave}
                         onMouseLeave={handleMouseUpOrLeave}
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
                       >
                         <motion.img
                           ref={imageRef}
                           src={selectedItem?.coverUrl}
                           alt={selectedItem?.name}
-                          className="max-w-full max-h-[80vh] object-contain shadow-2xl select-none"
+                          className="max-w-full max-h-[55vh] md:max-h-[80vh] object-contain shadow-2xl select-none"
                           style={{
                             transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
                             transition: isDragging ? 'none' : 'transform 0.15s ease-out'
@@ -380,7 +415,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                     </div>
 
                     {/* Right Panel: Information & Controls */}
-                    <div className="w-full lg:w-80 bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between shrink-0 shadow-2xl">
+                    <div className="w-full lg:w-72 xl:w-80 bg-white/5 border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6 flex flex-col justify-between shrink-0 shadow-2xl">
                       <div className="space-y-6">
                         {/* Newspaper Metadata */}
                         <div>
@@ -402,42 +437,42 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                         </div>
 
                         {/* Reading Advice */}
-                        <div className="bg-white/5 border border-white/5 p-4 rounded-2xl flex flex-col gap-1.5">
+                        <div className="bg-white/5 border border-white/5 p-3 md:p-4 rounded-2xl flex flex-col gap-1.5 hidden md:flex">
                           <span className="text-[9px] font-black uppercase text-blue-400 tracking-wider">Modo Lectura Activo</span>
                           <p className="text-[11px] text-gray-400 leading-relaxed">
-                            Utilice el arrastre del ratón para desplazarse (pan) por la portada cuando el zoom esté activo.
+                            Arrastre para desplazarse cuando el zoom esté activo.
                           </p>
                           <p className="text-[11px] text-gray-500 leading-relaxed mt-1">
-                            Doble clic sobre la imagen para zoom rápido 200%.
+                            Doble clic para zoom rápido 200%.
                           </p>
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="space-y-2 pt-6 border-t border-white/10">
+                      <div className="flex flex-col sm:flex-row lg:flex-col gap-2 pt-4 md:pt-6 border-t border-white/10">
                         <button
                           onClick={() => handleDownload(selectedItem?.coverUrl || '', `${selectedItem?.id}-tapa-${selectedItem?.date.replace(/\//g, '-')}.jpg`)}
-                          className="w-full py-3 bg-blue-650 hover:bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg transition-all"
+                          className="flex-1 py-2.5 md:py-3 bg-blue-650 hover:bg-blue-600 text-white rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg transition-all"
                         >
                           <Download className="w-4 h-4" />
-                          <span>Descargar JPG</span>
+                          <span>Descargar</span>
                         </button>
                         
                         <a
                           href={selectedItem?.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-full py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
+                          className="flex-1 py-2.5 md:py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
                         >
                           <ExternalLink className="w-4 h-4" />
-                          <span>Visitar Sitio Web</span>
+                          <span>Sitio Web</span>
                         </a>
 
                         <button
                           onClick={() => setSelectedItemIndex(null)}
-                          className="w-full py-3 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
+                          className="flex-1 py-2.5 md:py-3 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all"
                         >
-                          Volver al Listado
+                          Volver
                         </button>
                       </div>
                     </div>
