@@ -2,10 +2,11 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, ChevronDown, AlertTriangle, Info } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, ChevronDown, AlertTriangle, Info, Newspaper } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
 import RadioDashboard from './RadioDashboard';
+import TapasModal from './TapasModal';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import dynamic from 'next/dynamic';
@@ -60,6 +61,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   const [activeTab, setActiveTab] = useState('home');
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [showTapasModal, setShowTapasModal] = useState(false);
   const [density, setDensity] = useState<'compact' | 'comfortable'>('comfortable');
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
@@ -431,29 +433,39 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                 <div className="flex items-center gap-2 md:gap-4">
                     {/* Modo Vistas */}
                     {(activeTab === 'home' || activeTab === 'explore') && (
-                      <div className="flex items-center gap-1 bg-slate-150/80 dark:bg-white/5 p-1 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
-                        <button 
-                          onClick={() => setViewMode('list')} 
-                          className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
-                          title="Vista de Lista"
+                      <>
+                        <div className="flex items-center gap-1 bg-slate-150/80 dark:bg-white/5 p-1 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
+                          <button 
+                            onClick={() => setViewMode('list')} 
+                            className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
+                            title="Vista de Lista"
+                          >
+                            <List className="w-3.5 h-3.5" />
+                          </button>
+                          <button 
+                            onClick={() => setViewMode('grid')} 
+                            className={`p-1.5 rounded-full transition-all ${viewMode === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
+                            title="Vista de Galería"
+                          >
+                            <LayoutGrid className="w-3.5 h-3.5" />
+                          </button>
+                          <button 
+                            onClick={() => setViewMode('magazine')} 
+                            className={`p-1.5 rounded-full transition-all ${viewMode === 'magazine' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
+                            title="Vista de Revista"
+                          >
+                            <LayoutTemplate className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <button
+                          onClick={() => setShowTapasModal(true)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 font-bold text-xs shadow-sm transition-all shrink-0"
+                          title="Ver Tapas de Diarios"
                         >
-                          <List className="w-3.5 h-3.5" />
+                          <Newspaper className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
+                          <span className="hidden xs:inline">Tapas</span>
                         </button>
-                        <button 
-                          onClick={() => setViewMode('grid')} 
-                          className={`p-1.5 rounded-full transition-all ${viewMode === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
-                          title="Vista de Galería"
-                        >
-                          <LayoutGrid className="w-3.5 h-3.5" />
-                        </button>
-                        <button 
-                          onClick={() => setViewMode('magazine')} 
-                          className={`p-1.5 rounded-full transition-all ${viewMode === 'magazine' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
-                          title="Vista de Revista"
-                        >
-                          <LayoutTemplate className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                      </>
                     )}
                     
                     <div className="flex items-center gap-3 bg-slate-100 dark:bg-white/5 px-4 py-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
@@ -2159,6 +2171,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         )}
       </AnimatePresence>
       
+      <TapasModal isOpen={showTapasModal} onClose={() => setShowTapasModal(false)} />
     </div>
   );
 }
