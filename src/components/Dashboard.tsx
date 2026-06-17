@@ -434,7 +434,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     {/* Modo Vistas */}
                     {(activeTab === 'home' || activeTab === 'explore') && (
                       <>
-                        <div className="flex items-center gap-1 bg-slate-150/80 dark:bg-white/5 p-1 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
+                        <div className="hidden sm:flex items-center gap-1 bg-slate-150/80 dark:bg-white/5 p-1 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
                           <button 
                             onClick={() => setViewMode('list')} 
                             className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
@@ -482,7 +482,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                      {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
              {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
             {(activeTab === 'home' || activeTab === 'explore') && (
-                <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-3 xl:gap-6 py-3 md:py-6 px-3 md:px-8 border-b border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.01] backdrop-blur-3xl sticky top-[60px] md:top-[72px] z-20 transition-all duration-300">
+                <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-3 xl:gap-6 py-3 md:py-6 px-3 md:px-8 border-b border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.01] backdrop-blur-3xl xl:sticky xl:top-[72px] relative top-0 z-20 transition-all duration-300">
                     
                     {/* CUADRO DE BÚSQUEDA PRO */}
                     <div className="relative w-full xl:w-96 group">
@@ -754,33 +754,34 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         exit={{ opacity: 0, x: 10 }}
                                                         key={article.id} 
                                                         onClick={() => setSelectedArticle(article)}
-                                                        className="group flex flex-col sm:flex-row gap-5 px-6 py-5 border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.03] cursor-pointer transition-all border-l-4 border-l-transparent hover:border-l-blue-600 relative overflow-hidden"
+                                                        className="group flex flex-row gap-4 px-4 py-4 md:px-6 md:py-5 border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.03] cursor-pointer transition-all border-l-4 border-l-transparent hover:border-l-blue-600 relative overflow-hidden"
                                                     >
                                                         {article.thumbnail && (
-                                                            <div className="w-full sm:w-28 h-20 shrink-0 overflow-hidden rounded-xl relative shadow-md">
+                                                            <div className="w-20 h-20 md:w-28 md:h-20 shrink-0 overflow-hidden rounded-xl relative shadow-md">
                                                                 <img src={article.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                                                             </div>
                                                         )}
                                                         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
                                                             <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest">
                                                                <span className="text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded">{sourceName}</span>
-                                                               <span className="text-slate-400 dark:text-gray-500 font-mono">{getRelativeTime(article.pubDate)}</span>
+                                                               <span className="text-slate-400 dark:text-gray-555 font-mono">{getRelativeTime(article.pubDate)}</span>
                                                             </div>
-                                                            <h3 className="text-sm md:text-base font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug font-display">
+                                                            <h3 className="text-xs sm:text-sm md:text-base font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug font-display">
                                                                 {article.title}
                                                             </h3>
-                                                            {article.description && (
-                                                                <p className="text-xs text-slate-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                                                            {article.description ? (
+                                                                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-gray-400 line-clamp-2 leading-relaxed font-medium">
                                                                     {stripHtml(article.description)}
                                                                 </p>
+                                                            ) : (
+                                                                <p className="text-[11px] text-slate-450 dark:text-gray-555 italic leading-relaxed">
+                                                                    Esta nota está disponible de forma completa en el portal de origen.
+                                                                </p>
                                                             )}
-                                                            <p className="text-[11px] text-slate-400 dark:text-gray-500 line-clamp-2 italic border-t border-slate-100 dark:border-white/5 pt-1.5 mt-1">
-                                                                Desarrollo: {stripHtml(article.description || 'Esta nota está disponible de forma completa en el portal de origen.')}
-                                                            </p>
                                                         </div>
-                                                        <div className="flex items-center gap-2 mt-3 sm:mt-0 shrink-0 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                                                        <div className="hidden md:flex items-center gap-2 mt-3 sm:mt-0 shrink-0 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
                                                             <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-500 dark:text-gray-400 hover:text-green-500 rounded-xl transition-all"><MessageCircle className="w-4 h-4" /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-500 dark:text-gray-400 hover:text-blue-400 rounded-xl transition-all"><Send className="w-4 h-4" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-500 dark:text-gray-400 hover:text-blue-405 rounded-xl transition-all"><Send className="w-4 h-4" /></button>
                                                         </div>
                                                     </motion.div>
                                                 );
@@ -835,24 +836,25 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         )}
                                                         <div className="p-5 flex flex-col flex-1 gap-2.5">
                                                             <div className="flex items-center justify-between">
-                                                                <span className="text-[9px] text-slate-400 dark:text-gray-500 font-black uppercase tracking-widest font-mono">{getRelativeTime(article.pubDate)}</span>
-                                                                <Bookmark className="w-3.5 h-3.5 text-slate-300 dark:text-gray-700 hover:text-blue-500 transition-colors" />
+                                                                <span className="text-[9px] text-slate-400 dark:text-gray-555 font-black uppercase tracking-widest font-mono">{getRelativeTime(article.pubDate)}</span>
+                                                                <Bookmark className="w-3.5 h-3.5 text-slate-300 dark:text-gray-750 hover:text-blue-500 transition-colors" />
                                                             </div>
                                                             <h3 className="text-sm font-bold text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-snug line-clamp-2 transition-colors font-display">
                                                                 {article.title}
                                                             </h3>
-                                                            {article.description && (
+                                                            {article.description ? (
                                                                 <p className="text-xs text-slate-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
                                                                     {stripHtml(article.description)}
                                                                 </p>
+                                                            ) : (
+                                                                <p className="text-[11px] text-slate-450 dark:text-gray-550 italic leading-relaxed">
+                                                                    Consulte el informe completo en el enlace del portal original.
+                                                                </p>
                                                             )}
-                                                            <p className="text-[10px] text-slate-400 dark:text-gray-550 line-clamp-2 italic border-t border-slate-100 dark:border-white/5 pt-2 mt-1">
-                                                                Desarrollo: {stripHtml(article.description || 'Consulte el informe completo en el enlace del portal original.')}
-                                                            </p>
                                                         </div>
-                                                        <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 bg-white dark:bg-black/80 backdrop-blur-xl p-2 rounded-xl border border-slate-200 dark:border-white/10 shadow-xl">
+                                                        <div className="hidden md:flex absolute bottom-4 right-4 items-center gap-2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 bg-white dark:bg-black/80 backdrop-blur-xl p-2 rounded-xl border border-slate-200 dark:border-white/10 shadow-xl">
                                                             <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-lg transition-all"><MessageCircle className="w-4 h-4" /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-400 rounded-lg transition-all"><Send className="w-4 h-4" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-405 rounded-lg transition-all"><Send className="w-4 h-4" /></button>
                                                         </div>
                                                     </motion.div>
                                                 );
@@ -912,24 +914,25 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                             <div className="flex items-center gap-4">
                                                                <span className="text-[11px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.25em] font-mono">{sourceName}</span>
                                                                <div className="w-1.5 h-1.5 rounded-full bg-slate-350 dark:bg-slate-700"></div>
-                                                               <span className="text-[11px] font-bold text-slate-550 dark:text-gray-500 uppercase tracking-widest font-mono">{getRelativeTime(article.pubDate)}</span>
+                                                               <span className="text-[11px] font-bold text-slate-550 dark:text-gray-550 uppercase tracking-widest font-mono">{getRelativeTime(article.pubDate)}</span>
                                                             </div>
                                                             <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white leading-tight tracking-tight transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400 font-display">
                                                                 {article.title}
                                                             </h3>
-                                                            {article.description && (
-                                                                <div className="text-sm font-semibold text-slate-550 dark:text-gray-400 border-l-2 border-slate-300 dark:border-white/10 pl-3 italic">
-                                                                    Subtítulo: {stripHtml(article.description).slice(0, 160)}...
-                                                                </div>
+                                                            {article.description ? (
+                                                                <p className="text-[15px] text-slate-650 dark:text-gray-300 leading-relaxed font-medium max-w-3xl">
+                                                                    {stripHtml(article.description)}
+                                                                </p>
+                                                            ) : (
+                                                                <p className="text-[15px] text-slate-500 dark:text-gray-550 italic leading-relaxed font-medium max-w-3xl">
+                                                                    Esta noticia está disponible íntegramente a través de los canales de la agencia emisora. Haga clic en Seguir leyendo para visualizar el artículo completo en su portal original.
+                                                                </p>
                                                             )}
-                                                            <p className="text-[15px] text-slate-650 dark:text-gray-300 leading-relaxed font-medium max-w-3xl">
-                                                                Desarrollo: {stripHtml(article.description || '') || 'Esta noticia está disponible íntegramente a través de los canales de la agencia emisora. Haga clic en Seguir leyendo para visualizar el artículo completo en su portal original.'}
-                                                            </p>
                                                             <div className="flex items-center gap-4 mt-2">
                                                                 <span className="text-[12px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest border-b-2 border-blue-600/20 group-hover:border-blue-600 transition-all pb-1">Seguir leyendo</span>
-                                                                <div className="flex items-center gap-3 ml-auto opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                                                                <div className="hidden md:flex items-center gap-3 ml-auto opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
                                                                     <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en WhatsApp"><MessageCircle className="w-5 h-5" /></button>
-                                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-405 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en Telegram"><Send className="w-5 h-5" /></button>
+                                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-600 dark:text-gray-450 hover:text-blue-405 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en Telegram"><Send className="w-5 h-5" /></button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -964,7 +967,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                       {/* RIGHT COLUMN (CHECKLIST) FOR HOME */}
                       {activeTab === 'home' && (
-                        <div className="hidden xl:flex xl:col-span-4 flex-col gap-6">
+                        <div className="flex xl:col-span-4 flex-col gap-6 w-full xl:w-auto mt-4 xl:mt-0">
                             <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-2xl p-5 shadow-2xl flex flex-col gap-6">
                                 <div className="flex items-center justify-between text-slate-700 dark:text-gray-300">
                                     <h2 className="text-[13px] font-bold tracking-wide flex items-center gap-2">
@@ -1968,7 +1971,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                     Radar ADS-B de Tráfico Aéreo Regional (TDF)
                                                 </h2>
                                             </div>
-                                            <span className="text-[9px] font-mono text-slate-500 dark:text-gray-500 uppercase font-black">Navegación Libre</span>
+                                            <span className="text-[9px] font-mono text-slate-500 dark:text-gray-550 uppercase font-black">Navegación Libre</span>
                                         </div>
                                         <div className="w-full h-[260px] md:h-[370px] relative bg-white dark:bg-[#0c0c0c]">
                                             <iframe 
@@ -1987,9 +1990,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
           </div>
         </main>
 
-      {/* MOBILE FLOATING BOTTOM NAV (Si fuera necesario ajustar luego) */}
-      <div className="lg:hidden fixed bottom-4 left-3 right-3 z-50 safe-bottom">
-        <nav className="bg-white/80 dark:bg-[#0c0c0c]/80 backdrop-blur-3xl border border-slate-200 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-[2rem] h-[64px] flex items-center justify-around px-1 overflow-hidden">
+      {/* MOBILE FLOATING BOTTOM NAV */}
+      <div className="lg:hidden fixed bottom-[calc(env(safe-area-inset-bottom)+12px)] left-4 right-4 z-50">
+        <nav className="bg-white/90 dark:bg-[#0c0c0c]/90 backdrop-blur-3xl border border-slate-200 dark:border-white/10 shadow-premium rounded-[2rem] h-[60px] flex items-center justify-around px-2 overflow-hidden">
             {[
               { id: 'home', icon: LayoutDashboard, label: 'Inicio' },
               { id: 'explore', icon: Compass, label: 'Feeds' },
@@ -1999,16 +2002,26 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
               { id: 'logistics', icon: Anchor, label: 'Arribos' }
             ].map((item) => {
                const Icon = item.icon;
+               const isActive = activeTab === item.id;
                return (
                 <button 
                   key={item.id}
                   onClick={() => setActiveTab(item.id)} 
-                  className={`flex flex-col items-center justify-center min-w-[48px] min-h-[48px] py-1 rounded-2xl transition-all duration-300 relative ${activeTab === item.id ? 'text-blue-500' : 'text-slate-400 dark:text-gray-500'}`}
+                  className={`flex items-center justify-center py-2 px-3 rounded-full transition-all duration-300 relative ${
+                    isActive 
+                      ? 'bg-blue-600/10 text-blue-500 font-bold' 
+                      : 'text-slate-400 dark:text-gray-500 hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`}
+                  style={{ minWidth: isActive ? 'auto' : '44px', minHeight: '44px' }}
                 >
-                  <Icon className={`w-5 h-5 ${activeTab === item.id ? 'drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]' : ''}`} />
-                  <span className={`text-[7px] font-black mt-0.5 uppercase tracking-tighter ${activeTab === item.id ? 'opacity-100' : 'opacity-40'}`}>{item.label}</span>
-                  {activeTab === item.id && (
-                    <motion.div layoutId="mobile-nav-indicator" className="absolute -bottom-1 w-1 h-1 bg-blue-500 rounded-full" />
+                  <Icon className={`w-5 h-5 transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]' : ''}`} />
+                  {isActive && (
+                    <span className="text-[10px] font-black ml-1.5 uppercase tracking-wider transition-all duration-300">
+                      {item.label}
+                    </span>
+                  )}
+                  {isActive && (
+                    <motion.div layoutId="mobile-nav-indicator" className="absolute -bottom-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full" />
                   )}
                 </button>
                );
@@ -2097,19 +2110,19 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
               className="bg-white dark:bg-[#0a0a0a] w-full max-w-4xl h-full sm:h-[95vh] sm:max-h-[900px] rounded-none sm:rounded-[2.5rem] shadow-2xl flex flex-col border-none sm:border border-slate-200 dark:border-white/10 overflow-hidden"
               onClick={e => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#0c0c0c]">
+              <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#0c0c0c] safe-top">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-blue-600/10 flex items-center justify-center">
                     <FileText className="w-4 h-4 text-blue-500" />
                   </div>
                   <span className="text-[10px] md:text-[11px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-[0.2em]">Inteligencia Operativa</span>
                 </div>
-                <button onClick={() => setSelectedArticle(null)} className="p-2 md:p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-slate-600 dark:text-gray-400">
+                <button onClick={() => setSelectedArticle(null)} className="p-2 md:p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-slate-600 dark:text-gray-400" style={{ minWidth: '44px', minHeight: '44px' }}>
                   <X className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
               </div>
               
-              <div className="flex-1 overflow-y-auto p-6 md:p-16 custom-scrollbar bg-white dark:bg-[#0a0a0a]">
+              <div className="flex-1 overflow-y-auto p-6 md:p-16 custom-scrollbar bg-white dark:bg-[#0a0a0a] pb-[calc(env(safe-area-inset-bottom)+2rem)]">
                 <div className="max-w-2xl mx-auto">
                   <div className="flex items-center gap-4 mb-6">
                     <span className="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] bg-blue-600/10 px-3 py-1.5 rounded-lg border border-blue-500/20">
@@ -2149,7 +2162,23 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                   />
                   
                   <div className="mt-12 md:mt-20 pt-10 border-t border-slate-200 dark:border-white/5 flex flex-col items-center gap-6">
-                    <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Continúa leyendo la versión completa en el sitio oficial</p>
+                    <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Compartir esta noticia</p>
+                    <div className="flex items-center gap-3 w-full justify-center">
+                      <button 
+                        onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(selectedArticle.title + ' ' + selectedArticle.link)}`, '_blank')}
+                        className="flex items-center gap-2 px-5 py-3 bg-green-650 hover:bg-green-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md"
+                      >
+                        <MessageCircle className="w-4 h-4" /> WhatsApp
+                      </button>
+                      <button 
+                        onClick={() => window.open(`https://t.me/share/url?url=${encodeURIComponent(selectedArticle.link)}&text=${encodeURIComponent(selectedArticle.title)}`, '_blank')}
+                        className="flex items-center gap-2 px-5 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md"
+                      >
+                        <Send className="w-4 h-4" /> Telegram
+                      </button>
+                    </div>
+
+                    <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-center mt-4">Continúa leyendo la versión completa en el sitio oficial</p>
                     <a 
                       href={selectedArticle.link} 
                       target="_blank" 
