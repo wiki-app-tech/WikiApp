@@ -65,7 +65,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   const [density, setDensity] = useState<'compact' | 'comfortable'>('comfortable');
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
-   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeScope, setActiveScope] = useState<string>('all');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   const [isCoverageDropdownOpen, setIsCoverageDropdownOpen] = useState(false);
   const [reportSubTab, setReportSubTab] = useState<'summary' | 'global' | 'national' | 'provincial' | 'alerts_recs' | 'methodology'>('summary');
    const [blocklist, setBlocklist] = useState<string[]>(['pautas', 'anuncio', 'publicidad', 'clickbait']);
@@ -217,17 +218,37 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   };
 
   // Extraction of dynamic categories
-  const allCategories = useMemo(() => {
-     return Array.from(new Set(feeds.map(f => f.category))).filter(Boolean);
-  }, [feeds]);
+  const categoryTranslations: Record<string, { label: string; icon: string }> = {
+    general: { label: 'Noticias Generales', icon: '📰' },
+    tecnologia: { label: 'Tecnología y Ciencia', icon: '💻' },
+    economia: { label: 'Economía y Finanzas', icon: '📈' },
+    deportes: { label: 'Deportes', icon: '⚽' },
+    religion: { label: 'Religión y Sociedad', icon: '🕊️' },
+    gremial: { label: 'Gremial / Sindical', icon: '🤝' },
+    institucional: { label: 'Institucionales y Oficiales', icon: '🏛️' },
+    policial: { label: 'Policiales', icon: '🚨' },
+    otras: { label: 'Otras Temáticas', icon: '🔍' }
+  };
 
-  const dashboardCats = ['all', 'internacional', 'nacional', 'provincial'];
-  const feedSideCats = useMemo(() => allCategories.filter(c => !['internacional', 'nacional', 'provincial'].includes(c as string)), [allCategories]);
+  const availableCategories = useMemo(() => {
+      const matchingFeeds = activeScope === 'all' 
+          ? feeds 
+          : feeds.filter(f => f.scope === activeScope);
+      return Array.from(new Set(matchingFeeds.map(f => f.category))).filter(Boolean);
+  }, [feeds, activeScope]);
 
   // Enhanced Filter Logic
   const filteredArticles = useMemo(() => {
     let result = initialArticles;
     
+    // Scope filter
+    if (activeScope !== 'all') {
+        result = result.filter(a => {
+            const feed = feeds.find(f => f.id === a.sourceId);
+            return feed && feed.scope === activeScope;
+        });
+    }
+
     // Category filter
     if (activeCategory !== 'all') {
         result = result.filter(a => {
@@ -266,7 +287,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         });
     }
     return result;
-  }, [initialArticles, search, feeds, activeCategory, blocklist]);
+  }, [initialArticles, search, feeds, activeScope, activeCategory, blocklist]);
 
   const stripHtml = (html: string) => html.replace(/<[^>]*>?/gm, '');
 
@@ -282,17 +303,17 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
   // Separating articles for the Top Visual Widget: 1 International, 1 National, 1 Provincial
   const topVisualArticles = useMemo(() => {
-    if (search || activeTab !== 'home' || activeCategory !== 'all') return [];
+    if (search || activeTab !== 'home' || activeScope !== 'all' || activeCategory !== 'all') return [];
     
-    const findByCategory = (cat: string) => 
-        initialArticles.find(a => feeds.find(f => f.id === a.sourceId)?.category === cat);
+    const findByScope = (scope: string) => 
+        initialArticles.find(a => feeds.find(f => f.id === a.sourceId)?.scope === scope);
 
-    const inter = findByCategory('internacional');
-    const nac = findByCategory('nacional');
-    const prov = findByCategory('provincial');
+    const inter = findByScope('internacional');
+    const nac = findByScope('nacional');
+    const prov = findByScope('provincial');
     
     return [inter, nac, prov].filter(Boolean) as Article[];
-  }, [initialArticles, search, activeTab, activeCategory, feeds]);
+  }, [initialArticles, search, activeTab, activeScope, activeCategory, feeds]);
   
   // Logic for the main feed display: on home we show less, on explore we show more
   // Also exclude top visual articles from the main list
@@ -500,52 +521,45 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     <div className="flex items-center gap-2 md:gap-3 w-full xl:w-auto">
                         <div className="px-3 py-2.5 md:px-4 md:py-3 bg-slate-100/50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 flex items-center gap-2 shrink-0">
                             <ListFilter className="w-4 h-4 text-blue-500" />
-                            <span className="text-[10px] md:text-[11px] font-bold text-slate-600 dark:text-gray-400 uppercase tracking-widest hidden xs:inline">Categoría</span>
+                            <span className="text-[10px] md:text-[11px] font-bold text-slate-600 dark:text-gray-400 uppercase tracking-widest hidden xs:inline">Clasificación</span>
                         </div>
-                        <div className="relative flex-1 xl:w-56 group">
+                        <div className="relative flex-1 xl:w-64 group">
                             <select 
                                 value={activeCategory}
                                 onChange={(e) => setActiveCategory(e.target.value)}
                                 className="w-full bg-slate-100/50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-[12px] font-bold uppercase text-slate-700 dark:text-gray-300 focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer"
                             >
-                                <option value="all">Todas las Categorías</option>
-                                {activeTab === 'home' ? (
-                                    <>
-                                        <option value="tecnologia">Tecnología</option>
-                                        <option value="economia">Economía</option>
-                                        <option value="seguridad">Seguridad</option>
-                                        <option value="educacion">Educación</option>
-                                        <option value="transporte">Transporte</option>
-                                    </>
-                                ) : (
-                                    feedSideCats.map(cat => (
-                                        <option key={cat} value={cat as string}>
-                                            {(cat as string).replace(/-/g, ' ')}
+                                <option value="all">Todas las subcategorías</option>
+                                {availableCategories.map(cat => {
+                                    const trans = categoryTranslations[cat] || { label: cat, icon: '📰' };
+                                    return (
+                                        <option key={cat} value={cat}>
+                                            {trans.icon} {trans.label}
                                         </option>
-                                    ))
-                                )}
+                                    );
+                                })}
                             </select>
                             <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 rotate-90 pointer-events-none" />
                         </div>
                     </div>
 
                     {/* DROPDOWN DE COBERTURA GEOGRÁFICA INTERACTIVO & RESPONSIVO */}
-                    {activeTab === 'home' && (
+                    {(activeTab === 'home' || activeTab === 'explore') && (
                         <div className="relative">
                             <button
                                 onClick={() => setIsCoverageDropdownOpen(!isCoverageDropdownOpen)}
                                 className="flex items-center gap-2.5 px-4 py-3.5 bg-slate-100/80 dark:bg-black/50 border border-slate-200 dark:border-white/10 rounded-2xl text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-gray-300 hover:bg-slate-200/55 dark:hover:bg-white/[0.04] shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                             >
-                                {activeCategory === 'all' && <LayoutGrid className="w-4 h-4 text-blue-500" />}
-                                {activeCategory === 'internacional' && <Globe className="w-4 h-4 text-orange-500" />}
-                                {activeCategory === 'nacional' && <Flag className="w-4 h-4 text-sky-500" />}
-                                {activeCategory === 'provincial' && <Map className="w-4 h-4 text-emerald-500" />}
+                                {activeScope === 'all' && <LayoutGrid className="w-4 h-4 text-blue-500" />}
+                                {activeScope === 'internacional' && <Globe className="w-4 h-4 text-orange-500" />}
+                                {activeScope === 'nacional' && <Flag className="w-4 h-4 text-sky-500" />}
+                                {activeScope === 'provincial' && <Map className="w-4 h-4 text-emerald-500" />}
                                 
                                 <span className="font-sans tracking-wide">
                                     Cobertura: {
-                                        activeCategory === 'all' ? 'Todo el panorama' :
-                                        activeCategory === 'internacional' ? 'Global' :
-                                        activeCategory === 'nacional' ? 'Nacional' : 'Provincial'
+                                        activeScope === 'all' ? 'Todo el panorama' :
+                                        activeScope === 'internacional' ? 'Internacional' :
+                                        activeScope === 'nacional' ? 'Nacional Argentina' : 'Provincial (TDF)'
                                     }
                                 </span>
                                 <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-300 ${isCoverageDropdownOpen ? 'rotate-180' : ''}`} />
@@ -567,17 +581,18 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                         >
                                             {[
                                                 { id: 'all', label: 'Todo el panorama', desc: 'Todo el universo de noticias', icon: LayoutGrid, color: 'text-blue-500 bg-blue-500/10' },
-                                                { id: 'internacional', label: 'Global', desc: 'Cobertura internacional y exterior', icon: Globe, color: 'text-orange-500 bg-orange-500/10' },
-                                                { id: 'nacional', label: 'Nacional', desc: 'Noticias de toda Argentina', icon: Flag, color: 'text-sky-500 bg-sky-500/10' },
-                                                { id: 'provincial', label: 'Provincial', desc: 'Sucesos de Tierra del Fuego', icon: Map, color: 'text-emerald-500 bg-emerald-500/10' }
+                                                { id: 'internacional', label: 'Internacional', desc: 'Medios de cobertura internacional', icon: Globe, color: 'text-orange-500 bg-orange-500/10' },
+                                                { id: 'nacional', label: 'Nacional Argentina', desc: 'Medios nacionales de Argentina', icon: Flag, color: 'text-sky-500 bg-sky-500/10' },
+                                                { id: 'provincial', label: 'Provincial (TDF)', desc: 'Noticias de Tierra del Fuego', icon: Map, color: 'text-emerald-500 bg-emerald-500/10' }
                                             ].map((item) => {
                                                 const Icon = item.icon;
-                                                const isSelected = activeCategory === item.id;
+                                                const isSelected = activeScope === item.id;
                                                 return (
                                                     <button
                                                         key={item.id}
                                                         onClick={() => {
-                                                            setActiveCategory(item.id);
+                                                            setActiveScope(item.id);
+                                                            setActiveCategory('all');
                                                             setIsCoverageDropdownOpen(false);
                                                         }}
                                                         className={`flex items-center gap-3 p-2.5 rounded-xl text-left transition-all ${
@@ -711,9 +726,27 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                     <div className="w-6 h-6 rounded bg-blue-600/20 flex items-center justify-center">
                                         <BookmarkCheck className="w-3.5 h-3.5 text-blue-500" />
                                     </div>
-                                    <h2 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 tracking-wide uppercase">
-                                        {activeCategory === 'all' ? 'Flujo Dinámico' : activeCategory.replace(/-/g, ' ')}
-                                        <span className="text-slate-500 dark:text-gray-500 ml-2 font-normal text-[11px]">{feedArticlesToDisplay.length} resultados</span>
+                                    <h2 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 tracking-wide uppercase flex items-center gap-1.5 flex-wrap">
+                                        {activeScope === 'all' && activeCategory === 'all' ? (
+                                            <span>Flujo Dinámico</span>
+                                        ) : (
+                                            <>
+                                                {activeScope !== 'all' && (
+                                                    <span className="text-blue-600 dark:text-blue-400">
+                                                        {activeScope === 'internacional' ? 'Internacional' : activeScope === 'nacional' ? 'Nacional Argentina' : 'Provincial TDF'}
+                                                    </span>
+                                                )}
+                                                {activeScope !== 'all' && activeCategory !== 'all' && (
+                                                    <span className="text-slate-400 dark:text-gray-500">/</span>
+                                                )}
+                                                {activeCategory !== 'all' && (
+                                                    <span className="text-slate-500 dark:text-gray-400 font-medium">
+                                                        {categoryTranslations[activeCategory]?.label || activeCategory}
+                                                    </span>
+                                                )}
+                                            </>
+                                        )}
+                                        <span className="text-slate-400 dark:text-gray-600 ml-1.5 font-normal text-[10px] tracking-normal font-mono">({feedArticlesToDisplay.length} resultados)</span>
                                     </h2>
                                 </div>
                             </div>

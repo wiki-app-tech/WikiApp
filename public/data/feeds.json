@@ -4,27 +4,31 @@
         "name": "Infobae.com",
         "url": "https://www.infobae.com/arc/outboundfeeds/rss/",
         "type": "rss",
-        "category": "sociedad"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "radio-nacional",
         "name": "Radio Nacional",
         "url": "https://www.radionacional.com.ar/category/ushuaia/feed/",
         "type": "rss",
-        "category": "otras"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "www-nationalgeographic-com-es-ultimas-noticias",
         "name": "www.nationalgeographic.com.es - Últimas noticias",
         "url": "https://www.nationalgeographic.com.es/feeds/rss",
         "type": "rss",
-        "category": "otras"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "ciberseguridad-cibertip-noticias-de-hacking-ciber-tips",
         "name": "Ciberseguridad – Cibertip – Noticias de Hacking- Ciber Tips",
         "url": "https://www.cibertip.com/feed/",
         "type": "rss",
+        "scope": "internacional",
         "category": "tecnologia"
     },
     {
@@ -32,6 +36,7 @@
         "name": "Ciência/Tecnologia - Google Notícias",
         "url": "https://news.google.com.br/news?pz=1&amp;cf=all&amp;ned=pt-BR_br&amp;hl=pt-BR&amp;topic=t&amp;output=rss",
         "type": "rss",
+        "scope": "internacional",
         "category": "tecnologia"
     },
     {
@@ -39,20 +44,23 @@
         "name": "FLACSO Argentina",
         "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCjU0gGM2uoSfvMSGgDGHgiA",
         "type": "rss",
-        "category": "tecnologia"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "noticias-de-criptomonedas",
         "name": "Noticias de criptomonedas",
         "url": "https://es.investing.com/rss/news_301.rss",
         "type": "rss",
-        "category": "tecnologia"
+        "scope": "internacional",
+        "category": "economia"
     },
     {
         "id": "noticias-de-seguridad-informatica",
         "name": "Noticias de seguridad informática",
         "url": "https://noticiasseguridad.com/feed/",
         "type": "rss",
+        "scope": "internacional",
         "category": "tecnologia"
     },
     {
@@ -60,6 +68,7 @@
         "name": "Redes Sociales",
         "url": "https://feeds.feedburner.com/redessocialeses",
         "type": "rss",
+        "scope": "internacional",
         "category": "tecnologia"
     },
     {
@@ -67,6 +76,7 @@
         "name": "Redes Sociales – TreceBits – Redes Sociales y Tecnología",
         "url": "http://www.trecebits.com/category/redes-sociales/feed/",
         "type": "rss",
+        "scope": "internacional",
         "category": "tecnologia"
     },
     {
@@ -74,6 +84,7 @@
         "name": "Tecnoxplora: Noticias sobre tecnología",
         "url": "https://www.lasexta.com/tecnologia-tecnoxplora/rss/676249.xml",
         "type": "rss",
+        "scope": "internacional",
         "category": "tecnologia"
     },
     {
@@ -81,6 +92,7 @@
         "name": "Xataka",
         "url": "https://www.xataka.com/feedburner.xml",
         "type": "rss",
+        "scope": "internacional",
         "category": "tecnologia"
     },
     {
@@ -88,6 +100,7 @@
         "name": "CriptoNoticias – Bitcoin, Blockchain y criptomonedas",
         "url": "https://www.criptonoticias.com/feed/",
         "type": "rss",
+        "scope": "nacional",
         "category": "economia"
     },
     {
@@ -95,6 +108,7 @@
         "name": "El Cronista Comercial",
         "url": "https://www.cronista.com/rss.html",
         "type": "rss",
+        "scope": "nacional",
         "category": "economia"
     },
     {
@@ -102,13 +116,15 @@
         "name": "Olé - Futbol Primera",
         "url": "https://www.ole.com.ar/rss/futbol-primera/",
         "type": "rss",
-        "category": "deporte"
+        "scope": "nacional",
+        "category": "deportes"
     },
     {
         "id": "adelante-la-fe",
         "name": "Adelante la Fe",
         "url": "http://www.adelantelafe.com/feed/",
         "type": "rss",
+        "scope": "nacional",
         "category": "religion"
     },
     {
@@ -116,6 +132,7 @@
         "name": "Ateismo para Cristianos.",
         "url": "http://ateismoparacristianos.blogspot.com/feeds/posts/default",
         "type": "rss",
+        "scope": "nacional",
         "category": "religion"
     },
     {
@@ -123,6 +140,7 @@
         "name": "Blog de las Fuerzas de Defensa de la República Argentina",
         "url": "https://fdra.blogspot.com/feeds/posts/default",
         "type": "rss",
+        "scope": "nacional",
         "category": "religion"
     },
     {
@@ -130,6 +148,7 @@
         "name": "Coalición por el Evangelio",
         "url": "https://www.coalicionporelevangelio.org/feed/",
         "type": "rss",
+        "scope": "nacional",
         "category": "religion"
     },
     {
@@ -137,6 +156,7 @@
         "name": "Evangelico Digital",
         "url": "https://www.evangelicodigital.com/rss/portada",
         "type": "rss",
+        "scope": "nacional",
         "category": "religion"
     },
     {
@@ -144,6 +164,7 @@
         "name": "La Gaceta Cristiana",
         "url": "https://www.gacetacristiana.com.ar/feed/",
         "type": "rss",
+        "scope": "nacional",
         "category": "religion"
     },
     {
@@ -151,6 +172,7 @@
         "name": "NOTICIAS CRISTIANAS",
         "url": "https://www.bibliatodo.com/NoticiasCristianas/feed/",
         "type": "rss",
+        "scope": "nacional",
         "category": "religion"
     },
     {
@@ -158,6 +180,7 @@
         "name": "Noticias Proféticas",
         "url": "https://www.noticiasprofeticas.com/feed/",
         "type": "rss",
+        "scope": "nacional",
         "category": "religion"
     },
     {
@@ -165,6 +188,7 @@
         "name": "Titulares de Portada - religionenlibertad.com",
         "url": "https://www.religionenlibertad.com/rss/portada.xml",
         "type": "rss",
+        "scope": "nacional",
         "category": "religion"
     },
     {
@@ -172,6 +196,7 @@
         "name": "Vida Nueva",
         "url": "https://www.vidanuevadigital.com/feed/",
         "type": "rss",
+        "scope": "nacional",
         "category": "religion"
     },
     {
@@ -179,272 +204,311 @@
         "name": "ABC - Tu diario en español",
         "url": "https://www.abc.es/rss/feeds/abc_ultima.xml",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "alerta-digital",
         "name": "Alerta Digital",
         "url": "https://www.alertadigital.com/feed/",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "ambito-mundo",
         "name": "Ambito - Mundo",
         "url": "https://www.ambito.com/rss/mundo.xml",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "arc-la-nacion",
         "name": "ARC - La Nacion",
         "url": "https://www.nacion.com/arc/outboundfeeds/rss/?outputType=xml",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "bbcmundo-com-noticias",
         "name": "BBCMundo.com | Noticias",
         "url": "http://newsrss.bbc.co.uk/rss/spanish/news/rss.xml",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "canal26argentina",
         "name": "Canal26Argentina",
         "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrpMfcQNog595v5gAS-oUsQ",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "clarin-com-mundo",
         "name": "Clarin.com - Mundo",
         "url": "https://www.clarin.com/rss/mundo/",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "dw-espanol",
         "name": "DW (Español)",
         "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCT4Jg8h03dD0iN3Pb5L0PMA",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "economiapolitica-expansion-com",
         "name": "economiapolitica // expansion.com",
         "url": "https://estaticos.expansion.com/rss/economiapolitica.xml",
         "type": "rss",
-        "category": "politica"
+        "scope": "internacional",
+        "category": "economia"
     },
     {
         "id": "el-mundo",
         "name": "El mundo",
         "url": "https://www.pagina12.com.ar/rss/secciones/el-mundo/notas",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "eleconomista-economia",
         "name": "elEconomista economia",
         "url": "https://www.eleconomista.es/rss/rss-economia.php",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "euronews-en-espanol",
         "name": "euronews (en español)",
         "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCyoGb3SMlTlB8CLGVH4c8Rw",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "europa-press-internacional",
         "name": "Europa Press - Internacional",
         "url": "https://www.europapress.es/rss/rss.aspx?ch=00069",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "internacional-reciente",
         "name": "Internacional - Reciente",
         "url": "https://news.google.com/rss/topics/CAAqLAgKIiZDQkFTRmdvSUwyMHZNRGx1YlY4U0JtVnpMVFF4T1JvQ1ZWTW9BQVAB?hl=es-419&amp;gl=US&amp;ceid=US%3Aes-419&amp;oc=11",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "le-monde-diplomatique-en-espanol",
         "name": "Le Monde diplomatique en español",
         "url": "https://mondiplo.com/?page=backend",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "libertad-digital-internacional",
         "name": "Libertad Digital: Internacional",
         "url": "https://www.libertaddigital.com/internacional/rss.xml",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "noticias-telemundo",
         "name": "Noticias Telemundo",
         "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCRwA1NUcUnwsly35ikGhp0A",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "nyt-gt-the-new-york-times-en-espanol",
         "name": "NYT &gt; The New York Times en Español",
         "url": "https://rss.nytimes.com/services/xml/rss/nyt/es.xml",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "portada",
         "name": "Portada",
         "url": "https://www.lavanguardia.com/rss/home.xml",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "rss-de-el-confidencial",
         "name": "Rss de El confidencial",
         "url": "https://rss.elconfidencial.com/",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "rt-spanish",
         "name": "RT Spanish(?)",
         "url": "https://actualidad.rt.com/feeds/all.rss",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "rtve-noticias",
         "name": "RTVE Noticias",
         "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC7QZIf0dta-XPXsp9Hv4dTw",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "sputnik-mundo",
         "name": "Sputnik Mundo",
         "url": "http://sp.rian.ru/export/rss2/index.xml",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "total-medios",
         "name": "TOTAL MEDIOS",
         "url": "https://www.totalmedios.com/rss/",
         "type": "rss",
-        "category": "internacional"
+        "scope": "internacional",
+        "category": "general"
     },
     {
         "id": "radio-sudamericana",
         "name": " Radio Sudamericana",
         "url": "https://www.radiosudamericana.com/rss.php",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "actualidad-de-la-capital",
         "name": "Actualidad de la capital",
         "url": "https://www.lacapital.com.ar/rss/home.xml",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "ambito-portada",
         "name": "Ambito - Portada",
         "url": "https://www.ambito.com/rss/home.xml",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "clarin",
         "name": "Clarin",
         "url": "https://www.clarin.com/rss/lo-ultimo/",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "diario-el-dia-rss",
         "name": "Diario El Día - RSS",
         "url": "https://www.eldia.com/.rss",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "diario-hoy",
         "name": "Diario Hoy",
         "url": "https://diariohoy.net/xml/general.xml",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "el-diario-24",
         "name": "El Diario 24",
         "url": "https://www.eldiario24.com/rss",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "el-economista",
         "name": "El Economista",
         "url": "https://eleconomista.com.ar/feed/",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "el-pais",
         "name": "El país",
         "url": "https://www.pagina12.com.ar/rss/secciones/el-pais/notas",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "google-noticias",
         "name": "Google Noticias",
         "url": "https://news.google.com/rss/topics/CAAqLAgKIiZDQkFTRmdvSUwyMHZNRGx6TVdZU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB?hl=es-419&amp;gl=US&amp;ceid=US%3Aes-419&amp;oc=11",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "iprofesional-com",
         "name": "iProfesional.com",
         "url": "https://www.iprofesional.com/rss/home",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "jujuy-al-dia",
         "name": "JUJUY AL DÍA®",
         "url": "https://www.jujuyaldia.com.ar/feed/",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "la-nacion",
         "name": "LA NACION",
         "url": "https://www.lanacion.com.ar/arcio/rss/",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "la-voz",
         "name": "La Voz",
         "url": "https://www.lavoz.com.ar/arc/outboundfeeds/feeds/rss/?outputType=xml",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "mundo-gremial",
         "name": "Mundo Gremial",
         "url": "https://mundogremial.com/feed/",
         "type": "rss",
+        "scope": "nacional",
         "category": "gremial"
     },
     {
@@ -452,153 +516,175 @@
         "name": "News",
         "url": "https://www.cronista.com/files/rss/news.xml",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "pagina-12",
         "name": "Página/12",
         "url": "https://www.pagina12.com.ar/diario/rss/principal.xml",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "politica-argentina",
         "name": "Política Argentina",
         "url": "https://www.politicargentina.com/feed/ultimasnoticias.xml",
         "type": "rss",
-        "category": "politica"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "radio-nacional-argentina",
         "name": "Radio Nacional Argentina",
         "url": "http://www.radionacional.com.ar/?feed=rss2",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "revista-noticias",
         "name": "Revista Noticias",
         "url": "https://noticias.perfil.com/feed/",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "tn",
         "name": "TN",
         "url": "https://tn.com.ar/rss.xml",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "todas-las-noticias-de-argentina",
         "name": "Todas las noticias de Argentina",
         "url": "https://www.c5n.com/rss/pages/home.xml",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "todo-noticias",
         "name": "Todo Noticias",
         "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCj6PcyLvpnIRT_2W_mwa9Aw",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "tv-publica-argentina",
         "name": "TV Pública - Argentina",
         "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCs231K71Bnu5295_x0MB5Pg",
         "type": "rss",
-        "category": "nacional"
+        "scope": "nacional",
+        "category": "general"
     },
     {
         "id": "actualidad-tdf",
         "name": "Actualidad TDF",
         "url": "https://www.actualidadtdf.com.ar/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "aire-libre-fm-96-3",
         "name": "Aire Libre FM 96.3",
         "url": "https://www.airelibre.com.ar/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "ciudad-infofueguina",
         "name": "Ciudad - Infofueguina",
         "url": "https://www.infofueguina.com/rss/feed.html?r=1",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "cronicas-fueguinas",
         "name": "Cronicas Fueguinas",
         "url": "http://cronicasfueguinas.blogspot.com/feeds/posts/default",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "diario-prensa-noticias-de-tierra-del-fuego",
         "name": "Diario Prensa: Noticias de Tierra del Fuego",
         "url": "https://www.diarioprensa.com.ar/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "el-copernico",
         "name": "El Copérnico",
         "url": "https://elcopernico.com/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "el-diario-del-fin-del-mundo-economia",
         "name": "El Diario del Fin del Mundo - Economía",
         "url": "https://www.eldiariodelfindelmundo.com/rss/20-economia.xml",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "el-fueguino",
         "name": "El Fueguino",
         "url": "https://www.elfueguino.com.ar/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "el-riograndense",
         "name": "El Riograndense",
         "url": "https://www.elriograndense.com.ar/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "el-sureno",
         "name": "El Sureño",
         "url": "https://www.surenio.com.ar/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "el-tolhuinense",
         "name": "El Tolhuinense",
         "url": "https://eltolhuinense.com.ar/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "gps-sin-dial",
         "name": "GPS Sin Dial",
         "url": "https://www.gpssindial.com.ar/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "gremiales-del-sur",
         "name": "Gremiales del sur",
         "url": "https://www.gremialesdelsur.com.ar/rss/get_rss.php",
         "type": "rss",
+        "scope": "provincial",
         "category": "gremial"
     },
     {
@@ -606,83 +692,95 @@
         "name": "Infofueguina",
         "url": "https://www.infofueguina.com/rss/un_foto.html",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "jca-noticias",
         "name": "JCA Noticias",
         "url": "https://jcanoticias.com.ar/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "legislatura-tdf-a-i-a-s",
         "name": "Legislatura TDF A.I.A.S.",
         "url": "https://www.legistdf.gob.ar/index.php/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "institucional"
     },
     {
         "id": "municipio-de-rio-grande",
         "name": "Municipio de Río Grande",
         "url": "https://riogrande.gob.ar/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "institucional"
     },
     {
         "id": "portal-la-tdf",
         "name": "Portal La TDF",
         "url": "http://feeds.feedburner.com/PortalLaTdf",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "que-te-pasa-tdf",
         "name": "Que te Pasa tdf",
         "url": "https://www.quetepasatdf.com/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "red-23-noticias",
         "name": "Red 23 Noticias",
         "url": "https://red23noticias.com.ar/rss",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "tdf-al-dia",
         "name": "TDF AL DIA",
         "url": "https://tdfaldia.com.ar/?feed=rss2",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "tiempo-fueguino",
         "name": "Tiempo Fueguino",
         "url": "https://www.tiempofueguino.com/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "ultimas-noticias-de-94diez-gt",
         "name": "Últimas Noticias de 94diez&gt;",
         "url": "https://94diez.com/rss",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "ushuaia-noticias",
         "name": "Ushuaia Noticias",
         "url": "https://www.ushuaianoticias.com/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "general"
     },
     {
         "id": "resumen-policial",
         "name": "Resumen Policial",
         "url": "https://www.resumenpolicial.com.ar/feed/",
         "type": "rss",
-        "category": "provincial"
+        "scope": "provincial",
+        "category": "policial"
     }
 ]

@@ -95,6 +95,7 @@ function processRSSItems(items: any[], feed: FeedSource): Article[] {
             sourceId: feed.id,
             sourceName: feed.name,
             sourceType: feed.type,
+            sourceScope: feed.scope,
             sourceCategory: feed.category,
             thumbnail: item.enclosure?.url || undefined
         };
@@ -118,6 +119,7 @@ function getTelegramDemoArticles(feed: FeedSource): Article[] {
         sourceId: feed.id,
         sourceName: feed.name,
         sourceType: feed.type,
+        sourceScope: feed.scope,
         sourceCategory: feed.category
     }));
 }
