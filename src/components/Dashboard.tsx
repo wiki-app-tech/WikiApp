@@ -6,6 +6,7 @@ import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRig
 import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
 import RadioDashboard from './RadioDashboard';
+import BoletinesDashboard from './BoletinesDashboard';
 import TapasModal from './TapasModal';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -380,6 +381,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
           {[
             { id: 'home', icon: LayoutDashboard, label: 'Panel de Control', sub: 'Home' },
             { id: 'explore', icon: Compass, label: 'Fuentes de Inteligencia', sub: 'Feeds' },
+            { id: 'boletines', icon: Newspaper, label: 'Boletines Oficiales', sub: 'Boletines' },
             { id: 'weather', icon: Cloud, label: 'Clima & Alertas', sub: 'Clima' },
             { id: 'reports', icon: FileText, label: 'Análisis Estratégico', sub: 'Informes' },
             { id: 'security', icon: ShieldCheck, label: 'Centro de Seguridad', sub: 'Seguridad', color: 'text-red-500', activeBg: 'bg-red-500' },
@@ -446,7 +448,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                       <div className="flex items-center gap-2">
                         <ChevronRight className="w-3.5 h-3.5 text-slate-400 hidden lg:block" />
                         <span className="text-[10px] md:text-[11px] font-bold text-slate-500 dark:text-gray-400 uppercase tracking-[0.2em] font-mono hidden sm:block">
-                            {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'security' ? 'Centro de Auditoría' : activeTab === 'logistics' ? 'Control de Tráfico' : activeTab === 'radio' ? 'Dial Fueguino' : 'Sistema'}
+                            {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'boletines' ? 'Boletines Oficiales' : activeTab === 'security' ? 'Centro de Auditoría' : activeTab === 'logistics' ? 'Control de Tráfico' : activeTab === 'radio' ? 'Dial Fueguino' : 'Sistema'}
                         </span>
                       </div>
                    </div>
@@ -1189,6 +1191,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                   {/* RADIO DASHBOARD */}
                   {activeTab === 'radio' && <RadioDashboard />}
+
+                  {/* BOLETINES OFICIALES */}
+                  {activeTab === 'boletines' && <BoletinesDashboard />}
 
                   {/* 5. REPORTS DASHBOARD (NEW) */}
                   {activeTab === 'reports' && (
@@ -2029,6 +2034,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
             {[
               { id: 'home', icon: LayoutDashboard, label: 'Inicio' },
               { id: 'explore', icon: Compass, label: 'Feeds' },
+              { id: 'boletines', icon: Newspaper, label: 'Boletines' },
               { id: 'weather', icon: Cloud, label: 'Clima' },
               { id: 'radio', icon: Radio, label: 'Radio' },
               { id: 'security', icon: ShieldCheck, label: 'Seguridad' },
