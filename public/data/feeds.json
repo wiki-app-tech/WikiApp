@@ -677,5 +677,12 @@
         "url": "https://www.ushuaianoticias.com/feed/",
         "type": "rss",
         "category": "provincial"
+    },
+    {
+        "id": "resumen-policial",
+        "name": "Resumen Policial",
+        "url": "https://www.resumenpolicial.com.ar/feed/",
+        "type": "rss",
+        "category": "provincial"
     }
 ]

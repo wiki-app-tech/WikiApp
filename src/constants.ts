@@ -31,6 +31,7 @@ export const NEWS_SITES: Record<string, NewsSource[]> = {
     [NewsCategory.PROVINCIAL]: [
         { name: 'Ushuaia Noticias', url: 'https://ushuaianoticias.com/', logo: 'https://ushuaianoticias.com/wp-content/uploads/2021/08/logo-un.png', rssUrl: 'https://ushuaianoticias.com/feed/' },
         { name: 'TDF al Día', url: 'https://tdfaldia.com.ar/', logo: 'https://tdfaldia.com.ar/wp-content/uploads/2021/08/logo-tdf-al-dia.png', rssUrl: 'https://tdfaldia.com.ar/feed/' },
+        { name: 'Resumen Policial', url: 'https://www.resumenpolicial.com.ar/', logo: 'https://www.resumenpolicial.com.ar/wp-content/uploads/2020/03/logo_encab_old.png', rssUrl: 'https://www.resumenpolicial.com.ar/feed/' },
     ],
 };
 
