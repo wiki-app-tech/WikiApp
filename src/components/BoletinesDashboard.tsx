@@ -34,6 +34,7 @@ interface BulletinItem {
   date: string;
   year: string;
   title: string;
+  summary?: string;
   publisher: 'provincia' | 'legislativo' | 'ushuaia' | 'riogrande' | 'tolhuin';
   url: string;
   driveFileId?: string;
@@ -130,7 +131,7 @@ export default function BoletinesDashboard() {
       short: 'Tolhuin',
       logoText: 'MT',
       desc: 'Decretos ejecutivos locales, resoluciones administrativas y actas del Concejo Deliberante.',
-      url: 'https://tolhuin.gob.ar/',
+      url: 'https://tolhuin.gob.ar/boletin-oficial/',
       system: 'Boletines Oficiales y Resoluciones del Municipio de Tolhuin',
       icon: MapPin,
       color: 'from-rose-500 to-red-600',
@@ -232,7 +233,7 @@ export default function BoletinesDashboard() {
       publisher: 'legislativo',
       url: 'https://www.legistdf.gob.ar/'
     },
-    // Municipales
+    // Municipales - Ushuaia
     {
       id: 'ush-1',
       type: 'ordenanza',
@@ -242,6 +243,62 @@ export default function BoletinesDashboard() {
       title: 'Establecimiento del Plan Estratégico de Ordenamiento Territorial y Nuevos Códigos de Edificación.',
       publisher: 'ushuaia',
       url: 'https://www.ushuaia.gob.ar/'
+    },
+    // Municipales - Tolhuin
+    {
+      id: 'tol-1',
+      type: 'ordenanza',
+      number: 'Ordenanza Municipal 1240/2026',
+      date: '2026-06-12',
+      year: '2026',
+      title: 'Creación del Registro Único de Emprendedores y Artesanos Locales con acceso a créditos blandos municipales.',
+      summary: 'Incentiva la producción artesanal local y define líneas de financiamiento subsidiado directas para microemprendedores de la comuna.',
+      publisher: 'tolhuin',
+      url: 'https://tolhuin.gob.ar/boletin-oficial/'
+    },
+    {
+      id: 'tol-2',
+      type: 'decreto',
+      number: 'Decreto Municipal 198/2026',
+      date: '2026-06-02',
+      year: '2026',
+      title: 'Aprobación del Plan de Reforestación y Cuidado Biológico del Bosque Andino Patagónico en la cuenca del Lago Fagnano.',
+      summary: 'Establece pautas obligatorias de regeneración de flora nativa y penalizaciones para la tala de árboles milenarios.',
+      publisher: 'tolhuin',
+      url: 'https://tolhuin.gob.ar/boletin-oficial/'
+    },
+    {
+      id: 'tol-3',
+      type: 'resolucion',
+      number: 'Resolución Municipal 085/2026',
+      date: '2026-05-26',
+      year: '2026',
+      title: 'Adjudicación de obras de tendido eléctrico y extensión de redes de servicios básicos en barrios de Tolhuin.',
+      summary: 'Asigna fondos para el soterramiento y distribución eléctrica en zonas periurbanas de crecimiento demográfico reciente.',
+      publisher: 'tolhuin',
+      url: 'https://tolhuin.gob.ar/boletin-oficial/'
+    },
+    {
+      id: 'tol-4',
+      type: 'ordenanza',
+      number: 'Ordenanza Municipal 1238/2026',
+      date: '2026-05-18',
+      year: '2026',
+      title: 'Regulación y tarifas del servicio de recolección de residuos áridos e industriales y zonificación de depósitos transitorios.',
+      summary: 'Define el marco operativo de higiene urbana aplicable a industrias madereras y turberas del ejido urbano.',
+      publisher: 'tolhuin',
+      url: 'https://tolhuin.gob.ar/boletin-oficial/'
+    },
+    {
+      id: 'tol-5',
+      type: 'decreto',
+      number: 'Decreto Municipal 182/2026',
+      date: '2026-05-10',
+      year: '2026',
+      title: 'Llamado a licitación pública para la adquisición de maquinaria vial pesada destinada al mantenimiento de calles.',
+      summary: 'Proceso de compra pública de motoniveladoras y palas cargadoras con equipamiento invernal de despeje de nieve.',
+      publisher: 'tolhuin',
+      url: 'https://tolhuin.gob.ar/boletin-oficial/'
     }
   ];
 
@@ -446,7 +503,8 @@ export default function BoletinesDashboard() {
       const matchesYear = activePublisher !== 'provincia' || selectedYear === 'all' || item.year === selectedYear;
       const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             item.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            item.date.includes(searchTerm);
+                            item.date.includes(searchTerm) ||
+                            (item.summary && item.summary.toLowerCase().includes(searchTerm.toLowerCase()));
       return matchesPublisher && matchesYear && matchesSearch;
     });
   }, [activePublisher, selectedYear, searchTerm]);
@@ -722,6 +780,11 @@ export default function BoletinesDashboard() {
                           <p className="text-xs font-semibold text-slate-700 dark:text-gray-300 leading-relaxed group-hover:text-blue-500 transition-colors">
                             {item.title}
                           </p>
+                          {item.summary && (
+                            <p className="text-[11px] text-slate-500 dark:text-gray-400 leading-relaxed mt-1 font-medium">
+                              {item.summary}
+                            </p>
+                          )}
                         </div>
 
                         <div className="flex items-center gap-2 pt-3 border-t border-slate-200/50 dark:border-white/5">
@@ -840,6 +903,11 @@ export default function BoletinesDashboard() {
                               <p className="text-sm font-semibold text-slate-700 dark:text-gray-300 leading-snug group-hover:text-blue-500 transition-colors">
                                 {item.title}
                               </p>
+                              {item.summary && (
+                                <p className="text-xs text-slate-500 dark:text-gray-400 leading-relaxed mt-1 font-medium">
+                                  {item.summary}
+                                </p>
+                              )}
                             </div>
                           </div>
 
