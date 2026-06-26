@@ -17,7 +17,7 @@ const RADIOS: RadioStation[] = [
   { id: 'airelibre', name: 'Aire Libre FM', frequency: '96.3', city: 'Río Grande', url: 'https://cdn.instream.audio:9037/stream' },
   { id: 'masters', name: "FM Master's", frequency: '107.3', city: 'Ushuaia', url: 'https://streamingradiolinks.xyz/8130' },
   { id: 'fueguina', name: 'Radio Fueguina', frequency: '97.3', city: 'Río Grande', url: 'https://streamlky.alsolnet.com/radiofueguina' },
-  { id: 'lra24', name: 'LRA 24 (Nacional)', frequency: 'AM 640', city: 'Río Grande', url: 'https://sa.mp3.icecast.magma.edge-access.net/sc_rad24' },
+  { id: 'lra10', name: 'Radio Nacional Ushuaia', frequency: 'AM 780', city: 'Ushuaia', url: 'https://sa.mp3.icecast.magma.edge-access.net/sc_rad10' },
   { id: 'cadenafm', name: 'Cadena FM', frequency: 'Online', city: 'Tierra del Fuego', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO3.mp3?dist=onlineradiobox' },
   { id: 'infinito', name: 'Infinito 911', frequency: 'Online', city: 'Tierra del Fuego', url: 'https://stream.radioinfo.ar/5752/stream/' },
   { id: 'espectaculo', name: 'Espectáculo', frequency: '93.1', city: 'Ushuaia', url: 'https://emisorasdigitales2.com:8058/stream' },

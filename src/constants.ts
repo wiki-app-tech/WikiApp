@@ -41,7 +41,7 @@ export const RADIO_STATIONS: RadioStation[] = [
         city: 'Ushuaia',
         frequency: 'AM 780',
         logoUrl: 'https://www.radionacional.com.ar/wp-content/uploads/2020/03/LOGO-LRA10-USHUAIA-E-ISLAS-MALVINAS.png',
-        streamUrl: 'http://190.111.245.221:8000/stream'
+        streamUrl: 'https://sa.mp3.icecast.magma.edge-access.net/sc_rad10'
     },
     {
         name: 'Radio Argentina Ushuaia',
