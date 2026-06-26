@@ -11,7 +11,7 @@ interface RadioStation {
 }
 
 const RADIOS: RadioStation[] = [
-  { id: 'provincia', name: 'Radio Provincia', frequency: '99.9', city: 'Ushuaia', url: 'http://158.69.225.155:8041/live' },
+  { id: 'provincia', name: 'Radio Provincia', frequency: '99.9', city: 'Ushuaia', url: 'https://server.streamcasthd.com/8192/stream' },
   { id: 'fmfuego', name: 'FM Fuego', frequency: '90.1', city: 'Río Grande', url: 'https://media.siglocero.net:8004/stream' },
   { id: 'siglo', name: 'Estación del Siglo', frequency: '105.3', city: 'Río Grande', url: 'http://streamall.alsolnet.com/estaciondelsigloaudio' },
   { id: 'airelibre', name: 'Aire Libre FM', frequency: '96.3', city: 'Río Grande', url: 'https://cdn.instream.audio:9037/stream' },

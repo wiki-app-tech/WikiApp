@@ -55,7 +55,7 @@ export const RADIO_STATIONS: RadioStation[] = [
         city: 'Ushuaia',
         frequency: '99.5 FM',
         logoUrl: 'https://www.tierradelfuego.gob.ar/wp-content/uploads/2023/03/logo-99-5-1.png',
-        streamUrl: 'http://200.58.105.132:8000/ushuaia2'
+        streamUrl: 'https://server.streamcasthd.com/8192/stream'
     },
     {
         name: 'FM Fuego',
