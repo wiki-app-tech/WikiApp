@@ -14,6 +14,23 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
+// Ícono de referencia geográfica para ciudades TDF
+const createCityRefIcon = (emoji: string, bg: string) =>
+  L.divIcon({
+    className: '',
+    html: `<div style="background:${bg};border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid rgba(255,255,255,0.8);box-shadow:0 2px 8px rgba(0,0,0,0.5);opacity:0.9;">${emoji}</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -18],
+  });
+
+// Localidades de referencia en TDF
+const TDF_REFERENCE_CITIES = [
+  { id: 'ushuaia', name: 'Ushuaia', lat: -54.8019, lng: -68.3029, emoji: '🏔️', bg: '#1d4ed8' },
+  { id: 'rio-grande', name: 'Río Grande', lat: -53.7850, lng: -67.7000, emoji: '🏭', bg: '#0e7490' },
+  { id: 'tolhuin', name: 'Tolhuin', lat: -54.5100, lng: -67.1900, emoji: '🌲', bg: '#15803d' },
+];
+
 // Estructura GeoJSON de USGS
 interface EarthquakeFeature {
   type: string;
@@ -96,9 +113,9 @@ const EarthquakeMap = () => {
              />
           </LayersControl.BaseLayer>
 
-          <LayersControl.BaseLayer checked name="Cartografía (Street)">
+          <LayersControl.BaseLayer checked name="OpenStreetMap (Street)">
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
           </LayersControl.BaseLayer>
@@ -125,6 +142,32 @@ const EarthquakeMap = () => {
           </LayersControl.BaseLayer>
 
         </LayersControl>
+
+        {/* Marcadores de referencia geográfica: ciudades TDF */}
+        {TDF_REFERENCE_CITIES.map(city => (
+          <Marker
+            key={city.id}
+            position={[city.lat, city.lng]}
+            icon={createCityRefIcon(city.emoji, city.bg)}
+          >
+            <Popup>
+              <div className="flex flex-col gap-1 p-1 font-sans min-w-[150px]">
+                <strong className="text-sm font-bold border-b pb-1">{city.name}</strong>
+                <span className="text-[10px] text-gray-500 mt-1 font-mono">
+                  {city.lat.toFixed(4)}, {city.lng.toFixed(4)}
+                </span>
+                <a
+                  href={`https://www.openstreetmap.org/?mlat=${city.lat}&mlon=${city.lng}#map=13/${city.lat}/${city.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 text-[10px] font-bold hover:underline mt-1"
+                >
+                  Ver en OpenStreetMap →
+                </a>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
 
         {earthquakes.map(eq => (
           <Marker 

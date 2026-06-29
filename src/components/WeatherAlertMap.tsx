@@ -14,6 +14,50 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
+// Íconos de ciudades
+const createCityIcon = (emoji: string, bg: string) =>
+  L.divIcon({
+    className: '',
+    html: `<div style="background:${bg};border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:15px;border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.35);">${emoji}</div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -20],
+  });
+
+// Localidades precisas de Tierra del Fuego
+const TDF_CITIES = [
+  {
+    id: 'ushuaia',
+    name: 'Ushuaia',
+    desc: 'Capital de Tierra del Fuego. Lat: -54.8019 | Lon: -68.3029',
+    lat: -54.8019,
+    lng: -68.3029,
+    emoji: '🏔️',
+    bg: '#2563eb',
+    osmLink: 'https://www.openstreetmap.org/?mlat=-54.8019&mlon=-68.3029#map=13/-54.8019/-68.3029',
+  },
+  {
+    id: 'rio-grande',
+    name: 'Río Grande',
+    desc: 'Ciudad industrial al norte de la isla. Lat: -53.7850 | Lon: -67.7000',
+    lat: -53.7850,
+    lng: -67.7000,
+    emoji: '🏭',
+    bg: '#0e7490',
+    osmLink: 'https://www.openstreetmap.org/?mlat=-53.7850&mlon=-67.7000#map=13/-53.7850/-67.7000',
+  },
+  {
+    id: 'tolhuin',
+    name: 'Tolhuin',
+    desc: 'Localidad central de la provincia. Lat: -54.5100 | Lon: -67.1900',
+    lat: -54.5100,
+    lng: -67.1900,
+    emoji: '🌲',
+    bg: '#15803d',
+    osmLink: 'https://www.openstreetmap.org/?mlat=-54.5100&mlon=-67.1900#map=14/-54.5100/-67.1900',
+  },
+];
+
 interface Alert {
   title: string;
   status: string;
@@ -73,16 +117,16 @@ const WeatherAlertMap = () => {
         
         <LayersControl position="topright">
           
-          <LayersControl.BaseLayer checked name="Modo Oscuro (Gris)">
+          <LayersControl.BaseLayer name="Modo Oscuro (Gris)">
              <TileLayer
                attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
              />
           </LayersControl.BaseLayer>
 
-          <LayersControl.BaseLayer name="Cartografía (Street)">
+          <LayersControl.BaseLayer checked name="OpenStreetMap (Street)">
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
           </LayersControl.BaseLayer>
@@ -124,6 +168,26 @@ const WeatherAlertMap = () => {
                 }} 
             />
         )}
+
+        {/* Marcadores de ciudades de TDF */}
+        {TDF_CITIES.map(city => (
+          <Marker key={city.id} position={[city.lat, city.lng]} icon={createCityIcon(city.emoji, city.bg)}>
+            <Popup>
+              <div className="flex flex-col gap-1.5 min-w-[180px] p-1 font-sans">
+                <strong className="text-sm font-bold border-b pb-1">{city.name}</strong>
+                <span className="text-[10px] text-gray-600 mt-1 leading-snug font-mono">{city.desc}</span>
+                <a
+                  href={city.osmLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 text-[10px] font-bold hover:underline mt-1"
+                >
+                  Ver en OpenStreetMap →
+                </a>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
 
         {/* Nodos de Información (Fuentes TDF) */}
         {infoNodes.map(node => (

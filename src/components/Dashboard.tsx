@@ -32,6 +32,32 @@ const SecurityHeatMap = dynamic(() => import('./SecurityHeatMap'), {
     )
   });
 
+const MaritimeMap = dynamic(
+  () => import('./LogisticsMap').then(m => ({ default: m.MaritimeMap })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 dark:bg-[#0a0a0a] text-slate-500 dark:text-gray-500">
+        <Anchor className="w-7 h-7 mb-3 animate-pulse text-blue-500" />
+        <span className="text-xs font-bold uppercase tracking-widest">Cargando Mapa Marítimo...</span>
+      </div>
+    ),
+  }
+);
+
+const AirMap = dynamic(
+  () => import('./LogisticsMap').then(m => ({ default: m.AirMap })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 dark:bg-[#0a0a0a] text-slate-500 dark:text-gray-500">
+        <Plane className="w-7 h-7 mb-3 animate-pulse text-orange-500" />
+        <span className="text-xs font-bold uppercase tracking-widest">Cargando Mapa Aéreo...</span>
+      </div>
+    ),
+  }
+);
+
 const WikiAppLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -1143,7 +1169,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                                                         {/* Dirección Interactiva para GPS */}
                                                         <a
-                                                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Farmacia ${pharmacy.nombre}, ${pharmacy.direccion}, ${formattedCityName}, Tierra del Fuego`)}`}
+                                                            href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`Farmacia ${pharmacy.nombre}, ${pharmacy.direccion}, ${formattedCityName}, Tierra del Fuego, Argentina`)}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors w-fit group mt-1"
@@ -1752,8 +1778,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                         <span className="text-[10px] font-black text-slate-500 dark:text-gray-500 uppercase tracking-widest">Costos & Mantenimiento</span>
                                         <div className="space-y-2 text-[11px] font-semibold text-slate-700 dark:text-gray-300">
                                             <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1.5">
-                                                <span>Google Maps API:</span>
-                                                <span className="text-emerald-500 font-bold">Gratis (Crédito $200)</span>
+                                                <span>OpenStreetMap (OSM):</span>
+                                                <span className="text-emerald-500 font-bold">100% Gratuito</span>
                                             </div>
                                             <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1.5">
                                                 <span>Firebase Hosting:</span>
@@ -2015,13 +2041,25 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                             </div>
                                             <span className="text-[9px] font-mono text-slate-500 dark:text-gray-500 uppercase font-black">Navegación Libre</span>
                                         </div>
-                                        <div className="w-full h-[260px] md:h-[370px] relative bg-white dark:bg-[#0c0c0c]">
-                                            <iframe 
-                                                src="https://www.marinetraffic.com/en/ais/embed/zoom:9/centery:-54.7/centerx:-67.5/maptype:0/shownames:false"
-                                                className="w-full h-full border-none opacity-90 hover:opacity-100 transition-opacity"
-                                                title="Marine Traffic - Puerto de Ushuaia"
-                                                loading="lazy"
-                                            />
+                                        <div className="w-full h-[260px] md:h-[370px] relative bg-white dark:bg-[#0c0c0c] overflow-hidden">
+                                            <MaritimeMap />
+                                        </div>
+                                        {/* Leyenda */}
+                                        <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-t border-slate-200 dark:border-[#1f1f1f] bg-slate-50/60 dark:bg-black/20">
+                                          {[
+                                            { label: 'Puerto Ushuaia', color: '#2563eb' },
+                                            { label: 'Puerto Río Grande', color: '#0e7490' },
+                                            { label: 'Canal Beagle', color: '#1e40af' },
+                                            { label: 'Bahía Lapataia', color: '#15803d' },
+                                          ].map(item => (
+                                            <span key={item.label} className="flex items-center gap-1.5 text-[9px] font-bold uppercase text-slate-500 dark:text-gray-400">
+                                              <span style={{ background: item.color }} className="w-2.5 h-2.5 rounded-full inline-block" />
+                                              {item.label}
+                                            </span>
+                                          ))}
+                                          <span className="ml-auto text-[9px] font-mono text-slate-400 dark:text-gray-500">
+                                            &copy; OpenStreetMap contributors
+                                          </span>
                                         </div>
                                     </div>
 
@@ -2038,13 +2076,24 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                             </div>
                                             <span className="text-[9px] font-mono text-slate-500 dark:text-gray-550 uppercase font-black">Navegación Libre</span>
                                         </div>
-                                        <div className="w-full h-[260px] md:h-[370px] relative bg-white dark:bg-[#0c0c0c]">
-                                            <iframe 
-                                                src="https://www.radarbox.com/widget?lat=-54.8&lon=-68.3&z=8&theme=dark"
-                                                className="w-full h-full border-none opacity-90 hover:opacity-100 transition-opacity"
-                                                title="RadarBox - Tierra del Fuego"
-                                                loading="lazy"
-                                            />
+                                        <div className="w-full h-[260px] md:h-[370px] relative bg-white dark:bg-[#0c0c0c] overflow-hidden">
+                                            <AirMap />
+                                        </div>
+                                        {/* Leyenda */}
+                                        <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-t border-slate-200 dark:border-[#1f1f1f] bg-slate-50/60 dark:bg-black/20">
+                                          {[
+                                            { label: 'Aeropuerto Ushuaia (USH)', color: '#ea580c' },
+                                            { label: 'Aeropuerto Río Grande (RGA)', color: '#7c3aed' },
+                                            { label: 'Tolhuin', color: '#ca8a04' },
+                                          ].map(item => (
+                                            <span key={item.label} className="flex items-center gap-1.5 text-[9px] font-bold uppercase text-slate-500 dark:text-gray-400">
+                                              <span style={{ background: item.color }} className="w-2.5 h-2.5 rounded-full inline-block" />
+                                              {item.label}
+                                            </span>
+                                          ))}
+                                          <span className="ml-auto text-[9px] font-mono text-slate-400 dark:text-gray-500">
+                                            &copy; OpenStreetMap contributors
+                                          </span>
                                         </div>
                                     </div>
                                 </div>
