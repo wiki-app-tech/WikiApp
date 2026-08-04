@@ -23,7 +23,12 @@ import {
   Shield,
   FileCheck,
   ChevronRight,
-  Calculator
+  Calculator,
+  Send,
+  Bot,
+  User,
+  MessageSquare,
+  Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -53,7 +58,7 @@ interface LegalDocItem {
 }
 
 export default function BoletinesDashboard() {
-  const [activeMainTab, setActiveMainTab] = useState<'boletines' | 'guia_legal'>('boletines');
+  const [activeMainTab, setActiveMainTab] = useState<'boletines' | 'guia_legal' | 'asistente_ia'>('boletines');
   
   // Boletines state
   const [activePublisher, setActivePublisher] = useState<string>('all');
@@ -541,6 +546,70 @@ export default function BoletinesDashboard() {
     setTimeout(() => setShowShareToast(null), 3000);
   };
 
+  // Asistente IA Chatbot State
+  const [chatMessages, setChatMessages] = useState<Array<{
+    role: 'user' | 'assistant';
+    text: string;
+    sources?: Array<{ id: string; numero: string; publisher: string; fecha: string; pagina: number; score: number }>;
+  }>>([
+    {
+      role: 'assistant',
+      text: '¡Hola! Soy tu Asistente Legal Inteligente para los Boletines Oficiales de Tierra del Fuego. Pregúntame lo que necesites buscar dentro de la normativa o documentos oficiales, y te responderé con la cita de las fuentes correspondientes.',
+    }
+  ]);
+  const [chatInput, setChatInput] = useState('');
+  const [isChatLoading, setIsChatLoading] = useState(false);
+  const [chatPublisherFilter, setChatPublisherFilter] = useState('all');
+
+  const handleSendChatMessage = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const query = chatInput.trim();
+    if (!query) return;
+
+    const newMessages = [...chatMessages, { role: 'user' as const, text: query }];
+    setChatMessages(newMessages);
+    setChatInput('');
+    setIsChatLoading(true);
+
+    try {
+      const response = await fetch('/api/chat-boletines', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: query,
+          publisher: chatPublisherFilter,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al conectar con el servidor.');
+      }
+
+      const data = await response.json();
+      setChatMessages([
+        ...newMessages,
+        {
+          role: 'assistant',
+          text: data.answer,
+          sources: data.sources,
+        },
+      ]);
+    } catch (error: any) {
+      console.error('Error in chat request:', error);
+      setChatMessages([
+        ...newMessages,
+        {
+          role: 'assistant',
+          text: 'Lo siento, ocurrió un error al procesar tu consulta con la IA. Asegúrate de haber indexado los PDFs primero y que la API Key de Gemini esté configurada.',
+        },
+      ]);
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
+
   // Google Drive folder embed URL
   const driveEmbedUrl = `https://drive.google.com/embeddedfolderview?id=12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6#grid`;
 
@@ -564,37 +633,49 @@ export default function BoletinesDashboard() {
       className="flex flex-col gap-6 md:gap-8 pb-20 max-w-[100vw] overflow-x-hidden"
     >
       {/* SEGMENTED MAIN TABS */}
-      <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/5 max-w-md self-center md:self-start w-full">
+      <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/5 max-w-lg self-center md:self-start w-full">
         <button
           onClick={() => setActiveMainTab('boletines')}
-          className={`flex-1 py-2.5 px-4 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+          className={`flex-1 py-2.5 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
             activeMainTab === 'boletines' 
               ? 'bg-blue-600 text-white shadow-md' 
               : 'text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-white'
           }`}
         >
-          <div className="flex items-center justify-center gap-2">
-            <BookOpen className="w-4 h-4" />
-            Boletines Oficiales
+          <div className="flex items-center justify-center gap-1.5">
+            <BookOpen className="w-3.5 h-3.5" />
+            Boletines
           </div>
         </button>
         <button
           onClick={() => setActiveMainTab('guia_legal')}
-          className={`flex-1 py-2.5 px-4 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+          className={`flex-1 py-2.5 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
             activeMainTab === 'guia_legal' 
               ? 'bg-blue-600 text-white shadow-md' 
               : 'text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-white'
           }`}
         >
-          <div className="flex items-center justify-center gap-2">
-            <Scale className="w-4 h-4" />
-            Guía Legal TDF
+          <div className="flex items-center justify-center gap-1.5">
+            <Scale className="w-3.5 h-3.5" />
+            Guía Legal
+          </div>
+        </button>
+        <button
+          onClick={() => setActiveMainTab('asistente_ia')}
+          className={`flex-1 py-2.5 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+            activeMainTab === 'asistente_ia' 
+              ? 'bg-blue-600 text-white shadow-md' 
+              : 'text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-white'
+          }`}
+        >
+          <div className="flex items-center justify-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5" />
+            Asistente IA
           </div>
         </button>
       </div>
 
-      {activeMainTab === 'boletines' ? (
-        // ================= BOLETINES TAB =================
+      {activeMainTab === 'boletines' && (
         <>
           {/* HEADER */}
           <header className="flex flex-col gap-2">
@@ -941,8 +1022,9 @@ export default function BoletinesDashboard() {
             </div>
           )}
         </>
-      ) : (
-        // ================= GUIA LEGAL TAB =================
+      )}
+
+      {activeMainTab === 'guia_legal' && (
         <>
           {/* HEADER */}
           <header className="flex flex-col gap-2">
@@ -1153,6 +1235,206 @@ export default function BoletinesDashboard() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {activeMainTab === 'asistente_ia' && (
+        <>
+          {/* HEADER */}
+          <header className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-600/20 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-amber-500" />
+              </div>
+              <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase font-display">
+                Asistente Legal IA
+              </h1>
+            </div>
+            <p className="text-slate-500 dark:text-gray-400 text-sm max-w-2xl">
+              Realiza preguntas en lenguaje natural sobre el contenido de los Boletines Oficiales y obtén respuestas fundamentadas con citas de documentos oficiales.
+            </p>
+          </header>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch">
+            {/* Panel de control lateral del chat (1/4 col) */}
+            <div className="lg:col-span-1 bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-[2rem] p-5 flex flex-col gap-4 shadow-md">
+              <h3 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest flex items-center gap-2">
+                <Shield className="w-4 h-4 text-blue-500" /> Filtros del Asistente
+              </h3>
+              
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Organismo / Jurisdicción
+                </label>
+                <div className="flex flex-col gap-1.5">
+                  {[
+                    { id: 'all', label: 'Todos los Boletines', short: 'Todos' },
+                    { id: 'provincia', label: 'Gobierno Provincial (DeCoLey)', short: 'Provincial' },
+                    { id: 'ushuaia', label: 'Municipalidad de Ushuaia', short: 'Ushuaia' },
+                    { id: 'riogrande', label: 'Municipalidad de Río Grande', short: 'Río Grande' },
+                    { id: 'tolhuin', label: 'Municipalidad de Tolhuin', short: 'Tolhuin' },
+                  ].map(pub => (
+                    <button
+                      key={pub.id}
+                      onClick={() => setChatPublisherFilter(pub.id)}
+                      className={`w-full text-left px-3.5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all border ${
+                        chatPublisherFilter === pub.id
+                          ? 'bg-blue-600 border-blue-500 text-white shadow-sm'
+                          : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/10'
+                      }`}
+                    >
+                      {pub.short}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 dark:border-white/5 flex flex-col gap-2">
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Sugerencias de búsqueda:</span>
+                <div className="flex flex-col gap-1.5">
+                  {[
+                    '¿Cuáles son los requisitos de retiro de la Ley 819?',
+                    '¿Qué decretos regulan el tendido eléctrico en Tolhuin?',
+                    '¿Qué ordenanza regula el ordenamiento territorial en Ushuaia?',
+                    '¿Cómo se regula la reforestación nativa en el Lago Fagnano?'
+                  ].map((sug, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setChatInput(sug)}
+                      className="text-left text-[11px] text-slate-600 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 leading-snug p-2.5 bg-slate-50 dark:bg-white/5 rounded-xl hover:border-blue-500/20 border border-slate-200 dark:border-white/5 transition-all"
+                    >
+                      {sug}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Ventana de chat (3/4 col) */}
+            <div className="lg:col-span-3 bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-[2.5rem] flex flex-col justify-between h-[650px] shadow-2xl overflow-hidden">
+              {/* Chat Header */}
+              <div className="p-4 md:p-5 border-b border-slate-200 dark:border-[#1f1f1f] bg-slate-50/50 dark:bg-[#0a0a0a]/50 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                    <Bot className="w-4.5 h-4.5 text-blue-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">
+                      Asistente Virtual TDF
+                    </h3>
+                    <span className="text-[9px] font-bold text-emerald-500 uppercase flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Gemini 1.5 Flash Conectado
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setChatMessages([
+                    {
+                      role: 'assistant',
+                      text: '¡Hola! Soy tu Asistente Legal Inteligente para los Boletines Oficiales de Tierra del Fuego. Pregúntame lo que necesites buscar dentro de la normativa o documentos oficiales, y te responderé con la cita de las fuentes correspondientes.',
+                    }
+                  ])}
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-red-500/10 dark:bg-white/5 text-slate-500 hover:text-red-500 rounded-xl transition-all border border-slate-200 dark:border-white/5 text-[10px] font-black uppercase tracking-wider cursor-pointer"
+                >
+                  Limpiar Conversación
+                </button>
+              </div>
+
+              {/* Chat Messages */}
+              <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-4 bg-slate-50/30 dark:bg-black/10">
+                {chatMessages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`flex gap-3 max-w-[85%] ${
+                      msg.role === 'user' ? 'self-end flex-row-reverse' : 'self-start'
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border shadow-sm ${
+                      msg.role === 'user'
+                        ? 'bg-blue-600 border-blue-500 text-white'
+                        : 'bg-white dark:bg-[#1a1a1a] border-slate-200 dark:border-white/10 text-blue-500'
+                    }`}>
+                      {msg.role === 'user' ? <User className="w-4.5 h-4.5" /> : <Bot className="w-4.5 h-4.5" />}
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <div className={`p-4 rounded-3xl text-[12.5px] leading-relaxed shadow-sm ${
+                        msg.role === 'user'
+                          ? 'bg-blue-600 text-white rounded-tr-none'
+                          : 'bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-gray-200 rounded-tl-none'
+                      }`}>
+                        <div className="whitespace-pre-line font-medium">{msg.text}</div>
+                      </div>
+
+                      {/* Display Sources inside AI Response */}
+                      {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-1 px-1">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider self-center mr-1">
+                            Fuentes Citadas:
+                          </span>
+                          {msg.sources.map((src, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => {
+                                const pubInfo = publishersInfo.find(p => p.id === src.publisher);
+                                setPreviewFile({
+                                  title: src.numero,
+                                  url: pubInfo?.url || tdfDriveFolderUrl
+                                });
+                              }}
+                              className="px-2 py-1 bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg text-[9.5px] font-black uppercase tracking-wider border border-blue-500/20 hover:bg-blue-600 hover:text-white transition-all flex items-center gap-1 cursor-pointer"
+                              title={`Página ${src.pagina} | Confianza: ${src.score}%`}
+                            >
+                              <FileText className="w-3 h-3" />
+                              {src.numero} (Pág. {src.pagina})
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                {isChatLoading && (
+                  <div className="flex gap-3 self-start max-w-[80%]">
+                    <div className="w-8 h-8 rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/10 text-blue-500 flex items-center justify-center shrink-0 shadow-sm">
+                      <Loader2 className="w-4.5 h-4.5 animate-spin" />
+                    </div>
+                    <div className="bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/5 text-slate-450 dark:text-gray-400 rounded-3xl rounded-tl-none p-4 text-[12px] font-medium flex items-center gap-2 shadow-sm">
+                      <span>Procesando consulta en los boletines oficiales...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Chat Input Form */}
+              <form
+                onSubmit={handleSendChatMessage}
+                className="p-4 border-t border-slate-200 dark:border-[#1f1f1f] bg-slate-50/50 dark:bg-[#0a0a0a]/50 flex gap-3 items-center"
+              >
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    placeholder="Haz una pregunta sobre decretos, ordenanzas, leyes o retiros..."
+                    value={chatInput}
+                    onChange={e => setChatInput(e.target.value)}
+                    disabled={isChatLoading}
+                    className="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl py-3.5 pl-4 pr-12 text-[13px] font-medium text-slate-800 dark:text-gray-200 placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:opacity-50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isChatLoading || !chatInput.trim()}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all shadow-md disabled:opacity-30 disabled:hover:bg-blue-600 cursor-pointer"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </>

@@ -8,6 +8,7 @@ import WeatherDashboard from './WeatherDashboard';
 import RadioDashboard from './RadioDashboard';
 import BoletinesDashboard from './BoletinesDashboard';
 import TapasModal from './TapasModal';
+import TelegramFeed from './TelegramFeed';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import dynamic from 'next/dynamic';
@@ -189,23 +190,16 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
    const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   const [syncTime, setSyncTime] = useState('');
-  
-  React.useEffect(() => {
-    setMounted(true);
-    setTheme('light');
-    setSyncTime(new Date().toLocaleTimeString());
-    const interval = setInterval(() => {
-      setSyncTime(new Date().toLocaleTimeString());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [setTheme]);
+  const [activeShiftDay, setActiveShiftDay] = useState<number>(() => {
+    const now = new Date();
+    return now.getHours() < 9 ? new Date(now.getTime() - 24 * 60 * 60 * 1000).getDate() : now.getDate();
+  });
 
   const [pharmacies, setPharmacies] = useState<{ rio_grande: any[], tolhuin: any[], ushuaia: any[] } | null>(null);
   const [selectedPharmacyCity, setSelectedPharmacyCity] = useState<'ushuaia' | 'rio_grande' | 'tolhuin'>('ushuaia');
   const [activePharmacyIndex, setActivePharmacyIndex] = useState(0);
 
-  // Obtener farmacias
-  useEffect(() => {
+  const fetchPharmacies = () => {
     fetch('/api/pharmacies')
       .then(res => res.json())
       .then(data => {
@@ -218,7 +212,38 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         }
       })
       .catch(err => console.error("Error fetching pharmacies:", err));
-  }, []);
+  };
+
+  React.useEffect(() => {
+    setMounted(true);
+    setTheme('light');
+    setSyncTime(new Date().toLocaleTimeString());
+    
+    // Fetch inicial de farmacias
+    fetchPharmacies();
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      setSyncTime(now.toLocaleTimeString());
+      
+      // El turno de las farmacias comienza a las 09:00 AM.
+      // Si la hora es menor a 9, el turno activo corresponde al día anterior.
+      const currentShiftDay = now.getHours() < 9 
+        ? new Date(now.getTime() - 24 * 60 * 60 * 1000).getDate() 
+        : now.getDate();
+        
+      setActiveShiftDay(prev => {
+        if (prev !== currentShiftDay) {
+          // El día del turno activo cambió (ej. pasó de las 09:00 AM o cambió la fecha de calendario)
+          // Forzar la actualización automática de las farmacias
+          fetchPharmacies();
+          return currentShiftDay;
+        }
+        return prev;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [setTheme]);
 
   // Rotación del carrusel cada 5 segundos
   useEffect(() => {
@@ -229,11 +254,18 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
     return () => clearInterval(interval);
   }, [pharmacies, selectedPharmacyCity]);
 
+  const getActiveShiftDate = () => {
+    const now = new Date();
+    if (now.getHours() < 9) {
+      return new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    }
+    return now;
+  };
+
   const getVisiblePharmacies = (cityKey: 'ushuaia' | 'rio_grande' | 'tolhuin') => {
     if (!pharmacies || !pharmacies[cityKey] || pharmacies[cityKey].length === 0) return [];
     const list = pharmacies[cityKey];
-    const todayNum = new Date().getDate();
-    const todayIndex = list.findIndex(p => parseInt(p.fecha) === todayNum);
+    const todayIndex = list.findIndex(p => parseInt(p.fecha) === activeShiftDay);
     const startIndex = todayIndex === -1 ? 0 : todayIndex;
     
     const visible = [];
@@ -1138,8 +1170,30 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                 const pharmacy = visibleList[activePharmacyIndex];
                                                 if (!pharmacy) return null;
 
-                                                const isToday = parseInt(pharmacy.fecha) === new Date().getDate();
+                                                const pharmacyDayNum = parseInt(pharmacy.fecha);
+                                                const isCurrentShift = pharmacyDayNum === activeShiftDay;
+                                                
+                                                // Verificar si es el próximo turno (mañana del turno activo actual)
+                                                const shiftDate = getActiveShiftDate();
+                                                const tomorrow = new Date(shiftDate.getTime() + 24 * 60 * 60 * 1000);
+                                                const isNextShift = pharmacyDayNum === tomorrow.getDate();
+                                                
                                                 const formattedCityName = selectedPharmacyCity === 'ushuaia' ? 'Ushuaia' : selectedPharmacyCity === 'rio_grande' ? 'Río Grande' : 'Tolhuin';
+                                                
+                                                // Texto detallado y mejorado del período del turno
+                                                const getShiftPeriodText = () => {
+                                                    const now = new Date();
+                                                    if (isCurrentShift) {
+                                                        return now.getHours() < 9 
+                                                            ? 'De Turno: finaliza hoy a las 09:00 hs' 
+                                                            : 'De Turno: finaliza mañana a las 09:00 hs';
+                                                    } else if (isNextShift) {
+                                                        return now.getHours() < 9 
+                                                            ? 'Próximo turno: inicia hoy a las 09:00 hs' 
+                                                            : 'Próximo turno: inicia mañana a las 09:00 hs';
+                                                    }
+                                                    return pharmacy.horario;
+                                                };
 
                                                 return (
                                                     <motion.div
@@ -1152,14 +1206,16 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                     >
                                                         <div className="flex items-center justify-between">
                                                             <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
-                                                                isToday
+                                                                isCurrentShift
                                                                     ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 animate-pulse'
-                                                                    : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-gray-400'
+                                                                    : isNextShift
+                                                                        ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                                                        : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-gray-400'
                                                             }`}>
-                                                                {isToday ? 'Hoy de Turno' : `${pharmacy.dia} ${pharmacy.fecha}`}
+                                                                {isCurrentShift ? 'De Turno' : isNextShift ? 'Próximo Turno' : `${pharmacy.dia} ${pharmacy.fecha}`}
                                                             </span>
                                                             <span className="text-[9px] font-bold text-slate-500 dark:text-gray-500">
-                                                                {pharmacy.horario}
+                                                                {getShiftPeriodText()}
                                                             </span>
                                                         </div>
 
@@ -1234,6 +1290,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                       {/* SIDE PANEL REMOVED AND MOVED TO TOP DROPDOWN */}
                   </div>
+
+                  {activeTab === 'home' && <TelegramFeed />}
                 </div>
             )}
 
