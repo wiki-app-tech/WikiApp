@@ -171,11 +171,61 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
      }
    ]);
    const [flightsData, setFlightsData] = useState([
-     { id: 1, flight: 'AR 1886', airline: 'Aerolíneas Argentinas', route: 'AEP ➔ USH', status: 'En Pista', time: 'Llegó 14:23', type: 'Boeing 737-800' },
-     { id: 2, flight: 'AR 1898', airline: 'Aerolíneas Argentinas', route: 'FTE ➔ USH', status: 'En Vuelo', time: 'Previsto 15:40', type: 'Embraer 190' },
-     { id: 3, flight: 'AR 1866', airline: 'Aerolíneas Argentinas', route: 'AEP ➔ RGA', status: 'Programado', time: 'Mañana 02:20', type: 'Boeing 737-800' },
-     { id: 4, flight: 'WJ 3462', airline: 'JetSmart', route: 'AEP ➔ USH', status: 'En Vuelo', time: 'Previsto 16:15', type: 'Airbus A320' },
-     { id: 5, flight: 'FB 5120', airline: 'Flybondi', route: 'EPA ➔ USH', status: 'Programado', time: 'Hoy 18:10', type: 'Boeing 737-800' }
+     { 
+       id: 1, 
+       flight: 'AR 1886', 
+       airline: 'Aerolíneas Argentinas', 
+       route: 'AEP ➔ USH', 
+       status: 'En Pista', 
+       time: 'Llegó 14:23', 
+       type: 'Boeing 737-800',
+       image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=200&auto=format&fit=crop&q=60',
+       airlineUrl: 'https://www.aerolineas.com.ar'
+     },
+     { 
+       id: 2, 
+       flight: 'AR 1898', 
+       airline: 'Aerolíneas Argentinas', 
+       route: 'FTE ➔ USH', 
+       status: 'En Vuelo', 
+       time: 'Previsto 15:40', 
+       type: 'Embraer 190',
+       image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=200&auto=format&fit=crop&q=60',
+       airlineUrl: 'https://www.aerolineas.com.ar'
+     },
+     { 
+       id: 3, 
+       flight: 'AR 1866', 
+       airline: 'Aerolíneas Argentinas', 
+       route: 'AEP ➔ RGA', 
+       status: 'Programado', 
+       time: 'Mañana 02:20', 
+       type: 'Boeing 737-800',
+       image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=200&auto=format&fit=crop&q=60',
+       airlineUrl: 'https://www.aerolineas.com.ar'
+     },
+     { 
+       id: 4, 
+       flight: 'WJ 3462', 
+       airline: 'JetSmart', 
+       route: 'AEP ➔ USH', 
+       status: 'En Vuelo', 
+       time: 'Previsto 16:15', 
+       type: 'Airbus A320',
+       image: 'https://images.unsplash.com/photo-1517999144091-3d9dca6d1e43?w=200&auto=format&fit=crop&q=60',
+       airlineUrl: 'https://jetsmart.com'
+     },
+     { 
+       id: 5, 
+       flight: 'FB 5120', 
+       airline: 'Flybondi', 
+       route: 'EPA ➔ USH', 
+       status: 'Programado', 
+       time: 'Hoy 18:10', 
+       type: 'Boeing 737-800',
+       image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=200&auto=format&fit=crop&q=60',
+       airlineUrl: 'https://flybondi.com'
+     }
    ]);
 
    // Live Update Logistics Data
@@ -2089,26 +2139,53 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         <div className="flex flex-col gap-3.5 overflow-y-auto scrollbar-hide pr-1">
                                                             {flightsData.map(flight => (
                                                                 <div key={flight.id} className="bg-slate-50 dark:bg-[#161616]/40 border border-slate-200 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2.5 relative shadow-sm hover:border-orange-500/30 transition-all">
-                                                                    <div className="flex items-center justify-between">
-                                                                        <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
-                                                                            flight.status === 'En Pista' 
-                                                                                ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' 
-                                                                                : flight.status === 'En Vuelo'
-                                                                                ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20 animate-pulse'
-                                                                                : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-gray-400 border border-slate-350 dark:border-white/5'
-                                                                        }`}>
-                                                                            {flight.status}
-                                                                        </span>
+                                                                    <div className="flex items-center justify-between flex-wrap gap-2">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
+                                                                                flight.status === 'En Pista' 
+                                                                                    ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' 
+                                                                                    : flight.status === 'En Vuelo'
+                                                                                    ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20 animate-pulse'
+                                                                                    : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-gray-400 border border-slate-350 dark:border-white/5'
+                                                                            }`}>
+                                                                                {flight.status}
+                                                                            </span>
+                                                                            {flight.status === 'En Vuelo' && (
+                                                                                <a 
+                                                                                    href={`https://www.radarbox.com/data/flights/${flight.flight.replace(/\s+/g, '')}`} 
+                                                                                    target="_blank" 
+                                                                                    rel="noopener noreferrer"
+                                                                                    className="flex items-center gap-0.5 text-[8px] font-black uppercase text-orange-500 hover:text-orange-600 bg-orange-500/5 hover:bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded transition-all active:scale-95"
+                                                                                    title="Rastrear en RadarBox"
+                                                                                >
+                                                                                    Tracker <ExternalLink className="w-2 h-2" />
+                                                                                </a>
+                                                                            )}
+                                                                        </div>
                                                                         <span className="text-[9px] font-bold text-slate-500 dark:text-gray-500">{flight.time}</span>
                                                                     </div>
 
                                                                     <div className="flex items-center gap-3">
-                                                                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
-                                                                            <Plane className="w-5 h-5 text-orange-500" />
+                                                                        <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-200 dark:border-white/5 relative bg-orange-500/5 flex items-center justify-center">
+                                                                            {flight.image ? (
+                                                                                <img src={flight.image} alt={flight.flight} className="w-full h-full object-cover" />
+                                                                            ) : (
+                                                                                <Plane className="w-5 h-5 text-orange-500" />
+                                                                            )}
                                                                         </div>
-                                                                        <div className="flex min-w-0 flex-col">
+                                                                        <div className="flex min-w-0 flex-col justify-center">
                                                                             <span className="text-xs font-black text-slate-900 dark:text-white uppercase leading-tight italic truncate">{flight.flight}</span>
-                                                                            <span className="text-[10px] text-slate-500 dark:text-gray-400 truncate">{flight.airline}</span>
+                                                                            <span className="text-[9px] text-slate-500 dark:text-gray-400 truncate font-semibold">{flight.airline}</span>
+                                                                            {flight.airlineUrl && (
+                                                                                <a 
+                                                                                    href={flight.airlineUrl} 
+                                                                                    target="_blank" 
+                                                                                    rel="noopener noreferrer" 
+                                                                                    className="text-[8.5px] font-black text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300 uppercase tracking-wider mt-0.5 flex items-center gap-0.5 w-fit"
+                                                                                >
+                                                                                    Aerolínea <ExternalLink className="w-2.5 h-2.5" />
+                                                                                </a>
+                                                                            )}
                                                                         </div>
                                                                     </div>
 

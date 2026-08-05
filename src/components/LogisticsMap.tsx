@@ -131,50 +131,16 @@ export const MaritimeMap = () => (
 /* ─── COMPONENTE AÉREO ────────────────────────────────── */
 
 export const AirMap = () => (
-  <MapContainer
-    center={[-54.2, -67.8]}
-    zoom={8}
-    zoomControl={false}
-    className="w-full h-full z-0"
-    style={{ background: '#0a0a0a' }}
-  >
-    <ZoomControl position="bottomright" />
-
-    <TileLayer
-      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+  <div className="w-full h-full relative bg-[#0a0a0a]">
+    <iframe 
+      name="radarbox" 
+      id="radarbox" 
+      src="https://www.radarbox.com/widget?lat=-52.86061&lng=-62.04827&z=5&theme=dark&clicktoactive=false" 
+      width="100%" 
+      height="100%" 
+      frameBorder="0" 
+      style={{ border: 0 }}
+      title="RadarBox Live Flight Tracker"
     />
-
-    {AIR_POINTS.map((pt) => (
-      <React.Fragment key={pt.id}>
-        <Circle
-          center={[pt.lat, pt.lng]}
-          radius={pt.radius}
-          pathOptions={{
-            color: pt.color,
-            fillColor: pt.color,
-            fillOpacity: 0.12,
-            weight: 1.5,
-            dashArray: '4, 6',
-          }}
-        />
-        <Marker position={[pt.lat, pt.lng]} icon={createIcon(pt.emoji, pt.color)}>
-          <Popup>
-            <div className="flex flex-col gap-1 min-w-[170px] p-1 font-sans">
-              <strong className="text-sm font-bold border-b pb-1">{pt.name}</strong>
-              <span className="text-[11px] text-gray-600 mt-1 leading-snug">{pt.desc}</span>
-              <a
-                href={`https://www.openstreetmap.org/?mlat=${pt.lat}&mlon=${pt.lng}#map=14/${pt.lat}/${pt.lng}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 text-[10px] font-bold hover:underline mt-1"
-              >
-                Ver en OpenStreetMap →
-              </a>
-            </div>
-          </Popup>
-        </Marker>
-      </React.Fragment>
-    ))}
-  </MapContainer>
+  </div>
 );
