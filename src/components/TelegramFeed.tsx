@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Search, Calendar, Info, Shield, ExternalLink, CloudRain, Car, FileText, AlertTriangle } from 'lucide-react';
+import { Send, Search, Calendar, Info, Shield, ExternalLink, CloudRain, Car, FileText, AlertTriangle, BookOpen, Share2 } from 'lucide-react';
+import type { Article } from '@/types';
 
 interface TelegramMessage {
   id: number;
@@ -12,10 +13,35 @@ interface TelegramMessage {
   isImportant?: boolean;
 }
 
-export default function TelegramFeed() {
+interface TelegramFeedProps {
+  articles?: Article[];
+  onSelectArticle?: (article: Article) => void;
+}
+
+interface UnifiedFeedItem {
+  id: string;
+  date: Date;
+  timeStr: string;
+  sender: string;
+  category: 'clima' | 'transito' | 'institucional' | 'seguridad' | 'noticia';
+  title?: string;
+  content: string;
+  thumbnail?: string;
+  link?: string;
+  isImportant?: boolean;
+  rawArticle?: Article;
+}
+
+// Helper to strip HTML tags from RSS descriptions
+function stripHtml(html: string = '') {
+  return html.replace(/<[^>]*>/g, '').trim();
+}
+
+export default function TelegramFeed({ articles = [], onSelectArticle }: TelegramFeedProps) {
   const [searchTerm, setSearchTerm] = useState('');
   
-  const messages: TelegramMessage[] = [
+  // Alert messages (simulated official alerts)
+  const alerts: TelegramMessage[] = [
     {
       id: 1,
       date: '2026-08-04',
@@ -60,31 +86,69 @@ export default function TelegramFeed() {
       category: 'institucional',
       content: '🏥 CAMPAÑA DE VACUNACIÓN: Mañana inicia el cronograma de refuerzos de vacuna antigripal en todos los centros de salud provinciales (CAPS) de Ushuaia, Tolhuin y Río Grande. Presentarse con libreta de vacunación y DNI.',
       isImportant: false
-    },
-    {
-      id: 6,
-      date: '2026-08-01',
-      time: '08:40',
-      sender: 'Transporte de la Provincia',
-      category: 'transito',
-      content: '🚍 TRANSPORTE PÚBLICO: Demoras temporales de 15 minutos en los servicios interurbanos debido a la baja visibilidad y congelamiento de calzada en la salida sur de Río Grande. Las unidades circulan con precaución.',
-      isImportant: false
     }
   ];
 
-  const filteredMessages = useMemo(() => {
-    return messages.filter(msg =>
-      msg.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      msg.sender.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      msg.category.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [searchTerm, messages]);
+  // Merge alerts and news articles into a single chronological feed
+  const unifiedFeed = useMemo(() => {
+    const items: UnifiedFeedItem[] = [];
+
+    // Add alerts
+    alerts.forEach(alert => {
+      const dateObj = new Date(`${alert.date}T${alert.time}:00`);
+      items.push({
+        id: `alert-${alert.id}`,
+        date: dateObj,
+        timeStr: alert.time,
+        sender: alert.sender,
+        category: alert.category,
+        content: alert.content,
+        isImportant: alert.isImportant
+      });
+    });
+
+    // Add loaded news articles
+    articles.forEach(article => {
+      const dateObj = new Date(article.pubDate);
+      const timeStr = !isNaN(dateObj.getTime())
+        ? dateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+        : '00:00';
+
+      items.push({
+        id: `article-${article.id}`,
+        date: isNaN(dateObj.getTime()) ? new Date() : dateObj,
+        timeStr: timeStr,
+        sender: article.sourceName || 'Noticias TDF',
+        category: 'noticia',
+        title: article.title,
+        content: stripHtml(article.description),
+        thumbnail: article.thumbnail,
+        link: article.link,
+        rawArticle: article
+      });
+    });
+
+    // Sort by date descending (newest first)
+    return items.sort((a, b) => b.date.getTime() - a.date.getTime());
+  }, [articles]);
+
+  // Filter feed items by search input
+  const filteredFeed = useMemo(() => {
+    if (!searchTerm.trim()) return unifiedFeed.slice(0, 30); // limit to top 30 items for speed
+
+    return unifiedFeed.filter(item =>
+      item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.title && item.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      item.sender.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchTerm.toLowerCase())
+    ).slice(0, 30);
+  }, [searchTerm, unifiedFeed]);
 
   const getCategoryBadge = (category: string) => {
     switch (category) {
       case 'clima':
         return {
-          icon: <CloudRain className="w-3 h-3 text-sky-550" />,
+          icon: <CloudRain className="w-3 h-3 text-sky-500" />,
           classes: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20'
         };
       case 'transito':
@@ -102,6 +166,11 @@ export default function TelegramFeed() {
           icon: <Shield className="w-3 h-3 text-orange-500" />,
           classes: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20'
         };
+      case 'noticia':
+        return {
+          icon: <Send className="w-3 h-3 text-violet-500" />,
+          classes: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20'
+        };
       default:
         return {
           icon: <Info className="w-3 h-3 text-slate-500" />,
@@ -117,6 +186,7 @@ export default function TelegramFeed() {
       viewport={{ once: true }}
       className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl p-5 md:p-6 shadow-2xl flex flex-col gap-5 overflow-hidden w-full mt-6"
     >
+      {/* HEADER DE LA TARJETA */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100 dark:border-white/5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-blue-500/15 flex items-center justify-center relative shadow-inner">
@@ -129,23 +199,24 @@ export default function TelegramFeed() {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-sm md:text-base font-black text-slate-900 dark:text-white uppercase tracking-wider font-display">
-                Alertas TDF (Telegram Feed)
+                Últimas noticias
               </h2>
               <span className="hidden sm:inline-block px-2 py-0.5 bg-blue-600 text-white rounded-md text-[8px] font-black uppercase tracking-widest">
                 En Vivo
               </span>
             </div>
             <p className="text-slate-500 dark:text-gray-400 text-xs">
-              Repositorio de alertas oficiales y reportes urgentes indexados en tiempo real.
+              Repositorio de alertas oficiales y noticias provinciales en tiempo real.
             </p>
           </div>
         </div>
 
+        {/* Buscador y Botón de Unirse */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
             <input
               type="text"
-              placeholder="Buscar alertas..."
+              placeholder="Buscar noticias..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 rounded-xl py-2 pl-3 pr-8 text-xs font-medium text-slate-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 transition-all w-full sm:w-48"
@@ -164,30 +235,32 @@ export default function TelegramFeed() {
         </div>
       </div>
 
-      <div className="max-h-[350px] overflow-y-auto pr-1 flex flex-col gap-3.5 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-white/5">
+      {/* FEED DE MENSAJES */}
+      <div className="max-h-[420px] overflow-y-auto pr-1 flex flex-col gap-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-white/5">
         <AnimatePresence mode="popLayout">
-          {filteredMessages.map((msg, idx) => {
-            const badge = getCategoryBadge(msg.category);
+          {filteredFeed.map((item, idx) => {
+            const badge = getCategoryBadge(item.category);
             return (
               <motion.div
-                key={msg.id}
+                key={item.id}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 10 }}
                 transition={{ delay: Math.min(idx * 0.05, 0.3) }}
                 className={`p-4 rounded-2xl border transition-all flex flex-col gap-2.5 relative group ${
-                  msg.isImportant
+                  item.isImportant
                     ? 'bg-red-500/[0.02] border-red-500/25 dark:border-red-500/20'
                     : 'bg-slate-50/50 dark:bg-white/[0.01] border-slate-200 dark:border-white/5 hover:border-blue-500/20 dark:hover:border-blue-500/15'
                 }`}
               >
+                {/* Cabecera del mensaje */}
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-black uppercase text-slate-800 dark:text-white tracking-wider flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                      {msg.sender}
+                      {item.sender}
                     </span>
-                    {msg.isImportant && (
+                    {item.isImportant && (
                       <span className="text-[8px] font-black uppercase px-2 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded flex items-center gap-1">
                         <AlertTriangle className="w-2.5 h-2.5" /> Importante
                       </span>
@@ -195,44 +268,88 @@ export default function TelegramFeed() {
                   </div>
 
                   <div className="flex items-center gap-2">
+                    {/* Badge de Categoría */}
                     <div className={`px-2 py-0.5 rounded-md border text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${badge.classes}`}>
                       {badge.icon}
-                      {msg.category === 'clima' ? 'Clima' : msg.category === 'transito' ? 'Rutas' : msg.category === 'institucional' ? 'Gobierno' : 'Seguridad'}
+                      {item.category === 'clima' ? 'Clima' : item.category === 'transito' ? 'Rutas' : item.category === 'institucional' ? 'Gobierno' : item.category === 'seguridad' ? 'Seguridad' : 'Noticia'}
                     </div>
 
-                    <span className="text-[9px] text-slate-400 dark:text-gray-555 font-mono font-bold flex items-center gap-1">
+                    {/* Hora */}
+                    <span className="text-[9px] text-slate-400 dark:text-gray-500 font-mono font-bold flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
-                      {msg.time} hs
+                      {item.timeStr} hs
                     </span>
                   </div>
                 </div>
 
-                <p className="text-xs md:text-[12.5px] leading-relaxed text-slate-700 dark:text-gray-300 font-medium whitespace-pre-wrap">
-                  {msg.content}
-                </p>
+                {/* Contenido (con thumbnail si tiene) */}
+                <div className="flex flex-col md:flex-row gap-4 items-start">
+                  {item.thumbnail && (
+                    <div className="w-full md:w-40 aspect-[16/10] shrink-0 overflow-hidden rounded-xl relative shadow-md border border-slate-200 dark:border-white/5">
+                      <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div className="flex-1 flex flex-col gap-1.5">
+                    {item.title && (
+                      <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white leading-snug font-display">
+                        {item.title}
+                      </h3>
+                    )}
+                    <p className="text-xs md:text-[12.5px] leading-relaxed text-slate-700 dark:text-gray-300 font-medium whitespace-pre-wrap line-clamp-3">
+                      {item.content}
+                    </p>
+                  </div>
+                </div>
 
-                <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Pie con enlaces interactivos (Instant View / Open link / Share) */}
+                <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex flex-wrap gap-3 justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <span className="text-[8.5px] text-slate-400 dark:text-gray-500 uppercase tracking-widest font-mono">
-                    Canal ID: +rkKMfpVR3G0yMDBh
+                    {item.link ? 'Instant View disponible' : 'Canal ID: +rkKMfpVR3G0yMDBh'}
                   </span>
-                  <a
-                    href="https://t.me/+rkKMfpVR3G0yMDBh"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[9.5px] font-black uppercase text-blue-500 hover:text-blue-400 flex items-center gap-1 tracking-wider"
-                  >
-                    Ver en Telegram <ExternalLink className="w-3 h-3" />
-                  </a>
+                  
+                  <div className="flex items-center gap-3">
+                    {/* Botón de Vista Rápida (Instant View) */}
+                    {item.rawArticle && onSelectArticle && (
+                      <button
+                        onClick={() => onSelectArticle(item.rawArticle!)}
+                        className="flex items-center gap-1.5 text-[9.5px] font-black uppercase text-violet-500 hover:text-violet-400 transition-colors"
+                        title="Abrir vista de lectura limpia"
+                      >
+                        <BookOpen className="w-3.5 h-3.5" /> Vista Rápida
+                      </button>
+                    )}
+
+                    {/* Botón de Enlace Original */}
+                    {item.link ? (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[9.5px] font-black uppercase text-blue-500 hover:text-blue-400 flex items-center gap-1 tracking-wider transition-colors"
+                      >
+                        Ver Original <ExternalLink className="w-3 h-3" />
+                      </a>
+                    ) : (
+                      <a
+                        href="https://t.me/+rkKMfpVR3G0yMDBh"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[9.5px] font-black uppercase text-blue-500 hover:text-blue-400 flex items-center gap-1 tracking-wider transition-colors"
+                      >
+                        Ver en Telegram <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             );
           })}
         </AnimatePresence>
 
-        {filteredMessages.length === 0 && (
+        {filteredFeed.length === 0 && (
           <div className="text-center py-10 text-slate-400 dark:text-gray-500 flex flex-col items-center justify-center gap-2">
             <Send className="w-8 h-8 opacity-30 rotate-[345deg] text-blue-500 mb-1" />
-            <span className="text-xs font-black uppercase tracking-wider">No se encontraron alertas en el feed</span>
+            <span className="text-xs font-black uppercase tracking-wider">No se encontraron noticias ni alertas</span>
           </div>
         )}
       </div>

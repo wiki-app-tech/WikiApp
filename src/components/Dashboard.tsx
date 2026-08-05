@@ -1291,7 +1291,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                       {/* SIDE PANEL REMOVED AND MOVED TO TOP DROPDOWN */}
                   </div>
 
-                  {activeTab === 'home' && <TelegramFeed />}
+                  {activeTab === 'home' && <TelegramFeed articles={initialArticles} onSelectArticle={setSelectedArticle} />}
                 </div>
             )}
 
