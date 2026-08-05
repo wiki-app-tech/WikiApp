@@ -1,46 +1,50 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 @import "tailwindcss";
 
 @theme inline {
-  --color-surface-primary: #f8fafc;        /* slate-50 */
-  --color-surface-elevated: #ffffff;       /* white */
-  --color-surface-sunken: #f1f5f9;         /* slate-100 */
+  --color-surface-primary: #f2f5f9;        /* soft light blue-gray */
+  --color-surface-elevated: #ffffff;       /* clean white card */
+  --color-surface-sunken: #e9eff5;         /* slightly darker light gray */
   
-  --color-text-primary: #0f172a;           /* slate-900 */
-  --color-text-secondary: #334155;         /* slate-700 */
-  --color-text-tertiary: #64748b;          /* slate-500 (REFINED CONTRAST) */
+  --color-text-primary: #18283e;           /* TDF navy-black text */
+  --color-text-secondary: #4a5c73;         /* navy-gray text */
+  --color-text-tertiary: #7d90a8;          /* light navy-gray text */
   
-  --color-accent-primary: #2563eb;         /* blue-600 */
-  --color-accent-primary-hover: #1d4ed8;   /* blue-700 */
-  --color-accent-secondary: #10b981;       /* emerald-500 */
+  --color-accent-primary: #203553;         /* TDF Navy Blue */
+  --color-accent-primary-hover: #15263d;   /* darker TDF navy */
+  --color-accent-secondary: #1e73be;       /* TDF Secondary Blue */
   
-  --color-border-subtle: #e2e8f0;          /* slate-200 */
+  --color-border-subtle: #dbe3ed;          /* soft border color */
   --color-border-hover: #cbd5e1;           /* slate-300 */
   
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: 'Outfit', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Barlow', 'Outfit', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
   --radius-3xl: 2rem;
 
-  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  --shadow-premium: 0 10px 30px -10px rgba(32, 53, 83, 0.08), 0 4px 6px -4px rgba(32, 53, 83, 0.04);
+  --shadow-glass: 0 8px 32px 0 rgba(32, 53, 83, 0.05);
 }
 
 [data-theme='dark'] {
-  --color-surface-primary: #020617;        /* slate-950 */
-  --color-surface-elevated: #0f172a;       /* slate-900 */
-  --color-surface-sunken: #020617;         /* slate-950 */
+  --color-surface-primary: #0a0f18;        /* TDF dark navy background */
+  --color-surface-elevated: #111a28;       /* TDF main navy container */
+  --color-surface-sunken: #060910;         /* deeper TDF dark navy */
 
-  --color-text-primary: #f8fafc;           /* slate-50 */
+  --color-text-primary: #f1f5f9;           /* soft light slate */
   --color-text-secondary: #cbd5e1;         /* slate-300 */
-  --color-text-tertiary: #94a3b8;          /* slate-400 */
+  --color-text-tertiary: #8fa3b9;          /* slate-400 */
 
-  --color-border-subtle: #1e293b;          /* slate-800 */
-  --color-border-hover: #334155;           /* slate-700 */
+  --color-border-subtle: #202d41;          /* TDF dark border blue */
+  --color-border-hover: #2c3e56;           /* TDF hover dark border */
+  
+  --color-accent-primary: #bde80a;         /* lime green accent color for modern police contrast */
+  --color-accent-primary-hover: #a8cf07;   /* hover lime green */
+  --color-accent-secondary: #3b82f6;       /* bright blue secondary */
   
   --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
   --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);

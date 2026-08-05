@@ -60,25 +60,28 @@ const AirMap = dynamic(
 );
 
 const WikiAppLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
-  <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 120 120" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <linearGradient id="logo-gradient-wa" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#3b82f6" />
-        <stop offset="100%" stopColor="#10b981" />
+      <linearGradient id="tdf-blue-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#1e73be" />
+        <stop offset="100%" stopColor="#203553" />
+      </linearGradient>
+      <linearGradient id="tdf-orange-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#ff9a00" />
+        <stop offset="100%" stopColor="#ff5a00" />
       </linearGradient>
     </defs>
     <path 
-      d="M20 38 L35 72 L48 42 L61 72 L76 38" 
-      stroke="url(#logo-gradient-wa)" 
-      strokeWidth="10" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
+      d="M20 20 C20 20, 60 40, 60 100 C60 100, 20 80, 20 20" 
+      fill="url(#tdf-blue-grad)" 
     />
     <path 
-      d="M52 53 L68 53" 
-      stroke="url(#logo-gradient-wa)" 
-      strokeWidth="10" 
-      strokeLinecap="round" 
+      d="M100 20 C100 20, 60 40, 60 100 C60 100, 100 80, 100 20" 
+      fill="url(#tdf-orange-grad)" 
+    />
+    <path 
+      d="M60 15 C55 35, 45 45, 20 50 C45 55, 55 65, 60 105 C65 65, 75 55, 100 50 C75 45, 65 35, 60 15 Z" 
+      fill="#ffffff" 
     />
   </svg>
 );
@@ -509,7 +512,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   }, [filteredArticles, topVisualArticles, activeTab, search]);
 
   return (
-    <div className="flex h-screen max-w-[100vw] bg-slate-50 dark:bg-[#070707] text-slate-800 dark:text-[#e0e0e0] font-sans overflow-hidden transition-colors duration-200 relative selection:bg-blue-500/30">
+    <div className="flex h-screen max-w-[100vw] bg-surface-primary text-text-primary font-sans overflow-hidden transition-colors duration-200 relative selection:bg-accent-primary/30">
       {/* Animated Mesh Gradient Background */}
       <div className="absolute inset-0 z-0 opacity-[0.08] dark:opacity-20 pointer-events-none overflow-hidden">
         <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-blue-600/40 dark:bg-blue-600/30 rounded-full blur-[120px] animate-pulse"></div>
@@ -525,11 +528,11 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         animate={{ width: isSidebarExpanded ? 240 : 72 }}
         onMouseEnter={() => setIsSidebarExpanded(true)}
         onMouseLeave={() => setIsSidebarExpanded(false)}
-        className="bg-white/80 dark:bg-[#0c0c0c]/80 backdrop-blur-2xl border-r border-slate-200 dark:border-white/5 hidden lg:flex flex-col items-center shrink-0 z-50 py-4 gap-6 overflow-hidden shadow-2xl transition-all duration-300 ease-in-out"
+        className="bg-surface-elevated/80 backdrop-blur-2xl border-r border-border-subtle hidden lg:flex flex-col items-center shrink-0 z-50 py-4 gap-6 overflow-hidden shadow-premium transition-all duration-300 ease-in-out"
       >
         <div className="flex items-center gap-4 w-full px-4 mb-4">
           <div className="cursor-pointer group hover:scale-105 transition-transform shrink-0">
-            <WikiAppLogo className="w-10 h-10 drop-shadow-[0_0_10px_rgba(59,130,246,0.25)]" />
+            <WikiAppLogo className="w-10 h-10 drop-shadow-[0_0_10px_rgba(30,115,190,0.25)]" />
           </div>
           <AnimatePresence>
             {isSidebarExpanded && (
@@ -537,9 +540,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
-                className="text-lg font-black tracking-tighter text-slate-900 dark:text-white whitespace-nowrap font-display"
+                className="text-lg font-black tracking-tighter text-text-primary whitespace-nowrap font-display"
               >
-                WA <span className="text-blue-500">PRO</span>
+                WA <span className="text-accent-secondary dark:text-accent-primary">PRO</span>
               </motion.span>
             )}
           </AnimatePresence>
@@ -559,9 +562,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
             <button 
               key={item.id}
               onClick={() => setActiveTab(item.id)} 
-              className={`relative w-full flex items-center gap-4 px-3 py-3 rounded-xl group transition-all duration-200 ${activeTab === item.id ? (item.id === 'security' ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-500') : 'text-slate-500 dark:text-gray-500 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+              className={`relative w-full flex items-center gap-4 px-3 py-3 rounded-xl group transition-all duration-200 ${activeTab === item.id ? (item.id === 'security' ? 'bg-red-500/10 text-red-500' : 'bg-accent-primary/10 text-accent-primary dark:text-accent-primary') : 'text-text-secondary dark:text-text-tertiary hover:bg-surface-sunken'}`}
             >
-              <item.icon className={`w-5 h-5 shrink-0 ${activeTab === item.id ? (item.color || 'text-blue-500') : 'group-hover:scale-110 transition-transform'}`} />
+              <item.icon className={`w-5 h-5 shrink-0 ${activeTab === item.id ? (item.color || 'text-accent-primary') : 'group-hover:scale-110 transition-transform'}`} />
               
               <AnimatePresence>
                 {isSidebarExpanded && (
@@ -580,19 +583,19 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
               {activeTab === item.id && (
                 <motion.div 
                   layoutId="active-nav-indicator"
-                  className={`absolute left-0 w-1 h-6 rounded-r-full ${item.id === 'security' ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]'}`} 
+                  className={`absolute left-0 w-1 h-6 rounded-r-full ${item.id === 'security' ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-accent-primary shadow-[0_0_10px_rgba(189,232,10,0.5)]'}`} 
                 />
               )}
             </button>
           ))}
         </nav>
 
-        <div className="w-full px-2 space-y-1 pb-4 border-t border-slate-200 dark:border-white/5 pt-4">
-            <button className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-slate-500 dark:text-gray-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-all group">
+        <div className="w-full px-2 space-y-1 pb-4 border-t border-border-subtle pt-4">
+            <button className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-text-secondary hover:bg-surface-sunken transition-all group">
               <Search className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
               {isSidebarExpanded && <span className="text-[13px] font-bold">Búsqueda Rápida</span>}
             </button>
-            <button className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-slate-500 dark:text-gray-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-all group">
+            <button className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-text-secondary hover:bg-surface-sunken transition-all group">
               <Settings className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
               {isSidebarExpanded && <span className="text-[13px] font-bold">Configuración</span>}
             </button>
@@ -603,19 +606,19 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
       <main className="flex-1 flex flex-col min-w-0 relative">
         
         {/* PREMIUM TOP NAVIGATION */}
-        <div className="px-3 py-2 md:px-8 md:py-3.5 shrink-0 z-30 sticky top-0 bg-white/60 dark:bg-[#070707]/60 backdrop-blur-2xl border-b border-slate-200 dark:border-white/10 shadow-glass safe-top">
+        <div className="px-3 py-2 md:px-8 md:py-3.5 shrink-0 z-30 sticky top-0 bg-surface-elevated/70 backdrop-blur-2xl border-b border-border-subtle shadow-glass safe-top">
             <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className="flex items-center gap-3">
                    <div className="lg:hidden mr-2 shrink-0">
                       <WikiAppLogo className="w-10 h-10" />
                    </div>
                    <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3">
-                      <h1 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase font-display">
-                         WA <span className="text-[10px] bg-blue-500/20 px-2 py-0.5 rounded-full text-blue-500 font-black border border-blue-500/20 ml-1">PRO</span>
+                      <h1 className="text-xl md:text-2xl font-black text-text-primary tracking-tighter uppercase font-display">
+                         WA <span className="text-[10px] bg-accent-primary/20 px-2 py-0.5 rounded-full text-accent-primary font-black border border-accent-primary/20 ml-1">PRO</span>
                       </h1>
                       <div className="flex items-center gap-2">
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 hidden lg:block" />
-                        <span className="text-[10px] md:text-[11px] font-bold text-slate-500 dark:text-gray-400 uppercase tracking-[0.2em] font-mono hidden sm:block">
+                        <ChevronRight className="w-3.5 h-3.5 text-text-tertiary hidden lg:block" />
+                        <span className="text-[10px] md:text-[11px] font-bold text-text-tertiary uppercase tracking-[0.2em] font-mono hidden sm:block">
                             {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'boletines' ? 'Boletines Oficiales' : activeTab === 'security' ? 'Centro de Auditoría' : activeTab === 'logistics' ? 'Control de Tráfico' : activeTab === 'radio' ? 'Dial Fueguino' : 'Sistema'}
                         </span>
                       </div>
