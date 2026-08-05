@@ -104,11 +104,71 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
    const [isAutoCycle, setIsAutoCycle] = useState(true);
    const [secondsToUpdate, setSecondsToUpdate] = useState(15);
    const [shipsData, setShipsData] = useState([
-     { id: 1, name: 'EZEQUIEL MB', type: 'Catamarán de Pasajeros', status: 'En Puerto', time: 'Hoy, 17:51', flag: 'AR', speed: '0.0 kn', destination: 'Ushuaia' },
-     { id: 2, name: 'ASTURIANO III', type: 'Portacontenedores', status: 'En Ruta', time: 'Mañana, 06:00', flag: 'AR', speed: '12.4 kn', destination: 'Ushuaia' },
-     { id: 3, name: 'STELLA AUSTRALIS', type: 'Crucero Expedition', status: 'Arribando', time: 'Hoy, 20:30', flag: 'CL', speed: '9.8 kn', destination: 'Ushuaia' },
-     { id: 4, name: 'ALBATROS', type: 'Pesquero Congelador', status: 'En Puerto', time: 'Ayer, 22:40', flag: 'AR', speed: '0.0 kn', destination: 'Ushuaia' },
-     { id: 5, name: 'MAPOCHO', type: 'Remolcador de Altura', status: 'En Puerto', time: 'Hoy, 09:15', flag: 'CL', speed: '0.0 kn', destination: 'Río Grande' }
+     { 
+       id: 1, 
+       name: 'EZEQUIEL MB', 
+       type: 'Catamarán de Pasajeros', 
+       status: 'En Puerto', 
+       time: 'Hoy, 17:51', 
+       flag: 'AR', 
+       speed: '0.0 kn', 
+       destination: 'Ushuaia',
+       image: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=200&auto=format&fit=crop&q=60',
+       agencyName: 'Rumbo Sur S.A.',
+       agencyUrl: 'https://rumbosur.com.ar'
+     },
+     { 
+       id: 2, 
+       name: 'ASTURIANO III', 
+       type: 'Portacontenedores', 
+       status: 'En Ruta', 
+       time: 'Mañana, 06:00', 
+       flag: 'AR', 
+       speed: '12.4 kn', 
+       destination: 'Ushuaia',
+       image: 'https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?w=200&auto=format&fit=crop&q=60',
+       agencyName: 'Agencia Marítima Robinson',
+       agencyUrl: 'https://www.robinson.com.ar'
+     },
+     { 
+       id: 3, 
+       name: 'STELLA AUSTRALIS', 
+       type: 'Crucero Expedition', 
+       status: 'Arribando', 
+       time: 'Hoy, 20:30', 
+       flag: 'CL', 
+       speed: '9.8 kn', 
+       destination: 'Ushuaia',
+       image: 'https://images.unsplash.com/photo-1548574505-5e239809ee19?w=200&auto=format&fit=crop&q=60',
+       agencyName: 'Australis Cruceros',
+       agencyUrl: 'https://www.australis.com'
+     },
+     { 
+       id: 4, 
+       name: 'ALBATROS', 
+       type: 'Pesquero Congelador', 
+       status: 'En Puerto', 
+       time: 'Ayer, 22:40', 
+       flag: 'AR', 
+       speed: '0.0 kn', 
+       destination: 'Ushuaia',
+       image: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=200&auto=format&fit=crop&q=60',
+       agencyName: 'Pesquera del Fuego S.A.',
+       agencyUrl: 'https://www.interpatagonia.com/ushuaia/agencias-maritimas.html'
+     },
+     { 
+       id: 5, 
+       name: 'MAPOCHO', 
+       type: 'Remolcador de Altura', 
+       status: 'En Puerto', 
+       time: 'Hoy, 09:15', 
+       flag: 'CL', 
+       speed: '0.0 kn', 
+       destination: 'Río Grande',
+       image: 'https://images.unsplash.com/photo-1505242859157-562219b06ad7?w=200&auto=format&fit=crop&q=60',
+       agencyName: 'Agencia Marítima Ushuaia',
+       agencyUrl: 'https://www.agenciamaritimaushuaia.com'
+     }
    ]);
    const [flightsData, setFlightsData] = useState([
      { id: 1, flight: 'AR 1886', airline: 'Aerolíneas Argentinas', route: 'AEP ➔ USH', status: 'En Pista', time: 'Llegó 14:23', type: 'Boeing 737-800' },
@@ -1942,26 +2002,53 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         <div className="flex flex-col gap-3.5 overflow-y-auto scrollbar-hide pr-1">
                                                             {shipsData.map(ship => (
                                                                 <div key={ship.id} className="bg-slate-50 dark:bg-[#161616]/40 border border-slate-200 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2.5 relative shadow-sm hover:border-blue-500/30 transition-all">
-                                                                    <div className="flex items-center justify-between">
-                                                                        <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
-                                                                            ship.status === 'En Puerto' 
-                                                                                ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' 
-                                                                                : ship.status === 'Arribando'
-                                                                                ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse'
-                                                                                : 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20'
-                                                                        }`}>
-                                                                            {ship.status}
-                                                                        </span>
+                                                                    <div className="flex items-center justify-between flex-wrap gap-2">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
+                                                                                ship.status === 'En Puerto' 
+                                                                                    ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' 
+                                                                                    : ship.status === 'Arribando'
+                                                                                    ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse'
+                                                                                    : 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+                                                                            }`}>
+                                                                                {ship.status}
+                                                                            </span>
+                                                                            {ship.status !== 'En Puerto' && (
+                                                                                <a 
+                                                                                    href={`https://www.vesselfinder.com/vessels?name=${encodeURIComponent(ship.name)}`} 
+                                                                                    target="_blank" 
+                                                                                    rel="noopener noreferrer"
+                                                                                    className="flex items-center gap-0.5 text-[8px] font-black uppercase text-rose-500 hover:text-rose-600 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded transition-all active:scale-95"
+                                                                                    title="Rastrear en VesselFinder"
+                                                                                >
+                                                                                    Tracker <ExternalLink className="w-2 h-2" />
+                                                                                </a>
+                                                                            )}
+                                                                        </div>
                                                                         <span className="text-[9px] font-bold text-slate-500 dark:text-gray-500">{ship.time}</span>
                                                                     </div>
 
                                                                     <div className="flex items-center gap-3">
-                                                                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
-                                                                            <Anchor className="w-5 h-5 text-blue-500" />
+                                                                        <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-200 dark:border-white/5 relative bg-blue-500/5 flex items-center justify-center">
+                                                                            {ship.image ? (
+                                                                                <img src={ship.image} alt={ship.name} className="w-full h-full object-cover" />
+                                                                            ) : (
+                                                                                <Anchor className="w-5 h-5 text-blue-500" />
+                                                                            )}
                                                                         </div>
-                                                                        <div className="flex min-w-0 flex-col">
+                                                                        <div className="flex min-w-0 flex-col justify-center">
                                                                             <span className="text-xs font-black text-slate-900 dark:text-white uppercase leading-tight truncate">{ship.name}</span>
-                                                                            <span className="text-[10px] text-slate-500 dark:text-gray-400 truncate">{ship.type}</span>
+                                                                            <span className="text-[9px] text-slate-500 dark:text-gray-400 truncate font-semibold">{ship.type}</span>
+                                                                            {ship.agencyName && ship.agencyUrl && (
+                                                                                <a 
+                                                                                    href={ship.agencyUrl} 
+                                                                                    target="_blank" 
+                                                                                    rel="noopener noreferrer" 
+                                                                                    className="text-[8.5px] font-black text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 uppercase tracking-wider mt-0.5 flex items-center gap-0.5 w-fit"
+                                                                                >
+                                                                                    Agencia: {ship.agencyName} <ExternalLink className="w-2.5 h-2.5" />
+                                                                                </a>
+                                                                            )}
                                                                         </div>
                                                                     </div>
 

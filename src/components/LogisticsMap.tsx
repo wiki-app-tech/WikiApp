@@ -114,54 +114,18 @@ const AIR_POINTS = [
 /* ─── COMPONENTE MARÍTIMO ─────────────────────────────── */
 
 export const MaritimeMap = () => (
-  <MapContainer
-    center={[-54.4, -68.0]}
-    zoom={8}
-    zoomControl={false}
-    className="w-full h-full z-0"
-    style={{ background: '#0a0a0a' }}
-  >
-    <ZoomControl position="bottomright" />
-
-    {/* Capa base OSM estándar */}
-    <TileLayer
-      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+  <div className="w-full h-full relative bg-[#0a0a0a]">
+    <iframe 
+      name="vesselfinder" 
+      id="vesselfinder" 
+      src="https://www.vesselfinder.com/aismap?zoom=9&lat=-54.81&lon=-68.3&width=100%&height=100%&names=true&show_track=true&clicktoactive=false" 
+      width="100%" 
+      height="100%" 
+      frameBorder="0" 
+      style={{ border: 0 }}
+      title="VesselFinder Live AIS Map"
     />
-
-    {MARITIME_POINTS.map((pt) => (
-      <React.Fragment key={pt.id}>
-        {/* Radio de zona de influencia */}
-        <Circle
-          center={[pt.lat, pt.lng]}
-          radius={pt.radius}
-          pathOptions={{
-            color: pt.color,
-            fillColor: pt.color,
-            fillOpacity: 0.10,
-            weight: 1.5,
-            dashArray: '4, 6',
-          }}
-        />
-        <Marker position={[pt.lat, pt.lng]} icon={createIcon(pt.emoji, pt.color)}>
-          <Popup>
-            <div className="flex flex-col gap-1 min-w-[170px] p-1 font-sans">
-              <strong className="text-sm font-bold border-b pb-1">{pt.name}</strong>
-              <span className="text-[11px] text-gray-600 mt-1 leading-snug">{pt.desc}</span>
-              <a
-                href={`https://www.openstreetmap.org/?mlat=${pt.lat}&mlon=${pt.lng}#map=14/${pt.lat}/${pt.lng}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 text-[10px] font-bold hover:underline mt-1"
-              >
-                Ver en OpenStreetMap →
-              </a>
-            </div>
-          </Popup>
-        </Marker>
-      </React.Fragment>
-    ))}
-  </MapContainer>
+  </div>
 );
 
 /* ─── COMPONENTE AÉREO ────────────────────────────────── */
