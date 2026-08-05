@@ -226,6 +226,54 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
     }
   };
 
+  // Helper to quick share directly from a carousel card
+  const handleQuickShare = async (item: TapasItem, platform: 'whatsapp' | 'telegram') => {
+    const userHeadline = prompt(`Ingrese el titular principal de ${item.name} para compartir (opcional):`) || '';
+    const userSummary = prompt(`Ingrese una frase resumen o comentario (opcional):`) || '';
+
+    const categoryLabel = 
+      item.category === 'provinciales' ? 'Provincial (Tierra del Fuego)' :
+      item.category === 'nacionales' ? 'Nacional (Argentina)' : 'Internacional';
+
+    const textParts = [
+      `📰 *${item.name.toUpperCase()}*`,
+      `📅 Fecha: ${item.date}`,
+      `📍 Sección: ${categoryLabel}`,
+      `\n🔥 *TITULAR:* ${userHeadline || 'Tapa del día'}`,
+    ];
+    if (userSummary) {
+      textParts.push(`📝 _${userSummary}_`);
+    }
+    
+    const shareText = textParts.join('\n');
+
+    if (navigator.share && navigator.canShare) {
+      try {
+        const response = await fetch(item.coverUrl);
+        const blob = await response.blob();
+        const file = new File([blob], `${item.id}-tapa.jpg`, { type: 'image/jpeg' });
+        
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: `Tapa de ${item.name}`,
+            text: shareText,
+          });
+          return;
+        }
+      } catch (err) {
+        console.warn('Native share failed or aborted', err);
+      }
+    }
+
+    const encodedText = encodeURIComponent(shareText + `\n\nVer portada: ${item.coverUrl}`);
+    if (platform === 'whatsapp') {
+      window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
+    } else {
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(item.coverUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -365,7 +413,11 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                           </div>
                         </div>
 
-                        <div className="p-4 flex flex-col justify-between flex-grow gap-2">
+                        <div className="p-4 flex flex-col justify-between flex-grow gap-2" onClick={(e) => {
+                          if ((e.target as HTMLElement).closest('.share-btn')) {
+                            e.stopPropagation();
+                          }
+                        }}>
                           <div>
                             <h3 className="text-sm font-black text-white leading-tight group-hover:text-blue-400 transition-colors uppercase">
                               {item.name}
@@ -374,9 +426,27 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                               Edición: {item.date}
                             </span>
                           </div>
-                          <button className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg mt-2 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 duration-300">
-                            Visualizar Detalle
-                          </button>
+
+                          <div className="flex gap-1.5 mt-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleQuickShare(item, 'whatsapp');
+                              }}
+                              className="share-btn flex-1 py-1.5 bg-emerald-600/90 hover:bg-emerald-550 text-white rounded-xl text-[9px] font-black uppercase tracking-wider transition-all text-center"
+                            >
+                              WhatsApp
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleQuickShare(item, 'telegram');
+                              }}
+                              className="share-btn flex-1 py-1.5 bg-sky-600/90 hover:bg-sky-550 text-white rounded-xl text-[9px] font-black uppercase tracking-wider transition-all text-center"
+                            >
+                              Telegram
+                            </button>
+                          </div>
                         </div>
                       </motion.div>
                     ))}
