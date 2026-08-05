@@ -29,6 +29,8 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
 
   const [activeCategory, setActiveCategory] = useState<'internacionales' | 'nacionales' | 'provinciales'>('internacionales');
   const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
+  const [headline, setHeadline] = useState('');
+  const [summary, setSummary] = useState('');
   
   // Zoom & Pan state for the detail viewer
   const [zoom, setZoom] = useState(1);
@@ -58,10 +60,12 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
   const currentList = data[activeCategory] || [];
   const selectedItem = selectedItemIndex !== null ? currentList[selectedItemIndex] : null;
 
-  // Reset zoom & pan when switching selected newspaper
+  // Reset zoom, pan & inputs when switching selected newspaper
   useEffect(() => {
     setZoom(1);
     setPan({ x: 0, y: 0 });
+    setHeadline('');
+    setSummary('');
   }, [selectedItemIndex, activeCategory]);
 
   // Keyboard navigation & zoom
@@ -172,6 +176,53 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
     } catch (e) {
       // Fallback: open in new tab
       window.open(url, '_blank');
+    }
+  };
+
+  // Helper to share to Telegram and WhatsApp
+  const handleShare = async (platform: 'whatsapp' | 'telegram') => {
+    if (!selectedItem) return;
+
+    const categoryLabel = 
+      selectedItem.category === 'provinciales' ? 'Provincial (Tierra del Fuego)' :
+      selectedItem.category === 'nacionales' ? 'Nacional (Argentina)' : 'Internacional';
+
+    const textParts = [
+      `📰 *${selectedItem.name.toUpperCase()}*`,
+      `📅 Fecha: ${selectedItem.date}`,
+      `📍 Sección: ${categoryLabel}`,
+      `\n🔥 *TITULAR:* ${headline || 'Tapa del día'}`,
+    ];
+    if (summary) {
+      textParts.push(`📝 _${summary}_`);
+    }
+    
+    const shareText = textParts.join('\n');
+
+    if (navigator.share && navigator.canShare) {
+      try {
+        const response = await fetch(selectedItem.coverUrl);
+        const blob = await response.blob();
+        const file = new File([blob], `${selectedItem.id}-tapa.jpg`, { type: 'image/jpeg' });
+        
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: `Tapa de ${selectedItem.name}`,
+            text: shareText,
+          });
+          return;
+        }
+      } catch (err) {
+        console.warn('Native share failed or aborted', err);
+      }
+    }
+
+    const encodedText = encodeURIComponent(shareText + `\n\nVer portada: ${selectedItem.coverUrl}`);
+    if (platform === 'whatsapp') {
+      window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
+    } else {
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(selectedItem.coverUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
     }
   };
 
@@ -436,14 +487,53 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                           </p>
                         </div>
 
+                        {/* Compartir Portada */}
+                        <div className="bg-white/5 border border-white/10 p-3.5 rounded-2xl flex flex-col gap-3">
+                          <span className="text-[9px] font-black uppercase text-blue-400 tracking-wider">Compartir Portada</span>
+                          
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[8px] font-black uppercase text-gray-400 tracking-wider">Titular Principal</label>
+                            <input 
+                              type="text" 
+                              value={headline} 
+                              onChange={(e) => setHeadline(e.target.value)} 
+                              placeholder="Titular destacado..." 
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                            />
+                          </div>
+                          
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[8px] font-black uppercase text-gray-400 tracking-wider">Breve Frase / Comentario</label>
+                            <textarea 
+                              value={summary} 
+                              onChange={(e) => setSummary(e.target.value)} 
+                              placeholder="Breve comentario..." 
+                              rows={2}
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                            />
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-2 mt-1">
+                            <button
+                              onClick={() => handleShare('whatsapp')}
+                              className="py-2 bg-emerald-600 hover:bg-emerald-550 active:scale-95 transition-all text-white rounded-xl text-[9px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow"
+                            >
+                              WhatsApp
+                            </button>
+                            <button
+                              onClick={() => handleShare('telegram')}
+                              className="py-2 bg-sky-600 hover:bg-sky-550 active:scale-95 transition-all text-white rounded-xl text-[9px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow"
+                            >
+                              Telegram
+                            </button>
+                          </div>
+                        </div>
+
                         {/* Reading Advice */}
                         <div className="bg-white/5 border border-white/5 p-3 md:p-4 rounded-2xl flex flex-col gap-1.5 hidden md:flex">
                           <span className="text-[9px] font-black uppercase text-blue-400 tracking-wider">Modo Lectura Activo</span>
                           <p className="text-[11px] text-gray-400 leading-relaxed">
                             Arrastre para desplazarse cuando el zoom esté activo.
-                          </p>
-                          <p className="text-[11px] text-gray-500 leading-relaxed mt-1">
-                            Doble clic para zoom rápido 200%.
                           </p>
                         </div>
                       </div>
