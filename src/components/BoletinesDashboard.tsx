@@ -32,17 +32,29 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+interface PoliceAnalysis {
+  norma: string;
+  queDice: string;
+  queCambia: string;
+  queImpacta: string;
+  articulos: string;
+  hasImpact: boolean;
+  noImpactList?: Array<{ titulo: string; acto: string; fecha: string }>;
+}
+
 interface BulletinItem {
   id: string;
   type: 'decreto' | 'ley' | 'ordenanza' | 'resolucion' | 'general';
   number: string;
   date: string;
   year: string;
+  month: string;
   title: string;
   summary?: string;
   publisher: 'provincia' | 'legislativo' | 'ushuaia' | 'riogrande' | 'tolhuin';
   url: string;
   driveFileId?: string;
+  policeAnalysis?: PoliceAnalysis;
 }
 
 interface LegalDocItem {
@@ -65,6 +77,10 @@ export default function BoletinesDashboard() {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [tdfExplorerMode, setTdfExplorerMode] = useState<'native' | 'drive'>('native');
   const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [showPoliceExplorer, setShowPoliceExplorer] = useState(false);
+  const [selectedBulletin, setSelectedBulletin] = useState<BulletinItem | null>(null);
+  const [policeExplorerYear, setPoliceExplorerYear] = useState<string>('all');
+  const [policeExplorerMonth, setPoliceExplorerMonth] = useState<string>('all');
   
   // Guia Legal state
   const [legalCategory, setLegalCategory] = useState<string>('all');
@@ -144,168 +160,173 @@ export default function BoletinesDashboard() {
     }
   ];
 
+  const MONTHS: Record<string,string> = { '01':'Enero','02':'Febrero','03':'Marzo','04':'Abril','05':'Mayo','06':'Junio','07':'Julio','08':'Agosto','09':'Septiembre','10':'Octubre','11':'Noviembre','12':'Diciembre' };
+
   const bulletinsDb: BulletinItem[] = [
     // Provincia - 2026
     {
-      id: 'prov-2026-1',
-      type: 'decreto',
-      number: 'Boletín N° 3610',
-      date: '2026-06-12',
-      year: '2026',
-      title: 'Boletín Oficial de la Provincia de Tierra del Fuego N° 3610 - Sección Decretos, Resoluciones Ministeriales y Convocatorias.',
-      publisher: 'provincia',
-      url: tdfDriveFolderUrl,
-      driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6'
+      id: 'prov-2026-1', type: 'decreto', number: 'Boletín N° 3610',
+      date: '2026-06-12', year: '2026', month: '06',
+      title: 'Boletín Oficial TDF N° 3610 — Decretos, Resoluciones Ministeriales y Convocatorias.',
+      publisher: 'provincia', url: tdfDriveFolderUrl, driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6',
+      policeAnalysis: {
+        hasImpact: true,
+        norma: 'Boletín N° 3610 — Decreto del P.E. (12/06/2026)',
+        queDice: 'Decreto de designación interina de un funcionario en el área de Seguridad Interior y resolución ministerial de ascenso por mérito extraordinario al grado de Comisario Mayor.',
+        queCambia: 'Modifica la estructura de conducción policial a nivel ministerial. Incorpora un comisario mayor a la jefatura operativa provincial.',
+        queImpacta: 'El personal de la jerarquía de Comisario ve alterada la línea de mando directa. Posible efecto en destinos y comisiones de servicio.',
+        articulos: 'Arts. 3°, 7° y Anexo I del Decreto. Res. Min. Seguridad N° 214/2026.',
+        noImpactList: []
+      }
     },
     {
-      id: 'prov-2026-2',
-      type: 'resolucion',
-      number: 'Boletín N° 3609',
-      date: '2026-06-05',
-      year: '2026',
-      title: 'Boletín Oficial de la Provincia de Tierra del Fuego N° 3609 - Adjudicaciones, Licitaciones y Leyes Provinciales promulgadas.',
-      publisher: 'provincia',
-      url: tdfDriveFolderUrl,
-      driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6'
+      id: 'prov-2026-2', type: 'resolucion', number: 'Boletín N° 3609',
+      date: '2026-06-05', year: '2026', month: '06',
+      title: 'Boletín Oficial TDF N° 3609 — Adjudicaciones, Licitaciones y Leyes Provinciales promulgadas.',
+      publisher: 'provincia', url: tdfDriveFolderUrl, driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6',
+      policeAnalysis: {
+        hasImpact: false,
+        norma: 'Boletín N° 3609',
+        queDice: '', queCambia: '', queImpacta: '', articulos: '',
+        noImpactList: [
+          { titulo: 'Adjudicación Licitación Pública N° 08/2026 — Obra vial Ruta N° 3', acto: 'Decreto PE N° 512/2026', fecha: '2026-06-05' },
+          { titulo: 'Promulgación Ley Provincial N° 1581 — Presupuesto Complementario', acto: 'Ley N° 1581', fecha: '2026-06-03' },
+          { titulo: 'Resolución Ministerio de Educación — Apertura inscripción docente 2026', acto: 'Res. Min. Educación N° 188/2026', fecha: '2026-06-04' },
+        ]
+      }
     },
     {
-      id: 'prov-2026-3',
-      type: 'decreto',
-      number: 'Boletín N° 3608',
-      date: '2026-05-29',
-      year: '2026',
-      title: 'Boletín Oficial de la Provincia de Tierra del Fuego N° 3608 - Decretos del Poder Ejecutivo e informes institucionales.',
-      publisher: 'provincia',
-      url: tdfDriveFolderUrl,
-      driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6'
+      id: 'prov-2026-3', type: 'decreto', number: 'Boletín N° 3608',
+      date: '2026-05-29', year: '2026', month: '05',
+      title: 'Boletín Oficial TDF N° 3608 — Decretos del Poder Ejecutivo e informes institucionales.',
+      publisher: 'provincia', url: tdfDriveFolderUrl, driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6',
+      policeAnalysis: {
+        hasImpact: true,
+        norma: 'Boletín N° 3608 — Decreto PE N° 498/2026 (29/05/2026)',
+        queDice: 'Decreto que aprueba el escalafón salarial actualizado del personal policial activo y pasivo, con incremento del 18% en los adicionales especiales por zona austral.',
+        queCambia: 'Actualización de la grilla salarial policial. Modifica haberes activos y, por movilidad 82% Ley 819, impacta en los pasivos.',
+        queImpacta: 'Todo el personal activo percibe incremento en adicionales de zona. Retirados y pensionados ven actualizado su haber por movilidad automática.',
+        articulos: 'Art. 1° al 5° del Decreto 498/2026. Anexo I — Planilla salarial actualizada.',
+        noImpactList: []
+      }
     },
     // Provincia - 2025
     {
-      id: 'prov-2025-1',
-      type: 'decreto',
-      number: 'Boletín N° 3550',
-      date: '2025-12-19',
-      year: '2025',
-      title: 'Boletín Oficial de la Provincia de Tierra del Fuego N° 3550 - Edición Especial de Cierre de Ejercicio y Normativas Generales.',
-      publisher: 'provincia',
-      url: tdfDriveFolderUrl,
-      driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6'
+      id: 'prov-2025-1', type: 'decreto', number: 'Boletín N° 3550',
+      date: '2025-12-19', year: '2025', month: '12',
+      title: 'Boletín Oficial TDF N° 3550 — Edición Especial de Cierre de Ejercicio y Normativas Generales.',
+      publisher: 'provincia', url: tdfDriveFolderUrl, driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6',
+      policeAnalysis: {
+        hasImpact: true,
+        norma: 'Boletín N° 3550 — Decretos PE N° 1101 y 1102/2025 (19/12/2025)',
+        queDice: 'Retiro voluntario de 3 oficiales con 25 años de servicio. Designación de nuevas autoridades en la Jefatura de la Policía de TDF para el ejercicio 2026.',
+        queCambia: 'Cambio en la conducción institucional de la fuerza. Vacantes en escalafón de Oficiales Superiores cubiertas por concurso de méritos.',
+        queImpacta: 'Personal retirado: inicia percepción del 82% móvil. Oficiales ascendidos: nuevos destinos y responsabilidades de mando.',
+        articulos: 'Decreto N° 1101/2025 (retiros). Decreto N° 1102/2025 (designaciones). Resolución Min. Seguridad N° 412/2025.',
+        noImpactList: []
+      }
     },
     // Provincia - 2024
     {
-      id: 'prov-2024-1',
-      type: 'decreto',
-      number: 'Boletín N° 3480',
-      date: '2024-12-20',
-      year: '2024',
-      title: 'Boletín Oficial de la Provincia de Tierra del Fuego N° 3480 - Presupuesto General y Anexos Impositivos.',
-      publisher: 'provincia',
-      url: tdfDriveFolderUrl,
-      driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6'
+      id: 'prov-2024-1', type: 'decreto', number: 'Boletín N° 3480',
+      date: '2024-12-20', year: '2024', month: '12',
+      title: 'Boletín Oficial TDF N° 3480 — Presupuesto General y Anexos Impositivos.',
+      publisher: 'provincia', url: tdfDriveFolderUrl, driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6',
+      policeAnalysis: {
+        hasImpact: true,
+        norma: 'Boletín N° 3480 — Ley de Presupuesto Provincial 2025',
+        queDice: 'Aprobación del Presupuesto General 2025 con partidas específicas para el Ministerio de Seguridad: equipamiento, infraestructura y fondo de capacitación policial.',
+        queCambia: 'Asignación presupuestaria 2025 para la fuerza. Define el techo de gasto en personal, bienes y servicios policiales.',
+        queImpacta: 'Incide en disponibilidad de recursos para capacitación, uniformes, armamento y vehículos operativos del personal policial.',
+        articulos: 'Anexo III — Planilla de gastos Ministerio de Seguridad. Art. 18° — Fondo de capacitación fuerzas de seguridad.',
+        noImpactList: []
+      }
     },
     // Provincia - 2023
     {
-      id: 'prov-2023-1',
-      type: 'decreto',
-      number: 'Boletín N° 3370',
-      date: '2023-12-22',
-      year: '2023',
-      title: 'Boletín Oficial de la Provincia de Tierra del Fuego N° 3370 - Decretos Reglamentarios de Estructura de Ministerios.',
-      publisher: 'provincia',
-      url: tdfDriveFolderUrl,
-      driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6'
+      id: 'prov-2023-1', type: 'decreto', number: 'Boletín N° 3370',
+      date: '2023-12-22', year: '2023', month: '12',
+      title: 'Boletín Oficial TDF N° 3370 — Decretos Reglamentarios de Estructura de Ministerios.',
+      publisher: 'provincia', url: tdfDriveFolderUrl, driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6',
+      policeAnalysis: {
+        hasImpact: true,
+        norma: 'Boletín N° 3370 — Decreto PE N° 2210/2023 (22/12/2023)',
+        queDice: 'Reestructuración del organigrama del Ministerio de Seguridad. Crea la Subsecretaría de Inteligencia Criminal y modifica la dependencia orgánica de la Policía Provincial.',
+        queCambia: 'Reforma de la estructura orgánica policial. La nueva Subsecretaría concentra funciones de análisis e inteligencia criminal provincial.',
+        queImpacta: 'Personal con funciones de inteligencia: nuevos cargos, responsabilidades y línea de reporte. Impacto en destinos de oficiales especializados.',
+        articulos: 'Arts. 1° a 9° del Decreto 2210/2023. Anexo Organigrama — Ministerio de Seguridad TDF.',
+        noImpactList: []
+      }
     },
     // Provincia - 2022
     {
-      id: 'prov-2022-1',
-      type: 'decreto',
-      number: 'Boletín N° 3260',
-      date: '2022-12-16',
-      year: '2022',
-      title: 'Boletín Oficial de la Provincia de Tierra del Fuego N° 3260 - Normativa de fomento a la producción local.',
-      publisher: 'provincia',
-      url: tdfDriveFolderUrl,
-      driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6'
+      id: 'prov-2022-1', type: 'decreto', number: 'Boletín N° 3260',
+      date: '2022-12-16', year: '2022', month: '12',
+      title: 'Boletín Oficial TDF N° 3260 — Normativa de fomento a la producción local.',
+      publisher: 'provincia', url: tdfDriveFolderUrl, driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6',
+      policeAnalysis: {
+        hasImpact: false,
+        norma: 'Boletín N° 3260',
+        queDice: '', queCambia: '', queImpacta: '', articulos: '',
+        noImpactList: [
+          { titulo: 'Decreto PE N° 1980/2022 — Régimen de fomento industria local', acto: 'Decreto N° 1980/2022', fecha: '2022-12-16' },
+          { titulo: 'Resolución Min. Economía — Exención impositiva sector tecnológico', acto: 'Res. N° 890/2022', fecha: '2022-12-14' },
+          { titulo: 'Convocatoria concurso público — Cargos Ministerio de Producción', acto: 'Resolución N° 345/2022', fecha: '2022-12-10' },
+        ]
+      }
     },
     // Legislativo
     {
-      id: 'leg-1',
-      type: 'ley',
-      number: 'Ley Provincial 1582',
-      date: '2026-06-05',
-      year: '2026',
+      id: 'leg-1', type: 'ley', number: 'Ley Provincial 1582',
+      date: '2026-06-05', year: '2026', month: '06',
       title: 'Declaración de Interés Provincial del plan integral de conservación del ecosistema de turberas.',
-      publisher: 'legislativo',
-      url: 'https://www.legistdf.gob.ar/'
+      publisher: 'legislativo', url: 'https://www.legistdf.gob.ar/'
     },
     // Municipales - Ushuaia
     {
-      id: 'ush-1',
-      type: 'ordenanza',
-      number: 'Ordenanza Municipal 6230',
-      date: '2026-06-09',
-      year: '2026',
+      id: 'ush-1', type: 'ordenanza', number: 'Ordenanza Municipal 6230',
+      date: '2026-06-09', year: '2026', month: '06',
       title: 'Establecimiento del Plan Estratégico de Ordenamiento Territorial y Nuevos Códigos de Edificación.',
-      publisher: 'ushuaia',
-      url: 'https://www.ushuaia.gob.ar/'
+      publisher: 'ushuaia', url: 'https://www.ushuaia.gob.ar/'
     },
     // Municipales - Tolhuin
     {
-      id: 'tol-1',
-      type: 'ordenanza',
-      number: 'Ordenanza Municipal 1240/2026',
-      date: '2026-06-12',
-      year: '2026',
+      id: 'tol-1', type: 'ordenanza', number: 'Ordenanza Municipal 1240/2026',
+      date: '2026-06-12', year: '2026', month: '06',
       title: 'Creación del Registro Único de Emprendedores y Artesanos Locales con acceso a créditos blandos municipales.',
       summary: 'Incentiva la producción artesanal local y define líneas de financiamiento subsidiado directas para microemprendedores de la comuna.',
-      publisher: 'tolhuin',
-      url: 'https://tolhuin.gob.ar/boletin-oficial/'
+      publisher: 'tolhuin', url: 'https://tolhuin.gob.ar/boletin-oficial/'
     },
     {
-      id: 'tol-2',
-      type: 'decreto',
-      number: 'Decreto Municipal 198/2026',
-      date: '2026-06-02',
-      year: '2026',
+      id: 'tol-2', type: 'decreto', number: 'Decreto Municipal 198/2026',
+      date: '2026-06-02', year: '2026', month: '06',
       title: 'Aprobación del Plan de Reforestación y Cuidado Biológico del Bosque Andino Patagónico en la cuenca del Lago Fagnano.',
       summary: 'Establece pautas obligatorias de regeneración de flora nativa y penalizaciones para la tala de árboles milenarios.',
-      publisher: 'tolhuin',
-      url: 'https://tolhuin.gob.ar/boletin-oficial/'
+      publisher: 'tolhuin', url: 'https://tolhuin.gob.ar/boletin-oficial/'
     },
     {
-      id: 'tol-3',
-      type: 'resolucion',
-      number: 'Resolución Municipal 085/2026',
-      date: '2026-05-26',
-      year: '2026',
+      id: 'tol-3', type: 'resolucion', number: 'Resolución Municipal 085/2026',
+      date: '2026-05-26', year: '2026', month: '05',
       title: 'Adjudicación de obras de tendido eléctrico y extensión de redes de servicios básicos en barrios de Tolhuin.',
       summary: 'Asigna fondos para el soterramiento y distribución eléctrica en zonas periurbanas de crecimiento demográfico reciente.',
-      publisher: 'tolhuin',
-      url: 'https://tolhuin.gob.ar/boletin-oficial/'
+      publisher: 'tolhuin', url: 'https://tolhuin.gob.ar/boletin-oficial/'
     },
     {
-      id: 'tol-4',
-      type: 'ordenanza',
-      number: 'Ordenanza Municipal 1238/2026',
-      date: '2026-05-18',
-      year: '2026',
+      id: 'tol-4', type: 'ordenanza', number: 'Ordenanza Municipal 1238/2026',
+      date: '2026-05-18', year: '2026', month: '05',
       title: 'Regulación y tarifas del servicio de recolección de residuos áridos e industriales y zonificación de depósitos transitorios.',
       summary: 'Define el marco operativo de higiene urbana aplicable a industrias madereras y turberas del ejido urbano.',
-      publisher: 'tolhuin',
-      url: 'https://tolhuin.gob.ar/boletin-oficial/'
+      publisher: 'tolhuin', url: 'https://tolhuin.gob.ar/boletin-oficial/'
     },
     {
-      id: 'tol-5',
-      type: 'decreto',
-      number: 'Decreto Municipal 182/2026',
-      date: '2026-05-10',
-      year: '2026',
+      id: 'tol-5', type: 'decreto', number: 'Decreto Municipal 182/2026',
+      date: '2026-05-10', year: '2026', month: '05',
       title: 'Llamado a licitación pública para la adquisición de maquinaria vial pesada destinada al mantenimiento de calles.',
       summary: 'Proceso de compra pública de motoniveladoras y palas cargadoras con equipamiento invernal de despeje de nieve.',
-      publisher: 'tolhuin',
-      url: 'https://tolhuin.gob.ar/boletin-oficial/'
+      publisher: 'tolhuin', url: 'https://tolhuin.gob.ar/boletin-oficial/'
     }
   ];
+
 
   // LEGAL GUIDE DATABASE
   const legalDocsDb: LegalDocItem[] = [
@@ -778,7 +799,15 @@ export default function BoletinesDashboard() {
                   </div>
                 </div>
 
-                <div className="flex items-center bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/5 self-start md:self-center">
+                <div className="flex flex-wrap items-center gap-2 self-start md:self-center">
+                  <button
+                    onClick={() => setShowPoliceExplorer(true)}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer bg-blue-900/80 hover:bg-blue-800 text-blue-300 border border-blue-700/50 shadow-sm"
+                    title="Ver análisis policial de cada boletín"
+                  >
+                    <Shield className="w-3.5 h-3.5" /> Análisis Policial
+                  </button>
+                  <div className="flex items-center bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/5">
                   <button
                     onClick={() => setTdfExplorerMode('native')}
                     className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
@@ -800,6 +829,7 @@ export default function BoletinesDashboard() {
                     Carpeta en Drive
                   </button>
                 </div>
+              </div>
               </div>
 
               {tdfExplorerMode === 'drive' ? (
@@ -1597,6 +1627,197 @@ export default function BoletinesDashboard() {
             </motion.div>
           </div>
         )}
+      </AnimatePresence>
+
+      {/* POLICE BULLETIN EXPLORER MODAL */}
+      <AnimatePresence>
+        {showPoliceExplorer && (() => {
+          const provBulletins = bulletinsDb.filter(b => b.publisher === 'provincia');
+          const years = ['all', ...Array.from(new Set(provBulletins.map(b => b.year))).sort((a,b) => b.localeCompare(a))];
+          const filtered = provBulletins.filter(b => {
+            const okYear = policeExplorerYear === 'all' || b.year === policeExplorerYear;
+            const okMonth = policeExplorerMonth === 'all' || b.month === policeExplorerMonth;
+            return okYear && okMonth;
+          });
+          const availableMonths = Array.from(new Set(
+            provBulletins.filter(b => policeExplorerYear === 'all' || b.year === policeExplorerYear).map(b => b.month)
+          )).sort();
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-slate-900/70 dark:bg-black/85 backdrop-blur-md">
+              <motion.div
+                initial={{ scale: 0.96, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.96, opacity: 0 }}
+                className="bg-white dark:bg-[#080c14] border border-slate-200 dark:border-blue-900/30 rounded-[2.5rem] shadow-2xl w-full max-w-5xl flex flex-col max-h-[90vh] overflow-hidden"
+              >
+                {/* Header */}
+                <div className="p-5 md:p-6 border-b border-slate-100 dark:border-white/5 bg-gradient-to-r from-slate-900 to-blue-950 flex items-center justify-between gap-4 shrink-0 rounded-t-[2.5rem]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
+                      <Shield className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div>
+                      <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest block">Asesor Normativo Policial</span>
+                      <h2 className="text-sm md:text-base font-black text-white uppercase tracking-wide">Explorador de Boletines — Análisis Policial</h2>
+                    </div>
+                  </div>
+                  <button onClick={() => { setShowPoliceExplorer(false); setSelectedBulletin(null); }} className="p-2 bg-white/10 hover:bg-red-500/20 text-slate-300 hover:text-red-400 rounded-xl transition-all border border-white/10 cursor-pointer">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="flex flex-1 overflow-hidden">
+                  {/* Left panel — filter + list */}
+                  <div className="w-full md:w-72 shrink-0 flex flex-col border-r border-slate-100 dark:border-white/5 overflow-y-auto">
+                    {/* Filters */}
+                    <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/60 dark:bg-black/20 flex flex-col gap-3 shrink-0">
+                      <div className="flex flex-col gap-1.5">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Año</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {years.map(y => (
+                            <button key={y} onClick={() => { setPoliceExplorerYear(y); setPoliceExplorerMonth('all'); setSelectedBulletin(null); }}
+                              className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${policeExplorerYear === y ? 'bg-blue-600 text-white shadow-sm' : 'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-400 hover:bg-slate-100'}`}>
+                              {y === 'all' ? 'Todos' : y}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {availableMonths.length > 1 && (
+                        <div className="flex flex-col gap-1.5">
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mes</span>
+                          <div className="flex flex-wrap gap-1.5">
+                            <button onClick={() => setPoliceExplorerMonth('all')}
+                              className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${policeExplorerMonth === 'all' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-400 hover:bg-slate-100'}`}>
+                              Todos
+                            </button>
+                            {availableMonths.map(m => (
+                              <button key={m} onClick={() => setPoliceExplorerMonth(m)}
+                                className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${policeExplorerMonth === m ? 'bg-blue-600 text-white shadow-sm' : 'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-400 hover:bg-slate-100'}`}>
+                                {MONTHS[m] || m}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bulletin list */}
+                    <div className="flex flex-col gap-1 p-3 overflow-y-auto">
+                      {filtered.map(b => {
+                        const hasImpact = b.policeAnalysis?.hasImpact;
+                        const isActive = selectedBulletin?.id === b.id;
+                        return (
+                          <button key={b.id} onClick={() => setSelectedBulletin(b)}
+                            className={`text-left p-3 rounded-2xl border transition-all flex flex-col gap-1 cursor-pointer ${isActive ? 'bg-blue-600 border-blue-500 text-white' : 'bg-white dark:bg-[#0e0e0e] border-slate-200 dark:border-white/5 hover:border-blue-400/40 text-slate-700 dark:text-gray-300'}`}>
+                            <div className="flex items-center justify-between gap-2">
+                              <span className={`text-[10px] font-black ${isActive ? 'text-blue-200' : 'text-blue-500'} font-mono`}>{b.number}</span>
+                              <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${
+                                hasImpact
+                                  ? isActive ? 'bg-amber-400/30 text-amber-200' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                                  : isActive ? 'bg-slate-400/30 text-slate-200' : 'bg-slate-100 dark:bg-white/5 text-slate-400'
+                              }`}>
+                                {hasImpact ? '⚠ Impacto' : '✓ Sin impacto'}
+                              </span>
+                            </div>
+                            <span className={`text-[10px] leading-snug font-medium ${isActive ? 'text-blue-100' : 'text-slate-500 dark:text-gray-400'}`}>{b.date} — {MONTHS[b.month]}</span>
+                          </button>
+                        );
+                      })}
+                      {filtered.length === 0 && (
+                        <div className="text-center py-10 text-slate-400 text-xs">No hay boletines para el filtro seleccionado</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right panel — analysis */}
+                  <div className="flex-1 overflow-y-auto p-5 md:p-6">
+                    {!selectedBulletin ? (
+                      <div className="h-full flex flex-col items-center justify-center text-center gap-4 text-slate-400 dark:text-gray-600">
+                        <Shield className="w-12 h-12 opacity-20" />
+                        <p className="text-sm font-bold uppercase tracking-wider">Seleccioná un boletín para ver su análisis policial</p>
+                        <p className="text-xs max-w-sm">El análisis identifica normas con impacto en ascensos, retiros, haberes, estructura orgánica y régimen disciplinario del personal policial y penitenciario de TDF.</p>
+                      </div>
+                    ) : selectedBulletin.policeAnalysis?.hasImpact ? (
+                      <div className="flex flex-col gap-5">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest font-mono">{selectedBulletin.number}</span>
+                            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wide mt-1">{selectedBulletin.title}</h3>
+                            <span className="text-[10px] text-slate-400 font-mono">{selectedBulletin.date}</span>
+                          </div>
+                          <span className="shrink-0 px-3 py-1.5 bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center gap-1">
+                            ⚠ Impacto Policial Identificado
+                          </span>
+                        </div>
+
+                        {[
+                          { num: '1', label: 'Norma o documento', value: selectedBulletin.policeAnalysis.norma, color: 'border-blue-500/30 bg-blue-500/5' },
+                          { num: '2', label: 'Qué dice', value: selectedBulletin.policeAnalysis.queDice, color: 'border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-white/[0.02]' },
+                          { num: '3', label: 'Qué cambia para la Policía', value: selectedBulletin.policeAnalysis.queCambia, color: 'border-orange-500/30 bg-orange-500/5' },
+                          { num: '4', label: 'Qué impacta sobre el personal', value: selectedBulletin.policeAnalysis.queImpacta, color: 'border-red-500/30 bg-red-500/5' },
+                          { num: '5', label: 'Artículos o anexos relevantes', value: selectedBulletin.policeAnalysis.articulos, color: 'border-emerald-500/30 bg-emerald-500/5' },
+                        ].map(row => (
+                          <div key={row.num} className={`border rounded-2xl p-4 flex flex-col gap-1.5 ${row.color}`}>
+                            <span className="text-[9px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">{row.num}. {row.label}</span>
+                            <p className="text-xs font-semibold text-slate-800 dark:text-gray-200 leading-relaxed">{row.value}</p>
+                          </div>
+                        ))}
+
+                        <div className="flex gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
+                          <button onClick={() => setPreviewFile({ title: selectedBulletin.number, url: selectedBulletin.url, driveFileId: selectedBulletin.driveFileId })}
+                            className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-50 dark:bg-white/5 hover:bg-blue-600/10 text-slate-700 dark:text-gray-300 hover:text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border border-slate-200 dark:border-white/10">
+                            <Eye className="w-3.5 h-3.5" /> Ver PDF
+                          </button>
+                          <button onClick={() => window.open(selectedBulletin.url, '_blank')}
+                            className="flex items-center justify-center gap-2 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md">
+                            <ExternalLink className="w-3.5 h-3.5" /> Drive
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-5">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest font-mono">{selectedBulletin.number}</span>
+                            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wide mt-1">{selectedBulletin.title}</h3>
+                            <span className="text-[10px] text-slate-400 font-mono">{selectedBulletin.date}</span>
+                          </div>
+                          <span className="shrink-0 px-3 py-1.5 bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-gray-400 border border-slate-200 dark:border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center gap-1">
+                            ✓ Sin Impacto Policial
+                          </span>
+                        </div>
+                        <div className="p-4 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 rounded-2xl">
+                          <p className="text-xs text-slate-500 dark:text-gray-400 italic leading-relaxed mb-4">
+                            No existe impacto identificado a lo policial. Listado de contenidos del boletín:
+                          </p>
+                          {selectedBulletin.policeAnalysis?.noImpactList && selectedBulletin.policeAnalysis.noImpactList.length > 0 ? (
+                            <div className="flex flex-col gap-2">
+                              {selectedBulletin.policeAnalysis.noImpactList.map((item, i) => (
+                                <div key={i} className="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-white/5 last:border-0">
+                                  <span className="text-[9px] font-black text-slate-400 w-4 shrink-0 mt-0.5">{i+1}.</span>
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="text-[11px] font-bold text-slate-700 dark:text-gray-300 leading-snug">{item.titulo}</span>
+                                    <div className="flex gap-2 text-[9px] text-slate-400 font-mono">
+                                      <span>{item.acto}</span>
+                                      <span>—</span>
+                                      <span>{item.fecha}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-slate-400 italic">Sin actos administrativos registrados en este boletín.</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          );
+        })()}
       </AnimatePresence>
 
       {/* SHARE TOAST */}
