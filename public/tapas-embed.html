@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tapas de Diarios - WA PRO</title>
+  <!-- Google Fonts: Barlow & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;800;900&family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            barlow: ['Barlow', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #020617; /* slate-950 */
+      color: #ffffff;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body class="p-4 md:p-6 min-h-screen flex flex-col custom-scrollbar">
+
+  <!-- Header Section -->
+  <header class="flex flex-col md:flex-row items-center justify-between gap-4 pb-6 border-b border-slate-800 shrink-0">
+    <div class="flex items-center gap-3 w-full md:w-auto">
+      <div class="p-2 bg-blue-600/20 text-blue-400 rounded-xl border border-blue-500/20">
+        <i data-lucide="globe" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h1 class="font-barlow text-lg md:text-xl font-black uppercase tracking-wider leading-none">Tapas de Diarios</h1>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 block">Portadas del Día • WA PRO</span>
+      </div>
+    </div>
+
+    <!-- Category selector & search -->
+    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+      <!-- Search Input -->
+      <div class="relative w-full sm:w-48">
+        <input 
+          id="search-input"
+          type="text" 
+          placeholder="Buscar diario..." 
+          class="w-full bg-slate-900 border border-slate-800 rounded-full py-1.5 pl-8 pr-4 text-xs focus:outline-none focus:border-blue-500 transition-colors"
+        />
+        <i data-lucide="search" class="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-500"></i>
+      </div>
+
+      <!-- Categories tabs -->
+      <div class="flex bg-slate-900 p-1 rounded-full border border-slate-800 w-full sm:w-auto">
+        <button onclick="setCategory('internacionales')" id="tab-internacionales" class="flex-1 sm:flex-initial px-4 py-1.5 rounded-full text-xs font-bold uppercase transition-all bg-blue-600 text-white shadow-md">
+          Internacionales
+        </button>
+        <button onclick="setCategory('nacionales')" id="tab-nacionales" class="flex-1 sm:flex-initial px-4 py-1.5 rounded-full text-xs font-bold uppercase transition-all text-slate-400 hover:text-white">
+          Nacionales
+        </button>
+        <button onclick="setCategory('provinciales')" id="tab-provinciales" class="flex-1 sm:flex-initial px-4 py-1.5 rounded-full text-xs font-bold uppercase transition-all text-slate-400 hover:text-white">
+          Provinciales
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loader -->
+  <div id="loader" class="flex-1 flex flex-col items-center justify-center gap-4 py-20">
+    <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    <div class="text-center">
+      <h3 class="text-xs font-black uppercase tracking-widest text-slate-400">Escaneando Kioskos y Portales...</h3>
+      <p class="text-[10px] text-slate-500 mt-1">Cargando portadas del día</p>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div id="empty-state" class="hidden flex-1 flex flex-col items-center justify-center py-20 text-slate-500">
+    <i data-lucide="inbox" class="w-10 h-10 mb-2 text-slate-600"></i>
+    <p class="text-sm">No se encontraron tapas disponibles.</p>
+  </div>
+
+  <!-- Cards Grid -->
+  <main id="tapas-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 py-6 flex-grow">
+    <!-- Rendered dynamically -->
+  </main>
+
+  <!-- Modal / Lightbox Detail View -->
+  <div id="detail-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col md:flex-row relative">
+      
+      <!-- Close Button -->
+      <button onclick="closeModal()" class="absolute top-4 right-4 z-10 p-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-full border border-slate-700 transition-all">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Left Side: Image Viewer with zoom -->
+      <div class="flex-1 bg-black/45 border-r border-slate-800 flex items-center justify-center relative p-4 min-h-[300px] md:min-h-[450px]">
+        
+        <!-- Zoom Controls -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-full shadow-lg">
+          <button onclick="zoomOut()" class="p-1 hover:bg-slate-800 rounded text-slate-300">
+            <i data-lucide="zoom-out" class="w-4 h-4"></i>
+          </button>
+          <span id="zoom-value" class="text-[10px] font-mono font-bold text-blue-400 w-10 text-center">100%</span>
+          <button onclick="zoomIn()" class="p-1 hover:bg-slate-800 rounded text-slate-300">
+            <i data-lucide="zoom-in" class="w-4 h-4"></i>
+          </button>
+          <div class="w-px h-4 bg-slate-800 mx-1"></div>
+          <button onclick="resetZoom()" class="p-1 hover:bg-slate-800 rounded text-slate-300">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="w-full h-full flex items-center justify-center overflow-hidden">
+          <img 
+            id="modal-image" 
+            src="" 
+            alt="Portada" 
+            class="max-w-full max-h-[40vh] md:max-h-[70vh] object-contain transition-transform duration-150 select-none"
+            style="transform: scale(1);"
+          />
+        </div>
+      </div>
+
+      <!-- Right Side: Metadata and Actions -->
+      <div class="w-full md:w-80 p-6 flex flex-col justify-between overflow-y-auto max-h-[50vh] md:max-h-[90vh]">
+        <div class="space-y-5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="modal-region" class="bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded text-[9px] font-black uppercase border border-blue-500/20"></span>
+              <span id="modal-category" class="text-[10px] text-slate-500 font-bold uppercase tracking-widest"></span>
+            </div>
+            <h2 id="modal-title" class="text-lg font-black uppercase mt-2 text-white"></h2>
+            <p id="modal-date" class="text-xs text-slate-400 mt-1"></p>
+          </div>
+
+          <!-- Share section -->
+          <div class="bg-slate-950 border border-slate-800 p-3.5 rounded-2xl flex flex-col gap-3">
+            <span class="text-[9px] font-black uppercase text-blue-400 tracking-wider block">Compartir Portada</span>
+            
+            <div class="flex flex-col gap-1">
+              <label class="text-[8px] font-black uppercase text-slate-500 tracking-wider">Titular Principal</label>
+              <input 
+                id="share-headline"
+                type="text" 
+                placeholder="Titular destacado..." 
+                class="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
+              />
+            </div>
+            
+            <div class="flex flex-col gap-1">
+              <label class="text-[8px] font-black uppercase text-slate-500 tracking-wider">Breve Frase / Comentario</label>
+              <textarea 
+                id="share-summary"
+                placeholder="Breve comentario..." 
+                rows="2"
+                class="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 transition-colors resize-none"
+              ></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mt-1">
+              <button onclick="shareDetail('whatsapp')" class="py-2 bg-emerald-600 hover:bg-emerald-550 active:scale-95 transition-all text-white rounded-xl text-[9px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow">
+                WhatsApp
+              </button>
+              <button onclick="shareDetail('telegram')" class="py-2 bg-sky-600 hover:bg-sky-550 active:scale-95 transition-all text-white rounded-xl text-[9px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow">
+                Telegram
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2 pt-6 border-t border-slate-800 mt-6 shrink-0">
+          <button onclick="downloadCover()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow transition-all">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Descargar JPG</span>
+          </button>
+          <a id="modal-website" href="" target="_blank" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all">
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            <span>Visitar Sitio</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JavaScript logic -->
+  <script>
+    // Configuration: point to your deployed Next.js backend url
+    const DEFAULT_API_URL = 'https://wiki-app-swart.vercel.app/api/tapas';
+    
+    // Automatically determine backend location (same host or fallback)
+    const getApiUrl = () => {
+      const isLocalOrSame = window.location.hostname === 'wiki-app-swart.vercel.app' || 
+                            window.location.hostname === 'localhost' || 
+                            window.location.hostname === '127.0.0.1';
+      return isLocalOrSame ? '/api/tapas' : DEFAULT_API_URL;
+    };
+
+    let allData = { internacionales: [], nacionales: [], provinciales: [] };
+    let activeCategory = 'internacionales';
+    let searchQuery = '';
+    let selectedItem = null;
+    let currentZoom = 1;
+
+    // Load data from API
+    async function loadData() {
+      showLoader(true);
+      try {
+        const response = await fetch(getApiUrl());
+        if (!response.ok) throw new Error('Network error');
+        allData = await response.json();
+        renderGrid();
+      } catch (err) {
+        console.error('Error fetching tapas:', err);
+        document.getElementById('empty-state').classList.remove('hidden');
+      } finally {
+        showLoader(false);
+      }
+    }
+
+    function showLoader(show) {
+      const loader = document.getElementById('loader');
+      const grid = document.getElementById('tapas-grid');
+      const empty = document.getElementById('empty-state');
+      
+      if (show) {
+        loader.classList.remove('hidden');
+        grid.classList.add('hidden');
+        empty.classList.add('hidden');
+      } else {
+        loader.classList.add('hidden');
+      }
+    }
+
+    // Category Selector
+    function setCategory(cat) {
+      activeCategory = cat;
+      ['internacionales', 'nacionales', 'provinciales'].forEach(c => {
+        const btn = document.getElementById(`tab-${c}`);
+        if (c === cat) {
+          btn.className = 'flex-1 sm:flex-initial px-4 py-1.5 rounded-full text-xs font-bold uppercase transition-all bg-blue-600 text-white shadow-md';
+        } else {
+          btn.className = 'flex-1 sm:flex-initial px-4 py-1.5 rounded-full text-xs font-bold uppercase transition-all text-slate-400 hover:text-white';
+        }
+      });
+      renderGrid();
+    }
+
+    // Filter and Render
+    function renderGrid() {
+      const grid = document.getElementById('tapas-grid');
+      const empty = document.getElementById('empty-state');
+      grid.innerHTML = '';
+
+      const list = allData[activeCategory] || [];
+      const filtered = list.filter(item => 
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        item.countryOrRegion.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      if (filtered.length === 0) {
+        grid.classList.add('hidden');
+        empty.classList.remove('hidden');
+        return;
+      }
+
+      grid.classList.remove('hidden');
+      empty.classList.add('hidden');
+
+      filtered.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col group';
+        card.innerHTML = `
+          <div class="aspect-[3/4] overflow-hidden bg-black relative" onclick="openDetail(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+            <img 
+              src="${item.coverUrl}" 
+              alt="${item.name}" 
+              class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 opacity-90 group-hover:opacity-100"
+              loading="lazy"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-80"></div>
+            <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-blue-400">
+              ${item.countryOrRegion}
+            </span>
+          </div>
+          <div class="p-4 flex flex-col justify-between flex-grow gap-2">
+            <div onclick="openDetail(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+              <h3 class="text-xs font-black text-white leading-tight uppercase group-hover:text-blue-400 transition-colors">${item.name}</h3>
+              <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1 block">Edición: ${item.date}</span>
+            </div>
+            
+            <div class="flex gap-1.5 mt-2">
+              <button onclick="quickShare(${JSON.stringify(item).replace(/"/g, '&quot;')}, 'whatsapp')" class="flex-1 py-1.5 bg-emerald-600/90 hover:bg-emerald-550 text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-all text-center">
+                WhatsApp
+              </button>
+              <button onclick="quickShare(${JSON.stringify(item).replace(/"/g, '&quot;')}, 'telegram')" class="flex-1 py-1.5 bg-sky-600/90 hover:bg-sky-550 text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-all text-center">
+                Telegram
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      // Refresh lucide icons
+      lucide.createIcons();
+    }
+
+    // Search Input handler
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      renderGrid();
+    });
+
+    // Share Text formatter
+    function getShareText(item, headline, summary) {
+      const categoryLabel = 
+        item.category === 'provinciales' ? 'Provincial (Tierra del Fuego)' :
+        item.category === 'nacionales' ? 'Nacional (Argentina)' : 'Internacional';
+
+      const textParts = [
+        `📅 Fecha: ${item.date}`,
+        `🔥📍 Sección: ${categoryLabel}`,
+        `📰 Tapa Diario *${item.name}*`,
+        `*TITULAR:* "${headline || 'Tapa del día'}"`
+      ];
+      if (summary) {
+        textParts.push(`*RESUMEN:* "${summary}"`);
+      }
+      textParts.push('');
+      textParts.push(`Fuente: ${item.coverUrl}`);
+      
+      return textParts.join('\n');
+    }
+
+    // Quick share logic
+    async function quickShare(item, platform) {
+      const headline = prompt(`Ingrese el titular principal de ${item.name} (opcional):`) || '';
+      const summary = prompt(`Ingrese una frase resumen o comentario (opcional):`) || '';
+      const shareText = getShareText(item, headline, summary);
+
+      // Web share
+      if (navigator.share && navigator.canShare) {
+        try {
+          const res = await fetch(item.coverUrl);
+          const blob = await res.blob();
+          const file = new File([blob], `${item.id}-tapa.jpg`, { type: 'image/jpeg' });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: `Tapa de ${item.name}`,
+              text: shareText
+            });
+            return;
+          }
+        } catch (e) {
+          console.warn('Native share failed', e);
+        }
+      }
+
+      // Redirect fallback
+      const encodedText = encodeURIComponent(shareText);
+      if (platform === 'whatsapp') {
+        window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
+      } else {
+        window.open(`https://t.me/share/url?url=${encodeURIComponent(item.coverUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
+      }
+    }
+
+    // Detail Modal Handlers
+    function openDetail(item) {
+      selectedItem = item;
+      currentZoom = 1;
+      
+      document.getElementById('modal-image').src = item.coverUrl;
+      document.getElementById('modal-image').style.transform = `scale(1)`;
+      document.getElementById('zoom-value').innerText = '100%';
+      document.getElementById('modal-title').innerText = item.name;
+      document.getElementById('modal-date').innerText = `Edición del ${item.date}`;
+      document.getElementById('modal-region').innerText = item.countryOrRegion;
+      
+      const catLabel = item.category === 'provinciales' ? 'Provincial' : item.category === 'nacionales' ? 'Nacional' : 'Internacional';
+      document.getElementById('modal-category').innerText = catLabel;
+      
+      document.getElementById('modal-website').href = item.url;
+      document.getElementById('share-headline').value = '';
+      document.getElementById('share-summary').value = '';
+
+      document.getElementById('detail-modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('detail-modal').classList.add('hidden');
+      selectedItem = null;
+    }
+
+    // Zoom Controls
+    function zoomIn() {
+      if (currentZoom < 3) {
+        currentZoom += 0.25;
+        applyZoom();
+      }
+    }
+
+    function zoomOut() {
+      if (currentZoom > 1) {
+        currentZoom -= 0.25;
+        applyZoom();
+      }
+    }
+
+    function resetZoom() {
+      currentZoom = 1;
+      applyZoom();
+    }
+
+    function applyZoom() {
+      document.getElementById('modal-image').style.transform = `scale(${currentZoom})`;
+      document.getElementById('zoom-value').innerText = `${Math.round(currentZoom * 100)}%`;
+    }
+
+    // Modal Share
+    async function shareDetail(platform) {
+      if (!selectedItem) return;
+      const headline = document.getElementById('share-headline').value;
+      const summary = document.getElementById('share-summary').value;
+      const shareText = getShareText(selectedItem, headline, summary);
+
+      if (navigator.share && navigator.canShare) {
+        try {
+          const res = await fetch(selectedItem.coverUrl);
+          const blob = await res.blob();
+          const file = new File([blob], `${selectedItem.id}-tapa.jpg`, { type: 'image/jpeg' });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: `Tapa de ${selectedItem.name}`,
+              text: shareText
+            });
+            return;
+          }
+        } catch (e) {
+          console.warn('Native share failed', e);
+        }
+      }
+
+      const encodedText = encodeURIComponent(shareText);
+      if (platform === 'whatsapp') {
+        window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
+      } else {
+        window.open(`https://t.me/share/url?url=${encodeURIComponent(selectedItem.coverUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
+      }
+    }
+
+    // Download JPG helper
+    async function downloadCover() {
+      if (!selectedItem) return;
+      try {
+        const res = await fetch(selectedItem.coverUrl);
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `${selectedItem.id}-tapa-${selectedItem.date.replace(/\//g, '-')}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      } catch (e) {
+        window.open(selectedItem.coverUrl, '_blank');
+      }
+    }
+
+    // Handle ESC key to close modal
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && selectedItem) {
+        closeModal();
+      }
+    });
+
+    // Initial load
+    loadData();
+  </script>
+</body>
+</html>

@@ -115,15 +115,16 @@ const AIR_POINTS = [
 
 export const MaritimeMap = () => (
   <div className="w-full h-full relative bg-[#0a0a0a]">
-    <iframe 
-      name="vesselfinder" 
-      id="vesselfinder" 
-      src="https://www.vesselfinder.com/aismap?zoom=9&lat=-54.81&lon=-68.3&width=100%&height=100%&names=true&show_track=true&clicktoactive=false" 
-      width="100%" 
-      height="100%" 
-      frameBorder="0" 
+    <iframe
+      id="marinetraffic-map"
+      name="marinetraffic-map"
+      src="https://www.marinetraffic.com/en/ais/embed/zoom:6/centery:-53.9/centerx:-69.4/maptype:4/shownames:true/mmsi:0/shipid:0/fleet:/fleet_id:/vtypes:/showmenu:false/remember:false"
+      width="100%"
+      height="100%"
+      frameBorder="0"
       style={{ border: 0 }}
-      title="VesselFinder Live AIS Map"
+      title="MarineTraffic AIS — Canal Beagle / Tierra del Fuego"
+      allowFullScreen
     />
   </div>
 );

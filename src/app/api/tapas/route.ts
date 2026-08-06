@@ -312,10 +312,16 @@ export async function GET() {
       }
     });
 
-    return NextResponse.json(responseData);
+    const response = NextResponse.json(responseData);
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+    return response;
 
   } catch (error) {
     console.error('Error fetching tapas:', error);
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    const errorResponse = NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    errorResponse.headers.set('Access-Control-Allow-Origin', '*');
+    return errorResponse;
   }
 }

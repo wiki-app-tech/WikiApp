@@ -2261,10 +2261,19 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                     <Anchor className="w-3.5 h-3.5 text-blue-500" />
                                                 </div>
                                                 <h2 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 tracking-wide uppercase">
-                                                    Radar AIS de Tráfico Marítimo - Canal Beagle
+                                                    Radar AIS de Tráfico Marítimo — MarineTraffic
                                                 </h2>
                                             </div>
-                                            <span className="text-[9px] font-mono text-slate-500 dark:text-gray-500 uppercase font-black">Navegación Libre</span>
+                                            <a
+                                                href="https://www.marinetraffic.com/en/ais/home/centerx:-69.4/centery:-53.9/zoom:6"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-1.5 text-[9px] font-mono text-blue-500 hover:text-blue-400 dark:text-blue-400 dark:hover:text-blue-300 uppercase font-black border border-blue-500/20 hover:border-blue-500/40 bg-blue-500/5 hover:bg-blue-500/10 px-3 py-1.5 rounded-full transition-all"
+                                                title="Abrir en MarineTraffic"
+                                            >
+                                                <ExternalLink className="w-3 h-3" />
+                                                Ver Completo
+                                            </a>
                                         </div>
                                         <div className="w-full h-[260px] md:h-[370px] relative bg-white dark:bg-[#0c0c0c] overflow-hidden">
                                             <MaritimeMap />
@@ -2283,7 +2292,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                             </span>
                                           ))}
                                           <span className="ml-auto text-[9px] font-mono text-slate-400 dark:text-gray-500">
-                                            &copy; OpenStreetMap contributors
+                                            &copy; MarineTraffic / Kpler &mdash; AIS en tiempo real
                                           </span>
                                         </div>
                                     </div>
