@@ -132,17 +132,21 @@ export const MaritimeMap = () => (
 /* ─── COMPONENTE AÉREO ────────────────────────────────── */
 
 export const AirMap = () => (
-  <div className="w-full h-full relative bg-[#0a0a0a]">
-    <iframe
-      id="flightradar24-map"
-      name="flightradar24-map"
-      src="https://www.flightradar24.com/simple_index.php?lat=-53.73&lng=-68.22&z=7&hidebottombar=1&hidesidebar=1"
-      width="100%"
-      height="100%"
-      frameBorder="0"
-      style={{ border: 0 }}
-      title="FlightRadar24 — Tráfico Aéreo Canal Beagle / TDF"
-      allowFullScreen
-    />
+  <div className="w-full h-full relative bg-[#0c0c0c] overflow-hidden">
+    {/* CSS invert wrapper para tema oscuro coherente con el dashboard */}
+    <div style={{ width: '100%', height: '100%', filter: 'invert(90%) hue-rotate(180deg) brightness(0.85) saturate(1.4)' }}>
+      <iframe
+        id="adsbexchange-map"
+        name="adsbexchange-map"
+        src="https://globe.adsbexchange.com/?lat=-53.73&lon=-68.22&zoom=7&hideSidebar=1&hideButtons=1"
+        width="100%"
+        height="100%"
+        frameBorder="0"
+        style={{ border: 0, display: 'block' }}
+        title="ADS-B Exchange — Tráfico Aéreo Canal Beagle / TDF"
+        allowFullScreen
+      />
+    </div>
   </div>
 );
+

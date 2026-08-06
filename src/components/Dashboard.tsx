@@ -2305,15 +2305,15 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                     <Plane className="w-3.5 h-3.5 text-orange-500" />
                                                 </div>
                                                 <h2 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 tracking-wide uppercase">
-                                                    Radar de Tráfico Aéreo — FlightRadar24
+                                                    Radar de Tráfico Aéreo — AirNav Radar
                                                 </h2>
                                             </div>
                                             <a
-                                                href="https://www.flightradar24.com/-53.73,-68.22/7"
+                                                href="https://es.airnavradar.com/#@-53.73,-68.22,7z"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="flex items-center gap-1.5 text-[9px] font-mono text-orange-500 hover:text-orange-400 dark:text-orange-400 dark:hover:text-orange-300 uppercase font-black border border-orange-500/20 hover:border-orange-500/40 bg-orange-500/5 hover:bg-orange-500/10 px-3 py-1.5 rounded-full transition-all"
-                                                title="Abrir en FlightRadar24"
+                                                title="Abrir en AirNav Radar"
                                             >
                                                 <ExternalLink className="w-3 h-3" />
                                                 Ver Completo
@@ -2335,7 +2335,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                             </span>
                                           ))}
                                           <span className="ml-auto text-[9px] font-mono text-slate-400 dark:text-gray-500">
-                                            &copy; FlightRadar24 &mdash; ADS-B en tiempo real
+                                            &copy; ADS-B Exchange &mdash; AirNav Radar en tiempo real
                                           </span>
                                         </div>
                                     </div>
