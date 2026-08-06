@@ -118,7 +118,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
        destination: 'Ushuaia',
        image: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=200&auto=format&fit=crop&q=60',
        agencyName: 'Rumbo Sur S.A.',
-       agencyUrl: 'https://rumbosur.com.ar'
+       agencyUrl: 'https://rumbosur.com.ar',
+       paxCapacity: 90,
+       paxLabel: 'Pasajeros (Catamarán Beagle)'
      },
      { 
        id: 2, 
@@ -131,7 +133,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
        destination: 'Ushuaia',
        image: 'https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?w=200&auto=format&fit=crop&q=60',
        agencyName: 'Agencia Marítima Robinson',
-       agencyUrl: 'https://www.robinson.com.ar'
+       agencyUrl: 'https://www.robinson.com.ar',
+       paxCapacity: 20,
+       paxLabel: 'Tripulantes (Carga)'
      },
      { 
        id: 3, 
@@ -144,7 +148,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
        destination: 'Ushuaia',
        image: 'https://images.unsplash.com/photo-1548574505-5e239809ee19?w=200&auto=format&fit=crop&q=60',
        agencyName: 'Australis Cruceros',
-       agencyUrl: 'https://www.australis.com'
+       agencyUrl: 'https://www.australis.com',
+       paxCapacity: 210,
+       paxLabel: 'Pasajeros (Crucero Expedition)'
      },
      { 
        id: 4, 
@@ -157,7 +163,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
        destination: 'Ushuaia',
        image: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=200&auto=format&fit=crop&q=60',
        agencyName: 'Pesquera del Fuego S.A.',
-       agencyUrl: 'https://www.interpatagonia.com/ushuaia/agencias-maritimas.html'
+       agencyUrl: 'https://www.interpatagonia.com/ushuaia/agencias-maritimas.html',
+       paxCapacity: 18,
+       paxLabel: 'Tripulantes (Pesquero)'
      },
      { 
        id: 5, 
@@ -170,7 +178,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
        destination: 'Río Grande',
        image: 'https://images.unsplash.com/photo-1505242859157-562219b06ad7?w=200&auto=format&fit=crop&q=60',
        agencyName: 'Agencia Marítima Ushuaia',
-       agencyUrl: 'https://www.agenciamaritimaushuaia.com'
+       agencyUrl: 'https://www.agenciamaritimaushuaia.com',
+       paxCapacity: 10,
+       paxLabel: 'Tripulantes (Remolcador)'
      }
    ]);
    const [flightsData, setFlightsData] = useState([
@@ -183,7 +193,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
        time: 'Llegó 14:23', 
        type: 'Boeing 737-800',
        image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=200&auto=format&fit=crop&q=60',
-       airlineUrl: 'https://www.aerolineas.com.ar'
+       airlineUrl: 'https://www.aerolineas.com.ar',
+       paxCapacity: 189
      },
      { 
        id: 2, 
@@ -194,7 +205,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
        time: 'Previsto 15:40', 
        type: 'Embraer 190',
        image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=200&auto=format&fit=crop&q=60',
-       airlineUrl: 'https://www.aerolineas.com.ar'
+       airlineUrl: 'https://www.aerolineas.com.ar',
+       paxCapacity: 98
      },
      { 
        id: 3, 
@@ -205,7 +217,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
        time: 'Mañana 02:20', 
        type: 'Boeing 737-800',
        image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=200&auto=format&fit=crop&q=60',
-       airlineUrl: 'https://www.aerolineas.com.ar'
+       airlineUrl: 'https://www.aerolineas.com.ar',
+       paxCapacity: 189
      },
      { 
        id: 4, 
@@ -216,7 +229,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
        time: 'Previsto 16:15', 
        type: 'Airbus A320',
        image: 'https://images.unsplash.com/photo-1517999144091-3d9dca6d1e43?w=200&auto=format&fit=crop&q=60',
-       airlineUrl: 'https://jetsmart.com'
+       airlineUrl: 'https://jetsmart.com',
+       paxCapacity: 180
      },
      { 
        id: 5, 
@@ -227,7 +241,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
        time: 'Hoy 18:10', 
        type: 'Boeing 737-800',
        image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=200&auto=format&fit=crop&q=60',
-       airlineUrl: 'https://flybondi.com'
+       airlineUrl: 'https://flybondi.com',
+       paxCapacity: 189
      }
    ]);
 
@@ -2006,7 +2021,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                             <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
                                 {/* DATA CAROUSEL COLUMN */}
                                 <div className="xl:col-span-4 flex flex-col gap-6">
-                                    <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl p-4 md:p-6 shadow-2xl flex flex-col gap-5 relative overflow-hidden h-auto xl:h-[810px]">
+                                    <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl p-4 md:p-6 shadow-2xl flex flex-col gap-5 relative overflow-hidden h-auto">
                                         <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
                                             <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Estado de Tránsito</h3>
                                             <div className="flex items-center gap-1.5">
@@ -2019,6 +2034,85 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                 </button>
                                             </div>
                                         </div>
+
+                                        {/* ── PANEL ESTADÍSTICO DE INTERCAMBIO DE PERSONAS ── */}
+                                        {(() => {
+                                          const totalShipPax  = shipsData.reduce((s, v) => s + v.paxCapacity, 0);
+                                          const totalFlightPax = flightsData.reduce((s, v) => s + v.paxCapacity, 0);
+                                          const grandTotal    = totalShipPax + totalFlightPax;
+                                          const maxPax        = Math.max(...shipsData.map(v => v.paxCapacity), ...flightsData.map(v => v.paxCapacity));
+                                          return (
+                                            <div className="flex flex-col gap-3 bg-gradient-to-br from-slate-50 to-blue-50/40 dark:from-[#111]/80 dark:to-blue-950/20 border border-slate-200 dark:border-blue-900/20 rounded-2xl p-4">
+                                              {/* KPIs principales */}
+                                              <div className="grid grid-cols-3 gap-2">
+                                                {[
+                                                  { label: 'Embarcaciones', value: shipsData.length, icon: '⚓', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-500/10' },
+                                                  { label: 'Vuelos', value: flightsData.length, icon: '✈️', color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-500/10' },
+                                                  { label: 'Total Personas', value: grandTotal.toLocaleString('es-AR'), icon: '👥', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10' },
+                                                ].map(kpi => (
+                                                  <div key={kpi.label} className={`${kpi.bg} rounded-xl p-2.5 flex flex-col items-center gap-0.5`}>
+                                                    <span className="text-base leading-none">{kpi.icon}</span>
+                                                    <span className={`text-[17px] font-black leading-tight ${kpi.color}`}>{kpi.value}</span>
+                                                    <span className="text-[7.5px] font-bold uppercase tracking-widest text-slate-500 dark:text-gray-500 text-center leading-tight">{kpi.label}</span>
+                                                  </div>
+                                                ))}
+                                              </div>
+
+                                              {/* Desglose marítimo */}
+                                              <div className="flex flex-col gap-1.5">
+                                                <div className="flex items-center gap-1.5 pb-1 border-b border-slate-200 dark:border-white/5">
+                                                  <span className="text-[9px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">⚓ Marítimo</span>
+                                                  <span className="ml-auto text-[9px] font-black text-slate-500 dark:text-gray-500">{totalShipPax} personas</span>
+                                                </div>
+                                                {shipsData.map(ship => (
+                                                  <div key={ship.id} className="flex flex-col gap-0.5">
+                                                    <div className="flex items-center justify-between">
+                                                      <span className="text-[8.5px] font-bold text-slate-700 dark:text-gray-300 truncate max-w-[110px]">{ship.name}</span>
+                                                      <span className="text-[8.5px] font-black text-blue-600 dark:text-blue-400 tabular-nums">{ship.paxCapacity}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                      <div className="flex-1 h-1 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                                                        <div className="h-full bg-blue-500 rounded-full transition-all duration-700" style={{ width: `${(ship.paxCapacity / maxPax) * 100}%` }} />
+                                                      </div>
+                                                      <span className="text-[7px] text-slate-400 dark:text-gray-600 truncate max-w-[80px]">{ship.paxLabel}</span>
+                                                    </div>
+                                                  </div>
+                                                ))}
+                                              </div>
+
+                                              {/* Desglose aéreo */}
+                                              <div className="flex flex-col gap-1.5">
+                                                <div className="flex items-center gap-1.5 pb-1 border-b border-slate-200 dark:border-white/5">
+                                                  <span className="text-[9px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400">✈️ Aéreo</span>
+                                                  <span className="ml-auto text-[9px] font-black text-slate-500 dark:text-gray-500">{totalFlightPax} personas</span>
+                                                </div>
+                                                {flightsData.map(flight => (
+                                                  <div key={flight.id} className="flex flex-col gap-0.5">
+                                                    <div className="flex items-center justify-between">
+                                                      <span className="text-[8.5px] font-bold text-slate-700 dark:text-gray-300">{flight.flight} <span className="text-[7px] text-slate-400 dark:text-gray-500 font-normal">{flight.type}</span></span>
+                                                      <span className="text-[8.5px] font-black text-orange-600 dark:text-orange-400 tabular-nums">{flight.paxCapacity}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                      <div className="flex-1 h-1 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                                                        <div className="h-full bg-orange-500 rounded-full transition-all duration-700" style={{ width: `${(flight.paxCapacity / maxPax) * 100}%` }} />
+                                                      </div>
+                                                      <span className="text-[7px] text-slate-400 dark:text-gray-600">{flight.route}</span>
+                                                    </div>
+                                                  </div>
+                                                ))}
+                                              </div>
+
+                                              {/* Total destacado */}
+                                              <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-3 py-2 mt-1">
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Intercambio total estimado</span>
+                                                <span className="text-[18px] font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{grandTotal.toLocaleString('es-AR')}</span>
+                                              </div>
+                                              <p className="text-[7.5px] text-slate-400 dark:text-gray-600 leading-relaxed text-center">
+                                                * Capacidad máx. declarada por aeronave/embarcación. Dato estimado basado en tipos de nave operando en la región.
+                                              </p>
+                                            </div>
+                                          );
+                                        })()}
 
                                         {/* Tabs Selector */}
                                         <div className="grid grid-cols-2 gap-2 bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/5">
