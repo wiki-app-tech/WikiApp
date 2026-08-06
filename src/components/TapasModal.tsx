@@ -188,14 +188,16 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
       selectedItem.category === 'nacionales' ? 'Nacional (Argentina)' : 'Internacional';
 
     const textParts = [
-      `📰 *${selectedItem.name.toUpperCase()}*`,
       `📅 Fecha: ${selectedItem.date}`,
-      `📍 Sección: ${categoryLabel}`,
-      `\n🔥 *TITULAR:* ${headline || 'Tapa del día'}`,
+      `🔥📍 Sección: ${categoryLabel}`,
+      `📰 Tapa Diario *${selectedItem.name}*`,
+      `*TITULAR:* "${headline || 'Tapa del día'}"`
     ];
     if (summary) {
-      textParts.push(`📝 _${summary}_`);
+      textParts.push(`*RESUMEN:* "${summary}"`);
     }
+    textParts.push('');
+    textParts.push(`Fuente: ${selectedItem.coverUrl}`);
     
     const shareText = textParts.join('\n');
 
@@ -218,7 +220,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
       }
     }
 
-    const encodedText = encodeURIComponent(shareText + `\n\nVer portada: ${selectedItem.coverUrl}`);
+    const encodedText = encodeURIComponent(shareText);
     if (platform === 'whatsapp') {
       window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
     } else {
@@ -236,14 +238,16 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
       item.category === 'nacionales' ? 'Nacional (Argentina)' : 'Internacional';
 
     const textParts = [
-      `📰 *${item.name.toUpperCase()}*`,
       `📅 Fecha: ${item.date}`,
-      `📍 Sección: ${categoryLabel}`,
-      `\n🔥 *TITULAR:* ${userHeadline || 'Tapa del día'}`,
+      `🔥📍 Sección: ${categoryLabel}`,
+      `📰 Tapa Diario *${item.name}*`,
+      `*TITULAR:* "${userHeadline || 'Tapa del día'}"`
     ];
     if (userSummary) {
-      textParts.push(`📝 _${userSummary}_`);
+      textParts.push(`*RESUMEN:* "${userSummary}"`);
     }
+    textParts.push('');
+    textParts.push(`Fuente: ${item.coverUrl}`);
     
     const shareText = textParts.join('\n');
 
@@ -266,7 +270,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
       }
     }
 
-    const encodedText = encodeURIComponent(shareText + `\n\nVer portada: ${item.coverUrl}`);
+    const encodedText = encodeURIComponent(shareText);
     if (platform === 'whatsapp') {
       window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
     } else {
