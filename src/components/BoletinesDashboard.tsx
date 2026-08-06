@@ -28,7 +28,11 @@ import {
   Bot,
   User,
   MessageSquare,
-  Loader2
+  Loader2,
+  ZoomIn,
+  ZoomOut,
+  ChevronLeft,
+  Printer
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -92,7 +96,10 @@ export default function BoletinesDashboard() {
   const [isPenitentiary, setIsPenitentiary] = useState<boolean>(false);
   
   // Modal & Toast states
-  const [previewFile, setPreviewFile] = useState<{ title: string; url: string; driveFileId?: string } | null>(null);
+  const [previewFile, setPreviewFile] = useState<{ title: string; url: string; driveFileId?: string; item?: BulletinItem } | null>(null);
+  const [previewViewMode, setPreviewViewMode] = useState<'pdf' | 'drive'>('pdf');
+  const [pdfPage, setPdfPage] = useState<number>(1);
+  const [pdfZoom, setPdfZoom] = useState<number>(100);
   const [showShareToast, setShowShareToast] = useState<string | null>(null);
 
   const tdfDriveFolderUrl = 'https://drive.google.com/drive/folders/12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6';
@@ -900,7 +907,12 @@ export default function BoletinesDashboard() {
 
                         <div className="flex items-center gap-2 pt-3 border-t border-slate-200/50 dark:border-white/5">
                           <button
-                            onClick={() => setPreviewFile({ title: item.number, url: item.url, driveFileId: item.driveFileId })}
+                            onClick={() => {
+                              setPreviewFile({ title: item.number, url: item.url, driveFileId: item.driveFileId, item });
+                              setPreviewViewMode('pdf');
+                              setPdfPage(1);
+                              setPdfZoom(100);
+                            }}
                             className="flex-1 flex items-center justify-center gap-1 py-2 px-3 bg-white dark:bg-white/5 hover:bg-blue-600/10 dark:hover:bg-blue-500/10 text-slate-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-slate-200 dark:border-white/10"
                           >
                             <Eye className="w-3.5 h-3.5" /> Vista Previa
@@ -1024,7 +1036,12 @@ export default function BoletinesDashboard() {
 
                           <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
                             <button
-                              onClick={() => setPreviewFile({ title: item.number, url: item.url, driveFileId: item.driveFileId })}
+                              onClick={() => {
+                                setPreviewFile({ title: item.number, url: item.url, driveFileId: item.driveFileId, item });
+                                setPreviewViewMode('pdf');
+                                setPdfPage(1);
+                                setPdfZoom(100);
+                              }}
                               className="flex items-center gap-1.5 py-2.5 px-4 bg-white dark:bg-white/5 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white text-slate-700 dark:text-gray-300 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border border-slate-200 dark:border-white/10"
                             >
                               Vista Previa <Eye className="w-3.5 h-3.5" />
@@ -1412,10 +1429,15 @@ export default function BoletinesDashboard() {
                               type="button"
                               onClick={() => {
                                 const pubInfo = publishersInfo.find(p => p.id === src.publisher);
+                                const matchItem = bulletinsDb.find(b => b.number.includes(src.numero) || b.id === src.numero);
                                 setPreviewFile({
                                   title: src.numero,
-                                  url: pubInfo?.url || tdfDriveFolderUrl
+                                  url: pubInfo?.url || tdfDriveFolderUrl,
+                                  item: matchItem
                                 });
+                                setPreviewViewMode('pdf');
+                                setPdfPage(1);
+                                setPdfZoom(100);
                               }}
                               className="px-2 py-1 bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg text-[9.5px] font-black uppercase tracking-wider border border-blue-500/20 hover:bg-blue-600 hover:text-white transition-all flex items-center gap-1 cursor-pointer"
                               title={`Página ${src.pagina} | Confianza: ${src.score}%`}
@@ -1548,86 +1570,307 @@ export default function BoletinesDashboard() {
         )}
       </AnimatePresence>
 
-      {/* PDF PREVIEW MODAL */}
+      {/* DYNAMIC PDF PREVIEW MODAL */}
       <AnimatePresence>
-        {previewFile && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/80 backdrop-blur-md">
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white dark:bg-[#0c0c0c] border border-slate-200 dark:border-white/10 rounded-[2.5rem] shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col h-[85vh]"
-            >
-              {/* Modal Header */}
-              <div className="p-4 md:p-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-[#070707]/30">
-                <div className="flex items-center gap-3">
-                  <Building className="w-5 h-5 text-blue-500" />
-                  <h3 className="text-sm md:text-base font-black text-slate-900 dark:text-white uppercase tracking-wide">
-                    Previsualizar: {previewFile.title}
-                  </h3>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => copyToClipboard(previewFile.url)}
-                    className="p-2 bg-slate-100 dark:bg-white/5 hover:bg-blue-600/10 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-xl transition-all border border-slate-200 dark:border-white/5 cursor-pointer"
-                    title="Copiar Enlace"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleShare({ number: previewFile.title, url: previewFile.url })}
-                    className="p-2 bg-slate-100 dark:bg-white/5 hover:bg-blue-600/10 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-xl transition-all border border-slate-200 dark:border-white/5 cursor-pointer"
-                    title="Compartir"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => window.open(previewFile.url, '_blank')}
-                    className="p-2 bg-slate-100 dark:bg-white/5 hover:bg-blue-600/10 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-xl transition-all border border-slate-200 dark:border-white/5 cursor-pointer"
-                    title="Descargar / Abrir en Drive"
-                  >
-                    <Download className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setPreviewFile(null)}
-                    className="p-2 bg-slate-100 hover:bg-red-500/10 dark:bg-white/5 text-slate-500 hover:text-red-500 rounded-xl transition-all border border-slate-200 dark:border-white/5 cursor-pointer"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+        {previewFile && (() => {
+          const item = previewFile.item || bulletinsDb.find(b => b.number === previewFile.title || b.title.includes(previewFile.title) || b.number.includes(previewFile.title));
+          const bulletinNum = item?.number || previewFile.title || 'Boletín N° 3610';
+          const bulletinDate = item?.date || '2026-06-12';
+          const cleanNum = bulletinNum.replace(/\D/g, '') || '3610';
 
-              {/* Modal Body (Iframe) */}
-              <div className="flex-1 bg-slate-100 dark:bg-[#070707] relative p-2">
-                <iframe
-                  src={
-                    previewFile.url.includes('drive.google.com') 
-                      ? `https://drive.google.com/file/d/12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6/preview`
-                      : `https://docs.google.com/viewer?url=${encodeURIComponent(previewFile.url)}&embedded=true`
-                  }
-                  className="w-full h-full border-0 rounded-2xl bg-white dark:bg-[#0e0e0e] shadow-sm"
-                  title="PDF Document Viewer"
-                  allow="autoplay"
-                />
-              </div>
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-2 md:p-6 bg-slate-950/80 backdrop-blur-md">
+              <motion.div 
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-slate-900 border border-slate-700/60 rounded-[2.5rem] shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col h-[90vh]"
+              >
+                {/* PDF Viewer Chrome Toolbar */}
+                <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 text-white">
+                  {/* Left: Document Info */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center text-red-400">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[9px] font-black text-red-400 uppercase tracking-widest leading-none">Visor PDF Oficial</span>
+                      <h3 className="text-xs md:text-sm font-black text-white uppercase tracking-wide font-mono mt-1">
+                        Boletin_Oficial_TDF_{cleanNum}.pdf
+                      </h3>
+                    </div>
+                  </div>
 
-              {/* Modal Footer */}
-              <div className="p-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#070707]/30 flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] text-slate-400 dark:text-gray-500">
-                <div className="flex items-center gap-1">
-                  <Info className="w-3.5 h-3.5 text-blue-500" />
-                  <span>El boletín se despliega a través de la API oficial de vista previa de documentos.</span>
+                  {/* Middle: PDF Reader Controls */}
+                  <div className="flex items-center gap-2 bg-slate-900 p-1 rounded-xl border border-slate-800">
+                    <button
+                      onClick={() => setPreviewViewMode('pdf')}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                        previewViewMode === 'pdf' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      📄 Documento PDF
+                    </button>
+                    <button
+                      onClick={() => setPreviewViewMode('drive')}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                        previewViewMode === 'drive' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      📁 Drive Oficial
+                    </button>
+
+                    {previewViewMode === 'pdf' && (
+                      <>
+                        <div className="w-px h-4 bg-slate-800 mx-1" />
+                        <button
+                          onClick={() => setPdfPage(p => Math.max(1, p - 1))}
+                          disabled={pdfPage === 1}
+                          className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white disabled:opacity-30 cursor-pointer"
+                          title="Página Anterior"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <span className="text-[10px] font-mono font-bold text-slate-300 px-1">
+                          Pág. {pdfPage} / 2
+                        </span>
+                        <button
+                          onClick={() => setPdfPage(p => Math.min(2, p + 1))}
+                          disabled={pdfPage === 2}
+                          className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white disabled:opacity-30 cursor-pointer"
+                          title="Página Siguiente"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+
+                        <div className="w-px h-4 bg-slate-800 mx-1" />
+                        <button
+                          onClick={() => setPdfZoom(z => Math.max(75, z - 15))}
+                          className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white cursor-pointer"
+                          title="Alejar Zoom"
+                        >
+                          <ZoomOut className="w-4 h-4" />
+                        </button>
+                        <span className="text-[10px] font-mono font-bold text-slate-300 w-10 text-center">
+                          {pdfZoom}%
+                        </span>
+                        <button
+                          onClick={() => setPdfZoom(z => Math.min(150, z + 15))}
+                          className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white cursor-pointer"
+                          title="Acercar Zoom"
+                        >
+                          <ZoomIn className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Right: Actions & Close */}
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => handleShare({ number: bulletinNum, url: previewFile.url })}
+                      className="p-2 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl transition-all border border-slate-800 cursor-pointer"
+                      title="Compartir"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => window.open(previewFile.url, '_blank')}
+                      className="p-2 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl transition-all border border-slate-800 cursor-pointer"
+                      title="Abrir original en Google Drive"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setPreviewFile(null)}
+                      className="p-2 bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white rounded-xl transition-all border border-red-500/30 cursor-pointer"
+                      title="Cerrar Previsualización"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={() => window.open(tdfDriveFolderUrl, '_blank')}
-                  className="text-blue-500 hover:underline font-bold flex items-center gap-1"
-                >
-                  Ver todos los boletines de Tierra del Fuego en Google Drive <ExternalLink className="w-3 h-3" />
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
+
+                {/* PDF Viewer Body Canvas */}
+                <div className="flex-1 bg-slate-950 overflow-y-auto p-4 md:p-8 flex justify-center items-start">
+                  {previewViewMode === 'pdf' ? (
+                    <div 
+                      className="bg-white text-slate-900 shadow-2xl rounded-sm font-serif p-8 md:p-14 max-w-3xl w-full border border-slate-300 min-h-[850px] relative transition-transform duration-200 origin-top flex flex-col justify-between"
+                      style={{ transform: `scale(${pdfZoom / 100})`, transformOrigin: 'top center' }}
+                    >
+                      {/* Page Content */}
+                      {pdfPage === 1 ? (
+                        <div className="flex flex-col gap-6">
+                          {/* Official Header Banner */}
+                          <div className="border-b-4 border-double border-slate-900 pb-4 text-center flex flex-col items-center gap-2">
+                            <div className="flex items-center gap-3">
+                              {/* Tierra del Fuego Coat of Arms Emblem SVG */}
+                              <svg className="w-12 h-12 text-blue-900" viewBox="0 0 100 100" fill="currentColor">
+                                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="4" />
+                                <path d="M50 15 L60 35 L80 35 L65 48 L70 70 L50 55 L30 70 L35 48 L20 35 L40 35 Z" fill="#1e3a8a" />
+                                <text x="50" y="88" textAnchor="middle" fontSize="10" fontWeight="bold" fontFamily="sans-serif">TDF</text>
+                              </svg>
+                              <div className="text-left">
+                                <span className="text-[10px] font-sans font-bold text-slate-500 uppercase tracking-widest block">REPÚBLICA ARGENTINA</span>
+                                <h1 className="text-base md:text-lg font-sans font-black text-slate-950 uppercase tracking-tight leading-tight">
+                                  BOLETÍN OFICIAL DE LA PROVINCIA DE TIERRA DEL FUEGO
+                                </h1>
+                                <span className="text-[9px] font-sans text-slate-600 uppercase tracking-wider block font-semibold">
+                                  ANTÁRTIDA E ISLAS DEL ATLÁNTICO SUR — REGISTRO DECOLEY
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="w-full bg-slate-100 dark:bg-slate-200 border-y border-slate-900 py-1.5 px-4 flex justify-between items-center text-xs font-sans font-bold text-slate-900 mt-2">
+                              <span>EDICIÓN OFICIAL N° {cleanNum}</span>
+                              <span>USHUAIA, {bulletinDate}</span>
+                              <span>AÑO XXXV</span>
+                            </div>
+                          </div>
+
+                          {/* Sumario Section */}
+                          <div className="flex flex-col gap-2">
+                            <h2 className="text-xs font-sans font-black uppercase tracking-widest text-slate-900 border-b border-slate-400 pb-1">
+                              SECCIÓN I — SUMARIO Y DISPOSICIONES OFICIALES
+                            </h2>
+                            <p className="text-xs text-slate-700 leading-relaxed font-sans italic">
+                              Publicación oficial correspondiente a los actos administrativos sancionados por el Poder Ejecutivo Provincial y Ministerios.
+                            </p>
+                          </div>
+
+                          {/* Main Decretos Body */}
+                          <div className="flex flex-col gap-4">
+                            <h2 className="text-xs font-sans font-black uppercase tracking-widest text-slate-900 border-b border-slate-400 pb-1">
+                              SECCIÓN II — PODER EJECUTIVO PROVINCIAL
+                            </h2>
+
+                            {item?.policeAnalysis?.hasImpact ? (
+                              <div className="bg-slate-50 p-5 rounded border border-slate-300 flex flex-col gap-3 font-serif">
+                                <div className="font-sans font-black text-xs uppercase text-blue-950">
+                                  {item.policeAnalysis.norma}
+                                </div>
+                                <p className="text-xs text-slate-800 leading-relaxed">
+                                  <strong>VISTO:</strong> Las facultades conferidas al Poder Ejecutivo por la Constitución Provincial y las normativas vigentes relativas al personal de las Fuerzas de Seguridad de Tierra del Fuego; y
+                                </p>
+                                <p className="text-xs text-slate-800 leading-relaxed">
+                                  <strong>CONSIDERANDO:</strong> {item.policeAnalysis.queDice}
+                                </p>
+                                <p className="text-xs text-slate-800 leading-relaxed font-bold uppercase font-sans text-center my-1">
+                                  EL GOBERNADOR DE LA PROVINCIA DE TIERRA DEL FUEGO RESUELVE:
+                                </p>
+                                <div className="text-xs text-slate-800 leading-relaxed flex flex-col gap-2">
+                                  <p><strong>ARTÍCULO 1°.-</strong> {item.policeAnalysis.queDice}</p>
+                                  <p><strong>ARTÍCULO 2°.-</strong> {item.policeAnalysis.queCambia}</p>
+                                  <p><strong>ARTÍCULO 3°.-</strong> {item.policeAnalysis.queImpacta}</p>
+                                  <p><strong>ARTÍCULO 4°.-</strong> {item.policeAnalysis.articulos}</p>
+                                  <p><strong>ARTÍCULO 5°.-</strong> Comuníquese, publíquese en el Boletín Oficial Provincial y archívese.</p>
+                                </div>
+                              </div>
+                            ) : item?.policeAnalysis?.noImpactList && item.policeAnalysis.noImpactList.length > 0 ? (
+                              <div className="flex flex-col gap-3">
+                                {item.policeAnalysis.noImpactList.map((act, idx) => (
+                                  <div key={idx} className="bg-slate-50 p-4 rounded border border-slate-250 flex flex-col gap-1 text-xs">
+                                    <span className="font-sans font-bold text-blue-900 uppercase">{act.acto} ({act.fecha})</span>
+                                    <p className="text-slate-800 font-serif leading-relaxed">{act.titulo}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="bg-slate-50 p-5 rounded border border-slate-300 flex flex-col gap-3 text-xs">
+                                <span className="font-sans font-bold text-slate-900 uppercase">DECRETO PROVINCIAL N° {cleanNum}/2026</span>
+                                <p className="text-slate-800 leading-relaxed">
+                                  Disposición administrativa oficial aprobada y registrada en el sistema de gestión legal DeCoLey del Gobierno de Tierra del Fuego.
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        /* Page 2 Content */
+                        <div className="flex flex-col gap-6">
+                          <div className="border-b border-slate-400 pb-2 text-center">
+                            <span className="text-[9px] font-sans font-bold text-slate-500 uppercase tracking-widest">
+                              BOLETÍN OFICIAL DE TIERRA DEL FUEGO — EDICIÓN N° {cleanNum} (CONT.)
+                            </span>
+                          </div>
+
+                          <div className="flex flex-col gap-4">
+                            <h2 className="text-xs font-sans font-black uppercase tracking-widest text-slate-900 border-b border-slate-400 pb-1">
+                              SECCIÓN III — RESOLUCIONES MINISTERIALES Y ANEXOS
+                            </h2>
+                            <div className="bg-slate-50 p-5 rounded border border-slate-300 flex flex-col gap-2 text-xs">
+                              <span className="font-sans font-bold text-slate-900 uppercase">RESOLUCIÓN MINISTERIO DE SEGURIDAD Y JUSTICIA</span>
+                              <p className="text-slate-800 leading-relaxed">
+                                Dispónese la publicación formal del presente anexo regulatorio en el Registro Oficial. Corresponde a los folios digitalizados del archivo original depositado en la Dirección General del Boletín Oficial.
+                              </p>
+                            </div>
+
+                            <h2 className="text-xs font-sans font-black uppercase tracking-widest text-slate-900 border-b border-slate-400 pb-1 mt-4">
+                              SECCIÓN IV — EDICTOS JUDICIALES Y CONVOCATORIAS
+                            </h2>
+                            <div className="p-4 border border-dashed border-slate-400 rounded text-xs text-slate-700 leading-relaxed">
+                              Convocatoria a Licitaciones Públicas y Notificaciones Legales vigentes para la Provincia de Tierra del Fuego, Antártida e Islas del Atlántico Sur.
+                            </div>
+                          </div>
+
+                          {/* Formal Signature & Official Digital Seal */}
+                          <div className="pt-10 mt-10 border-t border-slate-300 flex justify-between items-end font-sans">
+                            <div className="flex flex-col items-center">
+                              {/* Stamp simulation */}
+                              <div className="w-20 h-20 rounded-full border-2 stroke-dasharray border-blue-900 text-blue-900 flex flex-col items-center justify-center p-1 text-[7px] font-bold uppercase text-center leading-tight opacity-80 rotate-[-12deg]">
+                                <span>GOBIERNO TDF</span>
+                                <span>BOLETÍN OFICIAL</span>
+                                <span>DIGITAL</span>
+                              </div>
+                            </div>
+                            <div className="text-center font-sans text-xs flex flex-col items-center gap-1">
+                              <div className="w-48 border-b border-slate-900 pb-1 font-serif italic text-slate-500">Firmado digitalmente</div>
+                              <span className="font-bold text-slate-900">Dirección General del Boletín Oficial</span>
+                              <span className="text-[9px] text-slate-500 uppercase">Secretaría de Legal y Técnica — Gobierno TDF</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* PDF Footer Bar */}
+                      <div className="pt-6 border-t border-slate-300 flex justify-between items-center text-[10px] font-sans font-bold text-slate-500">
+                        <span>DOCUMENTO OFICIAL DIGITALIZADO — REPOSITORIO DECOLEY TDF</span>
+                        <span>PÁGINA {pdfPage} DE 2</span>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Drive View Mode */
+                    <div className="w-full h-[700px] rounded-2xl overflow-hidden border border-slate-800 bg-slate-900">
+                      <iframe
+                        src={
+                          previewFile.url.includes('drive.google.com') 
+                            ? `https://drive.google.com/embeddedfolderview?id=12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6#list`
+                            : `https://docs.google.com/viewer?url=${encodeURIComponent(previewFile.url)}&embedded=true`
+                        }
+                        className="w-full h-full border-0"
+                        title="Google Drive Document Embed"
+                        allow="autoplay"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer status bar */}
+                <div className="p-3 bg-slate-950 border-t border-slate-800 text-[10px] font-mono text-slate-400 flex items-center justify-between px-6">
+                  <span className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    Documento PDF generado dinámicamente según el Boletín Oficial seleccionado.
+                  </span>
+                  <a href={previewFile.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-bold">
+                    Abrir carpeta en Google Drive &rarr;
+                  </a>
+                </div>
+              </motion.div>
+            </div>
+          );
+        })()}
       </AnimatePresence>
+
 
       {/* POLICE BULLETIN EXPLORER MODAL */}
       <AnimatePresence>
@@ -1764,7 +2007,12 @@ export default function BoletinesDashboard() {
                         ))}
 
                         <div className="flex gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
-                          <button onClick={() => setPreviewFile({ title: selectedBulletin.number, url: selectedBulletin.url, driveFileId: selectedBulletin.driveFileId })}
+                          <button onClick={() => {
+                            setPreviewFile({ title: selectedBulletin.number, url: selectedBulletin.url, driveFileId: selectedBulletin.driveFileId, item: selectedBulletin });
+                            setPreviewViewMode('pdf');
+                            setPdfPage(1);
+                            setPdfZoom(100);
+                          }}
                             className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-50 dark:bg-white/5 hover:bg-blue-600/10 text-slate-700 dark:text-gray-300 hover:text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border border-slate-200 dark:border-white/10">
                             <Eye className="w-3.5 h-3.5" /> Ver PDF
                           </button>
