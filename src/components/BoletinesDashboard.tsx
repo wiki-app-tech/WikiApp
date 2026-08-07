@@ -287,6 +287,21 @@ export default function BoletinesDashboard() {
       id: 'leg-1', type: 'ley', number: 'Ley Provincial 1582',
       date: '2026-06-05', year: '2026', month: '06',
       title: 'Declaración de Interés Provincial del plan integral de conservación del ecosistema de turberas.',
+      summary: 'Establece pautas estrictas de protección ambiental para turberas fueguinas y crea un comité científico técnico de evaluación de impacto.',
+      publisher: 'legislativo', url: 'https://www.legistdf.gob.ar/'
+    },
+    {
+      id: 'leg-2', type: 'ley', number: 'Ley Provincial 1581',
+      date: '2026-05-20', year: '2026', month: '05',
+      title: 'Aprobación del Fondo de Infraestructura Digital y Conectividad para Zonas Rurales y Periféricas.',
+      summary: 'Destina recursos fiscales a la extensión de fibra óptica y conectividad satelital en Tolhuin y parajes de la Isla Grande.',
+      publisher: 'legislativo', url: 'https://www.legistdf.gob.ar/'
+    },
+    {
+      id: 'leg-3', type: 'ley', number: 'Ley Provincial 1580',
+      date: '2026-04-18', year: '2026', month: '04',
+      title: 'Creación del Colegio Profesional de Enfermería de la Provincia de Tierra del Fuego.',
+      summary: 'Regula el ejercicio profesional de la enfermería, sus especialidades, matriculación obligatoria y código de ética disciplinario.',
       publisher: 'legislativo', url: 'https://www.legistdf.gob.ar/'
     },
     // Municipales - Ushuaia
@@ -294,7 +309,44 @@ export default function BoletinesDashboard() {
       id: 'ush-1', type: 'ordenanza', number: 'Ordenanza Municipal 6230',
       date: '2026-06-09', year: '2026', month: '06',
       title: 'Establecimiento del Plan Estratégico de Ordenamiento Territorial y Nuevos Códigos de Edificación.',
+      summary: 'Norma las alturas máximas, retiros edilicios y normas de aislamiento térmico para nuevas construcciones en ejido urbano de Ushuaia.',
       publisher: 'ushuaia', url: 'https://www.ushuaia.gob.ar/'
+    },
+    {
+      id: 'ush-2', type: 'decreto', number: 'Decreto Municipal 412/2026',
+      date: '2026-05-28', year: '2026', month: '05',
+      title: 'Adjudicación de la obra de repavimentación y asfaltado de la Avenida Héroes de Malvinas.',
+      summary: 'Adjudica la realización de bacheo profundo y carpeta asfáltica en caliente para el tramo norte del corredor principal.',
+      publisher: 'ushuaia', url: 'https://www.ushuaia.gob.ar/'
+    },
+    {
+      id: 'ush-3', type: 'ordenanza', number: 'Ordenanza Municipal 6228',
+      date: '2026-05-14', year: '2026', month: '05',
+      title: 'Programa Municipal de Protección Ambiental y Limpieza de la Costa del Canal Beagle.',
+      summary: 'Crea cuadrillas permanentes de saneamiento costero y prohíbe el vertido de plásticos de un solo uso en comercios del puerto.',
+      publisher: 'ushuaia', url: 'https://www.ushuaia.gob.ar/'
+    },
+    // Municipales - Río Grande
+    {
+      id: 'rg-1', type: 'ordenanza', number: 'Ordenanza Municipal 4850/2026',
+      date: '2026-06-10', year: '2026', month: '06',
+      title: 'Programa de Promoción de la Industria del Software y Exenciones Fiscales para Pymes Locales.',
+      summary: 'Bonifica el 100% de la tasa de comercio e industria a empresas de base tecnológica radicadas en el polo tecnológico de Río Grande.',
+      publisher: 'riogrande', url: 'https://www.riogrande.gob.ar/'
+    },
+    {
+      id: 'rg-2', type: 'decreto', number: 'Decreto Municipal 380/2026',
+      date: '2026-05-22', year: '2026', month: '05',
+      title: 'Licitación Pública para la Extensión de la Red de Agua Potable y Cloacas en Margen Sur.',
+      summary: 'Aprueba pliegos licitatorios para la provisión de servicios básicos esenciales a 1.200 familias del sector Margen Sur.',
+      publisher: 'riogrande', url: 'https://www.riogrande.gob.ar/'
+    },
+    {
+      id: 'rg-3', type: 'ordenanza', number: 'Ordenanza Municipal 4845/2026',
+      date: '2026-05-08', year: '2026', month: '05',
+      title: 'Marco Regulatorio y Frecuencias del Servicio Urbano de Transporte Público de Pasajeros.',
+      summary: 'Reordena los recorridos de las líneas de colectivos urbanos e incorpora unidades adaptadas para personas con movilidad reducida.',
+      publisher: 'riogrande', url: 'https://www.riogrande.gob.ar/'
     },
     // Municipales - Tolhuin
     {
@@ -333,6 +385,7 @@ export default function BoletinesDashboard() {
       publisher: 'tolhuin', url: 'https://tolhuin.gob.ar/boletin-oficial/'
     }
   ];
+
 
 
   // LEGAL GUIDE DATABASE
@@ -1577,6 +1630,65 @@ export default function BoletinesDashboard() {
           const bulletinNum = item?.number || previewFile.title || 'Boletín N° 3610';
           const bulletinDate = item?.date || '2026-06-12';
           const cleanNum = bulletinNum.replace(/\D/g, '') || '3610';
+          const pub = item?.publisher || 'provincia';
+          const pubInfo = publishersInfo.find(p => p.id === pub);
+
+          const getHeaderConfig = () => {
+            switch(pub) {
+              case 'legislativo':
+                return {
+                  headerTitle: 'BOLETÍN LEGISLATIVO — PODER LEGISLATIVO PROVINCIAL',
+                  headerSub: 'PROVINCIA DE TIERRA DEL FUEGO, ANTÁRTIDA E ISLAS DEL ATLÁNTICO SUR',
+                  headerTag: 'PORTAL LEGISLATIVO DE LEYES Y RESOLUCIONES',
+                  sealText: 'LEGISLATURA TDF',
+                  badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
+                  barClass: 'bg-amber-100 text-amber-950 border-amber-900',
+                  sigText: 'Secretaría Parlamentaria — Poder Legislativo Provincial'
+                };
+              case 'ushuaia':
+                return {
+                  headerTitle: 'BOLETÍN OFICIAL MUNICIPAL — MUNICIPALIDAD DE USHUAIA',
+                  headerSub: 'CIUDAD DE USHUAIA — CAPITAL DE LA PROVINCIA DE TIERRA DEL FUEGO',
+                  headerTag: 'REGISTRO DE ORDENANZAS Y DECRETOS MUNICIPALES',
+                  sealText: 'MUNI USHUAIA',
+                  badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                  barClass: 'bg-emerald-100 text-emerald-950 border-emerald-900',
+                  sigText: 'Secretaría de Gobierno — Municipalidad de Ushuaia'
+                };
+              case 'riogrande':
+                return {
+                  headerTitle: 'BOLETÍN OFICIAL MUNICIPAL — MUNICIPALIDAD DE RÍO GRANDE',
+                  headerSub: 'CIUDAD DE RÍO GRANDE — TIERRA DEL FUEGO, ANTÁRTIDA E ISLAS DEL ATLÁNTICO SUR',
+                  headerTag: 'PORTAL INSTITUCIONAL Y DECRETOS MUNICIPALES',
+                  sealText: 'MUNI RÍO GRANDE',
+                  badgeColor: 'bg-sky-100 text-sky-900 border-sky-300',
+                  barClass: 'bg-sky-100 text-sky-950 border-sky-900',
+                  sigText: 'Secretaría de Gestión Ciudadana — Municipalidad de Río Grande'
+                };
+              case 'tolhuin':
+                return {
+                  headerTitle: 'BOLETÍN OFICIAL MUNICIPAL — MUNICIPALIDAD DE TOLHUIN',
+                  headerSub: 'MUNICIPIO DE TOLHUIN — CORAZÓN DE LA ISLA GRANDE DE TIERRA DEL FUEGO',
+                  headerTag: 'ARCHIVO DIGITAL DE DECRETOS Y RESOLUCIONES',
+                  sealText: 'MUNI TOLHUIN',
+                  badgeColor: 'bg-rose-100 text-rose-900 border-rose-300',
+                  barClass: 'bg-rose-100 text-rose-950 border-rose-900',
+                  sigText: 'Secretaría Legal y Técnica — Municipio de Tolhuin'
+                };
+              default:
+                return {
+                  headerTitle: 'BOLETÍN OFICIAL DE LA PROVINCIA DE TIERRA DEL FUEGO',
+                  headerSub: 'ANTÁRTIDA E ISLAS DEL ATLÁNTICO SUR — REGISTRO DECOLEY',
+                  headerTag: 'REPÚBLICA ARGENTINA',
+                  sealText: 'GOBIERNO TDF',
+                  badgeColor: 'bg-blue-100 text-blue-900 border-blue-300',
+                  barClass: 'bg-slate-100 text-slate-900 border-slate-900',
+                  sigText: 'Secretaría de Legal y Técnica — Gobierno TDF'
+                };
+            }
+          };
+
+          const cfg = getHeaderConfig();
 
           return (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-2 md:p-6 bg-slate-950/80 backdrop-blur-md">
@@ -1594,9 +1706,9 @@ export default function BoletinesDashboard() {
                       <FileText className="w-5 h-5" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-black text-red-400 uppercase tracking-widest leading-none">Visor PDF Oficial</span>
+                      <span className="text-[9px] font-black text-red-400 uppercase tracking-widest leading-none">Visor PDF Oficial — {pubInfo?.short || 'Provincial'}</span>
                       <h3 className="text-xs md:text-sm font-black text-white uppercase tracking-wide font-mono mt-1">
-                        Boletin_Oficial_TDF_{cleanNum}.pdf
+                        Boletin_{pubInfo?.short || 'Oficial'}_{cleanNum}.pdf
                       </h3>
                     </div>
                   </div>
@@ -1617,7 +1729,7 @@ export default function BoletinesDashboard() {
                         previewViewMode === 'drive' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'
                       }`}
                     >
-                      📁 Drive Oficial
+                      📁 Portal Oficial
                     </button>
 
                     {previewViewMode === 'pdf' && (
@@ -1677,7 +1789,7 @@ export default function BoletinesDashboard() {
                     <button
                       onClick={() => window.open(previewFile.url, '_blank')}
                       className="p-2 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl transition-all border border-slate-800 cursor-pointer"
-                      title="Abrir original en Google Drive"
+                      title="Abrir enlace oficial"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </button>
@@ -1704,44 +1816,62 @@ export default function BoletinesDashboard() {
                           {/* Official Header Banner */}
                           <div className="border-b-4 border-double border-slate-900 pb-4 text-center flex flex-col items-center gap-2">
                             <div className="flex items-center gap-3">
-                              {/* Tierra del Fuego Coat of Arms Emblem SVG */}
-                              <svg className="w-12 h-12 text-blue-900" viewBox="0 0 100 100" fill="currentColor">
+                              {/* Coat of Arms Emblem SVG */}
+                              <svg className="w-12 h-12 text-slate-900" viewBox="0 0 100 100" fill="currentColor">
                                 <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="4" />
                                 <path d="M50 15 L60 35 L80 35 L65 48 L70 70 L50 55 L30 70 L35 48 L20 35 L40 35 Z" fill="#1e3a8a" />
-                                <text x="50" y="88" textAnchor="middle" fontSize="10" fontWeight="bold" fontFamily="sans-serif">TDF</text>
+                                <text x="50" y="88" textAnchor="middle" fontSize="9" fontWeight="bold" fontFamily="sans-serif">TDF</text>
                               </svg>
                               <div className="text-left">
-                                <span className="text-[10px] font-sans font-bold text-slate-500 uppercase tracking-widest block">REPÚBLICA ARGENTINA</span>
+                                <span className="text-[10px] font-sans font-bold text-slate-500 uppercase tracking-widest block">{cfg.headerTag}</span>
                                 <h1 className="text-base md:text-lg font-sans font-black text-slate-950 uppercase tracking-tight leading-tight">
-                                  BOLETÍN OFICIAL DE LA PROVINCIA DE TIERRA DEL FUEGO
+                                  {cfg.headerTitle}
                                 </h1>
                                 <span className="text-[9px] font-sans text-slate-600 uppercase tracking-wider block font-semibold">
-                                  ANTÁRTIDA E ISLAS DEL ATLÁNTICO SUR — REGISTRO DECOLEY
+                                  {cfg.headerSub}
                                 </span>
                               </div>
                             </div>
 
-                            <div className="w-full bg-slate-100 dark:bg-slate-200 border-y border-slate-900 py-1.5 px-4 flex justify-between items-center text-xs font-sans font-bold text-slate-900 mt-2">
-                              <span>EDICIÓN OFICIAL N° {cleanNum}</span>
-                              <span>USHUAIA, {bulletinDate}</span>
-                              <span>AÑO XXXV</span>
+                            <div className={`w-full border-y py-1.5 px-4 flex justify-between items-center text-xs font-sans font-bold mt-2 ${cfg.barClass}`}>
+                              <span>{bulletinNum}</span>
+                              <span>FECHA: {bulletinDate}</span>
+                              <span>EMISOR: {pubInfo?.short || 'Provincial'}</span>
                             </div>
                           </div>
 
                           {/* Sumario Section */}
                           <div className="flex flex-col gap-2">
                             <h2 className="text-xs font-sans font-black uppercase tracking-widest text-slate-900 border-b border-slate-400 pb-1">
-                              SECCIÓN I — SUMARIO Y DISPOSICIONES OFICIALES
+                              SECCIÓN I — SUMARIO Y ANÁLISIS DE CONTENIDO
                             </h2>
                             <p className="text-xs text-slate-700 leading-relaxed font-sans italic">
-                              Publicación oficial correspondiente a los actos administrativos sancionados por el Poder Ejecutivo Provincial y Ministerios.
+                              Publicación oficial correspondiente a los actos administrativos emanados de la jurisdicción de {pubInfo?.name}.
                             </p>
+                          </div>
+
+                          {/* Executive Summary Box (Resumen Corto y Breve) */}
+                          <div className="bg-slate-50 p-5 rounded border border-slate-300 flex flex-col gap-3 font-sans">
+                            <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                              <span className="font-black text-xs uppercase text-slate-900">
+                                RESUMEN CORTO Y BREVE DE LA NORMATIVA
+                              </span>
+                              <span className={`px-2.5 py-1 rounded text-[9px] font-black uppercase tracking-wider border ${cfg.badgeColor}`}>
+                                {pubInfo?.short}
+                              </span>
+                            </div>
+                            <div className="flex flex-col gap-1.5 text-xs text-slate-800">
+                              <p><strong>TÍTULO / ASUNTO:</strong> {item?.title || previewFile.title}</p>
+                              <p className="leading-relaxed">
+                                <strong>SÍNTESIS DEL DOCUMENTO:</strong> {item?.summary || item?.title || 'Publicación oficial registrada en el boletín municipal/provincial con vigencia legal aplicable en el ejido correspondiente.'}
+                              </p>
+                            </div>
                           </div>
 
                           {/* Main Decretos Body */}
                           <div className="flex flex-col gap-4">
                             <h2 className="text-xs font-sans font-black uppercase tracking-widest text-slate-900 border-b border-slate-400 pb-1">
-                              SECCIÓN II — PODER EJECUTIVO PROVINCIAL
+                              SECCIÓN II — TEXTO OFICIAL Y ARTICULADO
                             </h2>
 
                             {item?.policeAnalysis?.hasImpact ? (
@@ -1750,66 +1880,69 @@ export default function BoletinesDashboard() {
                                   {item.policeAnalysis.norma}
                                 </div>
                                 <p className="text-xs text-slate-800 leading-relaxed">
-                                  <strong>VISTO:</strong> Las facultades conferidas al Poder Ejecutivo por la Constitución Provincial y las normativas vigentes relativas al personal de las Fuerzas de Seguridad de Tierra del Fuego; y
+                                  <strong>VISTO:</strong> Las facultades conferidas por la Constitución Provincial y la legislación referente al personal de las Fuerzas de Seguridad; y
                                 </p>
                                 <p className="text-xs text-slate-800 leading-relaxed">
                                   <strong>CONSIDERANDO:</strong> {item.policeAnalysis.queDice}
                                 </p>
                                 <p className="text-xs text-slate-800 leading-relaxed font-bold uppercase font-sans text-center my-1">
-                                  EL GOBERNADOR DE LA PROVINCIA DE TIERRA DEL FUEGO RESUELVE:
+                                  DISPONESE:
                                 </p>
                                 <div className="text-xs text-slate-800 leading-relaxed flex flex-col gap-2">
                                   <p><strong>ARTÍCULO 1°.-</strong> {item.policeAnalysis.queDice}</p>
                                   <p><strong>ARTÍCULO 2°.-</strong> {item.policeAnalysis.queCambia}</p>
                                   <p><strong>ARTÍCULO 3°.-</strong> {item.policeAnalysis.queImpacta}</p>
                                   <p><strong>ARTÍCULO 4°.-</strong> {item.policeAnalysis.articulos}</p>
-                                  <p><strong>ARTÍCULO 5°.-</strong> Comuníquese, publíquese en el Boletín Oficial Provincial y archívese.</p>
+                                  <p><strong>ARTÍCULO 5°.-</strong> Comuníquese, publíquese en el Boletín Oficial y archívese.</p>
                                 </div>
                               </div>
-                            ) : item?.policeAnalysis?.noImpactList && item.policeAnalysis.noImpactList.length > 0 ? (
-                              <div className="flex flex-col gap-3">
-                                {item.policeAnalysis.noImpactList.map((act, idx) => (
-                                  <div key={idx} className="bg-slate-50 p-4 rounded border border-slate-250 flex flex-col gap-1 text-xs">
-                                    <span className="font-sans font-bold text-blue-900 uppercase">{act.acto} ({act.fecha})</span>
-                                    <p className="text-slate-800 font-serif leading-relaxed">{act.titulo}</p>
-                                  </div>
-                                ))}
-                              </div>
                             ) : (
-                              <div className="bg-slate-50 p-5 rounded border border-slate-300 flex flex-col gap-3 text-xs">
-                                <span className="font-sans font-bold text-slate-900 uppercase">DECRETO PROVINCIAL N° {cleanNum}/2026</span>
-                                <p className="text-slate-800 leading-relaxed">
-                                  Disposición administrativa oficial aprobada y registrada en el sistema de gestión legal DeCoLey del Gobierno de Tierra del Fuego.
+                              /* General Non-Police / Municipal / Legislative Decree Format */
+                              <div className="bg-slate-50 p-5 rounded border border-slate-300 flex flex-col gap-3 font-serif">
+                                <div className="font-sans font-black text-xs uppercase text-slate-900 border-b border-slate-200 pb-1">
+                                  {bulletinNum} — {pubInfo?.name}
+                                </div>
+                                <p className="text-xs text-slate-800 leading-relaxed font-sans">
+                                  <strong>VISTO Y CONSIDERANDO:</strong> Que mediante las atribuciones conferidas por la normativa constitucional y municipal vigente, la autoridad del {pubInfo?.name} dicta la presente disposición oficial.
                                 </p>
+                                <p className="text-xs text-slate-800 leading-relaxed font-bold uppercase font-sans text-center my-1">
+                                  SE SANCIONA Y DISPONE:
+                                </p>
+                                <div className="text-xs text-slate-800 leading-relaxed flex flex-col gap-2 font-serif">
+                                  <p><strong>ARTÍCULO 1°.-</strong> Apruébase en todos sus términos el instrumento legal {bulletinNum} referente a: {item?.title || previewFile.title}.</p>
+                                  <p><strong>ARTÍCULO 2°.- (ALCANCE Y RESUMEN):</strong> {item?.summary || 'Establecer las directrices de aplicación obligatoria para el ámbito de la jurisdicción respectiva.'}</p>
+                                  <p><strong>ARTÍCULO 3°.-</strong> Instruir a las dependencias técnicas y presupuestarias a ejecutar las medidas correspondientes para la puesta en marcha de la disposición.</p>
+                                  <p><strong>ARTÍCULO 4°.-</strong> Registrar, comunicar, publicar en el Boletín Oficial correspondiente y archivar.</p>
+                                </div>
                               </div>
                             )}
                           </div>
                         </div>
                       ) : (
                         /* Page 2 Content */
-                        <div className="flex flex-col gap-6">
-                          <div className="border-b border-slate-400 pb-2 text-center">
-                            <span className="text-[9px] font-sans font-bold text-slate-500 uppercase tracking-widest">
-                              BOLETÍN OFICIAL DE TIERRA DEL FUEGO — EDICIÓN N° {cleanNum} (CONT.)
+                        <div className="flex flex-col gap-6 font-serif">
+                          <div className="border-b border-slate-400 pb-2 text-center font-sans">
+                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                              {cfg.headerTitle} — {bulletinNum} (CONT.)
                             </span>
                           </div>
 
                           <div className="flex flex-col gap-4">
                             <h2 className="text-xs font-sans font-black uppercase tracking-widest text-slate-900 border-b border-slate-400 pb-1">
-                              SECCIÓN III — RESOLUCIONES MINISTERIALES Y ANEXOS
+                              SECCIÓN III — RESOLUCIONES Y EDICTOS COMPLEMENTARIOS
                             </h2>
                             <div className="bg-slate-50 p-5 rounded border border-slate-300 flex flex-col gap-2 text-xs">
-                              <span className="font-sans font-bold text-slate-900 uppercase">RESOLUCIÓN MINISTERIO DE SEGURIDAD Y JUSTICIA</span>
+                              <span className="font-sans font-bold text-slate-900 uppercase">ANEXOS TÉCNICOS Y REGLAMENTARIOS</span>
                               <p className="text-slate-800 leading-relaxed">
-                                Dispónese la publicación formal del presente anexo regulatorio en el Registro Oficial. Corresponde a los folios digitalizados del archivo original depositado en la Dirección General del Boletín Oficial.
+                                Se adjuntan los folios y documentación respaldatoria correspondientes a los actos administrativos sancionados por {pubInfo?.name}.
                               </p>
                             </div>
 
                             <h2 className="text-xs font-sans font-black uppercase tracking-widest text-slate-900 border-b border-slate-400 pb-1 mt-4">
-                              SECCIÓN IV — EDICTOS JUDICIALES Y CONVOCATORIAS
+                              SECCIÓN IV — NOTIFICACIONES OFICIALES
                             </h2>
-                            <div className="p-4 border border-dashed border-slate-400 rounded text-xs text-slate-700 leading-relaxed">
-                              Convocatoria a Licitaciones Públicas y Notificaciones Legales vigentes para la Provincia de Tierra del Fuego, Antártida e Islas del Atlántico Sur.
+                            <div className="p-4 border border-dashed border-slate-400 rounded text-xs text-slate-700 leading-relaxed font-sans">
+                              Registro digital de resoluciones de vigencia pública para {pubInfo?.short || 'la provincia'}.
                             </div>
                           </div>
 
@@ -1817,16 +1950,16 @@ export default function BoletinesDashboard() {
                           <div className="pt-10 mt-10 border-t border-slate-300 flex justify-between items-end font-sans">
                             <div className="flex flex-col items-center">
                               {/* Stamp simulation */}
-                              <div className="w-20 h-20 rounded-full border-2 stroke-dasharray border-blue-900 text-blue-900 flex flex-col items-center justify-center p-1 text-[7px] font-bold uppercase text-center leading-tight opacity-80 rotate-[-12deg]">
-                                <span>GOBIERNO TDF</span>
+                              <div className="w-20 h-20 rounded-full border-2 border-slate-800 text-slate-800 flex flex-col items-center justify-center p-1 text-[7px] font-bold uppercase text-center leading-tight opacity-80 rotate-[-12deg]">
+                                <span>{cfg.sealText}</span>
                                 <span>BOLETÍN OFICIAL</span>
                                 <span>DIGITAL</span>
                               </div>
                             </div>
                             <div className="text-center font-sans text-xs flex flex-col items-center gap-1">
                               <div className="w-48 border-b border-slate-900 pb-1 font-serif italic text-slate-500">Firmado digitalmente</div>
-                              <span className="font-bold text-slate-900">Dirección General del Boletín Oficial</span>
-                              <span className="text-[9px] text-slate-500 uppercase">Secretaría de Legal y Técnica — Gobierno TDF</span>
+                              <span className="font-bold text-slate-900">{pubInfo?.name}</span>
+                              <span className="text-[9px] text-slate-500 uppercase">{cfg.sigText}</span>
                             </div>
                           </div>
                         </div>
@@ -1834,7 +1967,7 @@ export default function BoletinesDashboard() {
 
                       {/* PDF Footer Bar */}
                       <div className="pt-6 border-t border-slate-300 flex justify-between items-center text-[10px] font-sans font-bold text-slate-500">
-                        <span>DOCUMENTO OFICIAL DIGITALIZADO — REPOSITORIO DECOLEY TDF</span>
+                        <span>DOCUMENTO REGISTRADO EN EL REPOSITORIO DIGITAL — {pubInfo?.short?.toUpperCase()}</span>
                         <span>PÁGINA {pdfPage} DE 2</span>
                       </div>
                     </div>
@@ -1859,10 +1992,10 @@ export default function BoletinesDashboard() {
                 <div className="p-3 bg-slate-950 border-t border-slate-800 text-[10px] font-mono text-slate-400 flex items-center justify-between px-6">
                   <span className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    Documento PDF generado dinámicamente según el Boletín Oficial seleccionado.
+                    Documento PDF adaptado para {pubInfo?.name}.
                   </span>
                   <a href={previewFile.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-bold">
-                    Abrir carpeta en Google Drive &rarr;
+                    Abrir portal oficial &rarr;
                   </a>
                 </div>
               </motion.div>
@@ -1870,6 +2003,7 @@ export default function BoletinesDashboard() {
           );
         })()}
       </AnimatePresence>
+
 
 
       {/* POLICE BULLETIN EXPLORER MODAL */}
