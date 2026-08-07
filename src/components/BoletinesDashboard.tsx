@@ -88,8 +88,8 @@ export default function BoletinesDashboard() {
   const [policeExplorerMonth, setPoliceExplorerMonth] = useState<string>('all');
   
   // Drive repositories URLs
-  const tdfDriveFolderUrl = 'https://drive.google.com/drive/folders/12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6';
-  const tdfLatestDriveFolderUrl = 'https://drive.google.com/drive/folders/1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR';
+  const tdfDriveFolderUrl = 'https://drive.google.com/drive/folders/12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6?usp=sharing';
+  const tdfLatestDriveFolderUrl = 'https://drive.google.com/drive/folders/1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR?usp=sharing';
   const [driveFolderId, setDriveFolderId] = useState<string>('1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR');
   const [isSyncingDrive, setIsSyncingDrive] = useState<boolean>(false);
   const [lastDriveSyncTime, setLastDriveSyncTime] = useState<string>('En tiempo real');
@@ -1028,55 +1028,123 @@ export default function BoletinesDashboard() {
               </div>
 
               {tdfExplorerMode === 'drive' ? (
-                <div className="flex flex-col gap-4">
-                  {/* Selector de Carpeta de Drive: Últimos Cargados vs Carpeta Histórica */}
-                  <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-slate-50 dark:bg-black/30 p-4 rounded-2xl border border-slate-200 dark:border-white/5">
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-500">Google Drive Repositorios Directos</span>
-                      <span className="text-xs font-bold text-slate-800 dark:text-gray-200">
-                        {driveFolderId === '1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR' ? '📁 Últimos Boletines Oficiales Cargados (En Vivo)' : '📂 Carpeta Histórica General TDF (2022-2026)'}
-                      </span>
+                <div className="flex flex-col gap-5">
+                  {/* Banner Explicativo sobre Acceso Seguro a Google Drive */}
+                  <div className="bg-gradient-to-r from-blue-900/30 via-slate-900 to-indigo-950/40 border border-blue-500/30 p-5 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+                    <div className="flex items-start gap-3.5">
+                      <div className="w-10 h-10 rounded-2xl bg-blue-500/20 flex items-center justify-center shrink-0">
+                        <FolderOpen className="w-5 h-5 text-blue-400" />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">Repositorio Oficial en la Nube</span>
+                          <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded text-[9px] font-black uppercase">
+                            Acceso Público Sin Bloqueos 403
+                          </span>
+                        </div>
+                        <h3 className="text-sm font-black text-white uppercase tracking-wide">
+                          {driveFolderId === '1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR' ? '⚡ Carpeta: Últimos Boletines Creados / Cargados (En Vivo)' : '📂 Carpeta: Repositorio Histórico de Boletines TDF (2022-2026)'}
+                        </h3>
+                        <p className="text-xs text-gray-300">
+                          Podés consultar los boletines directamente en la plataforma o ingresar a la carpeta compartida pública de Google Drive sin requerir permisos especiales.
+                        </p>
+                      </div>
                     </div>
+
+                    <div className="flex flex-wrap gap-2.5 shrink-0 self-stretch md:self-auto">
+                      <a
+                        href={driveFolderId === '1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR' ? tdfLatestDriveFolderUrl : tdfDriveFolderUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 md:flex-none px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg hover:shadow-blue-500/20 transition-all border border-blue-400/30 cursor-pointer active:scale-95"
+                      >
+                        <ExternalLink className="w-4 h-4" /> Abrir Carpeta Drive Directa
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Selector de Repositorio de Google Drive */}
+                  <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-slate-50 dark:bg-black/30 p-4 rounded-2xl border border-slate-200 dark:border-white/5">
+                    <span className="text-xs font-bold text-slate-700 dark:text-gray-300">
+                      Seleccioná la carpeta de Google Drive a explorar:
+                    </span>
 
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => setDriveFolderId('1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR')}
-                        className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
+                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
                           driveFolderId === '1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR'
                             ? 'bg-blue-600 text-white border-blue-500 shadow-md'
                             : 'bg-white dark:bg-white/5 text-slate-700 dark:text-gray-300 border-slate-200 dark:border-white/10 hover:border-blue-500/30'
                         }`}
                       >
-                        ⚡ Últimos Cargados
+                        ⚡ Últimos Cargados (En Vivo)
                       </button>
                       <button
                         onClick={() => setDriveFolderId('12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6')}
-                        className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
+                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
                           driveFolderId === '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6'
                             ? 'bg-blue-600 text-white border-blue-500 shadow-md'
                             : 'bg-white dark:bg-white/5 text-slate-700 dark:text-gray-300 border-slate-200 dark:border-white/10 hover:border-blue-500/30'
                         }`}
                       >
-                        📂 Carpeta Histórica
+                        📂 Carpeta Histórica (2022 - 2026)
                       </button>
-                      <a
-                        href={driveFolderId === '1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR' ? tdfLatestDriveFolderUrl : tdfDriveFolderUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-2 bg-slate-200 dark:bg-white/10 hover:bg-slate-300 text-slate-800 dark:text-white rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1 transition-all"
-                      >
-                        Abrir Drive <ExternalLink className="w-3 h-3" />
-                      </a>
                     </div>
                   </div>
 
-                  <div className="relative w-full h-[600px] rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-inner bg-slate-50 dark:bg-black/25">
-                    <iframe
-                      src={`https://drive.google.com/embeddedfolderview?id=${driveFolderId}#list`}
-                      className="w-full h-full border-0"
-                      title="Google Drive Folder Explorer"
-                      allow="autoplay"
-                    />
+                  {/* Fichas de Boletines en Drive con vista previa y enlace sin 403 */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                    {filteredBulletins
+                      .filter(item => item.publisher === 'provincia')
+                      .map(item => (
+                        <div
+                          key={item.id}
+                          className="p-5 bg-slate-50 dark:bg-[#161616]/40 border border-slate-200 dark:border-white/5 rounded-2xl flex flex-col justify-between gap-4 shadow-sm hover:border-blue-500/20 transition-all group"
+                        >
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-black text-blue-500 font-mono">
+                                {item.number}
+                              </span>
+                              <span className="text-[10px] font-bold text-slate-400 dark:text-gray-500 font-mono flex items-center gap-1">
+                                <Calendar className="w-3.5 h-3.5 text-blue-500" />
+                                {item.date}
+                              </span>
+                            </div>
+                            <h4 className="text-xs font-semibold text-slate-700 dark:text-gray-300 leading-relaxed group-hover:text-blue-500 transition-colors">
+                              {item.title}
+                            </h4>
+                            {item.summary && (
+                              <p className="text-[11px] text-slate-500 dark:text-gray-400 leading-relaxed mt-1 font-medium">
+                                {item.summary}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 pt-3 border-t border-slate-200/50 dark:border-white/5">
+                            <button
+                              onClick={() => {
+                                setPreviewFile({ title: item.number, url: item.url, driveFileId: item.driveFileId, item });
+                                setPreviewViewMode('pdf');
+                                setPdfPage(1);
+                                setPdfZoom(100);
+                              }}
+                              className="flex-1 flex items-center justify-center gap-1 py-2 px-3 bg-white dark:bg-white/5 hover:bg-blue-600/10 text-slate-700 dark:text-gray-300 hover:text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-slate-200 dark:border-white/10 cursor-pointer"
+                            >
+                              <Eye className="w-3.5 h-3.5" /> Vista Previa
+                            </button>
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 py-2 px-3 bg-blue-600/10 hover:bg-blue-600 text-blue-600 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-blue-500/20 cursor-pointer"
+                            >
+                              Abrir en Drive <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </div>
+                        </div>
+                      ))}
                   </div>
                 </div>
               ) : (
