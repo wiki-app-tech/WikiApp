@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Search, Calendar, Info, Shield, ExternalLink, CloudRain, Car, FileText, AlertTriangle, BookOpen, X, Filter } from 'lucide-react';
+import { Send, Search, Calendar, Info, Shield, ExternalLink, CloudRain, Car, FileText, AlertTriangle, BookOpen, X, Filter, RefreshCw, Wifi, Radio } from 'lucide-react';
 import type { Article } from '@/types';
 
 interface TelegramMessage {
@@ -69,7 +69,19 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState<string>(''); // YYYY-MM-DD format
   const [showDatePicker, setShowDatePicker] = useState(false);
-  
+  const [feedArticles, setFeedArticles] = useState<Article[]>(articles);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [autoSeconds, setAutoSeconds] = useState(25);
+  const [lastSyncTime, setLastSyncTime] = useState<string>('En tiempo real');
+  const [liveToast, setLiveToast] = useState<string | null>(null);
+
+  // Synchronize internal state if parent prop updates
+  useEffect(() => {
+    if (articles && articles.length > 0) {
+      setFeedArticles(articles);
+    }
+  }, [articles]);
+
   // Alert messages (simulated official alerts) with recent timestamps
   const alerts: TelegramMessage[] = [
     {
@@ -128,6 +140,50 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
     }
   ];
 
+  // REAL-TIME FETCH FUNCTION (impacts view automatically)
+  const fetchLiveFeeds = async (showNotification = false) => {
+    setIsRefreshing(true);
+    try {
+      const res = await fetch('/api/articles');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.articles && Array.isArray(data.articles) && data.articles.length > 0) {
+          const prevLength = feedArticles.length;
+          setFeedArticles(data.articles);
+          
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          setLastSyncTime(timeStr);
+
+          if (showNotification || data.articles.length > prevLength) {
+            setLiveToast(`📡 Noticias en tiempo real sincronizadas (${timeStr} hs)`);
+            setTimeout(() => setLiveToast(null), 3500);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Live RSS feed poll failed, retaining cache:', err);
+    } finally {
+      setIsRefreshing(false);
+      setAutoSeconds(25);
+    }
+  };
+
+  // AUTOMATED REAL-TIME POLLING EFFECT (Runs every 25 seconds)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setAutoSeconds(prev => {
+        if (prev <= 1) {
+          fetchLiveFeeds(false);
+          return 25;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [feedArticles]);
+
   // Merge alerts and news articles into a single chronological feed
   const unifiedFeed = useMemo(() => {
     const items: UnifiedFeedItem[] = [];
@@ -146,8 +202,8 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
       });
     });
 
-    // Add loaded news articles
-    articles.forEach(article => {
+    // Add loaded live news articles
+    feedArticles.forEach(article => {
       const dateObj = new Date(article.pubDate);
       const isValid = !isNaN(dateObj.getTime());
       const timeStr = isValid
@@ -170,7 +226,7 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
 
     // STRICT SORT: Descending by date and time (newest uploaded item FIRST at index 0)
     return items.sort((a, b) => b.date.getTime() - a.date.getTime());
-  }, [articles]);
+  }, [alerts, feedArticles]);
 
   // Filter feed items by search input & selected calendar date
   const filteredFeed = useMemo(() => {
@@ -235,8 +291,23 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl p-5 md:p-6 shadow-2xl flex flex-col gap-5 overflow-hidden w-full mt-6"
+      className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl p-5 md:p-6 shadow-2xl flex flex-col gap-5 overflow-hidden w-full mt-6 relative"
     >
+      {/* REAL-TIME TOAST ALERT */}
+      <AnimatePresence>
+        {liveToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            className="absolute top-3 left-1/2 -translate-x-1/2 z-50 bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-xl flex items-center gap-2 border border-blue-400"
+          >
+            <Radio className="w-4 h-4 animate-pulse" />
+            {liveToast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* HEADER DE LA TARJETA */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100 dark:border-white/5">
         <div className="flex items-center gap-3">
@@ -252,18 +323,31 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
               <h2 className="text-sm md:text-base font-black text-slate-900 dark:text-white uppercase tracking-wider font-display">
                 Últimas noticias
               </h2>
-              <span className="hidden sm:inline-block px-2 py-0.5 bg-blue-600 text-white rounded-md text-[8px] font-black uppercase tracking-widest">
-                En Vivo
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 rounded-md text-[9px] font-black uppercase tracking-widest">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                En Vivo ({autoSeconds}s)
               </span>
             </div>
-            <p className="text-slate-500 dark:text-gray-400 text-xs">
-              Repositorio de alertas oficiales y noticias provinciales en tiempo real.
+            <p className="text-slate-500 dark:text-gray-400 text-xs flex items-center gap-1.5 mt-0.5">
+              Repositorio de alertas oficiales y noticias provinciales en tiempo real. 
+              <span className="text-[10px] font-mono text-slate-400 hidden sm:inline">Última sincro: {lastSyncTime}</span>
             </p>
           </div>
         </div>
 
-        {/* CONTROLES: Buscador, Botón de Calendario y Unirse al Canal */}
+        {/* CONTROLES: Actualizar en Vivo, Buscador, Calendario y Canal */}
         <div className="flex flex-wrap items-center gap-2.5">
+          {/* Botón de Sincronización Manual */}
+          <button
+            onClick={() => fetchLiveFeeds(true)}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-200 rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-white/5 cursor-pointer disabled:opacity-50"
+            title="Sincronizar noticias en vivo ahora"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-blue-500 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Sincronizar</span>
+          </button>
+
           {/* Buscador de texto */}
           <div className="relative">
             <input
@@ -271,7 +355,7 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
               placeholder="Buscar noticias..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 rounded-xl py-2 pl-3 pr-8 text-xs font-medium text-slate-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 transition-all w-36 sm:w-44"
+              className="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 rounded-xl py-2 pl-3 pr-8 text-xs font-medium text-slate-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 transition-all w-32 sm:w-40"
             />
             <Search className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
           </div>
@@ -405,7 +489,7 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
         </div>
       )}
 
-      {/* FEED DE MENSAJES — ORDENADO CRONOLÓGICAMENTE (ÚLTIMA NOTICIA PRIMERO) */}
+      {/* FEED DE MENSAJES — EN TIEMPO REAL Y ORDENADO CRONOLÓGICAMENTE */}
       <div className="max-h-[460px] overflow-y-auto pr-1 flex flex-col gap-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-white/5">
         <AnimatePresence mode="popLayout">
           {filteredFeed.map((item, idx) => {
