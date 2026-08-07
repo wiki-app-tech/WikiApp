@@ -87,10 +87,22 @@ export default function BoletinesDashboard() {
   const [policeExplorerYear, setPoliceExplorerYear] = useState<string>('all');
   const [policeExplorerMonth, setPoliceExplorerMonth] = useState<string>('all');
   
-  // Drive repositories URLs
+  // Drive repositories URLs & 2026 Monthly Folders
+  const MONTHLY_FOLDERS_2026 = [
+    { month: '08', name: 'Agosto 2026', folderId: '1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR', url: 'https://drive.google.com/drive/folders/1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR?usp=sharing' },
+    { month: '07', name: 'Julio 2026', folderId: '1uxoaCpOt2nL6cnHX5zWuf4v5CsK6kBEX', url: 'https://drive.google.com/drive/folders/1uxoaCpOt2nL6cnHX5zWuf4v5CsK6kBEX?usp=sharing' },
+    { month: '06', name: 'Junio 2026', folderId: '1uqbg-8oOVfC9B7E850YIsRm7aiCyEUmf', url: 'https://drive.google.com/drive/folders/1uqbg-8oOVfC9B7E850YIsRm7aiCyEUmf?usp=sharing' },
+    { month: '05', name: 'Mayo 2026', folderId: '1qWrK0PiHpAC-UesyRGcLbwDjSJvrVo6a', url: 'https://drive.google.com/drive/folders/1qWrK0PiHpAC-UesyRGcLbwDjSJvrVo6a?usp=sharing' },
+    { month: '04', name: 'Abril 2026', folderId: '1X2l6C-kjSmiVEPp4XoFw6LKAXBEmoG_q', url: 'https://drive.google.com/drive/folders/1X2l6C-kjSmiVEPp4XoFw6LKAXBEmoG_q?usp=sharing' },
+    { month: '03', name: 'Marzo 2026', folderId: '1wzQci1Mq2Xj1RFBYTj7ALkdRhuuvYovo', url: 'https://drive.google.com/drive/folders/1wzQci1Mq2Xj1RFBYTj7ALkdRhuuvYovo?usp=sharing' },
+    { month: '02', name: 'Febrero 2026', folderId: '1F_1H-szMf84aoek12SSiaVh63obtWHIg', url: 'https://drive.google.com/drive/folders/1F_1H-szMf84aoek12SSiaVh63obtWHIg?usp=sharing' },
+    { month: '01', name: 'Enero 2026', folderId: '1bULetMc_bRhUaNC-d0sP5HJ4kdfl38oV', url: 'https://drive.google.com/drive/folders/1bULetMc_bRhUaNC-d0sP5HJ4kdfl38oV?usp=sharing' },
+  ];
+
   const tdfDriveFolderUrl = 'https://drive.google.com/drive/folders/12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6?usp=sharing';
   const tdfLatestDriveFolderUrl = 'https://drive.google.com/drive/folders/1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR?usp=sharing';
   const [driveFolderId, setDriveFolderId] = useState<string>('1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR');
+  const [selectedDriveMonth, setSelectedDriveMonth] = useState<string>('all');
   const [isSyncingDrive, setIsSyncingDrive] = useState<boolean>(false);
   const [lastDriveSyncTime, setLastDriveSyncTime] = useState<string>('En tiempo real');
 
@@ -285,7 +297,8 @@ export default function BoletinesDashboard() {
       id: 'prov-2026-3', type: 'decreto', number: 'Boletín N° 3608',
       date: '2026-05-29', year: '2026', month: '05',
       title: 'Boletín Oficial TDF N° 3608 — Decretos del Poder Ejecutivo e informes institucionales.',
-      publisher: 'provincia', url: tdfDriveFolderUrl, driveFileId: '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6',
+      summary: 'Aprobación del escalafón salarial actualizado del personal policial activo y pasivo.',
+      publisher: 'provincia', url: 'https://drive.google.com/drive/folders/1qWrK0PiHpAC-UesyRGcLbwDjSJvrVo6a?usp=sharing', driveFileId: '1qWrK0PiHpAC-UesyRGcLbwDjSJvrVo6a',
       policeAnalysis: {
         hasImpact: true,
         norma: 'Boletín N° 3608 — Decreto PE N° 498/2026 (29/05/2026)',
@@ -293,6 +306,70 @@ export default function BoletinesDashboard() {
         queCambia: 'Actualización de la grilla salarial policial. Modifica haberes activos y, por movilidad 82% Ley 819, impacta en los pasivos.',
         queImpacta: 'Todo el personal activo percibe incremento en adicionales de zona. Retirados y pensionados ven actualizado su haber por movilidad automática.',
         articulos: 'Art. 1° al 5° del Decreto 498/2026. Anexo I — Planilla salarial actualizada.',
+        noImpactList: []
+      }
+    },
+    {
+      id: 'prov-2026-3605', type: 'decreto', number: 'Boletín N° 3605',
+      date: '2026-04-24', year: '2026', month: '04',
+      title: 'Boletín Oficial TDF N° 3605 — Reglamentación de Adicionales y Cuadros Orgánicos.',
+      summary: 'Disposiciones sobre capacitación continua, partidas de seguridad y convenios interjurisdiccionales.',
+      publisher: 'provincia', url: 'https://drive.google.com/drive/folders/1X2l6C-kjSmiVEPp4XoFw6LKAXBEmoG_q?usp=sharing', driveFileId: '1X2l6C-kjSmiVEPp4XoFw6LKAXBEmoG_q',
+      policeAnalysis: {
+        hasImpact: true,
+        norma: 'Boletín N° 3605 — Decreto PE N° 410/2026 (24/04/2026)',
+        queDice: 'Asignación de partida presupuestaria especial para equipamiento de unidades operativas territoriales.',
+        queCambia: 'Renovación de parque automotor y chalecos balísticos para personal de prevención caminera.',
+        queImpacta: 'Comisarías y destacamentos de Ushuaia, Tolhuin y Río Grande.',
+        articulos: 'Arts. 1° al 4° del Decreto 410/2026.',
+        noImpactList: []
+      }
+    },
+    {
+      id: 'prov-2026-3600', type: 'resolucion', number: 'Boletín N° 3600',
+      date: '2026-03-27', year: '2026', month: '03',
+      title: 'Boletín Oficial TDF N° 3600 — Apertura de Cursos de Formación Policial 2026.',
+      summary: 'Convocatoria a concurso de ingreso para la Escuela de Policía de Tierra del Fuego.',
+      publisher: 'provincia', url: 'https://drive.google.com/drive/folders/1wzQci1Mq2Xj1RFBYTj7ALkdRhuuvYovo?usp=sharing', driveFileId: '1wzQci1Mq2Xj1RFBYTj7ALkdRhuuvYovo',
+      policeAnalysis: {
+        hasImpact: true,
+        norma: 'Boletín N° 3600 — Res. Min. Seguridad N° 120/2026',
+        queDice: 'Aprobación del reglamento de admisión y plan de estudios para la Escuela de Suboficiales y Agentes.',
+        queCambia: 'Requisitos de ingreso y programa lectivo de formación policial provincial.',
+        queImpacta: 'Cadetes e inscriptos al ciclo lectivo 2026.',
+        articulos: 'Anexos I y II de la Res. 120/2026.',
+        noImpactList: []
+      }
+    },
+    {
+      id: 'prov-2026-3590', type: 'decreto', number: 'Boletín N° 3590',
+      date: '2026-02-27', year: '2026', month: '02',
+      title: 'Boletín Oficial TDF N° 3590 — Ascensos Anuales y Asignaciones de Destino.',
+      summary: 'Decreto de ascensos del personal superior y subalterno de la Policía Provincial.',
+      publisher: 'provincia', url: 'https://drive.google.com/drive/folders/1F_1H-szMf84aoek12SSiaVh63obtWHIg?usp=sharing', driveFileId: '1F_1H-szMf84aoek12SSiaVh63obtWHIg',
+      policeAnalysis: {
+        hasImpact: true,
+        norma: 'Boletín N° 3590 — Decreto PE N° 210/2026 (27/02/2026)',
+        queDice: 'Promoción al grado inmediato superior del personal promovido por junta de calificaciones.',
+        queCambia: 'Modificación del orden jerárquico y reestructuración de dotaciones.',
+        queImpacta: 'Personal policial ascendido en todas las escalas y jerarquías.',
+        articulos: 'Arts. 1° al 12° y Anexos de Promociones.',
+        noImpactList: []
+      }
+    },
+    {
+      id: 'prov-2026-3580', type: 'decreto', number: 'Boletín N° 3580',
+      date: '2026-01-30', year: '2026', month: '01',
+      title: 'Boletín Oficial TDF N° 3580 — Primer Boletín Oficial Digital del Año 2026.',
+      summary: 'Promulgación de leyes de presupuesto y pautas de funcionamiento institucional del nuevo año.',
+      publisher: 'provincia', url: 'https://drive.google.com/drive/folders/1bULetMc_bRhUaNC-d0sP5HJ4kdfl38oV?usp=sharing', driveFileId: '1bULetMc_bRhUaNC-d0sP5HJ4kdfl38oV',
+      policeAnalysis: {
+        hasImpact: true,
+        norma: 'Boletín N° 3580 — Decreto PE N° 05/2026 (30/01/2026)',
+        queDice: 'Fijación de pautas salariales iniciales y prórroga de adicionales por zona inhóspita.',
+        queCambia: 'Continuidad y actualización de adicionales operativos.',
+        queImpacta: 'Personal activo y pasivo de la fuerza de seguridad provincial.',
+        articulos: 'Arts. 1° a 8°.',
         noImpactList: []
       }
     },
@@ -1037,13 +1114,13 @@ export default function BoletinesDashboard() {
                       </div>
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">Repositorio Oficial en la Nube</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">Repositorio Oficial 2026 en la Nube</span>
                           <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded text-[9px] font-black uppercase">
                             Acceso Público Sin Bloqueos 403
                           </span>
                         </div>
                         <h3 className="text-sm font-black text-white uppercase tracking-wide">
-                          {driveFolderId === '1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR' ? '⚡ Carpeta: Últimos Boletines Creados / Cargados (En Vivo)' : '📂 Carpeta: Repositorio Histórico de Boletines TDF (2022-2026)'}
+                          {MONTHLY_FOLDERS_2026.find(m => m.folderId === driveFolderId)?.name ? `⚡ Carpeta: ${MONTHLY_FOLDERS_2026.find(m => m.folderId === driveFolderId)?.name}` : '📂 Carpeta: Repositorio Histórico de Boletines TDF (2022-2026)'}
                         </h3>
                         <p className="text-xs text-gray-300">
                           Podés consultar los boletines directamente en la plataforma o ingresar a la carpeta compartida pública de Google Drive sin requerir permisos especiales.
@@ -1053,7 +1130,7 @@ export default function BoletinesDashboard() {
 
                     <div className="flex flex-wrap gap-2.5 shrink-0 self-stretch md:self-auto">
                       <a
-                        href={driveFolderId === '1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR' ? tdfLatestDriveFolderUrl : tdfDriveFolderUrl}
+                        href={MONTHLY_FOLDERS_2026.find(m => m.folderId === driveFolderId)?.url || tdfDriveFolderUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex-1 md:flex-none px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg hover:shadow-blue-500/20 transition-all border border-blue-400/30 cursor-pointer active:scale-95"
@@ -1063,32 +1140,62 @@ export default function BoletinesDashboard() {
                     </div>
                   </div>
 
-                  {/* Selector de Repositorio de Google Drive */}
-                  <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-slate-50 dark:bg-black/30 p-4 rounded-2xl border border-slate-200 dark:border-white/5">
-                    <span className="text-xs font-bold text-slate-700 dark:text-gray-300">
-                      Seleccioná la carpeta de Google Drive a explorar:
-                    </span>
+                  {/* Selector de Repositorio de Google Drive por Mes 2026 */}
+                  <div className="flex flex-col gap-3 bg-slate-50 dark:bg-black/30 p-4.5 rounded-2xl border border-slate-200 dark:border-white/5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-gray-300">
+                        Carpetas Mensuales de Google Drive 2026:
+                      </span>
+                      <span className="text-[10px] font-bold text-blue-500 font-mono">
+                        8 Meses Enlazados
+                      </span>
+                    </div>
 
                     <div className="flex flex-wrap gap-2">
                       <button
-                        onClick={() => setDriveFolderId('1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR')}
-                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
-                          driveFolderId === '1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR'
+                        onClick={() => {
+                          setSelectedDriveMonth('all');
+                          setDriveFolderId('1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR');
+                        }}
+                        className={`px-3.5 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
+                          selectedDriveMonth === 'all' && driveFolderId === '1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR'
                             ? 'bg-blue-600 text-white border-blue-500 shadow-md'
                             : 'bg-white dark:bg-white/5 text-slate-700 dark:text-gray-300 border-slate-200 dark:border-white/10 hover:border-blue-500/30'
                         }`}
                       >
-                        ⚡ Últimos Cargados (En Vivo)
+                        ⚡ Todos los Meses
                       </button>
+
+                      {MONTHLY_FOLDERS_2026.map(mf => (
+                        <button
+                          key={mf.month}
+                          onClick={() => {
+                            setDriveFolderId(mf.folderId);
+                            setSelectedDriveMonth(mf.month);
+                          }}
+                          className={`px-3.5 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer border flex items-center gap-1.5 ${
+                            driveFolderId === mf.folderId
+                              ? 'bg-blue-600 text-white border-blue-500 shadow-md'
+                              : 'bg-white dark:bg-white/5 text-slate-700 dark:text-gray-300 border-slate-200 dark:border-white/10 hover:border-blue-500/30'
+                          }`}
+                        >
+                          <FolderOpen className="w-3.5 h-3.5 text-blue-400" />
+                          {mf.name}
+                        </button>
+                      ))}
+
                       <button
-                        onClick={() => setDriveFolderId('12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6')}
-                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
+                        onClick={() => {
+                          setDriveFolderId('12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6');
+                          setSelectedDriveMonth('all');
+                        }}
+                        className={`px-3.5 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer border flex items-center gap-1.5 ${
                           driveFolderId === '12GrKybtm4cWyS6Ib_DnbwKAQ6JvQHCU6'
                             ? 'bg-blue-600 text-white border-blue-500 shadow-md'
                             : 'bg-white dark:bg-white/5 text-slate-700 dark:text-gray-300 border-slate-200 dark:border-white/10 hover:border-blue-500/30'
                         }`}
                       >
-                        📂 Carpeta Histórica (2022 - 2026)
+                        📂 Histórica General
                       </button>
                     </div>
                   </div>
@@ -1097,6 +1204,7 @@ export default function BoletinesDashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                     {filteredBulletins
                       .filter(item => item.publisher === 'provincia')
+                      .filter(item => selectedDriveMonth === 'all' || item.month === selectedDriveMonth)
                       .map(item => (
                         <div
                           key={item.id}
