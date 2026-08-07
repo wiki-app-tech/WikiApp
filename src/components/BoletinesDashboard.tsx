@@ -198,20 +198,68 @@ export default function BoletinesDashboard() {
   };
 
   const bulletinsDb: BulletinItem[] = [
-    // Provincia - 2026 (NUEVOS BOLETINES EN VIVO CARGADOS EN DRIVE)
+    // Provincia - 2026 (NUEVOS BOLETINES OFICIALES CARGADOS DIRECTAMENTE EN DRIVE POR EL USUARIO)
     {
-      id: 'prov-2026-3614', type: 'decreto', number: 'Boletín N° 3614',
+      id: 'prov-2026-6140', type: 'decreto', number: 'Boletín N° 6140',
       date: '2026-08-07', year: '2026', month: '08',
-      title: 'Boletín Oficial TDF N° 3614 — Edición Especial de Última Hora (Cargado en Drive).',
-      summary: 'Normativas de emergencia vial, resoluciones del Ministerio de Seguridad y acuerdos de recomposición salarial.',
-      publisher: 'provincia', url: tdfLatestDriveFolderUrl, driveFileId: '1ZBzjN-hTqSHVCQ5oS8sKqcXNBg-U28iR',
+      title: 'Boletín Oficial Digital TDF N° 6140 — Edición Especial de Última Hora.',
+      summary: 'Operativos invernales de seguridad vial, resoluciones del Ministerio de Seguridad y acuerdos de recomposición salarial.',
+      publisher: 'provincia', url: 'https://drive.google.com/file/d/1xw6uD9oeYMm00LHVEdVdkVBw02JtH-H2/view?usp=sharing', driveFileId: '1xw6uD9oeYMm00LHVEdVdkVBw02JtH-H2',
       policeAnalysis: {
         hasImpact: true,
-        norma: 'Boletín N° 3614 — Decreto PE N° 620/2026 (07/08/2026)',
-        queDice: 'Protocolo de actuación conjunta para operativos invernales de seguridad vial y actualización de adicionales por función operativa.',
-        queCambia: 'Incrementa el adicional por riesgo operacional del personal de servicio en rutas.',
+        norma: 'Boletín N° 6140 — Decreto PE N° 635/2026 (07/08/2026)',
+        queDice: 'Protocolo de actuación para el personal policial en pasos fronterizos y puestos camineros durante el operativo de prevención de invierno.',
+        queCambia: 'Actualiza adicionales por riesgo vial e intemperie operativa.',
         queImpacta: 'Personal policial asignado a puestos camineros de Ushuaia, Tolhuin y Río Grande.',
-        articulos: 'Arts. 1° al 6° del Decreto 620/2026. Res. Min. Seguridad N° 302/2026.',
+        articulos: 'Arts. 1° al 5° del Decreto 635/2026.',
+        noImpactList: []
+      }
+    },
+    {
+      id: 'prov-2026-6139', type: 'resolucion', number: 'Boletín N° 6139',
+      date: '2026-08-04', year: '2026', month: '08',
+      title: 'Boletín Oficial Digital TDF N° 6139 — Resoluciones Ministeriales y Convocatorias.',
+      summary: 'Resoluciones del Ministerio de Seguridad, asignación de destinos operativos y ascensos.',
+      publisher: 'provincia', url: 'https://drive.google.com/open?id=19L2ifUkWE15TWthmMaPTEQj1qxW68ri6&usp=sharing', driveFileId: '19L2ifUkWE15TWthmMaPTEQj1qxW68ri6',
+      policeAnalysis: {
+        hasImpact: true,
+        norma: 'Boletín N° 6139 — Res. Min. Seguridad N° 315/2026 (04/08/2026)',
+        queDice: 'Asignación de comisiones de servicio y pases de destino en comisarías provinciales.',
+        queCambia: 'Reestructuración de la línea de mando intersectorial en dependencias de prevención.',
+        queImpacta: 'Oficiales Jefes, Suboficiales y personal técnico de apoyo.',
+        articulos: 'Arts. 1° a 4° Res. Min. Seg. 315/2026.',
+        noImpactList: []
+      }
+    },
+    {
+      id: 'prov-2026-6138', type: 'decreto', number: 'Boletín N° 6138',
+      date: '2026-07-31', year: '2026', month: '07',
+      title: 'Boletín Oficial Digital TDF N° 6138 — Grilla Salarial y Movilidad Pasividades.',
+      summary: 'Actualización salarial para la administración pública provincial y cuadros de seguridad.',
+      publisher: 'provincia', url: 'https://drive.google.com/file/d/1prLIlcbaug-YtRqFLpNkDjK7lkzvK3qW/view?usp=sharing', driveFileId: '1prLIlcbaug-YtRqFLpNkDjK7lkzvK3qW',
+      policeAnalysis: {
+        hasImpact: true,
+        norma: 'Boletín N° 6138 — Decreto PE N° 588/2026 (31/07/2026)',
+        queDice: 'Ajuste del 15% en el haber básico policial y pasividades por ley de movilidad 819.',
+        queCambia: 'Recomposición directa en la escala salarial de activos y retirados.',
+        queImpacta: 'Personal policial activo, retirado y pensionado.',
+        articulos: 'Arts. 2° y 3°, Anexos Salariales I y II.',
+        noImpactList: []
+      }
+    },
+    {
+      id: 'prov-2026-6137', type: 'decreto', number: 'Boletín N° 6137',
+      date: '2026-07-28', year: '2026', month: '07',
+      title: 'Boletín Oficial Digital TDF N° 6137 — Régimen de Licencias y Estructuras Orgánicas.',
+      summary: 'Decretos del Poder Ejecutivo, contrataciones públicas e informes de gestión.',
+      publisher: 'provincia', url: 'https://drive.google.com/file/d/1rrcGJBGyUFvlSZuVCZeTp1yn5gXq0kKW/view?usp=sharing', driveFileId: '1rrcGJBGyUFvlSZuVCZeTp1yn5gXq0kKW',
+      policeAnalysis: {
+        hasImpact: true,
+        norma: 'Boletín N° 6137 — Decreto PE N° 570/2026 (28/07/2026)',
+        queDice: 'Modificación del régimen de licencias especiales por perfeccionamiento y capacitación policial.',
+        queCambia: 'Extiende plazos de licencias para cursos de posgrado en seguridad pública.',
+        queImpacta: 'Oficiales y suboficiales inscriptos en diplomaturas o carreras universitarias.',
+        articulos: 'Arts. 1° al 6° del Decreto 570/2026.',
         noImpactList: []
       }
     },
