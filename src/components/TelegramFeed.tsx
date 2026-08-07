@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Search, Calendar, Info, Shield, ExternalLink, CloudRain, Car, FileText, AlertTriangle, BookOpen, Share2 } from 'lucide-react';
+import { Send, Search, Calendar, Info, Shield, ExternalLink, CloudRain, Car, FileText, AlertTriangle, BookOpen, X, Filter } from 'lucide-react';
 import type { Article } from '@/types';
 
 interface TelegramMessage {
@@ -37,54 +37,93 @@ function stripHtml(html: string = '') {
   return html.replace(/<[^>]*>/g, '').trim();
 }
 
+// Helper to format Date into YYYY-MM-DD in local time
+function formatYMD(d: Date): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// Helper to display friendly date & time string
+function formatDisplayDate(d: Date, timeStr: string): string {
+  const todayYMD = formatYMD(new Date());
+  const itemYMD = formatYMD(d);
+  
+  if (itemYMD === todayYMD) {
+    return `Hoy ${timeStr} hs`;
+  }
+  
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (itemYMD === formatYMD(yesterday)) {
+    return `Ayer ${timeStr} hs`;
+  }
+  
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month} ${timeStr} hs`;
+}
+
 export default function TelegramFeed({ articles = [], onSelectArticle }: TelegramFeedProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDate, setSelectedDate] = useState<string>(''); // YYYY-MM-DD format
+  const [showDatePicker, setShowDatePicker] = useState(false);
   
-  // Alert messages (simulated official alerts)
+  // Alert messages (simulated official alerts) with recent timestamps
   const alerts: TelegramMessage[] = [
     {
       id: 1,
-      date: '2026-08-04',
-      time: '10:45',
+      date: '2026-08-07',
+      time: '11:30',
       sender: 'Defensa Civil TDF',
       category: 'clima',
-      content: '⚠️ ALERTA METEOROLÓGICA: Se registran ráfagas intensas superiores a 90 km/h en la zona norte y centro de la provincia. Se aconseja no asegurar elementos sueltos en techos o patios y evitar circular a pie o en vehículos de gran porte si no es estrictamente necesario.',
+      content: '⚠️ ALERTA METEOROLÓGICA: Se registran ráfagas intensas superiores a 95 km/h en el área del Canal Beagle y zona centro. Se solicita precaución extrema en la vía pública y asegurar chapas o estructuras de obra.',
       isImportant: true
     },
     {
       id: 2,
-      date: '2026-08-04',
-      time: '09:12',
+      date: '2026-08-07',
+      time: '10:15',
       sender: 'Vialidad Provincial TDF',
       category: 'transito',
-      content: '🚗 ESTADO DE RUTA 3: Calzada transitable con extrema precaución en el tramo Tolhuin - Ushuaia (Paso Garibaldi). Presencia de escarcha y nieve volada en sectores altos. Equipos de vialidad operando con fundentes. Portación de cubiertas térmicas u obligatoriedad de cadenas.',
+      content: '🚗 ESTADO DE RUTA 3: Calzada transitable con extrema precaución entre Tolhuin y Ushuaia (Paso Garibaldi). Presencia de hielo negro y nieve escarchada en zonas de sombra. Equipos invernales esparciendo sal y urea.',
       isImportant: false
     },
     {
       id: 3,
-      date: '2026-08-03',
-      time: '18:30',
+      date: '2026-08-07',
+      time: '08:45',
       sender: 'Gobierno de Tierra del Fuego',
       category: 'institucional',
-      content: '📢 COMUNICADO OFICIAL: Se encuentra abierta la inscripción para el Programa de Fortalecimiento Educativo Provincial para docentes y estudiantes avanzados de nivel superior. Accedé a las bases y condiciones en el portal oficial del Ministerio de Educación.',
+      content: '📢 COMUNICADO OFICIAL: Apertura de la inscripción online al Programa Provincial de Becas Universitarias y Terciarias 2026. Consultá requisitos y documentación en el sitio oficial del Ministerio de Educación.',
       isImportant: false
     },
     {
       id: 4,
-      date: '2026-08-03',
-      time: '15:20',
+      date: '2026-08-06',
+      time: '19:20',
       sender: 'Defensa Civil Ushuaia',
       category: 'seguridad',
-      content: '🚨 ATENCIÓN CIUDADANA: Se recuerda la vigencia de la prohibición de encendido de fuego en zonas agrestes y boscosas no habilitadas por el plan provincial de manejo del fuego. Evitemos incendios forestales. Denuncias al 103 o 911.',
+      content: '🚨 ATENCIÓN CIUDADANA: Se recuerda la vigencia de la prohibición de encendido de fuego en zonas boscosas no habilitadas por el Plan Provincial de Manejo del Fuego. Denuncias preventivas al 103 o 911.',
       isImportant: true
     },
     {
       id: 5,
-      date: '2026-08-02',
-      time: '11:05',
+      date: '2026-08-06',
+      time: '14:10',
       sender: 'Ministerio de Salud TDF',
       category: 'institucional',
-      content: '🏥 CAMPAÑA DE VACUNACIÓN: Mañana inicia el cronograma de refuerzos de vacuna antigripal en todos los centros de salud provinciales (CAPS) de Ushuaia, Tolhuin y Río Grande. Presentarse con libreta de vacunación y DNI.',
+      content: '🏥 CAMPAÑA DE SALUD: Cronograma de vacunación antigripal y libreta sanitaria en los Centros de Atención Primaria (CAPS) de Río Grande, Tolhuin y Ushuaia.',
+      isImportant: false
+    },
+    {
+      id: 6,
+      date: '2026-08-05',
+      time: '16:50',
+      sender: 'Policía de Tierra del Fuego',
+      category: 'seguridad',
+      content: '🛡️ OPERATIVO CONTROL DE TRÁNSITO: Se despliegan controles vehiculares preventivos y de verificación de cubiertas sílice/cadenas en los accesos a Río Grande y Ushuaia.',
       isImportant: false
     }
   ];
@@ -93,7 +132,7 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
   const unifiedFeed = useMemo(() => {
     const items: UnifiedFeedItem[] = [];
 
-    // Add alerts
+    // Add official alerts
     alerts.forEach(alert => {
       const dateObj = new Date(`${alert.date}T${alert.time}:00`);
       items.push({
@@ -110,13 +149,14 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
     // Add loaded news articles
     articles.forEach(article => {
       const dateObj = new Date(article.pubDate);
-      const timeStr = !isNaN(dateObj.getTime())
+      const isValid = !isNaN(dateObj.getTime());
+      const timeStr = isValid
         ? dateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
         : '00:00';
 
       items.push({
         id: `article-${article.id}`,
-        date: isNaN(dateObj.getTime()) ? new Date() : dateObj,
+        date: isValid ? dateObj : new Date(),
         timeStr: timeStr,
         sender: article.sourceName || 'Noticias TDF',
         category: 'noticia',
@@ -128,21 +168,32 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
       });
     });
 
-    // Sort by date descending (newest first)
+    // STRICT SORT: Descending by date and time (newest uploaded item FIRST at index 0)
     return items.sort((a, b) => b.date.getTime() - a.date.getTime());
   }, [articles]);
 
-  // Filter feed items by search input
+  // Filter feed items by search input & selected calendar date
   const filteredFeed = useMemo(() => {
-    if (!searchTerm.trim()) return unifiedFeed.slice(0, 30); // limit to top 30 items for speed
+    let result = unifiedFeed;
 
-    return unifiedFeed.filter(item =>
-      item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.title && item.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      item.sender.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchTerm.toLowerCase())
-    ).slice(0, 30);
-  }, [searchTerm, unifiedFeed]);
+    // Filter by selected date (YYYY-MM-DD)
+    if (selectedDate) {
+      result = result.filter(item => formatYMD(item.date) === selectedDate);
+    }
+
+    // Filter by search text
+    if (searchTerm.trim()) {
+      const query = searchTerm.toLowerCase();
+      result = result.filter(item =>
+        item.content.toLowerCase().includes(query) ||
+        (item.title && item.title.toLowerCase().includes(query)) ||
+        item.sender.toLowerCase().includes(query) ||
+        item.category.toLowerCase().includes(query)
+      );
+    }
+
+    return result.slice(0, 50); // display top 50 matches
+  }, [searchTerm, selectedDate, unifiedFeed]);
 
   const getCategoryBadge = (category: string) => {
     switch (category) {
@@ -211,49 +262,170 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
           </div>
         </div>
 
-        {/* Buscador y Botón de Unirse */}
-        <div className="flex flex-wrap items-center gap-3">
+        {/* CONTROLES: Buscador, Botón de Calendario y Unirse al Canal */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Buscador de texto */}
           <div className="relative">
             <input
               type="text"
               placeholder="Buscar noticias..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 rounded-xl py-2 pl-3 pr-8 text-xs font-medium text-slate-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 transition-all w-full sm:w-48"
+              className="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 rounded-xl py-2 pl-3 pr-8 text-xs font-medium text-slate-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 transition-all w-36 sm:w-44"
             />
             <Search className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+          </div>
+
+          {/* Botón de Calendario para Filtro por Día */}
+          <div className="relative">
+            <button
+              onClick={() => setShowDatePicker(!showDatePicker)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+                selectedDate
+                  ? 'bg-blue-600 text-white border-blue-500 shadow-md'
+                  : 'bg-slate-50 dark:bg-black/40 text-slate-700 dark:text-gray-300 border-slate-200 dark:border-white/5 hover:border-blue-500/30'
+              }`}
+              title="Filtrar noticias por día"
+            >
+              <Calendar className={`w-3.5 h-3.5 ${selectedDate ? 'text-white' : 'text-blue-500'}`} />
+              <span className="text-[11px]">
+                {selectedDate ? selectedDate.split('-').reverse().join('/') : 'Fecha'}
+              </span>
+              {selectedDate && (
+                <span 
+                  onClick={(e) => { e.stopPropagation(); setSelectedDate(''); }}
+                  className="ml-1 hover:bg-white/20 p-0.5 rounded-full transition-colors"
+                  title="Quitar filtro de fecha"
+                >
+                  <X className="w-3 h-3 text-white" />
+                </span>
+              )}
+            </button>
+
+            {/* Dropdown de Selector de Fecha */}
+            <AnimatePresence>
+              {showDatePicker && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                  className="absolute right-0 top-full mt-2 z-50 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl flex flex-col gap-3 min-w-[240px]"
+                >
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-gray-400 flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-blue-500" /> Filtrar noticias por día
+                    </span>
+                    <button 
+                      onClick={() => setShowDatePicker(false)}
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-bold text-slate-600 dark:text-gray-400 uppercase">
+                      Seleccionar Fecha:
+                    </label>
+                    <input
+                      type="date"
+                      value={selectedDate}
+                      onChange={(e) => {
+                        setSelectedDate(e.target.value);
+                        setShowDatePicker(false);
+                      }}
+                      className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 cursor-pointer"
+                    />
+                  </div>
+
+                  {/* Acceso Rápido: Hoy / Ayer / Ver Todas */}
+                  <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <button
+                      onClick={() => {
+                        setSelectedDate(formatYMD(new Date()));
+                        setShowDatePicker(false);
+                      }}
+                      className="flex-1 py-1.5 px-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 rounded-lg text-[9px] font-black uppercase text-center cursor-pointer"
+                    >
+                      Hoy
+                    </button>
+                    <button
+                      onClick={() => {
+                        const y = new Date();
+                        y.setDate(y.getDate() - 1);
+                        setSelectedDate(formatYMD(y));
+                        setShowDatePicker(false);
+                      }}
+                      className="flex-1 py-1.5 px-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-[9px] font-black uppercase text-center cursor-pointer"
+                    >
+                      Ayer
+                    </button>
+                    {selectedDate && (
+                      <button
+                        onClick={() => {
+                          setSelectedDate('');
+                          setShowDatePicker(false);
+                        }}
+                        className="py-1.5 px-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg text-[9px] font-black uppercase text-center cursor-pointer"
+                      >
+                        Todas
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <a
             href="https://t.me/+rkKMfpVR3G0yMDBh"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-md hover:shadow-blue-500/10 active:scale-95 shrink-0"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-md hover:shadow-blue-500/10 active:scale-95 shrink-0"
           >
-            Unirse al Canal <ExternalLink className="w-3.5 h-3.5" />
+            Canal <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
       </div>
 
-      {/* FEED DE MENSAJES */}
-      <div className="max-h-[420px] overflow-y-auto pr-1 flex flex-col gap-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-white/5">
+      {/* Indicador de Filtro Activo por Fecha */}
+      {selectedDate && (
+        <div className="flex items-center justify-between bg-blue-500/10 border border-blue-500/20 rounded-xl px-3.5 py-2 text-xs">
+          <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium">
+            <Filter className="w-3.5 h-3.5" />
+            <span>Filtro de fecha activo: <strong>{selectedDate.split('-').reverse().join('/')}</strong></span>
+            <span className="text-[10px] opacity-75">({filteredFeed.length} noticias encontradas)</span>
+          </div>
+          <button
+            onClick={() => setSelectedDate('')}
+            className="text-[10px] font-black uppercase text-blue-500 hover:underline cursor-pointer"
+          >
+            Mostrar todas las noticias
+          </button>
+        </div>
+      )}
+
+      {/* FEED DE MENSAJES — ORDENADO CRONOLÓGICAMENTE (ÚLTIMA NOTICIA PRIMERO) */}
+      <div className="max-h-[460px] overflow-y-auto pr-1 flex flex-col gap-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-white/5">
         <AnimatePresence mode="popLayout">
           {filteredFeed.map((item, idx) => {
             const badge = getCategoryBadge(item.category);
+            const friendlyDateStr = formatDisplayDate(item.date, item.timeStr);
+
             return (
               <motion.div
                 key={item.id}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 10 }}
-                transition={{ delay: Math.min(idx * 0.05, 0.3) }}
+                transition={{ delay: Math.min(idx * 0.04, 0.3) }}
                 className={`p-4 rounded-2xl border transition-all flex flex-col gap-2.5 relative group ${
                   item.isImportant
                     ? 'bg-red-500/[0.02] border-red-500/25 dark:border-red-500/20'
                     : 'bg-slate-50/50 dark:bg-white/[0.01] border-slate-200 dark:border-white/5 hover:border-blue-500/20 dark:hover:border-blue-500/15'
                 }`}
               >
-                {/* Cabecera del mensaje */}
+                {/* Cabecera del mensaje con emisor, categoría y fecha/hora exacta */}
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-black uppercase text-slate-800 dark:text-white tracking-wider flex items-center gap-1.5">
@@ -274,10 +446,10 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
                       {item.category === 'clima' ? 'Clima' : item.category === 'transito' ? 'Rutas' : item.category === 'institucional' ? 'Gobierno' : item.category === 'seguridad' ? 'Seguridad' : 'Noticia'}
                     </div>
 
-                    {/* Hora */}
-                    <span className="text-[9px] text-slate-400 dark:text-gray-500 font-mono font-bold flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {item.timeStr} hs
+                    {/* Fecha y Hora Exacta de Publicación */}
+                    <span className="text-[9.5px] text-slate-500 dark:text-gray-400 font-mono font-bold flex items-center gap-1 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md border border-slate-200 dark:border-white/5">
+                      <Calendar className="w-3 h-3 text-blue-500" />
+                      {friendlyDateStr}
                     </span>
                   </div>
                 </div>
@@ -312,7 +484,7 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
                     {item.rawArticle && onSelectArticle && (
                       <button
                         onClick={() => onSelectArticle(item.rawArticle!)}
-                        className="flex items-center gap-1.5 text-[9.5px] font-black uppercase text-violet-500 hover:text-violet-400 transition-colors"
+                        className="flex items-center gap-1.5 text-[9.5px] font-black uppercase text-violet-500 hover:text-violet-400 transition-colors cursor-pointer"
                         title="Abrir vista de lectura limpia"
                       >
                         <BookOpen className="w-3.5 h-3.5" /> Vista Rápida
@@ -347,9 +519,17 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
         </AnimatePresence>
 
         {filteredFeed.length === 0 && (
-          <div className="text-center py-10 text-slate-400 dark:text-gray-500 flex flex-col items-center justify-center gap-2">
+          <div className="text-center py-12 text-slate-400 dark:text-gray-500 flex flex-col items-center justify-center gap-2">
             <Send className="w-8 h-8 opacity-30 rotate-[345deg] text-blue-500 mb-1" />
             <span className="text-xs font-black uppercase tracking-wider">No se encontraron noticias ni alertas</span>
+            {selectedDate && (
+              <button
+                onClick={() => setSelectedDate('')}
+                className="mt-2 text-xs font-bold text-blue-500 hover:underline cursor-pointer"
+              >
+                Limpiar filtro de fecha ({selectedDate})
+              </button>
+            )}
           </div>
         )}
       </div>
