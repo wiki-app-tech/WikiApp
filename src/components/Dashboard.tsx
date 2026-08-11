@@ -646,29 +646,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     {/* Modo Vistas */}
                     {(activeTab === 'home' || activeTab === 'explore') && (
                       <>
-                        <div className="hidden sm:flex items-center gap-1 bg-slate-150/80 dark:bg-white/5 p-1 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
-                          <button 
-                            onClick={() => setViewMode('list')} 
-                            className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
-                            title="Vista de Lista"
-                          >
-                            <List className="w-3.5 h-3.5" />
-                          </button>
-                          <button 
-                            onClick={() => setViewMode('grid')} 
-                            className={`p-1.5 rounded-full transition-all ${viewMode === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
-                            title="Vista de Galería"
-                          >
-                            <LayoutGrid className="w-3.5 h-3.5" />
-                          </button>
-                          <button 
-                            onClick={() => setViewMode('magazine')} 
-                            className={`p-1.5 rounded-full transition-all ${viewMode === 'magazine' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
-                            title="Vista de Revista"
-                          >
-                            <LayoutTemplate className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
+
                         <button
                           onClick={() => setShowTapasModal(true)}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 font-bold text-xs shadow-sm transition-all shrink-0"
@@ -944,49 +922,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                         </div>
                     )}
 
-                    {/* SELECTORES DE VISTA Y DENSIDAD */}
-                    <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto mt-2 xl:mt-0 xl:ml-auto">
-                        {/* Selector de Vistas */}
-                        <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-black/40 p-1 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
-                            <button 
-                                onClick={() => setViewMode('list')} 
-                                className={`p-1.5 rounded-lg transition-all cursor-pointer ${viewMode === 'list' ? 'bg-blue-650 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
-                                title="Vista de Lista"
-                            >
-                                <List className="w-3.5 h-3.5" />
-                            </button>
-                            <button 
-                                onClick={() => setViewMode('grid')} 
-                                className={`p-1.5 rounded-lg transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-blue-650 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
-                                title="Vista de Galería"
-                            >
-                                <LayoutGrid className="w-3.5 h-3.5" />
-                            </button>
-                            <button 
-                                onClick={() => setViewMode('magazine')} 
-                                className={`p-1.5 rounded-lg transition-all cursor-pointer ${viewMode === 'magazine' ? 'bg-blue-650 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-gray-450 dark:hover:text-white'}`} 
-                                title="Vista de Revista"
-                            >
-                                <LayoutTemplate className="w-3.5 h-3.5" />
-                            </button>
-                        </div>
 
-                        {/* Selector de Densidad */}
-                        <div className="flex bg-slate-100/50 dark:bg-black/40 p-1 rounded-xl border border-slate-200 dark:border-white/5 items-center">
-                            <button 
-                                onClick={() => setDensity('compact')} 
-                                className={`px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer ${density === 'compact' ? 'bg-white dark:bg-white/10 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:text-gray-400'}`}
-                            >
-                                Compacto
-                            </button>
-                            <button 
-                                onClick={() => setDensity('comfortable')} 
-                                className={`px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer ${density === 'comfortable' ? 'bg-white dark:bg-white/10 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:text-gray-400'}`}
-                            >
-                                Amplio
-                            </button>
-                        </div>
-                    </div>
                 </div>
             )}
 
