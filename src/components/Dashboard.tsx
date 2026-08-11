@@ -60,27 +60,30 @@ const AirMap = dynamic(
 );
 
 const WikiAppLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
-  <svg viewBox="0 0 120 120" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 500 320" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <linearGradient id="tdf-blue-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#1e73be" />
-        <stop offset="100%" stopColor="#203553" />
+      <linearGradient id="logo-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#0095ff" />
+        <stop offset="100%" stopColor="#0066cc" />
       </linearGradient>
-      <linearGradient id="tdf-orange-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#ff9a00" />
-        <stop offset="100%" stopColor="#ff5a00" />
+      <linearGradient id="logo-orange" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#ff8c00" />
+        <stop offset="100%" stopColor="#e65100" />
       </linearGradient>
     </defs>
+    {/* Fondo / Estructura del ojo / ave estilizado en Azul */}
     <path 
-      d="M20 20 C20 20, 60 40, 60 100 C60 100, 20 80, 20 20" 
-      fill="url(#tdf-blue-grad)" 
+      d="M20 140 C 90 220, 200 270, 360 210 C 430 180, 480 100, 490 80 C 470 110, 410 170, 340 185 C 240 210, 140 170, 80 135 C 150 160, 240 160, 300 120 C 350 87, 430 40, 480 40 C 410 40, 320 80, 260 110 C 200 140, 110 135, 20 140 Z" 
+      fill="url(#logo-blue)" 
     />
+    {/* Trazo / Ala Superior Naranja */}
     <path 
-      d="M100 20 C100 20, 60 40, 60 100 C60 100, 100 80, 100 20" 
-      fill="url(#tdf-orange-grad)" 
+      d="M80 135 C 160 80, 300 30, 480 40 C 420 55, 300 110, 220 135 C 160 155, 100 150, 80 135 Z" 
+      fill="url(#logo-orange)" 
     />
+    {/* Detalle Central / Pupila e Iluminación en Blanco */}
     <path 
-      d="M60 15 C55 35, 45 45, 20 50 C45 55, 55 65, 60 105 C65 65, 75 55, 100 50 C75 45, 65 35, 60 15 Z" 
+      d="M180 135 C 230 115, 300 70, 420 50 C 350 75, 260 115, 200 132 C 160 142, 110 138, 95 133 C 120 125, 150 120, 180 135 Z" 
       fill="#ffffff" 
     />
   </svg>
