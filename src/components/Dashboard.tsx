@@ -95,6 +95,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   const [showTapasModal, setShowTapasModal] = useState(false);
   const [density, setDensity] = useState<'compact' | 'comfortable'>('comfortable');
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [activeScope, setActiveScope] = useState<string>('all');
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -674,6 +675,41 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                           <Newspaper className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
                           <span className="hidden xs:inline">Tapas</span>
                         </button>
+                        
+                        {/* LUPA DE BÚSQUEDA / CAMPO EXPANDIBLE DE BÚSQUEDA EN EL SECTOR SUPERIOR DERECHO */}
+                        <div className="relative flex items-center shrink-0">
+                          {isSearchOpen ? (
+                            <div className="relative flex items-center">
+                              <Search className="absolute left-3 w-3.5 h-3.5 text-blue-500 pointer-events-none" />
+                              <input 
+                                type="text"
+                                autoFocus
+                                placeholder="Buscar noticias..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="w-48 sm:w-64 bg-slate-100/90 dark:bg-black/60 border border-blue-500/50 rounded-full py-1.5 pl-8 pr-7 text-xs font-medium text-slate-800 dark:text-gray-200 focus:outline-none shadow-md transition-all"
+                              />
+                              <button 
+                                onClick={() => {
+                                  setIsSearchOpen(false);
+                                  setSearch('');
+                                }}
+                                className="absolute right-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-white p-0.5 text-xs font-bold"
+                                title="Cerrar búsqueda"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setIsSearchOpen(true)}
+                              className={`p-2 rounded-full border border-slate-200 dark:border-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 shadow-sm transition-all shrink-0 ${search ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-100/80 dark:bg-white/5'}`}
+                              title="Buscar en el flujo de noticias"
+                            >
+                              <Search className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
                       </>
                     )}
                     
@@ -688,22 +724,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                 </div>
             </div>
         </div>
-                     {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
-             {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - SEARCH + FILTROS + TABS */}
+                     {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - FILTROS + TABS */}
             {(activeTab === 'home' || activeTab === 'explore') && (
                 <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-3 xl:gap-5 py-2 md:py-3.5 px-3 md:px-6 border-b border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.01] backdrop-blur-3xl xl:sticky xl:top-[64px] relative top-0 z-20 transition-all duration-300">
-                    
-                    {/* CUADRO DE BÚSQUEDA PRO */}
-                    <div className="relative w-full xl:w-96 group">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                        <input 
-                            type="text" 
-                            placeholder="Buscar en el flujo de noticias..." 
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full bg-slate-100/50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl py-2 pl-10 pr-4 text-[12px] font-medium text-slate-800 dark:text-gray-200 placeholder:text-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm"
-                        />
-                    </div>
 
                     {/* FILTRO DE CATEGORÍAS (DROPDOWN) */}
                     <div className="flex items-center gap-2 md:gap-3 w-full xl:w-auto">
