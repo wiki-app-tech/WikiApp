@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, ChevronDown, AlertTriangle, Info, Newspaper } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, ChevronDown, AlertTriangle, Info, Newspaper, Eye, Check } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
 import RadioDashboard from './RadioDashboard';
@@ -93,6 +93,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [showTapasModal, setShowTapasModal] = useState(false);
+  const [isEyeMenuOpen, setIsEyeMenuOpen] = useState(false);
+  const [readFilter, setReadFilter] = useState<'all' | 'unread' | 'read'>('all');
   const [density, setDensity] = useState<'compact' | 'comfortable'>('comfortable');
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -675,6 +677,119 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                           <Newspaper className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
                           <span className="hidden xs:inline">Tapas</span>
                         </button>
+                        
+                        {/* ICONO DE OJO Y MENÚ DESPLEGABLE DE VISTA / ESTADO */}
+                        <div className="relative flex items-center shrink-0">
+                          <button
+                            onClick={() => setIsEyeMenuOpen(!isEyeMenuOpen)}
+                            className={`p-2 rounded-full border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 shadow-sm transition-all shrink-0 ${isEyeMenuOpen ? 'bg-slate-200 dark:bg-white/15' : 'bg-slate-100/80 dark:bg-white/5'}`}
+                            title="Opciones de Vista y Lectura"
+                          >
+                            <Eye className="w-4 h-4 text-slate-700 dark:text-gray-200" />
+                          </button>
+
+                          <AnimatePresence>
+                            {isEyeMenuOpen && (
+                              <>
+                                <div 
+                                  className="fixed inset-0 z-40" 
+                                  onClick={() => setIsEyeMenuOpen(false)}
+                                />
+                                <motion.div
+                                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                                  transition={{ duration: 0.15 }}
+                                  className="absolute right-0 top-full mt-2 w-72 bg-[#121417] text-white border border-white/10 rounded-2xl shadow-2xl p-2 z-50 flex flex-col gap-1 backdrop-blur-xl"
+                                >
+                                  {/* Sección 1: Estilo de Presentación */}
+                                  <div className="px-3 py-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-white/5">
+                                    Presentación
+                                  </div>
+                                  <button
+                                    onClick={() => { setViewMode('list'); setIsEyeMenuOpen(false); }}
+                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${viewMode === 'list' ? 'bg-white/10 text-white font-semibold' : 'text-gray-300 hover:bg-white/5'}`}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <List className="w-4 h-4 text-gray-400" />
+                                      <span>Lista</span>
+                                    </div>
+                                    {viewMode === 'list' && <Check className="w-4 h-4 text-blue-400" />}
+                                  </button>
+
+                                  <button
+                                    onClick={() => { setViewMode('grid'); setIsEyeMenuOpen(false); }}
+                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${viewMode === 'grid' ? 'bg-white/10 text-white font-semibold' : 'text-gray-300 hover:bg-white/5'}`}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <LayoutGrid className="w-4 h-4 text-gray-400" />
+                                      <span>Mosaico</span>
+                                    </div>
+                                    {viewMode === 'grid' && <Check className="w-4 h-4 text-blue-400" />}
+                                  </button>
+
+                                  <button
+                                    onClick={() => { setViewMode('magazine'); setIsEyeMenuOpen(false); }}
+                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${viewMode === 'magazine' ? 'bg-white/10 text-white font-semibold' : 'text-gray-300 hover:bg-white/5'}`}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <LayoutTemplate className="w-4 h-4 text-gray-400" />
+                                      <span>Revista</span>
+                                    </div>
+                                    {viewMode === 'magazine' && <Check className="w-4 h-4 text-blue-400" />}
+                                  </button>
+
+                                  {/* Divisor */}
+                                  <div className="my-1 border-t border-white/5" />
+
+                                  {/* Sección 2: Densidad */}
+                                  <div className="px-3 py-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-white/5">
+                                    Densidad
+                                  </div>
+                                  <button
+                                    onClick={() => { setDensity('comfortable'); setIsEyeMenuOpen(false); }}
+                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${density === 'comfortable' ? 'bg-white/10 text-white font-semibold' : 'text-gray-300 hover:bg-white/5'}`}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <List className="w-4 h-4 text-gray-400" />
+                                      <span>Cómodo</span>
+                                    </div>
+                                    {density === 'comfortable' && <Check className="w-4 h-4 text-blue-400" />}
+                                  </button>
+
+                                  <button
+                                    onClick={() => { setDensity('compact'); setIsEyeMenuOpen(false); }}
+                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${density === 'compact' ? 'bg-white/10 text-white font-semibold' : 'text-gray-300 hover:bg-white/5'}`}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <ListFilter className="w-4 h-4 text-gray-400" />
+                                      <span>Compacto</span>
+                                    </div>
+                                    {density === 'compact' && <Check className="w-4 h-4 text-blue-400" />}
+                                  </button>
+
+                                  {/* Divisor */}
+                                  <div className="my-1 border-t border-white/5" />
+
+                                  {/* Sección 3: Filtrar lecturas */}
+                                  <div className="px-3 py-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-white/5">
+                                    Opciones de Lectura
+                                  </div>
+                                  <button
+                                    onClick={() => { setReadFilter('unread'); setIsEyeMenuOpen(false); }}
+                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${readFilter === 'unread' ? 'bg-white/10 text-white font-semibold' : 'text-gray-300 hover:bg-white/5'}`}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <Eye className="w-4 h-4 text-gray-400" />
+                                      <span>Solo sin leer</span>
+                                    </div>
+                                    {readFilter === 'unread' && <Check className="w-4 h-4 text-blue-400" />}
+                                  </button>
+                                </motion.div>
+                              </>
+                            )}
+                          </AnimatePresence>
+                        </div>
                         
                         {/* LUPA DE BÚSQUEDA / CAMPO EXPANDIBLE DE BÚSQUEDA EN EL SECTOR SUPERIOR DERECHO */}
                         <div className="relative flex items-center shrink-0">
