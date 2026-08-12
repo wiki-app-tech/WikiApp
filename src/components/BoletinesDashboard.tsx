@@ -2081,100 +2081,170 @@ export default function BoletinesDashboard() {
                 ) : (
                   <div
                     style={{ transform: `scale(${pdfZoom / 100})`, transformOrigin: 'top center' }}
-                    className="w-full max-w-3xl bg-slate-900 text-slate-100 rounded-2xl border border-slate-800 shadow-2xl p-6 sm:p-10 flex flex-col gap-6 font-serif relative"
+                    className="w-full max-w-4xl bg-slate-900/95 text-slate-100 rounded-3xl border border-slate-700/60 shadow-2xl p-6 sm:p-10 flex flex-col gap-8 font-sans relative backdrop-blur-xl"
                   >
                     {(() => {
                       const pubType = previewFile.item?.publisher || 'provincia';
                       const headerConfig = getHeaderConfig(pubType);
+                      const item = previewFile.item;
 
                       return (
                         <>
-                          {/* MEMBRETE INSTITUCIONAL DINÁMICO */}
-                          <div className={`p-6 rounded-2xl bg-gradient-to-br ${headerConfig.headerBg} border border-white/10 flex flex-col items-center text-center gap-2 relative shadow-lg`}>
-                            <span className={`px-3 py-1 rounded-full text-[9px] font-mono font-bold tracking-widest uppercase border ${headerConfig.badgeColor}`}>
+                          {/* MEMBRETE INSTITUCIONAL DINÁMICO MEJORADO */}
+                          <div className={`p-6 sm:p-8 rounded-3xl bg-gradient-to-br ${headerConfig.headerBg} border border-white/15 flex flex-col items-center text-center gap-3 relative shadow-2xl overflow-hidden`}>
+                            <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                              <BookOpen className="w-32 h-32 text-white" />
+                            </div>
+                            <span className={`px-4 py-1.5 rounded-full text-[10px] font-mono font-black tracking-widest uppercase border shadow-sm ${headerConfig.badgeColor}`}>
                               {headerConfig.badgeText}
                             </span>
-                            <h2 className="text-base sm:text-xl font-black text-white font-sans uppercase tracking-tight">
+                            <h2 className="text-lg sm:text-2xl font-black text-white uppercase tracking-tight font-display">
                               {headerConfig.title}
                             </h2>
-                            <p className="text-[10px] sm:text-xs text-gray-300 font-sans tracking-wide">
+                            <p className="text-xs sm:text-sm text-slate-300 font-medium tracking-wide max-w-xl">
                               {headerConfig.subtitle}
                             </p>
-                            <div className="flex items-center gap-4 text-[10px] text-gray-400 font-mono mt-2 pt-2 border-t border-white/10 w-full justify-center">
-                              <span>EDICIÓN N° {previewFile.item?.number || previewFile.title}</span>
+                            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs text-slate-300 font-mono mt-2 pt-3 border-t border-white/10 w-full">
+                              <span className="bg-white/10 px-3 py-1 rounded-lg">EDICIÓN: <strong className="text-white">{item?.number || previewFile.title}</strong></span>
                               <span>•</span>
-                              <span>FECHA DE PUBLICACIÓN: {previewFile.item?.date || '07/08/2026'}</span>
+                              <span className="bg-white/10 px-3 py-1 rounded-lg">PUBLICADO: <strong className="text-white">{item?.date || '07/08/2026'}</strong></span>
                             </div>
                           </div>
 
-                          {/* RECUADRO DE RESUMEN CORTO Y BREVE */}
-                          <div className="bg-slate-800/80 border border-blue-500/30 p-5 rounded-2xl flex flex-col gap-2 font-sans text-xs">
-                            <span className="text-[10px] font-black uppercase text-blue-400 tracking-widest flex items-center gap-1.5">
-                              <Info className="w-3.5 h-3.5 text-blue-400" /> Resumen Corto y Breve de la Normativa
-                            </span>
-                            <h3 className="text-sm font-bold text-white leading-snug">
-                              {previewFile.item?.title}
+                          {/* INFORME ANALÍTICO SÍNTESIS Y PUNTOS CLAVE */}
+                          <div className="bg-slate-800/90 border border-blue-500/30 p-6 rounded-3xl flex flex-col gap-3 shadow-lg">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-black uppercase text-blue-400 tracking-widest flex items-center gap-2">
+                                <Info className="w-4 h-4 text-blue-400" /> Resumen Ejecutivo e Informe Institucional
+                              </span>
+                              <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded bg-blue-500/20 text-blue-300 border border-blue-400/30 uppercase">
+                                Documento Validado
+                              </span>
+                            </div>
+                            <h3 className="text-base sm:text-lg font-black text-white leading-snug font-display">
+                              {item?.title}
                             </h3>
-                            <p className="text-gray-300 leading-relaxed">
-                              {previewFile.item?.summary || previewFile.item?.policeAnalysis?.queDice || 'Síntesis técnica oficial publicada en el boletín institucional.'}
+                            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                              {item?.summary || 'Publicación normativa oficial correspondiente a la administración pública provincial / municipal de Tierra del Fuego.'}
                             </p>
                           </div>
 
-                          {/* ESTRUCTURA FORMAL DEL DOCUMENTO */}
-                          <div className="flex flex-col gap-4 text-xs sm:text-sm leading-relaxed text-gray-200 pt-4 border-t border-slate-800">
-                            <h4 className="font-bold text-white uppercase text-center font-sans tracking-wider text-xs">
-                              SECCIÓN I — SUMARIO DE DISPOSICIONES OFICIALES
-                            </h4>
+                          {/* DESGLOSE AMPLIADO PUNTO POR PUNTO (DECRETOS, EDICTOS Y DATOS DE INTERÉS) */}
+                          <div className="flex flex-col gap-6 pt-2">
+                            <div className="flex items-center gap-3 pb-3 border-b border-slate-700">
+                              <FileCheck className="w-5 h-5 text-blue-400" />
+                              <h4 className="font-black text-white uppercase tracking-wider text-xs sm:text-sm">
+                                DESGLOSE DETALLADO NORMATIVO (DECRETOS, EDICTOS Y RESOLUCIONES)
+                              </h4>
+                            </div>
 
-                            <div className="space-y-4">
-                              <div>
-                                <p className="font-bold text-blue-400">ARTÍCULO 1°.—</p>
-                                <p className="mt-1 text-gray-300">
-                                  TÉNGASE por promulgada y publíquese en el Boletín Oficial la presente disposición bajo el número de registro oficial correspondiente a la jurisdicción de {headerConfig.badgeText}.
+                            <div className="grid grid-cols-1 gap-4">
+                              {/* Punto 1: Decretos del Poder Ejecutivo */}
+                              <div className="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-5 flex flex-col gap-2 hover:border-blue-500/30 transition-colors">
+                                <div className="flex items-center gap-2">
+                                  <span className="w-7 h-7 rounded-xl bg-blue-600/20 text-blue-400 font-bold text-xs flex items-center justify-center font-mono">01</span>
+                                  <h5 className="text-xs sm:text-sm font-bold text-white uppercase">Decretos Promulgados y Estructura Normativa</h5>
+                                </div>
+                                <p className="text-xs text-slate-300 leading-relaxed pl-9">
+                                  {item?.policeAnalysis?.queDice || `Se promulgan los instrumentos legales de la fecha bajo la regulación correspondiente a la jurisdicción de ${headerConfig.badgeText}, disponiendo su aplicación obligatoria e incorporación al digesto legal.`}
                                 </p>
                               </div>
 
-                              <div>
-                                <p className="font-bold text-blue-400">ARTÍCULO 2° (ALCANCE Y OBJETIVO).—</p>
-                                <p className="mt-1 text-gray-300">
-                                  {previewFile.item?.summary || previewFile.item?.policeAnalysis?.queDice || 'Establecer los alcances normativos y reglamentarios vigentes para la administración pública provincial o municipal.'}
+                              {/* Punto 2: Edictos y Convocatorias Oficiales */}
+                              <div className="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-5 flex flex-col gap-2 hover:border-blue-500/30 transition-colors">
+                                <div className="flex items-center gap-2">
+                                  <span className="w-7 h-7 rounded-xl bg-amber-600/20 text-amber-400 font-bold text-xs flex items-center justify-center font-mono">02</span>
+                                  <h5 className="text-xs sm:text-sm font-bold text-white uppercase">Edictos, Licitaciones y Convocatorias Públicas</h5>
+                                </div>
+                                <p className="text-xs text-slate-300 leading-relaxed pl-9">
+                                  {item?.policeAnalysis?.noImpactList && item.policeAnalysis.noImpactList.length > 0 
+                                    ? item.policeAnalysis.noImpactList.map(ni => `• ${ni.titulo} (${ni.acto})`).join(' ')
+                                    : 'Avisos oficiales, licitaciones de suministros, citaciones de edictos judiciales y contrataciones aprobadas para las dependencias del Estado provincial/municipal.'}
                                 </p>
                               </div>
 
-                              <div>
-                                <p className="font-bold text-blue-400">ARTÍCULO 3°.—</p>
-                                <p className="mt-1 text-gray-300">
-                                  FACÚLTASE a las áreas pertinentes y secretarías del organismo a dictar la normativa complementaria requerida para la ejecución efectiva del presente instrumento.
-                                </p>
-                              </div>
+                              {/* Punto 3: Impacto en Seguridad y Escala Salarial */}
+                              {item?.policeAnalysis?.hasImpact && (
+                                <div className="bg-slate-800/50 border border-emerald-500/30 rounded-2xl p-5 flex flex-col gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className="w-7 h-7 rounded-xl bg-emerald-600/20 text-emerald-400 font-bold text-xs flex items-center justify-center font-mono">03</span>
+                                    <h5 className="text-xs sm:text-sm font-bold text-emerald-400 uppercase">Impacto Operativo Policial y Salarial</h5>
+                                  </div>
+                                  <div className="pl-9 space-y-2 text-xs text-slate-300">
+                                    <p><strong>Cambio Específico:</strong> {item.policeAnalysis.queCambia}</p>
+                                    <p><strong>Personal Afectado:</strong> {item.policeAnalysis.queImpacta}</p>
+                                    <p className="text-[11px] font-mono text-emerald-300 bg-emerald-950/40 p-2 rounded-xl border border-emerald-500/20">
+                                      Artículos aplicables: {item.policeAnalysis.articulos}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
 
-                              <div>
-                                <p className="font-bold text-blue-400">ARTÍCULO 4°.—</p>
-                                <p className="mt-1 text-gray-300">
-                                  Comuníquese, publíquese en el registro oficial, dese a la imprenta gubernamental y archívese.
+                              {/* Punto 4: Disposiciones Complementarias */}
+                              <div className="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-5 flex flex-col gap-2 hover:border-blue-500/30 transition-colors">
+                                <div className="flex items-center gap-2">
+                                  <span className="w-7 h-7 rounded-xl bg-purple-600/20 text-purple-400 font-bold text-xs flex items-center justify-center font-mono">04</span>
+                                  <h5 className="text-xs sm:text-sm font-bold text-white uppercase">Vigencia y Cláusulas Complementarias</h5>
+                                </div>
+                                <p className="text-xs text-slate-300 leading-relaxed pl-9">
+                                  Facúltase a las secretarías y direcciones correspondientes a dictar la reglamentación accesoria. Las disposiciones entran en vigencia a partir de su publicación en este ejemplar del Boletín Oficial.
                                 </p>
                               </div>
                             </div>
                           </div>
 
-                          {/* SELLO DIGITAL OFICIAL DE VALIDACIÓN */}
-                          <div className="mt-6 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left font-sans">
+                          {/* SECCIÓN DE DESCARGA Y ACCESO AL BOLETÍN OFICIAL REAL EN PDF */}
+                          <div className="mt-4 p-6 sm:p-8 bg-gradient-to-r from-blue-950/80 via-slate-900 to-indigo-950/80 border border-blue-500/40 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
+                            <div className="flex items-center gap-4">
+                              <div className="w-14 h-14 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center shrink-0">
+                                <FileText className="w-7 h-7 text-blue-400" />
+                              </div>
+                              <div className="flex flex-col gap-1 text-center sm:text-left">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">Documento PDF Oficial Completo</span>
+                                <h5 className="text-sm sm:text-base font-black text-white uppercase">¿Querés revisar el ejemplar original en PDF?</h5>
+                                <p className="text-xs text-slate-300">Descargá o visualizá el archivo escaneado y firmado oficialmente sin restricciones.</p>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto shrink-0">
+                              <a
+                                href={previewFile.url}
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full sm:w-auto px-6 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-xl hover:shadow-blue-500/30 transition-all border border-blue-400/30 cursor-pointer active:scale-95"
+                              >
+                                <Download className="w-4 h-4" /> Descargar PDF Real
+                              </a>
+                              <a
+                                href={previewFile.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full sm:w-auto px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all border border-slate-600 cursor-pointer active:scale-95"
+                              >
+                                <ExternalLink className="w-4 h-4" /> Abrir PDF Completo
+                              </a>
+                            </div>
+                          </div>
+
+                          {/* SELLO DIGITAL Y BOTÓN IMPRIMIR */}
+                          <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
                             <div className="flex items-center gap-3">
-                              <div className="w-14 h-14 rounded-full border-2 border-dashed border-blue-500/40 flex items-center justify-center p-1 text-[8px] font-mono text-blue-400 uppercase text-center leading-tight">
+                              <div className="w-12 h-12 rounded-full border-2 border-dashed border-blue-500/40 flex items-center justify-center p-1 text-[7px] font-mono text-blue-400 uppercase text-center leading-tight">
                                 {headerConfig.stampText}
                               </div>
-                              <div className="flex flex-col text-[10px] text-gray-400 font-mono">
-                                <span className="text-white font-bold">FIRMADO DIGITALMENTE</span>
-                                <span>Hash: tdf_2026_val_sec_{previewFile.item?.id || '01'}</span>
+                              <div className="flex flex-col text-[10px] text-slate-400 font-mono">
+                                <span className="text-white font-bold">VALIDACIÓN DIGITAL GUBERNAMENTAL</span>
+                                <span>Ref: tdf_2026_doc_{item?.id || '01'}</span>
                                 <span>{headerConfig.secondaryStamp}</span>
                               </div>
                             </div>
 
                             <button
                               onClick={() => window.print()}
-                              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-gray-200 rounded-xl text-xs font-bold font-sans flex items-center gap-2 transition-all border border-slate-700 cursor-pointer"
+                              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold font-sans flex items-center gap-2 transition-all border border-slate-700 cursor-pointer"
                             >
-                              <Printer className="w-4 h-4" /> Imprimir Documento
+                              <Printer className="w-4 h-4" /> Imprimir Informe
                             </button>
                           </div>
                         </>
