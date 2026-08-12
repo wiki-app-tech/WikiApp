@@ -75,11 +75,13 @@ interface LegalDocItem {
 }
 
 export default function BoletinesDashboard() {
-  const [activeMainTab, setActiveMainTab] = useState<'boletines' | 'guia_legal' | 'asistente_ia'>('boletines');
+  const [activeMainTab, setActiveMainTab] = useState<'boletines' | 'guia_legal' | 'busqueda_boletines'>('boletines');
   
   // Boletines state
   const [activePublisher, setActivePublisher] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [globalSearchTerm, setGlobalSearchTerm] = useState<string>('');
+  const [globalPublisherFilter, setGlobalPublisherFilter] = useState<string>('all');
   const [tdfExplorerMode, setTdfExplorerMode] = useState<'native' | 'drive'>('native');
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [showPoliceExplorer, setShowPoliceExplorer] = useState(false);
@@ -797,19 +799,61 @@ export default function BoletinesDashboard() {
   ];
 
   // STRICT DESCENDING SORTING: The NEWEST published bulletin FIRST (top), OLDEST published LAST (bottom)
+  // MULTI-WORD SEARCH logic: All words entered in the query must match within title, number, date or summary.
   const filteredBulletins = useMemo(() => {
+    const searchKeywords = searchTerm.trim().toLowerCase().split(/\s+/).filter(Boolean);
+
     return bulletinsDb
       .filter(item => {
         const matchesPublisher = activePublisher === 'all' || item.publisher === activePublisher;
         const matchesYear = activePublisher !== 'provincia' || selectedYear === 'all' || item.year === selectedYear;
-        const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              item.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              item.date.includes(searchTerm) ||
-                              (item.summary && item.summary.toLowerCase().includes(searchTerm.toLowerCase()));
-        return matchesPublisher && matchesYear && matchesSearch;
+
+        if (searchKeywords.length === 0) {
+          return matchesPublisher && matchesYear;
+        }
+
+        const fullText = (
+          item.title + ' ' +
+          item.number + ' ' +
+          item.date + ' ' +
+          (item.summary || '') + ' ' +
+          (item.policeAnalysis?.queDice || '') + ' ' +
+          (item.policeAnalysis?.queCambia || '') + ' ' +
+          (item.policeAnalysis?.queImpacta || '')
+        ).toLowerCase();
+
+        const matchesAllKeywords = searchKeywords.every(word => fullText.includes(word));
+        return matchesPublisher && matchesYear && matchesAllKeywords;
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [activePublisher, selectedYear, searchTerm, bulletinsDb]);
+
+  // BÚSQUEDA GLOBAL DENTRO DE TODOS LOS BOLETINES OFICIALES
+  const globalFilteredBulletins = useMemo(() => {
+    const searchKeywords = globalSearchTerm.trim().toLowerCase().split(/\s+/).filter(Boolean);
+
+    return bulletinsDb
+      .filter(item => {
+        const matchesPublisher = globalPublisherFilter === 'all' || item.publisher === globalPublisherFilter;
+
+        if (searchKeywords.length === 0) {
+          return matchesPublisher;
+        }
+
+        const fullText = (
+          item.title + ' ' +
+          item.number + ' ' +
+          item.date + ' ' +
+          (item.summary || '') + ' ' +
+          (item.policeAnalysis?.queDice || '') + ' ' +
+          (item.policeAnalysis?.queCambia || '') + ' ' +
+          (item.policeAnalysis?.queImpacta || '')
+        ).toLowerCase();
+
+        return matchesPublisher && searchKeywords.every(word => fullText.includes(word));
+      })
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [globalPublisherFilter, globalSearchTerm, bulletinsDb]);
 
   const filteredLaws = useMemo(() => {
     return legalDocsDb.filter(doc => {
@@ -988,15 +1032,16 @@ export default function BoletinesDashboard() {
         </div>
 
         <button
-          onClick={() => setActiveMainTab('asistente_ia')}
+          onClick={() => setActiveMainTab('busqueda_boletines')}
           className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border ${
-            activeMainTab === 'asistente_ia'
-              ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-violet-500 shadow-lg shadow-violet-500/20'
-              : 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20 hover:bg-violet-500/20'
+            activeMainTab === 'busqueda_boletines'
+              ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-500/20'
+              : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20 hover:bg-blue-500/20'
           }`}
+          title="Buscar en todos los Boletines Oficiales"
         >
-          <Sparkles className="w-4 h-4 animate-pulse" />
-          Asistente IA Legal
+          <Search className="w-4 h-4" />
+          Buscador de Boletines
         </button>
       </div>
 
@@ -1655,82 +1700,153 @@ export default function BoletinesDashboard() {
         </div>
       )}
 
-      {/* ASISTENTE IA TAB */}
-      {activeMainTab === 'asistente_ia' && (
+      {/* BUSCADOR GENERAL DE BOLETINES TAB */}
+      {activeMainTab === 'busqueda_boletines' && (
         <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-[2.5rem] p-6 shadow-2xl flex flex-col gap-6">
           <header className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-violet-600/20 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-violet-500 animate-pulse" />
+              <div className="w-10 h-10 rounded-2xl bg-blue-600/20 flex items-center justify-center">
+                <Search className="w-5 h-5 text-blue-500" />
               </div>
               <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase font-display">
-                Asistente Legal de Inteligencia Artificial
+                Buscador General de Boletines Oficiales
               </h1>
             </div>
             <p className="text-slate-500 dark:text-gray-400 text-sm max-w-2xl">
-              Consultá normativas, leyes y boletines oficiales fueguinos mediante búsqueda semántica vectorial.
+              Ingresá una o varias palabras clave para encontrar normativas, decretos, resoluciones u ordenanzas en todos los boletines oficiales. Los resultados se ordenan estrictamente desde lo más reciente a lo más antiguo.
             </p>
           </header>
 
-          <div className="flex flex-col h-[520px] bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden p-4">
-            {/* HISTORIAL CHAT */}
-            <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-2 custom-scrollbar">
-              {chatMessages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`flex gap-3 max-w-3xl ${
-                    msg.role === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto'
-                  }`}
-                >
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                    msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-violet-600/20 text-violet-500'
-                  }`}>
-                    {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-                  </div>
+          {/* CONTROLES DE BÚSQUEDA Y FILTRADO */}
+          <div className="bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 rounded-3xl p-5 flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+              {/* Campo de texto de búsqueda multipalabra */}
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500" />
+                <input
+                  type="text"
+                  placeholder="Escribí varias palabras clave (ej: rescate vehiculo nieve, ascenso comisario, adicional zona)..."
+                  value={globalSearchTerm}
+                  onChange={(e) => setGlobalSearchTerm(e.target.value)}
+                  className="w-full bg-white dark:bg-black/50 border border-slate-300 dark:border-white/10 rounded-2xl py-3 pl-12 pr-10 text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all"
+                />
+                {globalSearchTerm && (
+                  <button
+                    onClick={() => setGlobalSearchTerm('')}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg"
+                    title="Limpiar búsqueda"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
 
-                  <div className={`p-4 rounded-2xl text-xs leading-relaxed ${
-                    msg.role === 'user'
-                      ? 'bg-blue-600 text-white font-medium rounded-tr-none'
-                      : 'bg-white dark:bg-[#161616] text-slate-800 dark:text-gray-200 border border-slate-200 dark:border-white/5 shadow-sm rounded-tl-none'
-                  }`}>
-                    <p className="whitespace-pre-wrap">{msg.text}</p>
-                    {msg.sources && msg.sources.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/5 flex flex-col gap-1">
-                        <span className="text-[9px] font-black uppercase text-violet-500 tracking-wider">Fuentes consultadas:</span>
-                        {msg.sources.map((src, i) => (
-                          <span key={i} className="text-[9.5px] text-slate-500 font-mono">
-                            • {src.numero} ({src.publisher}) - Pág. ~{src.pagina}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {isChatLoading && (
-                <div className="flex items-center gap-2 text-xs text-violet-500 font-bold p-3">
-                  <Loader2 className="w-4 h-4 animate-spin" /> Buscando y generando respuesta legal...
-                </div>
-              )}
+              {/* Indicador de ordenamiento */}
+              <div className="flex items-center gap-2 px-3.5 py-2 bg-blue-500/10 border border-blue-500/20 rounded-xl text-blue-600 dark:text-blue-400 text-xs font-black uppercase tracking-wider shrink-0">
+                <Calendar className="w-4 h-4" />
+                <span>Orden: Más Nuevo ↓ Más Antiguo</span>
+              </div>
             </div>
 
-            {/* INPUT DE CHAT */}
-            <form onSubmit={handleSendChatMessage} className="pt-3 border-t border-slate-200 dark:border-white/5 flex gap-2">
-              <input
-                type="text"
-                placeholder="Escribe tu consulta legal (ej. ¿Qué norma regula los ascensos policiales en TDF?)..."
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                className="flex-1 bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 rounded-2xl px-4 py-3 text-xs font-medium text-slate-800 dark:text-white focus:outline-none focus:border-violet-500"
-              />
-              <button
-                type="submit"
-                disabled={isChatLoading || !chatInput.trim()}
-                className="px-5 py-3 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
-              >
-                <Send className="w-4 h-4" /> Enviar
-              </button>
-            </form>
+            {/* Filtros por Jurisdicción / Organismo */}
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-gray-500 mr-2">
+                Filtrar por Organismo:
+              </span>
+              {[
+                { id: 'all', label: 'Todos' },
+                { id: 'provincia', label: 'Gobierno TDF' },
+                { id: 'legislativo', label: 'Legislatura' },
+                { id: 'ushuaia', label: 'Ushuaia' },
+                { id: 'riogrande', label: 'Río Grande' },
+                { id: 'tolhuin', label: 'Tolhuin' }
+              ].map(pub => (
+                <button
+                  key={pub.id}
+                  onClick={() => setGlobalPublisherFilter(pub.id)}
+                  className={`px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
+                    globalPublisherFilter === pub.id
+                      ? 'bg-blue-600 text-white border-blue-500 shadow-md'
+                      : 'bg-white dark:bg-white/5 text-slate-600 dark:text-gray-300 border-slate-200 dark:border-white/10 hover:border-blue-500/30'
+                  }`}
+                >
+                  {pub.label}
+                </button>
+              ))}
+              <span className="ml-auto text-xs font-mono font-bold text-blue-500">
+                {globalFilteredBulletins.length} {globalFilteredBulletins.length === 1 ? 'resultado' : 'resultados'}
+              </span>
+            </div>
+          </div>
+
+          {/* LISTADO DE RESULTADOS DE BÚSQUEDA ORDENADOS DE MÁS NUEVO A MÁS ANTIGUO */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {globalFilteredBulletins.length > 0 ? (
+              globalFilteredBulletins.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-5 bg-slate-50 dark:bg-[#161616]/40 border border-slate-200 dark:border-white/5 rounded-2xl flex flex-col justify-between gap-4 shadow-sm hover:border-blue-500/20 transition-all group"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-black text-blue-500 font-mono">
+                        {item.number}
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-400 dark:text-gray-500 font-mono flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-blue-500" />
+                        {item.date}
+                      </span>
+                    </div>
+                    <p className="text-xs font-semibold text-slate-700 dark:text-gray-300 leading-relaxed group-hover:text-blue-500 transition-colors">
+                      {item.title}
+                    </p>
+                    {item.summary && (
+                      <p className="text-[11px] text-slate-500 dark:text-gray-400 leading-relaxed mt-1 font-medium">
+                        {item.summary}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-3 border-t border-slate-200/50 dark:border-white/5">
+                    <button
+                      onClick={() => {
+                        setPreviewFile({ title: item.number, url: item.url, driveFileId: item.driveFileId, item });
+                        setPreviewViewMode('pdf');
+                        setPdfPage(1);
+                        setPdfZoom(100);
+                      }}
+                      className="flex-1 flex items-center justify-center gap-1 py-2 px-3 bg-white dark:bg-white/5 hover:bg-blue-600/10 dark:hover:bg-blue-500/10 text-slate-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-slate-200 dark:border-white/10"
+                    >
+                      <Eye className="w-3.5 h-3.5" /> Vista Previa
+                    </button>
+                    <button
+                      onClick={() => window.open(item.url, '_blank')}
+                      className="p-2 bg-white dark:bg-white/5 hover:bg-blue-600/10 dark:hover:bg-blue-500/10 text-slate-700 dark:text-gray-300 hover:text-blue-500 rounded-lg transition-all border border-slate-200 dark:border-white/10"
+                      title="Descargar o Ver original"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleShare(item)}
+                      className="p-2 bg-white dark:bg-white/5 hover:bg-blue-600/10 dark:hover:bg-blue-500/10 text-slate-700 dark:text-gray-300 hover:text-blue-500 rounded-lg transition-all border border-slate-200 dark:border-white/10"
+                      title="Compartir enlace de boletín"
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full py-12 flex flex-col items-center justify-center text-center gap-3 bg-slate-50 dark:bg-black/20 rounded-3xl border border-dashed border-slate-300 dark:border-white/10">
+                <Search className="w-8 h-8 text-slate-400 animate-bounce" />
+                <h3 className="text-sm font-black text-slate-700 dark:text-gray-300 uppercase">
+                  No se encontraron coincidencias
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-gray-400 max-w-sm">
+                  Probá modificando las palabras clave o cambiando la jurisdicción seleccionada.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
