@@ -573,7 +573,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
           {[
             { id: 'home', icon: LayoutDashboard, label: 'Panel de Control', sub: 'Home' },
             { id: 'explore', icon: Compass, label: 'Fuentes de Inteligencia', sub: 'Feeds' },
-            { id: 'boletines', icon: Newspaper, label: 'Boletines Oficiales', sub: 'Boletines' },
+            { id: 'boletines', icon: Newspaper, label: 'Digesto & Boletines', sub: 'Digesto' },
             { id: 'weather', icon: Cloud, label: 'Clima & Alertas', sub: 'Clima' },
             { id: 'reports', icon: FileText, label: 'Análisis Estratégico', sub: 'Informes' },
             { id: 'security', icon: ShieldCheck, label: 'Centro de Seguridad', sub: 'Seguridad', color: 'text-red-500', activeBg: 'bg-red-500' },
@@ -640,7 +640,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                       <div className="flex items-center gap-2">
                         <ChevronRight className="w-3.5 h-3.5 text-text-tertiary hidden lg:block" />
                         <span className="text-[10px] md:text-[11px] font-bold text-text-tertiary uppercase tracking-[0.2em] font-mono hidden sm:block">
-                            {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'boletines' ? 'Boletines Oficiales' : activeTab === 'security' ? 'Centro de Auditoría' : activeTab === 'logistics' ? 'Control de Tráfico' : activeTab === 'radio' ? 'Dial Fueguino' : 'Sistema'}
+                            {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'boletines' ? 'Digesto & Boletines Oficiales' : activeTab === 'security' ? 'Centro de Auditoría' : activeTab === 'logistics' ? 'Control de Tráfico' : activeTab === 'radio' ? 'Dial Fueguino' : 'Sistema'}
                         </span>
                       </div>
                    </div>

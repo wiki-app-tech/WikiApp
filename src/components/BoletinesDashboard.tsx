@@ -126,6 +126,18 @@ export default function BoletinesDashboard() {
 
   const publishersInfo = [
     { 
+      id: 'silp', 
+      name: 'SILP — Sistema Legislativo y Político (TDF)', 
+      short: 'SILP LegisTDF',
+      logoText: 'SILP',
+      desc: 'Sistema de Información LegisTDF para consulta avanzada de Leyes, Decretos, Resoluciones, Circulares Nacionales, Provinciales y Municipales.',
+      url: 'https://silp.legistdf.gob.ar/silp/main.php',
+      system: 'Portal Oficial SILP — Sistema de Información Legislativo y Político',
+      icon: Scale,
+      color: 'from-purple-600 to-indigo-700',
+      badgeColor: 'bg-purple-500/10 text-purple-500 dark:text-purple-400'
+    },
+    { 
       id: 'provincia', 
       name: 'Gobierno de Tierra del Fuego', 
       short: 'Provincial',
@@ -1015,7 +1027,7 @@ export default function BoletinesDashboard() {
             }`}
           >
             <BookOpen className="w-4 h-4" />
-            Boletines Oficiales
+            Digesto & Boletines
           </button>
           
           <button
@@ -1054,11 +1066,11 @@ export default function BoletinesDashboard() {
                 <BookOpen className="w-5 h-5 text-blue-500" />
               </div>
               <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase font-display">
-                Boletines Oficiales
+                Digesto & Boletines Oficiales
               </h1>
             </div>
             <p className="text-slate-500 dark:text-gray-400 text-sm max-w-2xl">
-              Portal de consulta rápida a decretos, resoluciones, ordenanzas y leyes de la provincia de Tierra del Fuego y sus tres municipios.
+              Portal de búsqueda y consulta unificada de Leyes, Decretos, Resoluciones, Ordenanzas y Circulares de carácter Nacional, Provincial y Municipal (incluyendo la integración directa con SILP LegisTDF y archivos de la Provincia y Municipios).
             </p>
           </header>
 
