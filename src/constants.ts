@@ -126,16 +126,6 @@ export const LIVE_STREAM_CHANNELS: LiveStreamChannel[] = [
         isLive: true,
     },
     {
-        id: 'tv-publica-fueguina-rg',
-        name: 'TV Pública Fueguina (Canal 13)',
-        division: 'provincial',
-        cityOrCountry: 'Río Grande, TDF',
-        streamUrl: '',
-        type: 'youtube',
-        description: 'Canal 13 Río Grande - Transmisión Oficial',
-        isLive: false,
-    },
-    {
         id: 'aire-libre-tv',
         name: 'Aire Libre TV (Río Grande)',
         division: 'provincial',
@@ -144,16 +134,6 @@ export const LIVE_STREAM_CHANNELS: LiveStreamChannel[] = [
         type: 'youtube',
         description: 'Streaming en vivo Aire Libre FM 96.3 Río Grande',
         isLive: true,
-    },
-    {
-        id: 'radio-fueguina-tv',
-        name: 'Radio Fueguina Streaming',
-        division: 'provincial',
-        cityOrCountry: 'Río Grande, TDF',
-        streamUrl: '',
-        type: 'youtube',
-        description: 'Señal en vivo de La 97 Radio Fueguina',
-        isLive: false,
     },
     {
         id: 'radio-publica-fueguina-tv',
