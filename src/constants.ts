@@ -129,13 +129,13 @@ export const LIVE_STREAM_CHANNELS: LiveStreamChannel[] = [
     },
     {
         id: 'aire-libre-tv',
-        name: 'Aire Libre TV',
+        name: 'Aire Libre TV (Río Grande)',
         division: 'provincial',
         cityOrCountry: 'Río Grande, TDF',
-        streamUrl: '',
+        streamUrl: 'https://www.youtube.com/live/TOWKuu_OTzU?si=d96VtkWki9Qpn9HA',
         type: 'youtube',
-        description: 'Streaming en vivo Aire Libre FM 96.3',
-        isLive: false,
+        description: 'Streaming en vivo Aire Libre FM 96.3 Río Grande',
+        isLive: true,
     },
     {
         id: 'radio-fueguina-tv',
