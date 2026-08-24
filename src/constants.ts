@@ -148,6 +148,16 @@ export const LIVE_STREAM_CHANNELS: LiveStreamChannel[] = [
         isLive: false,
     },
     {
+        id: 'radio-publica-fueguina-tv',
+        name: 'Radio Pública Fueguina',
+        division: 'provincial',
+        cityOrCountry: 'Tierra del Fuego',
+        streamUrl: 'https://www.youtube.com/@radiopublicafueguina',
+        type: 'youtube',
+        description: 'Transmisiones periódicas y emisiones en vivo',
+        isLive: false,
+    },
+    {
         id: 'camara-malvinas-ushuaia',
         name: 'Cámara Plaza Islas Malvinas',
         division: 'provincial',
