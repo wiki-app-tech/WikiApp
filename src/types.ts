@@ -106,3 +106,18 @@ export interface LiveCamera {
   location: string;
   embedUrl: string;
 }
+
+export type LiveStreamDivision = 'provincial' | 'nacional' | 'internacional';
+
+export interface LiveStreamChannel {
+  id: string;
+  name: string;
+  division: LiveStreamDivision;
+  cityOrCountry: string;
+  streamUrl: string;
+  logoUrl?: string;
+  type?: 'youtube' | 'iframe' | 'hls' | 'custom';
+  description?: string;
+  isLive?: boolean;
+}
+
