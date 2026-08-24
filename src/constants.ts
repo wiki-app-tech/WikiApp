@@ -99,12 +99,12 @@ export const LIVE_STREAM_CHANNELS: LiveStreamChannel[] = [
     // PROVINCIAL (Tierra del Fuego)
     {
         id: '93-uno-tv',
-        name: '93 UNO (FM 93.1)',
+        name: '93 UNO Ushuaia',
         division: 'provincial',
-        cityOrCountry: 'Ushuaia / TDF',
-        streamUrl: 'https://www.youtube.com/@93UNO',
+        cityOrCountry: 'Ushuaia, TDF',
+        streamUrl: 'https://www.youtube.com/live/DarizlkL2vI?si=6iId3lEz44CuB9vR',
         type: 'youtube',
-        description: 'Streaming en vivo 93 UNO FM',
+        description: 'Streaming en vivo 93 UNO Ushuaia',
         isLive: true,
     },
     {
