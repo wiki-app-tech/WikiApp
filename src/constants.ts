@@ -83,7 +83,7 @@ export const RADIO_STATIONS: RadioStation[] = [
 export const LIVE_CAMERAS: LiveCamera[] = [
     {
         location: 'Plaza Islas Malvinas',
-        embedUrl: 'https://www.skylinewebcams.com/es/player/1769-plaza-islas-malvinas.html',
+        embedUrl: 'https://www.youtube.com/live/aweQQwQgvdE?si=lefLZGtJfgyrq44y',
     },
     {
         location: 'Tren del Fin del Mundo',
@@ -162,8 +162,8 @@ export const LIVE_STREAM_CHANNELS: LiveStreamChannel[] = [
         name: 'Cámara Plaza Islas Malvinas',
         division: 'provincial',
         cityOrCountry: 'Ushuaia, TDF',
-        streamUrl: 'https://www.skylinewebcams.com/es/player/1769-plaza-islas-malvinas.html',
-        type: 'iframe',
+        streamUrl: 'https://www.youtube.com/live/aweQQwQgvdE?si=lefLZGtJfgyrq44y',
+        type: 'youtube',
         description: 'Vista panorámica en tiempo real de la Plaza Islas Malvinas',
         isLive: true,
     },
