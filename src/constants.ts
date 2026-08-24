@@ -86,6 +86,14 @@ export const LIVE_CAMERAS: LiveCamera[] = [
         embedUrl: 'https://www.youtube.com/live/aweQQwQgvdE?si=lefLZGtJfgyrq44y',
     },
     {
+        location: 'Río Grande',
+        embedUrl: 'https://www.youtube.com/live/dSOWER6MtKo?si=nBBDlcacAcNjGeze',
+    },
+    {
+        location: 'Tolhuin',
+        embedUrl: 'https://www.youtube.com/live/BZCkK1pRO3k?si=rfVPMR-TyVDoCRxp',
+    },
+    {
         location: 'Tren del Fin del Mundo',
         embedUrl: 'https://www.skylinewebcams.com/es/player/2218-tren-del-fin-del-mundo.html',
     },
@@ -165,6 +173,26 @@ export const LIVE_STREAM_CHANNELS: LiveStreamChannel[] = [
         streamUrl: 'https://www.youtube.com/live/aweQQwQgvdE?si=lefLZGtJfgyrq44y',
         type: 'youtube',
         description: 'Vista panorámica en tiempo real de la Plaza Islas Malvinas',
+        isLive: true,
+    },
+    {
+        id: 'camara-rio-grande',
+        name: 'Cámara en Vivo Río Grande',
+        division: 'provincial',
+        cityOrCountry: 'Río Grande, TDF',
+        streamUrl: 'https://www.youtube.com/live/dSOWER6MtKo?si=nBBDlacAcNjGeze',
+        type: 'youtube',
+        description: 'Vista panorámica en tiempo real de Río Grande',
+        isLive: true,
+    },
+    {
+        id: 'camara-tolhuin',
+        name: 'Cámara en Vivo Tolhuin',
+        division: 'provincial',
+        cityOrCountry: 'Tolhuin, TDF',
+        streamUrl: 'https://www.youtube.com/live/BZCkK1pRO3k?si=rfVPMR-TyVDoCRxp',
+        type: 'youtube',
+        description: 'Vista panorámica en tiempo real de Tolhuin',
         isLive: true,
     },
 
