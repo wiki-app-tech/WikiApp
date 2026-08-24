@@ -202,9 +202,9 @@ export const LIVE_STREAM_CHANNELS: LiveStreamChannel[] = [
         name: 'LN+ (La Nación Mas)',
         division: 'nacional',
         cityOrCountry: 'Buenos Aires, Argentina',
-        streamUrl: 'https://www.youtube.com/embed/live_stream?channel=UCx8321vN2_w999a-X_9w12Q',
+        streamUrl: 'https://www.youtube.com/live/FEWZjXJ7M0c?si=GaHdGy1WeBsHIaeP',
         type: 'youtube',
-        description: 'Canal de noticias de La Nación',
+        description: 'Canal de noticias de La Nación en vivo',
         isLive: true,
     },
     {
