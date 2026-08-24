@@ -212,7 +212,7 @@ export const LIVE_STREAM_CHANNELS: LiveStreamChannel[] = [
         name: 'C5N - En Vivo',
         division: 'nacional',
         cityOrCountry: 'Buenos Aires, Argentina',
-        streamUrl: 'https://www.youtube.com/embed/live_stream?channel=UCFgk2Q2mNloj6_V4iyxHQ9w',
+        streamUrl: 'https://www.youtube.com/live/j6oh4Kqz3UM?si=3UhM7mSEFl3THePL',
         type: 'youtube',
         description: 'Noticias y actualidad argentina las 24 horas',
         isLive: true,
