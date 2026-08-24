@@ -212,9 +212,9 @@ export const LIVE_STREAM_CHANNELS: LiveStreamChannel[] = [
         name: 'Televisión Pública Argentina',
         division: 'nacional',
         cityOrCountry: 'Argentina',
-        streamUrl: 'https://www.youtube.com/embed/live_stream?channel=UCx8321vN2_w999a-X_9w12Q',
+        streamUrl: 'https://www.youtube.com/live/zOCZ8Bj5nJ4?si=IIZOgTyIaXl31NGt',
         type: 'youtube',
-        description: 'Cadena nacional pública de televisión',
+        description: 'Cadena nacional pública de televisión en vivo',
         isLive: true,
     },
     {
