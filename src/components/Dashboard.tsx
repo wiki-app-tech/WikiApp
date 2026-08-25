@@ -7,6 +7,7 @@ import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
 import RadioDashboard from './RadioDashboard';
 import BoletinesDashboard from './BoletinesDashboard';
+import GuiaDashboard from './GuiaDashboard';
 import TapasModal from './TapasModal';
 import TelegramFeed from './TelegramFeed';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -575,6 +576,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
             { id: 'explore', icon: Compass, label: 'Fuentes de Inteligencia', sub: 'Feeds' },
             { id: 'boletines', icon: Newspaper, label: 'Digesto & Boletines', sub: 'Digesto' },
             { id: 'weather', icon: Cloud, label: 'Clima & Alertas', sub: 'Clima' },
+            { id: 'guia', icon: Map, label: 'Guía Fueguina', sub: 'Naturaleza & Senderos', color: 'text-emerald-500' },
             { id: 'reports', icon: FileText, label: 'Análisis Estratégico', sub: 'Informes' },
             { id: 'security', icon: ShieldCheck, label: 'Centro de Seguridad', sub: 'Seguridad', color: 'text-red-500', activeBg: 'bg-red-500' },
             { id: 'radio', icon: Radio, label: 'Dial & Streaming', sub: 'En Vivo' },
@@ -1502,6 +1504,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                   {/* 4. WEATHER DASHBOARD */}
                   {activeTab === 'weather' && <WeatherDashboard />}
+
+                  {/* GUIA DASHBOARD */}
+                  {activeTab === 'guia' && <GuiaDashboard />}
 
                   {/* RADIO DASHBOARD */}
                   {activeTab === 'radio' && <RadioDashboard />}
@@ -2524,6 +2529,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
             {[
               { id: 'home', icon: LayoutDashboard, label: 'Inicio' },
               { id: 'explore', icon: Compass, label: 'Feeds' },
+              { id: 'guia', icon: Map, label: 'Guía' },
               { id: 'boletines', icon: Newspaper, label: 'Boletines' },
               { id: 'weather', icon: Cloud, label: 'Clima' },
               { id: 'radio', icon: Radio, label: 'Radio' },
