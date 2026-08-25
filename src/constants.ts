@@ -37,20 +37,6 @@ export const NEWS_SITES: Record<string, NewsSource[]> = {
 
 export const RADIO_STATIONS: RadioStation[] = [
     {
-        name: 'Radio Nacional Ushuaia',
-        city: 'Ushuaia',
-        frequency: 'AM 780',
-        logoUrl: 'https://www.radionacional.com.ar/wp-content/uploads/2020/03/LOGO-LRA10-USHUAIA-E-ISLAS-MALVINAS.png',
-        streamUrl: 'https://sa.mp3.icecast.magma.edge-access.net/sc_rad10'
-    },
-    {
-        name: 'Radio Argentina Ushuaia',
-        city: 'Ushuaia',
-        frequency: '97.9 FM',
-        logoUrl: 'https://www.radioargentinaushuaia.com/wp-content/uploads/2020/radio-argentina-ushuaia-logo.png',
-        streamUrl: 'https://proxy.turadioinfo.com/6334;live'
-    },
-    {
         name: 'Radio Provincia',
         city: 'Ushuaia',
         frequency: '99.5 FM',
@@ -62,14 +48,7 @@ export const RADIO_STATIONS: RadioStation[] = [
         city: 'Río Grande',
         frequency: '90.1 FM',
         logoUrl: 'https://static.mytuner.mobi/media/tvos_radios/256/m4af5hsyv65k.png',
-        streamUrl: 'https://v2.tustreaming.tv/8030/'
-    },
-    {
-        name: 'La 97 Radio Fueguina',
-        city: 'Río Grande',
-        frequency: '96.9 FM',
-        logoUrl: 'https://www.radiofueguina.com/wp-content/uploads/2020/08/logo-radio-fueguina-97.png',
-        streamUrl: 'http://streamall.alsolnet.com/radiofueguina/radiofueguina.stream'
+        streamUrl: 'https://media.siglocero.net:8004/stream'
     },
     {
         name: 'Estación del Siglo',
@@ -78,6 +57,104 @@ export const RADIO_STATIONS: RadioStation[] = [
         logoUrl: 'https://estaciondelsiglo.net/wp-content/uploads/2020/01/cropped-logo-estacion-del-siglo.png',
         streamUrl: 'http://streamall.alsolnet.com/estaciondelsigloaudio'
     },
+    {
+        name: 'Aire Libre FM',
+        city: 'Río Grande',
+        frequency: '96.3 FM',
+        logoUrl: 'https://www.airelibre.com.ar/wp-content/uploads/2021/04/logo-airelibre.png',
+        streamUrl: 'https://cdn.instream.audio:9037/stream'
+    },
+    {
+        name: "FM Master's",
+        city: 'Ushuaia',
+        frequency: '102.7 FM',
+        logoUrl: 'https://www.radiomasters.com.ar/logo.png',
+        streamUrl: 'https://streamingradiolinks.xyz/8130'
+    },
+    {
+        name: 'La 97 Radio Fueguina',
+        city: 'Río Grande',
+        frequency: '96.9 FM',
+        logoUrl: 'https://www.radiofueguina.com/wp-content/uploads/2020/08/logo-radio-fueguina-97.png',
+        streamUrl: 'https://streamlky.alsolnet.com/radiofueguina'
+    },
+    {
+        name: 'Radio Nacional Ushuaia (LRA 10)',
+        city: 'Ushuaia',
+        frequency: 'AM 780',
+        logoUrl: 'https://www.radionacional.com.ar/wp-content/uploads/2020/03/LOGO-LRA10-USHUAIA-E-ISLAS-MALVINAS.png',
+        streamUrl: 'https://sa.mp3.icecast.magma.edge-access.net/sc_rad10'
+    },
+    {
+        name: 'Radio Nacional Río Grande (LRA 24)',
+        city: 'Río Grande',
+        frequency: 'AM 640',
+        logoUrl: 'https://www.radionacional.com.ar/wp-content/uploads/2020/03/LOGO-LRA24-RIO-GRANDE.png',
+        streamUrl: 'https://sa.mp3.icecast.magma.edge-access.net/sc_rad24'
+    },
+    {
+        name: 'Radio Argentina Ushuaia',
+        city: 'Ushuaia',
+        frequency: '97.9 FM',
+        logoUrl: 'https://www.radioargentinaushuaia.com/wp-content/uploads/2020/radio-argentina-ushuaia-logo.png',
+        streamUrl: 'https://proxy.turadioinfo.com/6334;live'
+    },
+    {
+        name: 'FM Espectáculo',
+        city: 'Ushuaia',
+        frequency: '93.1 FM',
+        logoUrl: 'https://fmespectaculo.com/logo.png',
+        streamUrl: 'https://emisorasdigitales2.com:8058/stream'
+    },
+    {
+        name: 'Infinito 911',
+        city: 'Ushuaia',
+        frequency: '91.1 FM',
+        logoUrl: '',
+        streamUrl: 'https://stream.radioinfo.ar/5752/stream/'
+    },
+    {
+        name: 'Cadena FM',
+        city: 'Tierra del Fuego',
+        frequency: 'Online',
+        logoUrl: '',
+        streamUrl: 'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO3.mp3?dist=onlineradiobox'
+    },
+    {
+        name: 'Stylo FM',
+        city: 'Río Grande',
+        frequency: '101.1 FM',
+        logoUrl: '',
+        streamUrl: 'https://cdn.instream.audio:9272/stream'
+    },
+    {
+        name: 'FM Ushuaia',
+        city: 'Ushuaia',
+        frequency: '103.3 FM',
+        logoUrl: '',
+        streamUrl: 'https://stream.tustreaming.cl/8030/stream'
+    },
+    {
+        name: 'Radio FM Centro',
+        city: 'Ushuaia',
+        frequency: '100.7 FM',
+        logoUrl: 'https://www.radiofmcentro.com/logo.png',
+        streamUrl: 'https://stream.tustreaming.cl/9037/stream'
+    },
+    {
+        name: 'La Tecno FM',
+        city: 'Río Grande',
+        frequency: '95.9 FM',
+        logoUrl: '',
+        streamUrl: 'https://stream.radioinfo.ar/latecno'
+    },
+    {
+        name: 'Radio Pública Fueguina',
+        city: 'Tierra del Fuego',
+        frequency: 'Online',
+        logoUrl: '',
+        streamUrl: 'https://www.youtube.com/@radiopublicafueguina'
+    }
 ];
 
 export const LIVE_CAMERAS: LiveCamera[] = [
@@ -222,7 +299,7 @@ export const LIVE_STREAM_CHANNELS: LiveStreamChannel[] = [
         name: 'Crónica HD',
         division: 'nacional',
         cityOrCountry: 'Buenos Aires, Argentina',
-        streamUrl: 'https://www.youtube.com/live/hw4uHyct4vg?si=OByAzhtpgfE51FiL',
+        streamUrl: 'https://www.youtube.com/live/hw4uHyct4vg?si=bxqSuEBAx4s3_KVf',
         type: 'youtube',
         description: 'Transmisión en vivo de Crónica Televisión',
         isLive: true,
@@ -254,7 +331,7 @@ export const LIVE_STREAM_CHANNELS: LiveStreamChannel[] = [
         name: 'Euronews Español',
         division: 'internacional',
         cityOrCountry: 'Europa / Internacional',
-        streamUrl: 'https://www.youtube.com/embed/live_stream?channel=UC2_ZqP-O9j79j9V0',
+        streamUrl: 'https://www.youtube.com/live/O9mOtdZ-nSk?si=geAqpRrG5B55AjK2',
         type: 'youtube',
         description: 'Perspectivas europeas e internacionales en vivo',
         isLive: true,

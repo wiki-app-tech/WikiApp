@@ -59,9 +59,10 @@ function formatEmbedUrl(url: string): string {
 }
 
 export default function RadioDashboard() {
-  const [activeMode, setActiveMode] = useState<'radio' | 'tv'>('tv');
+  const [activeMode, setActiveMode] = useState<'radio' | 'tv'>('radio');
   const [search, setSearch] = useState('');
   const [selectedDivision, setSelectedDivision] = useState<LiveStreamDivision | 'todos'>('todos');
+  const [selectedCityRadio, setSelectedCityRadio] = useState<string>('todos');
   
   // Channels state (Default + Custom local streams)
   const [channels, setChannels] = useState<LiveStreamChannel[]>(() => {
@@ -207,19 +208,24 @@ export default function RadioDashboard() {
     return matchesDivision && matchesSearch;
   });
 
-  // Filter Radio stations by search query
+  // Filter Radio stations by search query & city filter
   const allRadios = RADIO_STATIONS.map((r, i) => ({
     id: `radio-${i}`,
     name: r.name,
     frequency: r.frequency,
     city: r.city,
+    logoUrl: r.logoUrl,
     url: r.streamUrl,
   }));
 
-  const filteredRadios = allRadios.filter(radio => 
-    radio.name.toLowerCase().includes(search.toLowerCase()) || 
-    radio.city.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredRadios = allRadios.filter(radio => {
+    const matchesCity = selectedCityRadio === 'todos' || radio.city.toLowerCase().includes(selectedCityRadio.toLowerCase());
+    const matchesSearch = 
+      radio.name.toLowerCase().includes(search.toLowerCase()) || 
+      radio.city.toLowerCase().includes(search.toLowerCase()) ||
+      radio.frequency.toLowerCase().includes(search.toLowerCase());
+    return matchesCity && matchesSearch;
+  });
 
   return (
     <div className="flex flex-col h-full relative pb-12">
@@ -334,8 +340,42 @@ export default function RadioDashboard() {
               </button>
             </div>
           ) : (
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Diales Radiofonicos Fueguinos en Vivo
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 no-scrollbar">
+              <button
+                onClick={() => setSelectedCityRadio('todos')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap ${
+                  selectedCityRadio === 'todos'
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md'
+                    : 'bg-slate-100 dark:bg-[#141414] text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:bg-[#202020]'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Todas las Emisoras ({allRadios.length})
+              </button>
+
+              <button
+                onClick={() => setSelectedCityRadio('Ushuaia')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap ${
+                  selectedCityRadio === 'Ushuaia'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                    : 'bg-slate-100 dark:bg-[#141414] text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:bg-[#202020]'
+                }`}
+              >
+                <MapPin className="w-3.5 h-3.5 text-blue-400" />
+                Ushuaia
+              </button>
+
+              <button
+                onClick={() => setSelectedCityRadio('Río Grande')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap ${
+                  selectedCityRadio === 'Río Grande'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'bg-slate-100 dark:bg-[#141414] text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:bg-[#202020]'
+                }`}
+              >
+                <MapPin className="w-3.5 h-3.5 text-indigo-400" />
+                Río Grande
+              </button>
             </div>
           )}
 
@@ -472,38 +512,72 @@ export default function RadioDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredRadios.map((station, idx) => {
             const noStream = !station.url;
+            const isYoutube = station.url?.includes('youtube.com') || station.url?.includes('youtu.be');
 
             return (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.04 }}
+                transition={{ delay: idx * 0.03 }}
                 key={station.id}
-                className={`relative overflow-hidden rounded-2xl p-6 flex flex-col justify-between gap-4 transition-all duration-300 ${
+                className={`relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between gap-4 transition-all duration-300 ${
                   noStream 
                     ? 'bg-slate-50 dark:bg-[#111] border border-slate-200 dark:border-white/5 opacity-70' 
-                    : 'bg-white dark:bg-[#111] border border-slate-200 dark:border-white/10 hover:border-blue-500/40 hover:bg-slate-50 dark:hover:bg-[#151515] shadow-lg'
+                    : 'bg-white dark:bg-[#111114] border border-slate-200 dark:border-white/10 hover:border-blue-500/40 hover:bg-slate-50 dark:hover:bg-[#151518] shadow-lg hover:shadow-xl'
                 }`}
               >
-                <div className="flex justify-between items-start z-10">
-                  <div className="flex flex-col gap-0.5">
-                    <h3 className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-                      {station.name}
-                    </h3>
-                    <span className="text-[10px] uppercase text-slate-500 dark:text-gray-400 tracking-wider flex items-center gap-1 font-semibold">
-                      <Activity className="w-3 h-3 text-blue-500" />
-                      {station.city}
-                    </span>
+                <div className="flex justify-between items-start z-10 gap-3">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    {station.logoUrl ? (
+                      <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 shrink-0 p-1 flex items-center justify-center">
+                        <img 
+                          src={station.logoUrl} 
+                          alt={station.name} 
+                          className="w-full h-full object-contain"
+                          onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 shrink-0 flex items-center justify-center">
+                        <RadioIcon className="w-5 h-5 text-blue-500" />
+                      </div>
+                    )}
+                    <div className="flex flex-col gap-0.5 overflow-hidden">
+                      <h3 className="font-extrabold text-sm md:text-base tracking-tight text-slate-900 dark:text-white truncate">
+                        {station.name}
+                      </h3>
+                      <span className="text-[10px] uppercase text-slate-500 dark:text-gray-400 tracking-wider flex items-center gap-1 font-semibold truncate">
+                        <Activity className="w-3 h-3 text-blue-500 shrink-0" />
+                        {station.city}
+                      </span>
+                    </div>
                   </div>
-                  <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md ${
+
+                  <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md shrink-0 ${
                     noStream ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
                   }`}>
                     {noStream ? 'Offline' : station.frequency}
                   </span>
                 </div>
 
-                <div className="mt-2 z-10 flex flex-col gap-2">
-                  {!noStream ? (
+                <div className="mt-1 z-10 flex flex-col gap-2">
+                  {noStream ? (
+                    <div className="w-full h-10 bg-slate-100 dark:bg-white/5 rounded-xl flex items-center justify-center border border-slate-200 dark:border-white/5">
+                      <span className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">
+                        Transmisión no disponible
+                      </span>
+                    </div>
+                  ) : isYoutube ? (
+                    <a
+                      href={station.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full h-10 bg-red-600 hover:bg-red-700 text-white rounded-xl flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-wider transition-colors shadow-md shadow-red-600/20"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Ver Transmisión en YouTube
+                    </a>
+                  ) : (
                     <audio 
                       controls 
                       src={station.url} 
@@ -511,12 +585,6 @@ export default function RadioDashboard() {
                       onPlay={handlePlayAudio}
                       className="w-full h-10 outline-none grayscale hover:grayscale-0 transition-all opacity-90 hover:opacity-100"
                     />
-                  ) : (
-                    <div className="w-full h-10 bg-slate-100 dark:bg-white/5 rounded-xl flex items-center justify-center border border-slate-200 dark:border-white/5">
-                      <span className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">
-                        Transmisión no disponible
-                      </span>
-                    </div>
                   )}
                 </div>
               </motion.div>
