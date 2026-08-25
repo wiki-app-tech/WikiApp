@@ -437,6 +437,150 @@ const TRAILS_DATA: TrailItem[] = [
     equipment: ['Carpa de 4 estaciones', 'Bolsa de dormir confort -10°C', 'Calentador y comida de travesía', 'GPS / Mapa topográfico', 'Registro de travesías obligatoria en Defensa Civil'],
     coverImage: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&auto=format&fit=crop&q=80',
     requiresRegistration: true
+  },
+  {
+    id: 'trail-ojo-albino-invierno',
+    name: 'Glaciar Ojo del Albino (Invierno 2026)',
+    city: 'Ushuaia',
+    difficulty: 'Exigente',
+    difficultyColor: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+    distance: '18.0 km (Vuelta completa)',
+    duration: '8 horas',
+    elevation: '+850 metros',
+    season: 'Invierno / Primavera',
+    coordinates: '54°43\'18"S 68°07\'05"O (Estacionamiento Laguna Esmeralda RN3)',
+    description: 'Desafío técnico de alta montaña cruzando Laguna Esmeralda congelada. Tramo muy exigente sobre acarreo rocoso y hielo glaciar. Se recomienda guía habilitado.',
+    equipment: ['Crampones obligatorios con picos de acero', 'Bastones de trekking', 'Ropa térmica de alta montaña (-10°C)', 'Linterna frontal', 'Campera impermeable 10k+', 'Guía de montaña recomendado'],
+    coverImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=80',
+    requiresRegistration: true
+  },
+  {
+    id: 'trail-velo-de-novia',
+    name: 'Cascada Velo de Novia',
+    city: 'Ushuaia',
+    difficulty: 'Fácil',
+    difficultyColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+    distance: '6.0 km (Ida y vuelta)',
+    duration: '2 horas',
+    elevation: '+180 metros',
+    season: 'Todo el año',
+    coordinates: '54°47\'10"S 68°14\'20"O (Camping Kawi Yoppen - RN3)',
+    description: 'Rincón clásico y salto de agua a pocos kilómetros de la salida de Ushuaia. Recorrido boscoso corto con descenso final sobre rocas húmedas.',
+    equipment: ['Calzado de trekking con buen agarre', 'Campera impermeable o capa de agua', 'Atención en tramo final resbaladizo'],
+    coverImage: 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=800&auto=format&fit=crop&q=80',
+    requiresRegistration: false
+  },
+  {
+    id: 'trail-laguna-celeste-alvear',
+    name: 'Laguna Celeste y Glaciar Alvear',
+    city: 'Ushuaia',
+    difficulty: 'Moderada',
+    difficultyColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+    distance: '11.0 km (Ida y vuelta)',
+    duration: '5 a 6 horas',
+    elevation: '+520 metros',
+    season: 'Noviembre a Mayo',
+    coordinates: '54°42\'30"S 68°05\'10"O (Valle de las Cotorras - RN3)',
+    description: 'Ascenso continuo bordeando el cauce del arroyo hasta una deslumbrante laguna de tono celeste turquesa al pie de las paredes del Macizo Alvear.',
+    equipment: ['Botas impermeables de caña alta', 'Bastones de trekking', 'Polainas para zona de rocas', 'Agua (1.5L) y ración de marcha'],
+    coverImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80',
+    requiresRegistration: true
+  },
+  {
+    id: 'trail-paso-aves-oculta',
+    name: 'Paso de las Aves y Laguna Oculta',
+    city: 'Ushuaia',
+    difficulty: 'Exigente',
+    difficultyColor: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+    distance: '16.0 km (Ida y vuelta)',
+    duration: '7 a 8 horas',
+    elevation: '+620 metros',
+    season: 'Diciembre a Abril',
+    coordinates: '54°45\'00"S 68°10\'00"O (Valle del Río Chico)',
+    description: 'Aventura profunda cruzando el Valle del Río Chico hasta el alto paso cordillerano que alberga las lagunas Halcón, Cóndor y la prístina Laguna Oculta.',
+    equipment: ['Botas de alta montaña impermeables', 'GPS / Navegador con track', 'Linterna frontal', 'Manta térmica', 'Registro de senderistas obligatorio'],
+    coverImage: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&auto=format&fit=crop&q=80',
+    requiresRegistration: true
+  },
+  {
+    id: 'trail-cascada-mellizas',
+    name: 'Cascada Las Mellizas',
+    city: 'Ushuaia',
+    difficulty: 'Fácil',
+    difficultyColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+    distance: '4.5 km (Ida y vuelta)',
+    duration: '1.5 a 2 horas',
+    elevation: '+120 metros',
+    season: 'Todo el año',
+    coordinates: '54°41\'15"S 67°58\'30"O (Paso Garibaldi / Sector Gasoducto)',
+    description: 'Trekking corto en inmediaciones del Paso Garibaldi. Atraviesa bosque, turbal y vadeo de arroyo hasta llegar a dos imponentes caídas de agua gemelas.',
+    equipment: ['Calzado impermeable o botas de goma', 'Abrigo cortavientos', 'Precaución en cruce de río'],
+    coverImage: 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&auto=format&fit=crop&q=80',
+    requiresRegistration: false
+  },
+  {
+    id: 'trail-cerro-atukoyak',
+    name: 'Cerro Atukoyak (Reserva Corazón de la Isla)',
+    city: 'Tolhuin',
+    difficulty: 'Fácil',
+    difficultyColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+    distance: '5.0 km (Ida y vuelta)',
+    duration: '2 a 2.5 horas',
+    elevation: '+220 metros',
+    season: 'Todo el año',
+    coordinates: '54°28\'10"S 67°25\'00"O (Reserva Provincial Corazón de la Isla)',
+    description: 'Sendero completamente señalizado cerca de Tolhuin. Ofrece espectaculares vistas panorámicas de la Reserva Corazón de la Isla y el gran Lago Fagnano.',
+    equipment: ['Calzado de caminata cómodo', 'Campera liviana cortavientos', 'Protección solar y agua'],
+    coverImage: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&auto=format&fit=crop&q=80',
+    requiresRegistration: false
+  },
+  {
+    id: 'trail-laguna-caminante',
+    name: 'Laguna del Caminante (Valle de Andorra)',
+    city: 'Ushuaia',
+    difficulty: 'Exigente',
+    difficultyColor: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+    distance: '18.0 km (Ida y vuelta)',
+    duration: '8 a 10 horas',
+    elevation: '+550 metros',
+    season: 'Noviembre a Abril',
+    coordinates: '54°44\'30"S 68°18\'10"O (Entrada Valle de Andorra)',
+    description: 'Travesía intensa atravesando turbales extensos, bosques primarios y valles glaciares hasta alcanzar una solitaria y sobrecogedora laguna de altura.',
+    equipment: ['Botas impermeables de caña alta', 'Polainas impermeables', 'Linterna frontal', 'Manta térmica y botiquín', 'Registro de Senderista activado'],
+    coverImage: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&auto=format&fit=crop&q=80',
+    requiresRegistration: true
+  },
+  {
+    id: 'trail-cerro-cortez',
+    name: 'Cerro Cortez (Atardecer Fueguino)',
+    city: 'Ushuaia',
+    difficulty: 'Moderada',
+    difficultyColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+    distance: '7.5 km (Ida y vuelta)',
+    duration: '3.5 a 4.5 horas',
+    elevation: '+480 metros',
+    season: 'Octubre a Mayo',
+    coordinates: '54°48\'05"S 68°20\'15"O (Valle de los Lobos - RN3)',
+    description: 'Sendero de cumbres sobre el Valle de los Lobos ideal para apreciar atardeceres de verano sobre la Cordillera de los Andes y el Canal Beagle.',
+    equipment: ['Bastones de trekking', 'Calzado técnico con buen agarre', 'Linterna frontal (imprescindible para descenso nocturno)', 'Campera de abrigo'],
+    coverImage: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&auto=format&fit=crop&q=80',
+    requiresRegistration: false
+  },
+  {
+    id: 'trail-terma-escondida',
+    name: 'Terma Escondida de Tolhuin',
+    city: 'Tolhuin',
+    difficulty: 'Muy Fácil',
+    difficultyColor: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
+    distance: '3.0 km (Ida y vuelta)',
+    duration: '1 a 1.5 horas',
+    elevation: '+40 metros',
+    season: 'Todo el año',
+    coordinates: '54°31\'00"S 67°12\'00"O (Sector Termas de Tolhuin)',
+    description: 'Rincón escondido en el bosque de Tolhuin con pozón natural de agua termal. Caminata plácida envuelta en silencio y naturaleza silvestre.',
+    equipment: ['Calzado cómodo', 'Malla de baño y toalla', 'Bolsa para residuos (Sin Huella)'],
+    coverImage: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80',
+    requiresRegistration: false
   }
 ];
 
@@ -761,6 +905,7 @@ export default function GuiaDashboard() {
             >
               <option value="all">Todas las Ubicaciones</option>
               <option value="Ushuaia">Ushuaia</option>
+              <option value="Tolhuin">Tolhuin</option>
               <option value="Parque Nacional TDF">Parque Nacional TDF</option>
               <option value="Río Grande">Río Grande / San Pablo</option>
             </select>
