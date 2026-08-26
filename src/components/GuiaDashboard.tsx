@@ -355,7 +355,7 @@ const TRAILS_DATA: TrailItem[] = [
     coordinates: '54°45\'12"S 68°20\'02"O (Final del Valle de Andorra)',
     description: 'Travesía dentro del Sitio RAMSAR Internacional. Requiere cruzar turbales profundos y un ascenso de fuerte pendiente en bosque andino hasta una impresionante laguna de fusión glaciar repleta de témpanos de hielo azul.',
     equipment: ['Botas de montaña impermeables rígidas', 'Polainas obligatorias', 'Crampones de tracción', 'Linterna frontal', 'Campera impermeable (10k+)', 'Manta térmica de supervivencia'],
-    coverImage: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&auto=format&fit=crop&q=80',
+    coverImage: '/images/glaciar-vinciguerra.png',
     requiresRegistration: true
   },
   {
