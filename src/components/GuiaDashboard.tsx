@@ -371,7 +371,7 @@ const TRAILS_DATA: TrailItem[] = [
     coordinates: '54°51\'10"S 68°29\'30"O (Ensenada Zaratiegui)',
     description: 'Recorrido que serpentea las bahías costeras de Ensenada Zaratiegui y Lapataia sobre el Canal Beagle. Excelente oportunidad para el avistaje de avifauna marina, concheros yámanas e imponentes bosques costeros.',
     equipment: ['Botas de trekking', 'Ticket de entrada al Parque Nacional', 'Campera impermeable', 'Protección solar y repelente'],
-    coverImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80',
+    coverImage: '/images/senda-costera.jpg',
     requiresRegistration: false
   },
   {
