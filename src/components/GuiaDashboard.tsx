@@ -339,7 +339,7 @@ const TRAILS_DATA: TrailItem[] = [
     coordinates: '54°47\'38"S 68°22\'45"O (Base Pista de Esquí)',
     description: 'Ascenso constante bordeando el arroyo Buena Esperanza hasta llegar a la morena frontal del glaciar. Ofrece una de las vistas panorámicas más deslumbrantes de la ciudad de Ushuaia y el Canal Beagle.',
     equipment: ['Calzado deportivo con buen agarre o bota', 'Abanico de abrigo cortavientos', 'Gafas de sol y filtro UV', 'Crampones en invierno/primavera'],
-    coverImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=80',
+    coverImage: '/images/glaciar-martial.jpg',
     requiresRegistration: false
   },
   {
