@@ -403,7 +403,7 @@ const TRAILS_DATA: TrailItem[] = [
     coordinates: '54°51\'40"S 68°33\'50"O (Cabecera Lago Acigami)',
     description: 'Sendero llano y relajante que bordea la ribera norte del Lago Acigami (Roca) hasta la pirámide de hierro que marca el límite fronterizo entre Argentina y Chile.',
     equipment: ['Calzado cómodo de caminata', 'Campera liviana', 'Agua para hidratación'],
-    coverImage: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&auto=format&fit=crop&q=80',
+    coverImage: '/images/hito-xxiv.jpg',
     requiresRegistration: false
   },
   {
