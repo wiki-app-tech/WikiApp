@@ -387,7 +387,7 @@ const TRAILS_DATA: TrailItem[] = [
     coordinates: '54°53\'22"S 68°34\'15"O (Centro de Visitantes Alakush)',
     description: 'La cumbre más alta accesible a pie en el Parque Nacional. Un ascenso sumamente empinado que exige óptima condición física, recompensando con una deslumbrante vista de 360° sobre el Lago Acigami y la cordillera.',
     equipment: ['Botas de alta montaña rígidas', 'Bastones (imprescindibles)', 'Ropa técnica de alta montaña (-5°C)', 'Agua 2L mínimo', 'Ingreso al sendero solo antes de las 09:00 AM'],
-    coverImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=80',
+    coverImage: '/images/cerro-guanaco.jpg',
     requiresRegistration: true
   },
   {
