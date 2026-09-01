@@ -419,7 +419,7 @@ const TRAILS_DATA: TrailItem[] = [
     coordinates: '54°17\'55"S 66°41\'40"O (Ruta Complementaria A)',
     description: 'Recorrido costero por los acantilados del faro inclinado de Cabo San Pablo hasta la playa donde yace encallado desde 1985 el emblemático barco de carga Desdémona.',
     equipment: ['Calzado deportivo/bota', 'Abanico cortaviento de alta resistencia', 'Cámara de fotos'],
-    coverImage: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80',
+    coverImage: '/images/cabo-san-pablo.jpg',
     requiresRegistration: false
   },
   {
