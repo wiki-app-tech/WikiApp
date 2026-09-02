@@ -483,7 +483,7 @@ const TRAILS_DATA: TrailItem[] = [
     coordinates: '54°42\'30"S 68°05\'10"O (Valle de las Cotorras - RN3)',
     description: 'Ascenso continuo bordeando el cauce del arroyo hasta una deslumbrante laguna de tono celeste turquesa al pie de las paredes del Macizo Alvear.',
     equipment: ['Botas impermeables de caña alta', 'Bastones de trekking', 'Polainas para zona de rocas', 'Agua (1.5L) y ración de marcha'],
-    coverImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80',
+    coverImage: '/images/laguna-celeste-alvear.png',
     requiresRegistration: true
   },
   {
