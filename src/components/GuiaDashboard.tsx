@@ -467,7 +467,7 @@ const TRAILS_DATA: TrailItem[] = [
     coordinates: '54°47\'10"S 68°14\'20"O (Camping Kawi Yoppen - RN3)',
     description: 'Rincón clásico y salto de agua a pocos kilómetros de la salida de Ushuaia. Recorrido boscoso corto con descenso final sobre rocas húmedas.',
     equipment: ['Calzado de trekking con buen agarre', 'Campera impermeable o capa de agua', 'Atención en tramo final resbaladizo'],
-    coverImage: 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=800&auto=format&fit=crop&q=80',
+    coverImage: '/images/cascada-velo-de-novia.jpg',
     requiresRegistration: false
   },
   {
