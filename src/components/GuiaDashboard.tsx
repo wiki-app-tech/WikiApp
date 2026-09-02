@@ -451,7 +451,7 @@ const TRAILS_DATA: TrailItem[] = [
     coordinates: '54°43\'18"S 68°07\'05"O (Estacionamiento Laguna Esmeralda RN3)',
     description: 'Desafío técnico de alta montaña cruzando Laguna Esmeralda congelada. Tramo muy exigente sobre acarreo rocoso y hielo glaciar. Se recomienda guía habilitado.',
     equipment: ['Crampones obligatorios con picos de acero', 'Bastones de trekking', 'Ropa térmica de alta montaña (-10°C)', 'Linterna frontal', 'Campera impermeable 10k+', 'Guía de montaña recomendado'],
-    coverImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=80',
+    coverImage: '/images/glaciar-ojo-del-albino.png',
     requiresRegistration: true
   },
   {
