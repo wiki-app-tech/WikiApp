@@ -435,7 +435,7 @@ const TRAILS_DATA: TrailItem[] = [
     coordinates: '54°44\'00"S 68°19\'00"O (Andorra a Cañadón Oveja)',
     description: 'La travesía mítica que cruza la Cordillera Fueguina entre el Valle de Andorra y el Cañadón de la Oveja. Requiere pernoctar en carpa de montaña en vegas de altura.',
     equipment: ['Carpa de 4 estaciones', 'Bolsa de dormir confort -10°C', 'Calentador y comida de travesía', 'GPS / Mapa topográfico', 'Registro de travesías obligatoria en Defensa Civil'],
-    coverImage: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&auto=format&fit=crop&q=80',
+    coverImage: '/images/paso-oveja.jpg',
     requiresRegistration: true
   },
   {
@@ -547,7 +547,7 @@ const TRAILS_DATA: TrailItem[] = [
     coordinates: '54°44\'30"S 68°18\'10"O (Entrada Valle de Andorra)',
     description: 'Travesía intensa atravesando turbales extensos, bosques primarios y valles glaciares hasta alcanzar una solitaria y sobrecogedora laguna de altura.',
     equipment: ['Botas impermeables de caña alta', 'Polainas impermeables', 'Linterna frontal', 'Manta térmica y botiquín', 'Registro de Senderista activado'],
-    coverImage: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&auto=format&fit=crop&q=80',
+    coverImage: '/images/laguna-caminante.jpg',
     requiresRegistration: true
   },
   {
