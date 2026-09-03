@@ -581,6 +581,22 @@ const TRAILS_DATA: TrailItem[] = [
     equipment: ['Calzado cómodo', 'Malla de baño y toalla', 'Bolsa para residuos (Sin Huella)'],
     coverImage: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80',
     requiresRegistration: false
+  },
+  {
+    id: 'trail-laguna-negra-tolhuin',
+    name: 'Reserva Provincial Laguna Negra',
+    city: 'Tolhuin',
+    difficulty: 'Fácil',
+    difficultyColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+    distance: '4.5 km (Ida y vuelta)',
+    duration: '1.5 a 2 horas',
+    elevation: '+50 metros',
+    season: 'Todo el año',
+    coordinates: '54°30\'59"S 67°15\'12"O (Reserva Provincial Laguna Negra - Tolhuin)',
+    description: 'Área Natural Protegida a orillas del Lago Khami (Fagnano). Cuenta con el sendero interpretativo "Paisaje en Movimiento" con pasarelas de madera sobre turbera, acantilados panorámicos y observación de avifauna.',
+    equipment: ['Calzado cómodo de caminata', 'Campera cortavientos', 'Binoculares para avistaje de aves', 'Cámara fotográfica'],
+    coverImage: '/images/laguna-negra-tolhuin.png',
+    requiresRegistration: false
   }
 ];
 
