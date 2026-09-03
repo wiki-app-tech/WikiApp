@@ -488,7 +488,7 @@ const TRAILS_DATA: TrailItem[] = [
   },
   {
     id: 'trail-paso-aves-oculta',
-    name: 'Paso de las Aves y Laguna Oculta',
+    name: 'Paso de las Aves - Laguna Cóndor',
     city: 'Ushuaia',
     difficulty: 'Exigente',
     difficultyColor: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
@@ -499,7 +499,7 @@ const TRAILS_DATA: TrailItem[] = [
     coordinates: '54°45\'00"S 68°10\'00"O (Valle del Río Chico)',
     description: 'Aventura profunda cruzando el Valle del Río Chico hasta el alto paso cordillerano que alberga las lagunas Halcón, Cóndor y la prístina Laguna Oculta.',
     equipment: ['Botas de alta montaña impermeables', 'GPS / Navegador con track', 'Linterna frontal', 'Manta térmica', 'Registro de senderistas obligatorio'],
-    coverImage: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&auto=format&fit=crop&q=80',
+    coverImage: '/images/paso-de-las-aves-laguna-condor.jpg',
     requiresRegistration: true
   },
   {
