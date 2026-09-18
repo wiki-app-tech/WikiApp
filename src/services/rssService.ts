@@ -1,5 +1,7 @@
 import Parser from 'rss-parser';
 import { FeedSource, Article } from '@/types';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // Omit telegram since it was mocked and rss-parser works differently
 const parser = new Parser({
@@ -170,6 +172,19 @@ export async function updateAllFeeds(feeds: FeedSource[]): Promise<Article[]> {
         if (isNaN(dateB)) return -1;
         return dateB - dateA;
     });
+
+    // Persist to public/data/articles.json for instant subsequent reads
+    if (allArticles.length > 0) {
+        try {
+            const articlesPath = path.join(process.cwd(), 'public/data/articles.json');
+            await fs.writeFile(articlesPath, JSON.stringify({
+                lastUpdated: new Date().toISOString(),
+                articles: allArticles
+            }, null, 2), 'utf8');
+        } catch (e) {
+            console.warn('Could not persist to articles.json:', e);
+        }
+    }
 
     return allArticles;
 }

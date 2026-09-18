@@ -4,15 +4,35 @@ import React, { useState, useMemo, useEffect } from 'react';
 import type { Article, FeedSource } from '@/types';
 import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, AlertTriangle, Info, Newspaper, Eye, Check, Type } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import WeatherDashboard from './WeatherDashboard';
-import RadioDashboard from './RadioDashboard';
-import BoletinesDashboard from './BoletinesDashboard';
-import GuiaDashboard from './GuiaDashboard';
-import TapasModal from './TapasModal';
-import TelegramFeed from './TelegramFeed';
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { motion, AnimatePresence } from 'framer-motion';
-
 import dynamic from 'next/dynamic';
+
+const TabLoadingSkeleton = ({ title = "Cargando..." }: { title?: string }) => (
+  <div className="w-full min-h-[420px] flex flex-col items-center justify-center bg-white/40 dark:bg-white/[0.02] backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 p-12 text-slate-500 dark:text-gray-400">
+    <div className="w-9 h-9 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+    <span className="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-gray-300 animate-pulse">{title}</span>
+  </div>
+);
+
+const WeatherDashboard = dynamic(() => import('./WeatherDashboard'), {
+  loading: () => <TabLoadingSkeleton title="Sincronizando Pronóstico y Clima..." />
+});
+const RadioDashboard = dynamic(() => import('./RadioDashboard'), {
+  loading: () => <TabLoadingSkeleton title="Cargando Emisoras de Radio en Vivo..." />
+});
+const BoletinesDashboard = dynamic(() => import('./BoletinesDashboard'), {
+  loading: () => <TabLoadingSkeleton title="Indexando Boletines Oficiales y Digesto..." />
+});
+const GuiaDashboard = dynamic(() => import('./GuiaDashboard'), {
+  loading: () => <TabLoadingSkeleton title="Cargando Guía de Servicios y Senderos..." />
+});
+const TapasModal = dynamic(() => import('./TapasModal'), {
+  ssr: false
+});
+const TelegramFeed = dynamic(() => import('./TelegramFeed'), {
+  loading: () => <TabLoadingSkeleton title="Cargando Canales de Noticias..." />
+});
 
 const WeatherAlertMap = dynamic(() => import('./WeatherAlertMap'), {
     ssr: false,
@@ -93,6 +113,28 @@ const WikiAppLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
 type ViewMode = 'list' | 'grid' | 'magazine';
 
 export default function Dashboard({ initialArticles, feeds }: { initialArticles: Article[], feeds: FeedSource[] }) {
+  const [articles, setArticles] = useState<Article[]>(initialArticles);
+
+  useEffect(() => {
+    setArticles(initialArticles);
+  }, [initialArticles]);
+
+  useAutoRefresh(async () => {
+    try {
+      const res = await fetch('/api/articles');
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.articles && Array.isArray(data.articles) && data.articles.length > 0) {
+          setArticles(data.articles);
+        }
+      }
+    } catch (err) {
+      console.warn('Auto-refresh background sync failed:', err);
+    }
+  }, { interval: 5 * 60 * 1000, enabled: true });
+
+  const feedsMap = useMemo(() => new globalThis.Map<string, FeedSource>(feeds.map(f => [f.id, f])), [feeds]);
+
   const [activeTab, setActiveTab] = useState('home');
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -436,12 +478,12 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
   // Enhanced Filter Logic
   const filteredArticles = useMemo(() => {
-    let result = initialArticles;
+    let result = articles;
     
     // Scope filter
     if (activeScope !== 'all') {
         result = result.filter(a => {
-            const feed = feeds.find(f => f.id === a.sourceId);
+            const feed = feedsMap.get(a.sourceId);
             return feed && feed.scope === activeScope;
         });
     }
@@ -449,7 +491,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
     // Category filter
     if (activeCategory !== 'all') {
         result = result.filter(a => {
-            const feed = feeds.find(f => f.id === a.sourceId);
+            const feed = feedsMap.get(a.sourceId);
             return feed && feed.category === activeCategory;
         });
     }
@@ -475,7 +517,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
     if (search.trim()) {
         const lowerSearch = search.toLowerCase();
         result = result.filter(a => {
-          const sourceName = feeds.find(f => f.id === a.sourceId)?.name || '';
+          const sourceName = feedsMap.get(a.sourceId)?.name || '';
           return (
             a.title.toLowerCase().includes(lowerSearch) ||
             (a.description && a.description.toLowerCase().includes(lowerSearch)) ||
@@ -484,7 +526,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         });
     }
     return result;
-  }, [initialArticles, search, feeds, activeScope, activeCategory, blocklist]);
+  }, [articles, search, feedsMap, activeScope, activeCategory, blocklist]);
 
   const stripHtml = (html: string) => html.replace(/<[^>]*>?/gm, '');
 
@@ -503,14 +545,14 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
     if (search || activeTab !== 'home' || activeScope !== 'all' || activeCategory !== 'all') return [];
     
     const findByScope = (scope: string) => 
-        initialArticles.find(a => feeds.find(f => f.id === a.sourceId)?.scope === scope);
+        articles.find(a => feedsMap.get(a.sourceId)?.scope === scope);
 
     const inter = findByScope('internacional');
     const nac = findByScope('nacional');
     const prov = findByScope('provincial');
     
     return [inter, nac, prov].filter(Boolean) as Article[];
-  }, [initialArticles, search, activeTab, activeScope, activeCategory, feeds]);
+  }, [articles, search, activeTab, activeScope, activeCategory, feedsMap]);
   
   // Logic for the main feed display: on home we show less, on explore we show more
   // Also exclude top visual articles from the main list
@@ -999,7 +1041,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                         {(() => {
                           const heroArticle = topVisualArticles[0];
                           const isVid = isYouTube(heroArticle.link);
-                          const sourceName = feeds.find(f => f.id === heroArticle.sourceId)?.name || 'Central';
+                          const sourceName = feedsMap.get(heroArticle.sourceId)?.name || 'Central';
                           return (
                             <motion.div
                               initial={{ opacity: 0, y: 15 }}
@@ -1011,6 +1053,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                 <img 
                                   src={heroArticle.thumbnail} 
                                   alt="" 
+                                  loading="lazy"
+                                  decoding="async"
                                   className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 group-hover:opacity-85 transition-all duration-700" 
                                 />
                               ) : (
@@ -1193,7 +1237,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {topVisualArticles.slice(1, 3).map((article, idx) => {
                             const isVid = isYouTube(article.link);
-                            const sourceName = feeds.find(f => f.id === article.sourceId)?.name || 'Central';
+                            const sourceName = feedsMap.get(article.sourceId)?.name || 'Central';
                             return (
                               <motion.div
                                 key={'sub-bento-' + article.id}
@@ -1205,7 +1249,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                               >
                                 {article.thumbnail && (
                                   <div className="w-24 h-24 sm:w-28 sm:h-24 rounded-xl overflow-hidden shrink-0 relative shadow-sm">
-                                    <img src={article.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                    <img src={article.thumbnail} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                                     {isVid && (
                                       <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                                         <PlayCircle className="w-6 h-6 text-white" />
@@ -1272,7 +1316,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                 <AnimatePresence mode="popLayout">
                                     {feedArticlesToDisplay.map(article => {
                                         const isVid = isYouTube(article.link);
-                                        const sourceName = feeds.find(f => f.id === article.sourceId)?.name || 'Fuente';
+                                        const sourceName = feedsMap.get(article.sourceId)?.name || 'Fuente';
 
                                         // VIEW: LIST
                                                                                 // VIEW: LIST
@@ -1309,7 +1353,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                     >
                                                         {article.thumbnail && (
                                                             <div className="w-20 h-20 md:w-28 md:h-20 shrink-0 overflow-hidden rounded-xl relative shadow-md">
-                                                                <img src={article.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                                                <img src={article.thumbnail} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                                                             </div>
                                                         )}
                                                         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
@@ -1374,7 +1418,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                     >
                                                         {article.thumbnail ? (
                                                             <div className="aspect-[16/10] overflow-hidden relative">
-                                                                <img src={article.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                                                <img src={article.thumbnail} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                                                                 <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent opacity-60"></div>
                                                                 <div className="absolute top-4 left-4">
                                                                     <span className="text-xs font-bold text-white uppercase tracking-wider bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10">{sourceName}</span>
@@ -1428,7 +1472,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                     >
                                                         {article.thumbnail && (
                                                             <div className="w-full sm:w-40 aspect-[16/10] shrink-0 overflow-hidden rounded-2xl relative shadow-md">
-                                                                <img src={article.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                                                <img src={article.thumbnail} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                                                             </div>
                                                         )}
                                                         <div className="flex flex-col justify-center gap-2 flex-1">
@@ -1453,7 +1497,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         className="group flex flex-col lg:flex-row gap-8 md:gap-12 p-6 md:p-10 border-b border-slate-200 dark:border-white/5 hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-all cursor-pointer relative overflow-hidden"
                                                     >
                                                         <div className="w-full lg:w-[450px] aspect-[16/10] lg:h-[280px] shrink-0 overflow-hidden rounded-[2.5rem] relative shadow-2xl">
-                                                            <img src={article.thumbnail || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=600'} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2000ms]" />
+                                                            <img src={article.thumbnail || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=600'} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2000ms]" />
                                                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                                                             {isVid && (
                                                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center border border-white/30 opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100">
@@ -2943,7 +2987,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                         className="p-4 hover:bg-blue-600/10 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-blue-500/20 group"
                       >
                         <h4 className="text-sm font-bold text-slate-800 dark:text-gray-200 group-hover:text-blue-500 transition-colors">{article.title}</h4>
-                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest mt-1 block">{(feeds.find(f => f.id === article.sourceId)?.name || 'Fuente')}</span>
+                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest mt-1 block">{(feedsMap.get(article.sourceId)?.name || 'Fuente')}</span>
                       </div>
                     ))}
                     {filteredArticles.length === 0 && (
@@ -2996,7 +3040,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                 {/* Lado izquierdo: Fuente y fecha */}
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className="text-[11px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/40 px-2.5 py-1 rounded-lg truncate max-w-[130px] sm:max-w-[200px]">
-                    {feeds.find(f => f.id === selectedArticle.sourceId)?.name || 'Central Fueguina'}
+                    {feedsMap.get(selectedArticle.sourceId)?.name || 'Central Fueguina'}
                   </span>
                   <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 font-mono shrink-0 hidden sm:inline-block">
                     {new Date(selectedArticle.pubDate).toLocaleDateString()}
@@ -3140,7 +3184,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                   {/* Metadatos superiores */}
                   <div className="flex flex-wrap items-center gap-3 mb-4">
                     <span className="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] bg-blue-600/10 px-3 py-1 rounded-lg border border-blue-500/20">
-                      {feeds.find(f => f.id === selectedArticle.sourceId)?.name || 'Central'}
+                      {feedsMap.get(selectedArticle.sourceId)?.name || 'Central'}
                     </span>
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">
                       {new Date(selectedArticle.pubDate).toLocaleDateString()} · {getRelativeTime(selectedArticle.pubDate)}
@@ -3155,7 +3199,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                   {/* Portada / Imagen principal */}
                   {selectedArticle.thumbnail && (
                     <div className="w-full aspect-[16/10] mb-8 sm:mb-10 rounded-[1.75rem] overflow-hidden border border-slate-200 dark:border-white/10 relative group shadow-xl">
-                      <img src={selectedArticle.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[3000ms]" />
+                      <img src={selectedArticle.thumbnail} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[3000ms]" />
                       {isYouTube(selectedArticle.link) && (
                         <a href={selectedArticle.link} target="_blank" rel="noopener noreferrer" className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-all">
                           <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center border border-white/30 transform group-hover:scale-110 transition-all">
@@ -3198,7 +3242,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                             {filteredArticles[currentArticleIndex + 1].title}
                           </h4>
                           <span className="text-[10px] font-medium text-slate-400 mt-0.5 block">
-                            {(feeds.find(f => f.id === filteredArticles[currentArticleIndex + 1].sourceId)?.name || 'Fuente')}
+                            {(feedsMap.get(filteredArticles[currentArticleIndex + 1].sourceId)?.name || 'Fuente')}
                           </span>
                         </div>
                         <div className="w-10 h-10 rounded-xl bg-blue-600/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-all">

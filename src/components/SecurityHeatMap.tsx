@@ -29,11 +29,12 @@ const SecurityHeatMap = () => {
     const fetchData = async () => {
       try {
         const response = await fetch('/data/tierradelfuego_crimes.json');
-        if (response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (response.ok && contentType && contentType.includes('application/json')) {
           const data = await response.json();
           setCrimes(data.crimes || []);
         } else {
-          console.error("Fallo al cargar delitos locales");
+          console.warn("No se pudo cargar delitos locales o respuesta no es JSON");
         }
       } catch (err) {
         console.error("Error cargando delitos:", err);
