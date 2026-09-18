@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, ChevronDown, AlertTriangle, Info, Newspaper, Eye, Check } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, AlertTriangle, Info, Newspaper, Eye, Check, Type } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import WeatherDashboard from './WeatherDashboard';
 import RadioDashboard from './RadioDashboard';
@@ -103,6 +103,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [readerFontSize, setReaderFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
+  const [readingProgress, setReadingProgress] = useState<number>(0);
+  const [isMobileMoreOpen, setIsMobileMoreOpen] = useState(false);
   const [activeScope, setActiveScope] = useState<string>('all');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [isCoverageDropdownOpen, setIsCoverageDropdownOpen] = useState(false);
@@ -511,6 +514,25 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
   
   // Logic for the main feed display: on home we show less, on explore we show more
   // Also exclude top visual articles from the main list
+  const currentArticleIndex = useMemo(() => {
+    if (!selectedArticle) return -1;
+    return filteredArticles.findIndex(a => a.id === selectedArticle.id);
+  }, [selectedArticle, filteredArticles]);
+
+  const handlePrevArticle = () => {
+    if (currentArticleIndex > 0) {
+      setSelectedArticle(filteredArticles[currentArticleIndex - 1]);
+      setReadingProgress(0);
+    }
+  };
+
+  const handleNextArticle = () => {
+    if (currentArticleIndex >= 0 && currentArticleIndex < filteredArticles.length - 1) {
+      setSelectedArticle(filteredArticles[currentArticleIndex + 1]);
+      setReadingProgress(0);
+    }
+  };
+
   // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -519,12 +541,28 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         setShowSearchModal(prev => !prev);
       }
       if (e.key === 'Escape') {
-        setShowSearchModal(false);
+        if (selectedArticle) {
+          setSelectedArticle(null);
+        } else {
+          setShowSearchModal(false);
+        }
+      }
+      // Navegación con flechas cuando el lector de noticias está abierto
+      if (selectedArticle && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+        if (e.key === 'ArrowLeft' && currentArticleIndex > 0) {
+          e.preventDefault();
+          setSelectedArticle(filteredArticles[currentArticleIndex - 1]);
+          setReadingProgress(0);
+        } else if (e.key === 'ArrowRight' && currentArticleIndex >= 0 && currentArticleIndex < filteredArticles.length - 1) {
+          e.preventDefault();
+          setSelectedArticle(filteredArticles[currentArticleIndex + 1]);
+          setReadingProgress(0);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [selectedArticle, currentArticleIndex, filteredArticles]);
 
   const feedArticlesToDisplay = useMemo(() => {
     const topIds = new Set(topVisualArticles.map(a => a.id));
@@ -906,7 +944,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         }}
                                                         className={`flex items-center gap-3 p-2.5 rounded-xl text-left transition-all ${
                                                             isSelected 
-                                                                ? 'bg-blue-650 text-white shadow-md' 
+                                                                ? 'bg-blue-600 text-white shadow-md' 
                                                                 : 'hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-gray-300'
                                                         }`}
                                                     >
@@ -914,8 +952,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                             <Icon className="w-4 h-4" />
                                                         </div>
                                                         <div className="flex flex-col min-w-0">
-                                                            <span className="text-[11px] font-black uppercase tracking-wider leading-none">{item.label}</span>
-                                                            <span className={`text-[9px] mt-1 leading-normal ${isSelected ? 'text-blue-100' : 'text-slate-450 dark:text-gray-500'}`}>{item.desc}</span>
+                                                            <span className="text-xs font-bold uppercase tracking-wider leading-none">{item.label}</span>
+                                                            <span className={`text-[11px] mt-1 leading-normal ${isSelected ? 'text-blue-100' : 'text-slate-400 dark:text-gray-400'}`}>{item.desc}</span>
                                                         </div>
                                                     </button>
                                                 );
@@ -953,59 +991,247 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     </div>
                   )}
 
-                  {/* TOP VISUAL WIDGET (SOLO EN HOME SIN FILTRO) */}
+                  {/* BENTO GRID EDITORIAL DE ALTO IMPACTO (HOME) */}
                   {!search && activeTab === 'home' && topVisualArticles.length > 0 && (
-                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                        {topVisualArticles.map((article, idx) => {
-                            const isVid = isYouTube(article.link);
-                            return (
-                               <motion.div 
-                                  initial={{ opacity: 0, y: 10 }}
-                                  whileInView={{ opacity: 1, y: 0 }}
-                                  viewport={{ once: true }}
-                                  transition={{ delay: idx * 0.1 }}
-                                  key={'top-'+article.id}
-                                  onClick={() => setSelectedArticle(article)}
-                                  className="group relative h-48 sm:h-56 md:h-80 bg-white dark:bg-[#111] rounded-2xl overflow-hidden border border-slate-300 dark:border-[#222] cursor-pointer shadow-2xl press-effect hover-lift"
-                               >
-                                  {article.thumbnail ? (
-                                      <img src={article.thumbnail} className="w-full h-full object-cover opacity-60 group-hover:scale-105 group-hover:opacity-80 transition-all duration-700" alt="" />
-                                  ) : (
-                                      <div className="w-full h-full bg-gradient-to-br from-[#1a1a1a] to-black"></div>
-                                  )}
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-                                  
-                                  {/* YouTube overlay if applicable */}
-                                  {isVid && (
-                                     <div className="absolute top-3 right-3 md:top-4 md:right-4 bg-red-600/90 text-white p-1.5 md:p-2 rounded-full backdrop-blur shadow-lg">
-                                        <PlayCircle className="w-5 h-5 md:w-6 md:h-6" />
-                                     </div>
-                                  )}
-                                  {/* Category Badge with Fire Icon */}
-                                  {!isVid && (
-                                     <div className="absolute top-3 right-3 md:top-4 md:right-4 bg-orange-600/90 text-white px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[8px] md:text-[10px] font-black uppercase shadow-lg flex items-center gap-1 backdrop-blur ring-1 ring-white/20">
-                                        <Flame className="w-2.5 h-2.5 md:w-3 md:h-3" /> 
-                                        {feeds.find(f => f.id === article.sourceId)?.category === 'internacional' ? 'Internacional' : 
-                                         feeds.find(f => f.id === article.sourceId)?.category === 'nacional' ? 'Argentina' : 'TDF'}
-                                     </div>
-                                  )}
-
-                                  <div className="absolute inset-x-0 bottom-0 p-5 flex flex-col gap-2 transform group-hover:-translate-y-2 transition-transform duration-300">
-                                      <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest bg-slate-100/80 dark:bg-black/50 w-max px-2 py-1 rounded-md mb-1 border border-slate-200 dark:border-white/5 backdrop-blur-md">
-                                          {feeds.find(f => f.id === article.sourceId)?.name}
-                                      </span>
-                                      <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight line-clamp-3 text-shadow-md">
-                                          {article.title}
-                                      </h3>
-                                      <div className="flex items-center gap-3 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                          <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 bg-black/50 hover:bg-green-500 text-white rounded-lg transition-all backdrop-blur-md" title="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
-                                          <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 bg-black/50 hover:bg-blue-500 text-white rounded-lg transition-all backdrop-blur-md" title="Compartir en Telegram"><Send className="w-4 h-4" /></button>
-                                      </div>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5">
+                        {/* 1. HERO FEATURE CARD */}
+                        {(() => {
+                          const heroArticle = topVisualArticles[0];
+                          const isVid = isYouTube(heroArticle.link);
+                          const sourceName = feeds.find(f => f.id === heroArticle.sourceId)?.name || 'Central';
+                          return (
+                            <motion.div
+                              initial={{ opacity: 0, y: 15 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              onClick={() => setSelectedArticle(heroArticle)}
+                              className="lg:col-span-7 xl:col-span-8 group relative min-h-[340px] sm:min-h-[390px] lg:min-h-[420px] rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 cursor-pointer shadow-xl press-effect flex flex-col justify-end p-6 md:p-8 bg-slate-900"
+                            >
+                              {heroArticle.thumbnail ? (
+                                <img 
+                                  src={heroArticle.thumbnail} 
+                                  alt="" 
+                                  className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 group-hover:opacity-85 transition-all duration-700" 
+                                />
+                              ) : (
+                                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-950 to-black"></div>
+                              )}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                              
+                              {/* Badges superiores */}
+                              <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+                                <div className="flex items-center gap-2">
+                                  <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-600 text-white backdrop-blur shadow-md">
+                                    {sourceName}
+                                  </span>
+                                  <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-black/50 text-slate-200 border border-white/10 backdrop-blur font-mono">
+                                    {getRelativeTime(heroArticle.pubDate)}
+                                  </span>
+                                </div>
+                                {isVid && (
+                                  <div className="bg-red-600 text-white p-2 rounded-full backdrop-blur shadow-lg">
+                                    <PlayCircle className="w-5 h-5" />
                                   </div>
-                               </motion.div>
-                            )
-                        })}
-                     </div>
+                                )}
+                              </div>
+
+                              {/* Contenido Hero */}
+                              <div className="relative z-10 flex flex-col gap-2.5">
+                                <span className="text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                                  <Flame className="w-3.5 h-3.5" /> Portada Destacada
+                                </span>
+                                <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white leading-tight line-clamp-3 font-display drop-shadow-md">
+                                  {heroArticle.title}
+                                </h2>
+                                {heroArticle.description && (
+                                  <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 leading-relaxed max-w-2xl font-normal hidden sm:block">
+                                    {stripHtml(heroArticle.description)}
+                                  </p>
+                                )}
+                                <div className="flex items-center gap-4 mt-2 pt-2 border-t border-white/10">
+                                  <span className="text-xs font-bold text-blue-400 uppercase tracking-wider group-hover:underline flex items-center gap-1">
+                                    Leer artículo <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                                  </span>
+                                  <div className="flex items-center gap-2 ml-auto">
+                                    <button 
+                                      onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(heroArticle.title + ' ' + heroArticle.link)}`, '_blank'); }} 
+                                      className="p-2 bg-white/10 hover:bg-emerald-600 text-white rounded-xl transition-all backdrop-blur" 
+                                      title="Compartir por WhatsApp"
+                                    >
+                                      <MessageCircle className="w-4 h-4" />
+                                    </button>
+                                    <button 
+                                      onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(heroArticle.link)}&text=${encodeURIComponent(heroArticle.title)}`, '_blank'); }} 
+                                      className="p-2 bg-white/10 hover:bg-blue-600 text-white rounded-xl transition-all backdrop-blur" 
+                                      title="Compartir por Telegram"
+                                    >
+                                      <Send className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          );
+                        })()}
+
+                        {/* 2. SIDE BENTO UTILITIES (Col 5 / 4) */}
+                        <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-4">
+                          {/* Bento Card: Estado Vial TDF */}
+                          <div 
+                            onClick={() => setActiveTab('security')}
+                            className="bg-white dark:bg-[#10141c] border border-slate-200/80 dark:border-white/10 rounded-3xl p-5 shadow-lg hover:border-blue-500/40 transition-all cursor-pointer flex flex-col justify-between flex-1 group"
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center">
+                                  <Car className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                                    Ruta Nacional 3
+                                  </h3>
+                                  <span className="text-[10px] text-slate-500 dark:text-gray-400">Tránsito & Monitoreo</span>
+                                </div>
+                              </div>
+                              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Habilitada
+                              </span>
+                            </div>
+
+                            <div className="space-y-1.5 my-2">
+                              <div className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5">
+                                <span className="font-medium text-slate-700 dark:text-gray-300">San Sebastián ➔ R. Grande</span>
+                                <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">Normal</span>
+                              </div>
+                              <div className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5">
+                                <span className="font-medium text-slate-700 dark:text-gray-300">R. Grande ➔ Tolhuin</span>
+                                <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">Normal</span>
+                              </div>
+                              <div className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5">
+                                <span className="font-medium text-slate-700 dark:text-gray-300">Paso Garibaldi (Montaña)</span>
+                                <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">Precaución</span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/5 text-[11px] font-bold text-blue-600 dark:text-blue-400">
+                              <span>Ver mapa de alertas</span>
+                              <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                            </div>
+                          </div>
+
+                          {/* Bento Card: Farmacia de Turno Hoy Flash */}
+                          <div className="bg-white dark:bg-[#10141c] border border-slate-200/80 dark:border-white/10 rounded-3xl p-5 shadow-lg flex flex-col justify-between flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                                  <Plus className="w-4 h-4" />
+                                </div>
+                                <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                                  Farmacia de Turno
+                                </h3>
+                              </div>
+                              <div className="flex gap-1 bg-slate-100 dark:bg-white/5 p-0.5 rounded-lg">
+                                {(['ushuaia', 'rio_grande', 'tolhuin'] as const).map(city => (
+                                  <button
+                                    key={city}
+                                    onClick={() => setSelectedPharmacyCity(city)}
+                                    className={`text-[9px] font-bold uppercase px-2 py-1 rounded-md transition-all ${
+                                      selectedPharmacyCity === city
+                                        ? 'bg-blue-600 text-white shadow-sm'
+                                        : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
+                                    }`}
+                                  >
+                                    {city === 'rio_grande' ? 'RGA' : city === 'ushuaia' ? 'USH' : 'TOL'}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {(() => {
+                              const list = getVisiblePharmacies(selectedPharmacyCity);
+                              const activePharm = list[0];
+                              if (!activePharm) {
+                                return (
+                                  <div className="py-3 text-center text-xs text-slate-400">
+                                    Cargando turno...
+                                  </div>
+                                );
+                              }
+                              return (
+                                <div className="flex flex-col gap-1 py-1">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm font-bold text-slate-900 dark:text-white">
+                                      {activePharm.nombre}
+                                    </span>
+                                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                                      Turno Activo
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-slate-500 dark:text-gray-400">
+                                    {activePharm.direccion}
+                                  </p>
+                                  <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-gray-500 mt-2 pt-2 border-t border-slate-100 dark:border-white/5">
+                                    <span className="font-mono">Hasta las 09:00 hs</span>
+                                    {activePharm.telefono && (
+                                      <a 
+                                        href={`tel:${activePharm.telefono}`}
+                                        className="text-blue-600 dark:text-blue-400 font-bold hover:underline"
+                                      >
+                                        Tel: {activePharm.telefono}
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Sub-tarjetas Bento secundarias (si existen 2da y 3ra nota) */}
+                      {topVisualArticles.length > 1 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {topVisualArticles.slice(1, 3).map((article, idx) => {
+                            const isVid = isYouTube(article.link);
+                            const sourceName = feeds.find(f => f.id === article.sourceId)?.name || 'Central';
+                            return (
+                              <motion.div
+                                key={'sub-bento-' + article.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 * (idx + 1) }}
+                                onClick={() => setSelectedArticle(article)}
+                                className="bg-white dark:bg-[#10141c] border border-slate-200/80 dark:border-white/10 rounded-2xl p-4 flex gap-4 items-center hover:border-blue-500/50 hover-lift cursor-pointer shadow-md group"
+                              >
+                                {article.thumbnail && (
+                                  <div className="w-24 h-24 sm:w-28 sm:h-24 rounded-xl overflow-hidden shrink-0 relative shadow-sm">
+                                    <img src={article.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                    {isVid && (
+                                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                        <PlayCircle className="w-6 h-6 text-white" />
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                                <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+                                  <div className="flex items-center gap-2 text-xs">
+                                    <span className="font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">
+                                      {sourceName}
+                                    </span>
+                                    <span className="text-[11px] text-slate-400 font-mono">
+                                      {getRelativeTime(article.pubDate)}
+                                    </span>
+                                  </div>
+                                  <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 font-display group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                    {article.title}
+                                  </h3>
+                                </div>
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
@@ -1062,12 +1288,12 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         className="group flex items-center justify-between px-6 py-2.5 border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.03] cursor-pointer transition-all border-l-4 border-l-transparent hover:border-l-blue-600 relative overflow-hidden"
                                                     >
                                                         <div className="flex-1 min-w-0 pr-4">
-                                                            <h3 className="text-[12.5px] font-bold text-slate-800 dark:text-gray-150 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-snug transition-colors font-display">
+                                                            <h3 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-snug transition-colors font-display">
                                                                 {article.title}
                                                             </h3>
                                                         </div>
                                                         <div className="shrink-0 flex items-center gap-3">
-                                                            <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-500/10 px-2 py-0.5 rounded">{sourceName}</span>
+                                                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider bg-blue-500/10 px-2.5 py-0.5 rounded">{sourceName}</span>
                                                         </div>
                                                     </motion.div>
                                                 );
@@ -1087,26 +1313,26 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                             </div>
                                                         )}
                                                         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                                                            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest">
-                                                               <span className="text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded">{sourceName}</span>
-                                                               <span className="text-slate-400 dark:text-gray-555 font-mono">{getRelativeTime(article.pubDate)}</span>
+                                                            <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-wider">
+                                                               <span className="text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">{sourceName}</span>
+                                                               <span className="text-slate-400 dark:text-gray-400 font-mono text-[11px]">{getRelativeTime(article.pubDate)}</span>
                                                             </div>
-                                                            <h3 className="text-xs sm:text-sm md:text-base font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug font-display">
+                                                            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug font-display">
                                                                 {article.title}
                                                             </h3>
                                                             {article.description ? (
-                                                                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-gray-400 line-clamp-2 leading-relaxed font-medium">
+                                                                <p className="text-xs text-slate-500 dark:text-gray-400 line-clamp-2 leading-relaxed font-normal">
                                                                     {stripHtml(article.description)}
                                                                 </p>
                                                             ) : (
-                                                                <p className="text-[11px] text-slate-450 dark:text-gray-555 italic leading-relaxed">
+                                                                <p className="text-xs text-slate-400 dark:text-gray-400 italic leading-relaxed">
                                                                     Esta nota está disponible de forma completa en el portal de origen.
                                                                 </p>
                                                             )}
                                                         </div>
                                                         <div className="hidden md:flex items-center gap-2 mt-3 sm:mt-0 shrink-0 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-500 dark:text-gray-400 hover:text-green-500 rounded-xl transition-all"><MessageCircle className="w-4 h-4" /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-500 dark:text-gray-400 hover:text-blue-405 rounded-xl transition-all"><Send className="w-4 h-4" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-500 dark:text-gray-400 hover:text-green-500 rounded-xl transition-all" title="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-500 dark:text-gray-400 hover:text-blue-500 rounded-xl transition-all" title="Compartir en Telegram"><Send className="w-4 h-4" /></button>
                                                         </div>
                                                     </motion.div>
                                                 );
@@ -1124,14 +1350,14 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         exit={{ opacity: 0, scale: 0.95 }}
                                                         key={article.id} 
                                                         onClick={() => setSelectedArticle(article)}
-                                                        className="group relative w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm border border-slate-200 dark:border-white/5 rounded-2xl hover:border-blue-500/50 p-4 transition-all cursor-pointer flex flex-col justify-between min-h-[100px] press-effect"
+                                                        className="group relative w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm border border-slate-200 dark:border-white/5 rounded-2xl hover:border-blue-500/50 p-4 transition-all cursor-pointer flex flex-col justify-between"
                                                     >
-                                                        <h3 className="text-[12.5px] font-bold text-slate-800 dark:text-gray-150 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-snug line-clamp-3 transition-colors font-display">
+                                                        <h3 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-snug line-clamp-3 transition-colors font-display">
                                                             {article.title}
                                                         </h3>
                                                         <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 dark:border-white/5">
-                                                            <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-500/10 px-1.5 py-0.5 rounded">{sourceName}</span>
-                                                            <span className="text-[9px] text-slate-400 dark:text-gray-500 font-mono">{getRelativeTime(article.pubDate)}</span>
+                                                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider bg-blue-500/10 px-2 py-0.5 rounded">{sourceName}</span>
+                                                            <span className="text-[11px] text-slate-500 dark:text-gray-400 font-mono">{getRelativeTime(article.pubDate)}</span>
                                                         </div>
                                                     </motion.div>
                                                 );
@@ -1151,7 +1377,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                                 <img src={article.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                                                                 <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent opacity-60"></div>
                                                                 <div className="absolute top-4 left-4">
-                                                                    <span className="text-[9px] font-black text-white uppercase tracking-widest bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10">{sourceName}</span>
+                                                                    <span className="text-xs font-bold text-white uppercase tracking-wider bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10">{sourceName}</span>
                                                                 </div>
                                                             </div>
                                                         ) : (
@@ -1161,8 +1387,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         )}
                                                         <div className="p-5 flex flex-col flex-1 gap-2.5">
                                                             <div className="flex items-center justify-between">
-                                                                <span className="text-[9px] text-slate-400 dark:text-gray-555 font-black uppercase tracking-widest font-mono">{getRelativeTime(article.pubDate)}</span>
-                                                                <Bookmark className="w-3.5 h-3.5 text-slate-300 dark:text-gray-750 hover:text-blue-500 transition-colors" />
+                                                                <span className="text-[11px] text-slate-500 dark:text-gray-400 font-semibold uppercase tracking-wider font-mono">{getRelativeTime(article.pubDate)}</span>
+                                                                <Bookmark className="w-3.5 h-3.5 text-slate-300 dark:text-gray-500 hover:text-blue-500 transition-colors" />
                                                             </div>
                                                             <h3 className="text-sm font-bold text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-snug line-clamp-2 transition-colors font-display">
                                                                 {article.title}
@@ -1172,14 +1398,14 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                                     {stripHtml(article.description)}
                                                                 </p>
                                                             ) : (
-                                                                <p className="text-[11px] text-slate-450 dark:text-gray-550 italic leading-relaxed">
+                                                                <p className="text-xs text-slate-400 dark:text-gray-400 italic leading-relaxed">
                                                                     Consulte el informe completo en el enlace del portal original.
                                                                 </p>
                                                             )}
                                                         </div>
                                                         <div className="hidden md:flex absolute bottom-4 right-4 items-center gap-2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 bg-white dark:bg-black/80 backdrop-blur-xl p-2 rounded-xl border border-slate-200 dark:border-white/10 shadow-xl">
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-lg transition-all"><MessageCircle className="w-4 h-4" /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-405 rounded-lg transition-all"><Send className="w-4 h-4" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-lg transition-all" title="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-lg transition-all" title="Compartir en Telegram"><Send className="w-4 h-4" /></button>
                                                         </div>
                                                     </motion.div>
                                                 );
@@ -1207,10 +1433,10 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         )}
                                                         <div className="flex flex-col justify-center gap-2 flex-1">
                                                             <div className="flex items-center gap-3">
-                                                               <span className="text-[10px] font-black text-blue-650 dark:text-blue-400 uppercase tracking-wider bg-blue-500/5 px-2 py-0.5 rounded">{sourceName}</span>
-                                                               <span className="text-[10px] text-slate-400 dark:text-gray-500 font-mono">{getRelativeTime(article.pubDate)}</span>
+                                                               <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider bg-blue-500/10 px-2 py-0.5 rounded">{sourceName}</span>
+                                                               <span className="text-[11px] text-slate-500 dark:text-gray-400 font-mono">{getRelativeTime(article.pubDate)}</span>
                                                             </div>
-                                                            <h3 className="text-base font-bold text-slate-850 dark:text-white leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors font-display">
+                                                            <h3 className="text-base font-bold text-slate-900 dark:text-white leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors font-display">
                                                                 {article.title}
                                                             </h3>
                                                         </div>
@@ -1237,27 +1463,27 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         </div>
                                                         <div className="flex flex-col flex-1 justify-center gap-5">
                                                             <div className="flex items-center gap-4">
-                                                               <span className="text-[11px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.25em] font-mono">{sourceName}</span>
-                                                               <div className="w-1.5 h-1.5 rounded-full bg-slate-350 dark:bg-slate-700"></div>
-                                                               <span className="text-[11px] font-bold text-slate-550 dark:text-gray-550 uppercase tracking-widest font-mono">{getRelativeTime(article.pubDate)}</span>
+                                                               <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider font-mono">{sourceName}</span>
+                                                               <div className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-600"></div>
+                                                               <span className="text-[11px] font-medium text-slate-500 dark:text-gray-400 uppercase tracking-wider font-mono">{getRelativeTime(article.pubDate)}</span>
                                                             </div>
                                                             <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white leading-tight tracking-tight transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400 font-display">
                                                                 {article.title}
                                                             </h3>
                                                             {article.description ? (
-                                                                <p className="text-[15px] text-slate-650 dark:text-gray-300 leading-relaxed font-medium max-w-3xl">
+                                                                <p className="text-base text-slate-700 dark:text-gray-300 leading-relaxed font-normal max-w-3xl">
                                                                     {stripHtml(article.description)}
                                                                 </p>
                                                             ) : (
-                                                                <p className="text-[15px] text-slate-500 dark:text-gray-550 italic leading-relaxed font-medium max-w-3xl">
+                                                                <p className="text-base text-slate-500 dark:text-gray-400 italic leading-relaxed font-normal max-w-3xl">
                                                                     Esta noticia está disponible íntegramente a través de los canales de la agencia emisora. Haga clic en Seguir leyendo para visualizar el artículo completo en su portal original.
                                                                 </p>
                                                             )}
                                                             <div className="flex items-center gap-4 mt-2">
-                                                                <span className="text-[12px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest border-b-2 border-blue-600/20 group-hover:border-blue-600 transition-all pb-1">Seguir leyendo</span>
+                                                                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider border-b-2 border-blue-600/20 group-hover:border-blue-600 transition-all pb-1">Seguir leyendo</span>
                                                                 <div className="hidden md:flex items-center gap-3 ml-auto opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
                                                                     <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en WhatsApp"><MessageCircle className="w-5 h-5" /></button>
-                                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-600 dark:text-gray-450 hover:text-blue-405 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en Telegram"><Send className="w-5 h-5" /></button>
+                                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en Telegram"><Send className="w-5 h-5" /></button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1804,18 +2030,18 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         Las estadísticas del **IPIEC** confirman que la provincia ostenta la tasa de criminalidad violenta más baja del país (1.1 homicidios x100k). Sin embargo, el comportamiento delictivo se distribuye de forma muy dispar según el nodo municipal:
                                                     </p>
                                                     
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-2 text-[11px]">
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-2 text-xs">
                                                         <div className="bg-blue-500/5 dark:bg-blue-500/[0.01] p-3.5 rounded-2xl border border-blue-500/10 flex flex-col gap-1">
-                                                            <span className="font-black text-blue-600 dark:text-blue-400 uppercase">Ushuaia: Foco Turístico</span>
-                                                            <p className="text-slate-650 dark:text-gray-400 mt-1">Alta vulnerabilidad estacional en temporada. Prevalecen las estafas virtuales de falsos alquileres temporarios de cabañas y robo oportunista sin violencia.</p>
+                                                            <span className="font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider text-xs">Ushuaia: Foco Turístico</span>
+                                                            <p className="text-slate-600 dark:text-gray-300 mt-1 leading-relaxed">Alta vulnerabilidad estacional en temporada. Prevalecen las estafas virtuales de falsos alquileres temporarios de cabañas y robo oportunista sin violencia.</p>
                                                         </div>
                                                         <div className="bg-emerald-500/5 dark:bg-emerald-500/[0.01] p-3.5 rounded-2xl border border-emerald-500/10 flex flex-col gap-1">
-                                                            <span className="font-black text-emerald-600 dark:text-emerald-400 uppercase">Río Grande: Foco Logístico</span>
-                                                            <p className="text-slate-650 dark:text-gray-400 mt-1">Concentración de ciberdelitos financieros complejos en redes industriales, phishing empresarial corporativo y fraudes de Marketplace.</p>
+                                                            <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider text-xs">Río Grande: Foco Logístico</span>
+                                                            <p className="text-slate-600 dark:text-gray-300 mt-1 leading-relaxed">Concentración de ciberdelitos financieros complejos en redes industriales, phishing empresarial corporativo y fraudes de Marketplace.</p>
                                                         </div>
                                                         <div className="bg-orange-500/5 dark:bg-orange-500/[0.01] p-3.5 rounded-2xl border border-orange-500/10 flex flex-col gap-1">
-                                                            <span className="font-black text-orange-600 dark:text-orange-400 uppercase">Tolhuin: Foco de Enlace</span>
-                                                            <p className="text-slate-650 dark:text-gray-400 mt-1">Eje vial estratégico (Ruta Nacional N° 3). Requiere control físico-operativo de vehículos y resguardo preventivo de transporte forestal.</p>
+                                                            <span className="font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wider text-xs">Tolhuin: Foco de Enlace</span>
+                                                            <p className="text-slate-600 dark:text-gray-300 mt-1 leading-relaxed">Eje vial estratégico (Ruta Nacional N° 3). Requiere control físico-operativo de vehículos y resguardo preventivo de transporte forestal.</p>
                                                         </div>
                                                     </div>
 
@@ -2010,13 +2236,13 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                     </div>
 
                                     <div className="bg-slate-50 dark:bg-black/35 border border-slate-200 dark:border-white/5 p-4 rounded-2xl flex flex-col gap-2 mt-2">
-                                        <span className="text-[10px] font-black text-slate-650 dark:text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                                        <span className="text-xs font-bold text-slate-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
                                             💻 Ejecutar Despliegue Manual:
                                         </span>
-                                        <code className="text-[10px] font-mono p-2 bg-slate-900 text-slate-100 rounded-lg select-all border border-white/5">
+                                        <code className="text-xs font-mono p-2.5 bg-slate-900 text-slate-100 rounded-lg select-all border border-white/5">
                                             firebase deploy --only hosting
                                         </code>
-                                        <span className="text-[9px] text-slate-400 dark:text-gray-500 leading-tight">
+                                        <span className="text-[11px] text-slate-400 dark:text-gray-400 leading-tight">
                                             Nota: Firebase CLI no detectado en el PATH local. Despliegue desde su terminal del sistema.
                                         </span>
                                     </div>
@@ -2524,45 +2750,156 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         </main>
 
       {/* MOBILE FLOATING BOTTOM NAV */}
-      <div className="lg:hidden fixed bottom-[calc(env(safe-area-inset-bottom)+8px)] left-4 right-4 z-50">
-        <nav className="bg-white/95 dark:bg-[#0c0c0c]/95 backdrop-blur-3xl border border-slate-200 dark:border-white/10 shadow-premium rounded-2xl h-[48px] flex items-center justify-around px-2 overflow-hidden">
+      <div className="lg:hidden fixed bottom-[calc(env(safe-area-inset-bottom)+8px)] left-3 right-3 z-50">
+        <nav className="bg-white/95 dark:bg-[#0c0c0c]/95 backdrop-blur-3xl border border-slate-200 dark:border-white/10 shadow-premium rounded-2xl h-[58px] flex items-center justify-around px-1 overflow-hidden">
             {[
               { id: 'home', icon: LayoutDashboard, label: 'Inicio' },
               { id: 'explore', icon: Compass, label: 'Feeds' },
-              { id: 'guia', icon: Map, label: 'Guía' },
-              { id: 'boletines', icon: Newspaper, label: 'Boletines' },
               { id: 'weather', icon: Cloud, label: 'Clima' },
               { id: 'radio', icon: Radio, label: 'Radio' },
-              { id: 'security', icon: ShieldCheck, label: 'Seguridad' },
-              { id: 'logistics', icon: Anchor, label: 'Arribos' }
             ].map((item) => {
                const Icon = item.icon;
                const isActive = activeTab === item.id;
                return (
                 <button 
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)} 
-                  className={`flex items-center justify-center py-1.5 px-2.5 rounded-xl transition-all duration-300 relative ${
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    setIsMobileMoreOpen(false);
+                  }} 
+                  className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all duration-200 relative ${
                     isActive 
-                      ? 'bg-blue-600/10 text-blue-500 font-bold' 
-                      : 'text-slate-400 dark:text-gray-500 hover:bg-slate-100 dark:hover:bg-white/5'
+                      ? 'text-blue-600 dark:text-blue-400 font-bold' 
+                      : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
-                  style={{ minWidth: isActive ? 'auto' : '36px', minHeight: '36px' }}
+                  style={{ minWidth: '52px', minHeight: '46px' }}
                 >
-                  <Icon className={`w-4.5 h-4.5 transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]' : ''}`} />
-                  {isActive && (
-                    <span className="text-[9px] font-black ml-1.5 uppercase tracking-wider transition-all duration-300">
-                      {item.label}
-                    </span>
-                  )}
+                  <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]' : ''}`} />
+                  <span className="text-[10px] font-bold mt-1 tracking-tight">
+                    {item.label}
+                  </span>
                   {isActive && (
                     <motion.div layoutId="mobile-nav-indicator" className="absolute -bottom-1 w-1.5 h-1.5 bg-blue-500 rounded-full" />
                   )}
                 </button>
                );
             })}
+
+            {/* BOTÓN MÁS... */}
+            {(() => {
+              const isMoreActive = ['guia', 'boletines', 'security', 'logistics', 'reports'].includes(activeTab) || isMobileMoreOpen;
+              return (
+                <button 
+                  onClick={() => setIsMobileMoreOpen(!isMobileMoreOpen)} 
+                  className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all duration-200 relative ${
+                    isMoreActive 
+                      ? 'text-blue-600 dark:text-blue-400 font-bold' 
+                      : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  style={{ minWidth: '52px', minHeight: '46px' }}
+                >
+                  <MoreHorizontal className={`w-5 h-5 transition-transform duration-200 ${isMoreActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]' : ''}`} />
+                  <span className="text-[10px] font-bold mt-1 tracking-tight">
+                    Más
+                  </span>
+                  {isMoreActive && (
+                    <motion.div layoutId="mobile-nav-indicator" className="absolute -bottom-1 w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                  )}
+                </button>
+              );
+            })()}
         </nav>
       </div>
+
+      {/* MOBILE MORE ACTION SHEET / DRAWER */}
+      <AnimatePresence>
+        {isMobileMoreOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="lg:hidden fixed inset-0 z-[90] flex items-end justify-center bg-slate-950/60 backdrop-blur-sm"
+            onClick={() => setIsMobileMoreOpen(false)}
+          >
+            <motion.div 
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 26, stiffness: 280 }}
+              className="bg-white dark:bg-[#101318] w-full max-w-lg rounded-t-[2.5rem] border-t border-slate-200 dark:border-white/10 p-6 pb-28 shadow-2xl flex flex-col gap-4 overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="w-12 h-1.5 rounded-full bg-slate-200 dark:bg-white/20 mx-auto -mt-1 mb-2" />
+              
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-white/5">
+                <div className="flex items-center gap-2.5">
+                  <WikiAppLogo className="w-6 h-6" />
+                  <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-wider font-display">
+                    Módulos Fueguinos
+                  </h3>
+                </div>
+                <button 
+                  onClick={() => setIsMobileMoreOpen(false)} 
+                  className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                {[
+                  { id: 'guia', icon: Map, title: 'Guía Fueguina', desc: 'Senderos & Turismo', color: 'text-emerald-500 bg-emerald-500/10' },
+                  { id: 'boletines', icon: Newspaper, title: 'Digesto & Boletines', desc: 'Leyes y Decretos', color: 'text-blue-500 bg-blue-500/10' },
+                  { id: 'security', icon: ShieldCheck, title: 'Seguridad', desc: 'Ruta 3 & Auditoría', color: 'text-red-500 bg-red-500/10' },
+                  { id: 'logistics', icon: Anchor, title: 'Arribos & Tráfico', desc: 'Barcos y Vuelos', color: 'text-orange-500 bg-orange-500/10' },
+                  { id: 'reports', icon: FileText, title: 'Informes', desc: 'Análisis Estratégico', color: 'text-indigo-500 bg-indigo-500/10' },
+                  { 
+                    id: 'tapas_action', 
+                    icon: Newspaper, 
+                    title: 'Tapas de Diarios', 
+                    desc: 'Portadas Impresas', 
+                    color: 'text-purple-500 bg-purple-500/10',
+                    onClick: () => { setShowTapasModal(true); setIsMobileMoreOpen(false); }
+                  }
+                ].map(mod => {
+                  const Icon = mod.icon;
+                  const isCurrent = activeTab === mod.id;
+                  return (
+                    <button
+                      key={mod.id}
+                      onClick={() => {
+                        if (mod.onClick) {
+                          mod.onClick();
+                        } else {
+                          setActiveTab(mod.id);
+                          setIsMobileMoreOpen(false);
+                        }
+                      }}
+                      className={`flex items-start gap-3 p-3.5 rounded-2xl border text-left transition-all ${
+                        isCurrent 
+                          ? 'bg-blue-600/10 border-blue-500/50 text-blue-600 dark:text-blue-400' 
+                          : 'bg-slate-50 dark:bg-white/[0.02] border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/15'
+                      }`}
+                    >
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${mod.color}`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
+                          {mod.title}
+                        </span>
+                        <span className="text-[10px] text-slate-500 dark:text-gray-400 mt-0.5 leading-snug">
+                          {mod.desc}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* 4. MODAL LECTOR */}
       {/* 5. OVERLAYS & HUD */}
@@ -2634,98 +2971,285 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-md p-0 sm:p-4 md:p-12"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[110] flex justify-end bg-slate-950/60 backdrop-blur-sm"
             onClick={() => setSelectedArticle(null)}
           >
             <motion.div 
-              initial={{ y: "100%", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "100%", opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-white dark:bg-[#0a0a0a] w-full max-w-4xl h-full sm:h-[95vh] sm:max-h-[900px] rounded-none sm:rounded-[2.5rem] shadow-2xl flex flex-col border-none sm:border border-slate-200 dark:border-white/10 overflow-hidden"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 280 }}
+              className="bg-white dark:bg-[#0b0e14] w-full sm:w-[92vw] sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl h-full shadow-[-20px_0_60px_rgba(0,0,0,0.45)] flex flex-col border-l border-slate-200 dark:border-white/10 overflow-hidden relative"
               onClick={e => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#0c0c0c] safe-top">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-600/10 flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-blue-500" />
-                  </div>
-                  <span className="text-[10px] md:text-[11px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-[0.2em]">Inteligencia Operativa</span>
-                </div>
-                <button onClick={() => setSelectedArticle(null)} className="p-2 md:p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-slate-600 dark:text-gray-400" style={{ minWidth: '44px', minHeight: '44px' }}>
-                  <X className="w-5 h-5 md:w-6 md:h-6" />
-                </button>
+              {/* Barra de progreso de lectura */}
+              <div className="h-1 bg-slate-100 dark:bg-white/5 w-full overflow-hidden shrink-0">
+                <div 
+                  className="h-full bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 transition-all duration-150 ease-out" 
+                  style={{ width: `${readingProgress}%` }} 
+                />
               </div>
-              
-              <div className="flex-1 overflow-y-auto p-6 md:p-16 custom-scrollbar bg-white dark:bg-[#0a0a0a] pb-[calc(env(safe-area-inset-bottom)+2rem)]">
+
+              {/* Header ergonómico del lector */}
+              <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 border-b border-slate-200 dark:border-white/10 bg-white/90 dark:bg-[#0c0f17]/90 backdrop-blur-md shrink-0 gap-2">
+                {/* Lado izquierdo: Fuente y fecha */}
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/40 px-2.5 py-1 rounded-lg truncate max-w-[130px] sm:max-w-[200px]">
+                    {feeds.find(f => f.id === selectedArticle.sourceId)?.name || 'Central Fueguina'}
+                  </span>
+                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 font-mono shrink-0 hidden sm:inline-block">
+                    {new Date(selectedArticle.pubDate).toLocaleDateString()}
+                  </span>
+                  {isYouTube(selectedArticle.link) && (
+                    <span className="bg-red-600/10 text-red-500 px-2 py-0.5 rounded-md text-[10px] font-black uppercase border border-red-500/20 flex items-center gap-1 shrink-0">
+                      <PlayCircle className="w-3 h-3" /> Video
+                    </span>
+                  )}
+                </div>
+
+                {/* Centro / Derecha: Controles de navegación, tamaño tipográfico y cierre */}
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                  {/* Navegación Anterior / Siguiente */}
+                  <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10">
+                    <button
+                      onClick={handlePrevArticle}
+                      disabled={currentArticleIndex <= 0}
+                      className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-gray-300 disabled:opacity-25 disabled:pointer-events-none transition-all"
+                      title="Nota anterior (Atajo: Flecha izquierda)"
+                      aria-label="Nota anterior"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <span className="text-[11px] font-bold text-slate-600 dark:text-gray-300 px-1.5 font-mono whitespace-nowrap">
+                      {currentArticleIndex >= 0 ? `${currentArticleIndex + 1}/${filteredArticles.length}` : 'Nota'}
+                    </span>
+                    <button
+                      onClick={handleNextArticle}
+                      disabled={currentArticleIndex < 0 || currentArticleIndex >= filteredArticles.length - 1}
+                      className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-gray-300 disabled:opacity-25 disabled:pointer-events-none transition-all"
+                      title="Siguiente nota (Atajo: Flecha derecha)"
+                      aria-label="Siguiente nota"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Selector de escala de fuente */}
+                  <div className="hidden sm:flex items-center gap-0.5 bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10">
+                    <button
+                      onClick={() => setReaderFontSize('normal')}
+                      className={`px-2 py-1 rounded-lg text-xs font-bold transition-all ${
+                        readerFontSize === 'normal' 
+                          ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs' 
+                          : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'
+                      }`}
+                      title="Tipografía normal"
+                    >
+                      A
+                    </button>
+                    <button
+                      onClick={() => setReaderFontSize('large')}
+                      className={`px-2 py-1 rounded-lg text-sm font-bold transition-all ${
+                        readerFontSize === 'large' 
+                          ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs' 
+                          : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'
+                      }`}
+                      title="Tipografía grande"
+                    >
+                      A+
+                    </button>
+                    <button
+                      onClick={() => setReaderFontSize('xlarge')}
+                      className={`px-2 py-1 rounded-lg text-base font-extrabold transition-all ${
+                        readerFontSize === 'xlarge' 
+                          ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs' 
+                          : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'
+                      }`}
+                      title="Tipografía extra grande"
+                    >
+                      A++
+                    </button>
+                  </div>
+
+                  {/* Botón enlace externo */}
+                  <a 
+                    href={selectedArticle.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-white/5 transition-all"
+                    title="Abrir fuente original en nueva pestaña"
+                    aria-label="Abrir fuente original"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+
+                  {/* Botón cerrar */}
+                  <button 
+                    onClick={() => setSelectedArticle(null)} 
+                    className="p-2 rounded-xl text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-white/5 transition-all"
+                    title="Cerrar (Esc)"
+                    aria-label="Cerrar lector"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Contenedor con scroll del contenido */}
+              <div 
+                onScroll={(e) => {
+                  const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+                  if (scrollHeight <= clientHeight) {
+                    setReadingProgress(100);
+                  } else {
+                    const pct = Math.min(100, Math.round((scrollTop / (scrollHeight - clientHeight)) * 100));
+                    setReadingProgress(pct);
+                  }
+                }}
+                className="flex-1 overflow-y-auto px-5 py-6 sm:px-10 sm:py-10 md:px-14 custom-scrollbar bg-white dark:bg-[#0b0e14] pb-[calc(env(safe-area-inset-bottom)+3rem)]"
+              >
                 <div className="max-w-2xl mx-auto">
-                  <div className="flex items-center gap-4 mb-6">
-                    <span className="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] bg-blue-600/10 px-3 py-1.5 rounded-lg border border-blue-500/20">
+                  {/* Selector de fuente móvil */}
+                  <div className="flex sm:hidden items-center justify-between bg-slate-50 dark:bg-white/5 px-3 py-2 rounded-xl mb-6 border border-slate-200 dark:border-white/10">
+                    <span className="text-xs font-bold text-slate-500 flex items-center gap-1.5">
+                      <Type className="w-3.5 h-3.5" /> Tamaño de texto:
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setReaderFontSize('normal')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold ${readerFontSize === 'normal' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}
+                      >
+                        A
+                      </button>
+                      <button
+                        onClick={() => setReaderFontSize('large')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold ${readerFontSize === 'large' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}
+                      >
+                        A+
+                      </button>
+                      <button
+                        onClick={() => setReaderFontSize('xlarge')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold ${readerFontSize === 'xlarge' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}
+                      >
+                        A++
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Metadatos superiores */}
+                  <div className="flex flex-wrap items-center gap-3 mb-4">
+                    <span className="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] bg-blue-600/10 px-3 py-1 rounded-lg border border-blue-500/20">
                       {feeds.find(f => f.id === selectedArticle.sourceId)?.name || 'Central'}
                     </span>
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">{new Date(selectedArticle.pubDate).toLocaleDateString()}</span>
-                    {isYouTube(selectedArticle.link) && (
-                      <span className="bg-red-600/10 text-red-500 px-3 py-1 rounded-lg text-[10px] font-black uppercase border border-red-500/20 flex items-center gap-1.5">
-                        <PlayCircle className="w-3.5 h-3.5" /> Video
-                      </span>
-                    )}
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">
+                      {new Date(selectedArticle.pubDate).toLocaleDateString()} · {getRelativeTime(selectedArticle.pubDate)}
+                    </span>
                   </div>
                   
-                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-slate-900 dark:text-white mb-6 md:mb-10 font-display">
+                  {/* Titular de la noticia */}
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-[1.15] text-slate-900 dark:text-white mb-6 md:mb-8 font-display">
                     {selectedArticle.title}
                   </h1>
                   
+                  {/* Portada / Imagen principal */}
                   {selectedArticle.thumbnail && (
-                    <div className="w-full aspect-[16/10] mb-12 rounded-[2rem] overflow-hidden border border-slate-200 dark:border-white/10 relative group shadow-2xl">
+                    <div className="w-full aspect-[16/10] mb-8 sm:mb-10 rounded-[1.75rem] overflow-hidden border border-slate-200 dark:border-white/10 relative group shadow-xl">
                       <img src={selectedArticle.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[3000ms]" />
                       {isYouTube(selectedArticle.link) && (
-                        <a href={selectedArticle.link} target="_blank" rel="noopener noreferrer" className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
-                          <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center border border-white/30 transform group-hover:scale-110 transition-all">
-                            <PlayCircle className="w-10 h-10 text-white" />
+                        <a href={selectedArticle.link} target="_blank" rel="noopener noreferrer" className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-all">
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center border border-white/30 transform group-hover:scale-110 transition-all">
+                            <PlayCircle className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                           </div>
                         </a>
                       )}
                     </div>
                   )}
 
+                  {/* Cuerpo del artículo con tamaño dinámico */}
                   <div 
-                    className="prose prose-slate dark:prose-invert max-w-none 
-                      prose-p:text-lg prose-p:leading-relaxed prose-p:text-slate-600 dark:prose-p:text-gray-300
-                      prose-headings:font-black prose-headings:tracking-tight prose-headings:font-display
-                      prose-a:text-blue-600 prose-img:rounded-3xl prose-img:shadow-xl" 
+                    className={`prose prose-slate dark:prose-invert max-w-none 
+                      prose-p:text-slate-700 dark:prose-p:text-gray-300
+                      prose-headings:font-black prose-headings:tracking-tight prose-headings:font-display prose-headings:text-slate-900 dark:prose-headings:text-white
+                      prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:underline hover:prose-a:text-blue-500
+                      prose-img:rounded-2xl prose-img:shadow-lg prose-strong:text-slate-900 dark:prose-strong:text-white
+                      ${
+                        readerFontSize === 'xlarge' 
+                          ? 'prose-p:text-xl md:prose-p:2xl prose-p:leading-loose text-lg' 
+                          : readerFontSize === 'large'
+                          ? 'prose-p:text-lg md:prose-p:xl prose-p:leading-relaxed text-base'
+                          : 'prose-p:text-base md:prose-p:lg prose-p:leading-relaxed text-base'
+                      }`} 
                     dangerouslySetInnerHTML={{ __html: selectedArticle.description || '<p>Contenido principal no provisto por la fuente.</p>' }} 
                   />
                   
-                  <div className="mt-12 md:mt-20 pt-10 border-t border-slate-200 dark:border-white/5 flex flex-col items-center gap-6">
-                    <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Compartir esta noticia</p>
-                    <div className="flex items-center gap-3 w-full justify-center">
+                  {/* Tarjeta de Siguiente Nota en el feed */}
+                  {currentArticleIndex >= 0 && currentArticleIndex < filteredArticles.length - 1 && (
+                    <div 
+                      onClick={handleNextArticle}
+                      className="mt-12 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/80 to-slate-50 dark:from-blue-950/20 dark:to-white/[0.02] border border-blue-200/60 dark:border-white/10 hover:border-blue-500/50 cursor-pointer transition-all group shadow-sm"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="min-w-0">
+                          <span className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 tracking-wider block mb-1">
+                            Siguiente Nota en el feed ➔
+                          </span>
+                          <h4 className="text-sm font-bold text-slate-800 dark:text-gray-200 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            {filteredArticles[currentArticleIndex + 1].title}
+                          </h4>
+                          <span className="text-[10px] font-medium text-slate-400 mt-0.5 block">
+                            {(feeds.find(f => f.id === filteredArticles[currentArticleIndex + 1].sourceId)?.name || 'Fuente')}
+                          </span>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-blue-600/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                          <ChevronRight className="w-5 h-5" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Acciones de pie de artículo: Compartir y Sitio Oficial */}
+                  <div className="mt-10 md:mt-16 pt-8 border-t border-slate-200 dark:border-white/10 flex flex-col items-center gap-5">
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">Compartir esta noticia</p>
+                    <div className="flex flex-wrap items-center gap-3 w-full justify-center">
                       <button 
                         onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(selectedArticle.title + ' ' + selectedArticle.link)}`, '_blank')}
-                        className="flex items-center gap-2 px-5 py-3 bg-green-650 hover:bg-green-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md"
                       >
                         <MessageCircle className="w-4 h-4" /> WhatsApp
                       </button>
                       <button 
                         onClick={() => window.open(`https://t.me/share/url?url=${encodeURIComponent(selectedArticle.link)}&text=${encodeURIComponent(selectedArticle.title)}`, '_blank')}
-                        className="flex items-center gap-2 px-5 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md"
                       >
                         <Send className="w-4 h-4" /> Telegram
                       </button>
+                      <button 
+                        onClick={() => {
+                          if (navigator.clipboard) {
+                            navigator.clipboard.writeText(selectedArticle.link);
+                            alert('Enlace copiado al portapapeles');
+                          }
+                        }}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-700 dark:text-gray-200 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
+                      >
+                        <Share2 className="w-4 h-4" /> Copiar Enlace
+                      </button>
                     </div>
 
-                    <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-center mt-4">Continúa leyendo la versión completa en el sitio oficial</p>
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center mt-2">Continúa leyendo la versión completa en el sitio oficial</p>
                     <a 
                       href={selectedArticle.link} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className={`flex items-center gap-3 px-8 py-4 md:px-10 md:py-5 rounded-2xl text-[11px] md:text-[13px] font-black tracking-widest transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 w-full md:w-max justify-center ${
+                      className={`flex items-center gap-3 px-8 py-4 rounded-2xl text-[12px] md:text-[13px] font-black tracking-widest transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 w-full md:w-max justify-center ${
                         isYouTube(selectedArticle.link) 
-                          ? 'bg-red-600 text-white hover:bg-red-700 shadow-red-600/20' 
-                          : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-600/20'
+                          ? 'bg-red-600 text-white hover:bg-red-700 shadow-red-600/25' 
+                          : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-600/25'
                       }`}
                     >
-                      {isYouTube(selectedArticle.link) ? 'VER EN YOUTUBE' : 'ACCEDER AL SITIO WEB'} 
-                      <ExternalLink className="w-4 h-4 md:w-4.5 md:h-4.5" />
+                      {isYouTube(selectedArticle.link) ? 'VER EN YOUTUBE' : 'ACCEDER AL SITIO WEB OFICIAL'} 
+                      <ExternalLink className="w-4 h-4" />
                     </a>
                   </div>
                 </div>

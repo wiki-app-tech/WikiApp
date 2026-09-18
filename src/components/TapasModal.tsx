@@ -616,7 +616,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                       <div className="flex flex-col sm:flex-row lg:flex-col gap-2 pt-4 md:pt-6 border-t border-white/10">
                         <button
                           onClick={() => handleDownload(selectedItem?.coverUrl || '', `${selectedItem?.id}-tapa-${selectedItem?.date.replace(/\//g, '-')}.jpg`)}
-                          className="flex-1 py-2.5 md:py-3 bg-blue-650 hover:bg-blue-600 text-white rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg transition-all"
+                          className="flex-1 py-2.5 md:py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all"
                         >
                           <Download className="w-4 h-4" />
                           <span>Descargar</span>

@@ -105,7 +105,7 @@ const SecurityHeatMap = () => {
 
           <button 
             onClick={() => setShowSummary(!showSummary)}
-            className="px-3 py-1.5 bg-orange-650/15 text-orange-600 dark:text-orange-500 hover:bg-orange-600/25 border border-orange-500/10 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all"
+            className="px-3 py-1.5 bg-orange-500/15 text-orange-600 dark:text-orange-400 hover:bg-orange-500/25 border border-orange-500/20 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
           >
             {showSummary ? 'Ocultar Panel' : 'Info Táctica'}
           </button>

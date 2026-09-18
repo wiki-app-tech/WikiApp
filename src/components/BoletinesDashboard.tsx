@@ -1131,7 +1131,7 @@ export default function BoletinesDashboard() {
                       {pub.id === 'provincia' && (
                         <button
                           onClick={() => { setActivePublisher('provincia'); setTdfExplorerMode('drive'); }}
-                          className="flex items-center justify-center p-3 bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 hover:bg-blue-650 hover:text-white rounded-xl transition-all border border-blue-500/25"
+                          className="flex items-center justify-center p-3 bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white rounded-xl transition-all border border-blue-500/25"
                           title="Explorar Carpeta de Google Drive"
                         >
                           <FolderOpen className="w-4 h-4" />
