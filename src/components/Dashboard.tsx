@@ -615,11 +615,11 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
   return (
     <div className="flex h-screen max-w-[100vw] bg-surface-primary text-text-primary font-sans overflow-hidden transition-colors duration-200 relative selection:bg-accent-primary/30">
-      {/* Animated Mesh Gradient Background */}
-      <div className="absolute inset-0 z-0 opacity-[0.08] dark:opacity-20 pointer-events-none overflow-hidden">
-        <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-blue-600/40 dark:bg-blue-600/30 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-orange-600/30 dark:bg-orange-600/20 rounded-full blur-[100px] animate-pulse [animation-delay:2s]"></div>
-        <div className="absolute -bottom-[20%] left-[20%] w-[50%] h-[50%] bg-indigo-600/30 dark:bg-red-600/20 rounded-full blur-[100px] animate-pulse [animation-delay:4s]"></div>
+      {/* Animated Mesh Gradient Background - Subtle Luxury Gold & Plum Glows */}
+      <div className="absolute inset-0 z-0 opacity-20 dark:opacity-30 pointer-events-none overflow-hidden">
+        <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-[#D4AF37]/[0.09] dark:bg-[#D4AF37]/[0.12] rounded-full blur-[140px] animate-pulse"></div>
+        <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-[#4A2E35]/[0.08] dark:bg-[#4A2E35]/[0.14] rounded-full blur-[120px] animate-pulse [animation-delay:2s]"></div>
+        <div className="absolute -bottom-[20%] left-[20%] w-[50%] h-[50%] bg-[#1B263B]/[0.06] dark:bg-[#1B263B]/[0.12] rounded-full blur-[120px] animate-pulse [animation-delay:4s]"></div>
       </div>
 
 
@@ -686,7 +686,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
               {activeTab === item.id && (
                 <motion.div 
                   layoutId="active-nav-indicator"
-                  className={`absolute left-0 w-1 h-6 rounded-r-full ${item.id === 'security' ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-accent-primary shadow-[0_0_10px_rgba(189,232,10,0.5)]'}`} 
+                  className={`absolute left-0 w-1 h-6 rounded-r-full ${item.id === 'security' ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-accent-primary shadow-[0_0_10px_rgba(212,175,55,0.5)]'}`} 
                 />
               )}
             </button>

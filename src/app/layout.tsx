@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Outfit, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 
-// Tipografía principal: Inter - perfecta para cuerpo de texto
-// Variable font para mejor rendimiento y control tipográfico
+// Tipografía principal: Inter - cuerpo de texto y lectura limpia
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -11,8 +10,7 @@ const inter = Inter({
   preload: true,
 });
 
-// Tipografía para títulos: Outfit - moderna y geométrica
-// Tendencia 2026: combinación de fuentes con personalidad
+// Tipografía geométrica complementaria
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
@@ -20,9 +18,18 @@ const outfit = Outfit({
   preload: true,
 });
 
+// Tipografía de lujo esbelta para alta gama: Cormorant Garamond
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-cormorant",
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+  preload: true,
+});
+
 export const metadata: Metadata = {
-  title: "MediosWikiApp | Panel de Noticias Premium",
-  description: "Dashboard RSS de alto rendimiento para noticias en tiempo real de Tierra del Fuego.",
+  title: "WikiApp Prestige | Exclusive Services & Intelligence",
+  description: "Plataforma de alta gama para servicios exclusivos, inteligencia estratégica y noticias de distinción.",
 };
 
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -35,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${outfit.variable} font-sans antialiased`}
+        className={`${inter.variable} ${outfit.variable} ${cormorant.variable} font-sans antialiased`}
       >
         <ThemeProvider>
           {children}

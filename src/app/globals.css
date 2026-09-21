@@ -1,51 +1,64 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-surface-primary: #f2f5f9;        /* soft light blue-gray */
-  --color-surface-elevated: #ffffff;       /* clean white card */
-  --color-surface-sunken: #e9eff5;         /* slightly darker light gray */
+  /* 60% Dominant: Bone White / Pearl Gray space & backgrounds */
+  --color-surface-primary: #f7f7f7;        /* Bone white luxury background (60%) */
+  --color-surface-elevated: #ffffff;       /* Pure white elevated container */
+  --color-surface-sunken: #efefef;         /* Pearl sunken surface */
   
-  --color-text-primary: #18283e;           /* TDF navy-black text */
-  --color-text-secondary: #4a5c73;         /* navy-gray text */
-  --color-text-tertiary: #7d90a8;          /* light navy-gray text */
+  /* 30% Secondary & Structure: Deep Navy Blue & Rich Plum */
+  --color-text-primary: #1b263b;           /* Deep navy blue text for maximum clarity & contrast (30%) */
+  --color-text-secondary: #4a2e35;         /* Rich plum for subheadings & structural accents */
+  --color-text-tertiary: #6e6875;          /* Muted plum-slate for secondary metadata */
   
-  --color-accent-primary: #203553;         /* TDF Navy Blue */
-  --color-accent-primary-hover: #15263d;   /* darker TDF navy */
-  --color-accent-secondary: #1e73be;       /* TDF Secondary Blue */
+  --color-primary-navy: #1b263b;           /* Deep Navy Blue */
+  --color-primary-plum: #4a2e35;           /* Rich Plum */
   
-  --color-border-subtle: #dbe3ed;          /* soft border color */
-  --color-border-hover: #cbd5e1;           /* slate-300 */
+  /* 10% Accent: Soft Metallic Gold */
+  --color-accent-primary: #d4af37;         /* Soft metallic gold (10% CTA / highlights) */
+  --color-accent-primary-hover: #c5a028;   /* Refined bronze-gold hover */
+  --color-accent-secondary: #4a2e35;       /* Rich Plum secondary accent */
   
+  /* Structural Boundaries */
+  --color-border-subtle: #e5e0da;          /* Warm ivory-bone subtle border */
+  --color-border-hover: #d4af37;           /* Delicate gold hover border */
+  --color-border-gold: rgba(212, 175, 55, 0.4);
+  
+  /* Typography Tokens */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: var(--font-outfit), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-cormorant), Georgia, serif;
+  --font-serif: var(--font-cormorant), Georgia, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
   --radius-3xl: 2rem;
 
-  --shadow-premium: 0 10px 30px -10px rgba(32, 53, 83, 0.08), 0 4px 6px -4px rgba(32, 53, 83, 0.04);
-  --shadow-glass: 0 8px 32px 0 rgba(32, 53, 83, 0.05);
+  --shadow-premium: 0 10px 30px -10px rgba(27, 38, 59, 0.06), 0 4px 6px -4px rgba(27, 38, 59, 0.02);
+  --shadow-glass: 0 8px 32px 0 rgba(74, 46, 53, 0.04);
+  --shadow-gold: 0 4px 20px -2px rgba(212, 175, 55, 0.25);
 }
 
 [data-theme='dark'] {
-  --color-surface-primary: #0a0f18;        /* TDF dark navy background */
-  --color-surface-elevated: #111a28;       /* TDF main navy container */
-  --color-surface-sunken: #060910;         /* deeper TDF dark navy */
+  /* Dark Luxury Obsidian & Royal Plum Palette */
+  --color-surface-primary: #0d0f17;        /* Obsidian midnight base */
+  --color-surface-elevated: #151824;       /* Deep plum-navy elevated card */
+  --color-surface-sunken: #090a10;         /* Deepest obsidian */
 
-  --color-text-primary: #f1f5f9;           /* soft light slate */
-  --color-text-secondary: #cbd5e1;         /* slate-300 */
-  --color-text-tertiary: #8fa3b9;          /* slate-400 */
+  --color-text-primary: #f7f7f7;           /* Bone white for pristine legibility */
+  --color-text-secondary: #e5cf87;         /* Soft champagne gold secondary */
+  --color-text-tertiary: #a49da8;          /* Pearl gray tertiary */
 
-  --color-border-subtle: #202d41;          /* TDF dark border blue */
-  --color-border-hover: #2c3e56;           /* TDF hover dark border */
+  --color-border-subtle: #242938;          /* Midnight plum border */
+  --color-border-hover: #d4af37;           /* Gold border highlight */
   
-  --color-accent-primary: #bde80a;         /* lime green accent color for modern police contrast */
-  --color-accent-primary-hover: #a8cf07;   /* hover lime green */
-  --color-accent-secondary: #3b82f6;       /* bright blue secondary */
+  --color-accent-primary: #d4af37;         /* Radiant metallic gold */
+  --color-accent-primary-hover: #e5c358;   /* Luminous gold hover */
+  --color-accent-secondary: #6e4650;       /* Luminous plum */
   
-  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
-  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.7), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --shadow-glass: 0 8px 32px 0 rgba(212, 175, 55, 0.05);
+  --shadow-gold: 0 4px 25px rgba(212, 175, 55, 0.35);
 }
 
 /* ═══════════════════════════════════════
@@ -79,7 +92,7 @@ body {
    TYPOGRAPHY SYSTEM
    ═══════════════════════════════════════ */
 
-h1, h2, h3, h4, .font-display {
+h1, h2, h3, h4, .font-display, .font-serif {
   font-family: var(--font-display);
 }
 
@@ -247,4 +260,101 @@ iframe, embed, object, video {
 
 [data-theme='dark'] .hover-lift:hover {
   box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* ═══════════════════════════════════════
+   LUXURY EXCLUSIVE BRAND UTILITIES (60-30-10)
+   ═══════════════════════════════════════ */
+
+/* 10% Gold CTA Button: High-value, refined border, subtle gold aura */
+.btn-gold-luxury {
+  background: linear-gradient(135deg, #d4af37 0%, #c5a028 100%);
+  color: #1b263b;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.75rem 1.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(212, 175, 55, 0.6);
+  box-shadow: 0 4px 18px -2px rgba(212, 175, 55, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.btn-gold-luxury:hover {
+  background: linear-gradient(135deg, #e0be48 0%, #d4af37 100%);
+  color: #0d1522;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px 0 rgba(212, 175, 55, 0.45);
+}
+
+/* 30% Structural Luxury Outline Button */
+.btn-outline-luxury {
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-subtle);
+  padding: 0.75rem 1.75rem;
+  border-radius: 9999px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.btn-outline-luxury:hover {
+  border-color: #d4af37;
+  color: #4a2e35;
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.15);
+  transform: translateY(-1px);
+}
+
+[data-theme='dark'] .btn-outline-luxury:hover {
+  color: #e5cf87;
+  border-color: #d4af37;
+}
+
+/* 60% Luxury Elevated Card: Crisp container with featherlight soft shadow */
+.luxury-card {
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 30px -10px rgba(27, 38, 59, 0.04), 0 2px 6px -2px rgba(27, 38, 59, 0.02);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.luxury-card:hover {
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 16px 40px -12px rgba(74, 46, 53, 0.08);
+}
+
+[data-theme='dark'] .luxury-card {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='dark'] .luxury-card:hover {
+  box-shadow: 0 16px 40px -12px rgba(212, 175, 55, 0.15);
+  border-color: rgba(212, 175, 55, 0.5);
+}
+
+/* Delicate Gold Micro-Aura */
+.gold-glow {
+  box-shadow: 0 0 24px -2px rgba(212, 175, 55, 0.25);
+}
+
+/* Refined Glass for Luxury Overlays */
+.glass-luxury {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(229, 224, 218, 0.8);
+}
+
+[data-theme='dark'] .glass-luxury {
+  background: rgba(21, 24, 36, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.15);
 }
