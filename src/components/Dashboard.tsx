@@ -732,23 +732,29 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     {(activeTab === 'home' || activeTab === 'explore') && (
                       <>
 
+                        {/* 1. BOTÓN VER TAPAS DE DIARIOS (Estilo Digesto & Boletines) */}
                         <button
                           onClick={() => setShowTapasModal(true)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 font-bold text-xs shadow-sm transition-all shrink-0"
+                          className="flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/25 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white hover:border-blue-600 shadow-sm shrink-0 group"
                           title="Ver Tapas de Diarios"
                         >
-                          <Newspaper className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
-                          <span className="hidden xs:inline">Tapas</span>
+                          <Newspaper className="w-4 h-4 text-blue-600 dark:text-blue-400 group-hover:text-white transition-colors" />
+                          <span>Tapas</span>
                         </button>
                         
-                        {/* ICONO DE OJO Y MENÚ DESPLEGABLE DE VISTA / ESTADO */}
+                        {/* 2. BOTÓN OPCIONES DE VISTA Y LECTURA (Estilo Digesto & Boletines) */}
                         <div className="relative flex items-center shrink-0">
                           <button
                             onClick={() => setIsEyeMenuOpen(!isEyeMenuOpen)}
-                            className={`p-2 rounded-full border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 shadow-sm transition-all shrink-0 ${isEyeMenuOpen ? 'bg-slate-200 dark:bg-white/15' : 'bg-slate-100/80 dark:bg-white/5'}`}
+                            className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border shadow-sm shrink-0 group ${
+                              isEyeMenuOpen 
+                                ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-500/20' 
+                                : 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/25 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white hover:border-blue-600'
+                            }`}
                             title="Opciones de Vista y Lectura"
                           >
-                            <Eye className="w-4 h-4 text-slate-700 dark:text-gray-200" />
+                            <Eye className={`w-4 h-4 ${isEyeMenuOpen ? 'text-white' : 'text-blue-600 dark:text-blue-400 group-hover:text-white'} transition-colors`} />
+                            <span>Vistas</span>
                           </button>
 
                           <AnimatePresence>
@@ -854,25 +860,25 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                           </AnimatePresence>
                         </div>
                         
-                        {/* LUPA DE BÚSQUEDA / CAMPO EXPANDIBLE DE BÚSQUEDA EN EL SECTOR SUPERIOR DERECHO */}
+                        {/* 3. BOTÓN BUSCAR EN EL FLUJO DE NOTICIAS (Estilo Digesto & Boletines) */}
                         <div className="relative flex items-center shrink-0">
                           {isSearchOpen ? (
                             <div className="relative flex items-center">
-                              <Search className="absolute left-3 w-3.5 h-3.5 text-blue-500 pointer-events-none" />
+                              <Search className="absolute left-3.5 w-4 h-4 text-blue-500 pointer-events-none" />
                               <input 
                                 type="text"
                                 autoFocus
                                 placeholder="Buscar noticias..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-48 sm:w-64 bg-slate-100/90 dark:bg-black/60 border border-blue-500/50 rounded-full py-1.5 pl-8 pr-7 text-xs font-medium text-slate-800 dark:text-gray-200 focus:outline-none shadow-md transition-all"
+                                className="w-48 sm:w-64 bg-white dark:bg-black/60 border-2 border-blue-500 rounded-2xl py-2 pl-10 pr-8 text-xs font-bold text-slate-800 dark:text-gray-200 focus:outline-none shadow-lg shadow-blue-500/10 transition-all"
                               />
                               <button 
                                 onClick={() => {
                                   setIsSearchOpen(false);
                                   setSearch('');
                                 }}
-                                className="absolute right-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-white p-0.5 text-xs font-bold"
+                                className="absolute right-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-white p-0.5 text-xs font-bold cursor-pointer"
                                 title="Cerrar búsqueda"
                               >
                                 ✕
@@ -881,10 +887,15 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                           ) : (
                             <button
                               onClick={() => setIsSearchOpen(true)}
-                              className={`p-2 rounded-full border border-slate-200 dark:border-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 shadow-sm transition-all shrink-0 ${search ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-100/80 dark:bg-white/5'}`}
+                              className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border shadow-sm shrink-0 group ${
+                                search 
+                                  ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-500/20' 
+                                  : 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/25 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white hover:border-blue-600'
+                              }`}
                               title="Buscar en el flujo de noticias"
                             >
-                              <Search className="w-3.5 h-3.5" />
+                              <Search className={`w-4 h-4 ${search ? 'text-white' : 'text-blue-600 dark:text-blue-400 group-hover:text-white'} transition-colors`} />
+                              <span>Buscar</span>
                             </button>
                           )}
                         </div>
