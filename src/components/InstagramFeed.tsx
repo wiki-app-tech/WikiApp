@@ -1,0 +1,502 @@
+'use client';
+
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  ExternalLink, 
+  Search, 
+  Share2, 
+  MessageCircle, 
+  Copy, 
+  Check, 
+  Sparkles, 
+  Info, 
+  PlusCircle, 
+  X, 
+  ChevronDown, 
+  ChevronUp
+} from 'lucide-react';
+import type { Article, FeedSource } from '@/types';
+
+export const InstagramIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
+
+interface InstagramFeedProps {
+  articles: Article[];
+  feeds?: FeedSource[];
+}
+
+export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedProps) {
+  const [selectedAccount, setSelectedAccount] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+
+  // Filtrar solo artículos provenientes de Instagram
+  const instagramArticles = useMemo(() => {
+    return articles.filter(a => a.sourceType === 'instagram' || a.sourceId.startsWith('instagram-'));
+  }, [articles]);
+
+  // Lista única de cuentas disponibles para las pestañas de filtro
+  const accounts = useMemo(() => {
+    const accMap = new Map<string, { id: string; name: string; username: string; count: number }>();
+    
+    instagramArticles.forEach(art => {
+      const uname = art.username || art.sourceId.replace('instagram-', '');
+      if (!accMap.has(uname)) {
+        accMap.set(uname, {
+          id: art.sourceId,
+          name: art.sourceName,
+          username: uname,
+          count: 1
+        });
+      } else {
+        const item = accMap.get(uname)!;
+        item.count += 1;
+      }
+    });
+
+    return Array.from(accMap.values());
+  }, [instagramArticles]);
+
+  // Artículos filtrados por búsqueda y por cuenta
+  const filteredArticles = useMemo(() => {
+    return instagramArticles.filter(art => {
+      const uname = art.username || art.sourceId.replace('instagram-', '');
+      const matchesAccount = selectedAccount === 'all' || uname.toLowerCase() === selectedAccount.toLowerCase();
+      
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch = !q || 
+        art.title.toLowerCase().includes(q) || 
+        art.description.toLowerCase().includes(q) ||
+        uname.toLowerCase().includes(q) ||
+        art.sourceName.toLowerCase().includes(q);
+
+      return matchesAccount && matchesSearch;
+    });
+  }, [instagramArticles, selectedAccount, searchQuery]);
+
+  const toggleExpand = (id: string) => {
+    setExpandedCards(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleCopyLink = (url: string, id: string) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2500);
+    }
+  };
+
+  const formatPostDate = (isoStr: string) => {
+    try {
+      const date = new Date(isoStr);
+      if (isNaN(date.getTime())) return 'Reciente';
+
+      const diff = Date.now() - date.getTime();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      if (hours < 1) return 'Hace instantes';
+      if (hours === 1) return 'Hace 1 hora';
+      if (hours < 24) return `Hace ${hours} horas`;
+      
+      const days = Math.floor(hours / 24);
+      if (days === 1) return 'Ayer';
+      if (days < 7) return `Hace ${days} días`;
+
+      return date.toLocaleDateString('es-AR', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return 'Reciente';
+    }
+  };
+
+  // Resalta hashtags en el texto con estilo distintivo
+  const renderFormattedCaption = (text: string) => {
+    if (!text) return null;
+    const parts = text.split(/(#[a-zA-Z0-9_áéíóúÁÉÍÓÚñÑ]+)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith('#')) {
+        return (
+          <span key={index} className="text-blue-500 dark:text-blue-400 font-semibold hover:underline cursor-pointer">
+            {part}
+          </span>
+        );
+      }
+      return part;
+    });
+  };
+
+  return (
+    <div className="w-full flex flex-col gap-6 pb-12 animate-fadeIn">
+      {/* 1. HEADER PRINCIPAL */}
+      <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white/70 dark:bg-[#121214]/80 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 rounded-3xl p-6 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-[2px] shadow-lg shadow-rose-500/20 shrink-0">
+            <div className="w-full h-full bg-white dark:bg-[#121214] rounded-[14px] flex items-center justify-center">
+              <InstagramIcon className="w-6 h-6 text-rose-500" />
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight font-display">
+                Redes Sociales & Cuentas Públicas
+              </h1>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                Instagram RSS
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
+              Publicaciones oficiales en tiempo real de medios, turismo y justicia de Tierra del Fuego.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Sincronizado</span>
+          </div>
+
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:opacity-90 transition-opacity shadow-sm"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>Agregar Cuentas</span>
+          </button>
+        </div>
+      </header>
+
+      {/* 2. BARRA DE HERRAMIENTAS: FILTRO DE CUENTAS + BUSCADOR */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+        {/* Chips de cuentas */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
+          <button
+            onClick={() => setSelectedAccount('all')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
+              selectedAccount === 'all'
+                ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-md shadow-rose-500/20'
+                : 'bg-white dark:bg-[#141416] text-slate-600 dark:text-gray-400 border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Todas las Cuentas</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-black/20 text-[10px]">
+              {instagramArticles.length}
+            </span>
+          </button>
+
+          {accounts.map(acc => {
+            const isActive = selectedAccount.toLowerCase() === acc.username.toLowerCase();
+            return (
+              <button
+                key={acc.username}
+                onClick={() => setSelectedAccount(acc.username)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 border ${
+                  isActive
+                    ? 'bg-rose-500/10 border-rose-500/40 text-rose-600 dark:text-rose-400 shadow-sm'
+                    : 'bg-white dark:bg-[#141416] border-slate-200 dark:border-white/5 text-slate-600 dark:text-gray-400 hover:border-slate-300 dark:hover:border-white/20'
+                }`}
+              >
+                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-amber-500 to-rose-500" />
+                <span>@{acc.username}</span>
+                <span className="text-[10px] opacity-70">({acc.count})</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Buscador */}
+        <div className="relative w-full lg:w-72">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Buscar en publicaciones..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 rounded-xl text-xs bg-white dark:bg-[#141416] border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/40 transition-all"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white text-xs"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* 3. GRILLA DE TARJETAS DE INSTAGRAM */}
+      {filteredArticles.length === 0 ? (
+        <div className="w-full min-h-[320px] flex flex-col items-center justify-center p-8 bg-white/50 dark:bg-[#121214]/40 rounded-3xl border border-dashed border-slate-300 dark:border-white/10 text-center">
+          <InstagramIcon className="w-12 h-12 text-slate-300 dark:text-gray-600 mb-3" />
+          <h3 className="text-base font-bold text-slate-700 dark:text-gray-300">
+            No se encontraron publicaciones
+          </h3>
+          <p className="text-xs text-slate-400 dark:text-gray-500 max-w-sm mt-1">
+            Intenta cambiar el término de búsqueda o selecciona otra cuenta en la barra superior.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredArticles.map((art) => {
+            const username = art.username || art.sourceId.replace('instagram-', '');
+            const isExpanded = !!expandedCards[art.id];
+            const isLongText = (art.description || '').length > 150;
+            const postUrl = art.link || `https://www.instagram.com/${username}`;
+
+            return (
+              <motion.article
+                key={art.id}
+                layout
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="group flex flex-col bg-white dark:bg-[#141416] border border-slate-200/90 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300"
+              >
+                {/* CABECERA DE LA TARJETA */}
+                <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.01]">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Ring degradado característico de Instagram */}
+                    <div className="w-10 h-10 rounded-full p-[2px] bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 shrink-0 shadow-sm">
+                      <div className="w-full h-full rounded-full bg-white dark:bg-[#141416] flex items-center justify-center overflow-hidden">
+                        <InstagramIcon className="w-5 h-5 text-rose-500" />
+                      </div>
+                    </div>
+
+                    <div className="min-w-0 flex flex-col">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                          {art.sourceName}
+                        </span>
+                        {art.sourceCategory && (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-gray-300">
+                            {art.sourceCategory}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[11px] font-mono text-slate-500 dark:text-gray-400 truncate">
+                        @{username}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <span className="text-[11px] text-slate-400 dark:text-gray-500 font-mono shrink-0">
+                      {formatPostDate(art.pubDate)}
+                    </span>
+                    <a
+                      href={`https://www.instagram.com/${username}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 rounded-lg transition-colors"
+                      title={`Ver perfil de @${username}`}
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* IMAGEN DE LA PUBLICACIÓN */}
+                <div className="relative aspect-square sm:aspect-[4/3] w-full bg-slate-100 dark:bg-[#0c0c0d] overflow-hidden">
+                  {art.thumbnail ? (
+                    <img
+                      src={art.thumbnail}
+                      alt={art.title || `Publicación de @${username}`}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        // Fallback estético si la URL de Instagram caduca
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-rose-950/20 via-purple-950/20 to-slate-950/20 text-slate-400 dark:text-gray-500">
+                      <InstagramIcon className="w-12 h-12 mb-2 text-rose-500/40" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Publicación Oficial</span>
+                    </div>
+                  )}
+
+                  <div className="absolute top-3 right-3">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/60 text-white backdrop-blur border border-white/15 flex items-center gap-1">
+                      <InstagramIcon className="w-3 h-3 text-rose-400" />
+                      <span>Post</span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* COPY / TEXTO DE LA PUBLICACIÓN */}
+                <div className="p-4 flex-1 flex flex-col justify-between gap-4">
+                  <div className="space-y-2">
+                    {/* Titular o extracto principal */}
+                    {art.title && !art.title.startsWith('@') && (
+                      <h4 className="text-sm font-black text-slate-900 dark:text-white leading-snug font-display">
+                        {art.title}
+                      </h4>
+                    )}
+
+                    {/* Copy con soporte para Ver Más / Ver Menos */}
+                    <div className="text-xs text-slate-700 dark:text-gray-300 leading-relaxed whitespace-pre-line font-normal">
+                      {isExpanded || !isLongText ? (
+                        renderFormattedCaption(art.description)
+                      ) : (
+                        renderFormattedCaption(`${art.description.slice(0, 140)}...`)
+                      )}
+                    </div>
+
+                    {isLongText && (
+                      <button
+                        onClick={() => toggleExpand(art.id)}
+                        className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 transition-colors"
+                      >
+                        {isExpanded ? (
+                          <>
+                            <span>Mostrar menos</span>
+                            <ChevronUp className="w-3 h-3" />
+                          </>
+                        ) : (
+                          <>
+                            <span>Ver texto completo</span>
+                            <ChevronDown className="w-3 h-3" />
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* PIE DE LA TARJETA: BOTÓN DE REDIRECCIÓN A INSTAGRAM & ACCIONES */}
+                  <div className="pt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between gap-2">
+                    {/* Compartir / Copiar */}
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleCopyLink(postUrl, art.id)}
+                        className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+                        title="Copiar enlace del post"
+                      >
+                        {copiedId === art.id ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => {
+                          const waText = `Mirá este post de @${username} en Instagram: ${postUrl}`;
+                          window.open(`https://wa.me/?text=${encodeURIComponent(waText)}`, '_blank');
+                        }}
+                        className="p-2 rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+                        title="Compartir en WhatsApp"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    {/* Botón Principal: Ver en Instagram */}
+                    <a
+                      href={postUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white shadow-md shadow-rose-500/20 hover:opacity-90 active:scale-95 transition-all"
+                    >
+                      <InstagramIcon className="w-3.5 h-3.5" />
+                      <span>Ver en Instagram</span>
+                      <ExternalLink className="w-3 h-3 opacity-80" />
+                    </a>
+                  </div>
+                </div>
+              </motion.article>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 4. MODAL / GUÍA PARA AGREGAR MÁS CUENTAS PÚBLICAS */}
+      <AnimatePresence>
+        {showAddModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+            <div 
+              className="fixed inset-0"
+              onClick={() => setShowAddModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-xl bg-white dark:bg-[#141416] border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-2xl z-10 space-y-5"
+            >
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center">
+                    <PlusCircle className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    Cómo agregar más cuentas de Instagram
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="text-xs text-slate-600 dark:text-gray-300 space-y-3 leading-relaxed">
+                <p>
+                  Para agregar nuevas cuentas públicas a esta sección, solo debes añadir un nuevo bloque dentro del archivo <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-rose-500 font-mono">public/data/feeds.json</code>:
+                </p>
+
+                <div className="bg-slate-900 text-slate-200 p-3.5 rounded-2xl font-mono text-[11px] overflow-x-auto border border-white/10">
+{`{
+  "id": "instagram-nombrecuenta",
+  "name": "Nombre de la Cuenta",
+  "username": "usuario_instagram",
+  "url": "https://openrss.org/instagram.com/usuario_instagram",
+  "type": "instagram",
+  "scope": "provincial",
+  "category": "noticias"
+}`}
+                </div>
+
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-3.5 flex items-start gap-2.5 text-amber-700 dark:text-amber-400 text-[11px]">
+                  <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Requisito clave</strong>: La cuenta debe ser <strong>100% pública</strong> para que los motores RSS puedan indexar sus fotos y textos sin requerir inicio de sesión.
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 dark:border-white/5 flex justify-end">
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="px-5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-900"
+                >
+                  Entendido
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

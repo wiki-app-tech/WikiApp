@@ -27,6 +27,8 @@ export interface FeedSource {
   type: FeedType;
   scope: 'internacional' | 'nacional' | 'provincial';
   category: string;
+  username?: string;
+  avatarUrl?: string;
 }
 
 export interface Article {
@@ -41,6 +43,8 @@ export interface Article {
   sourceType: FeedType;
   sourceScope: 'internacional' | 'nacional' | 'provincial';
   sourceCategory?: string;
+  username?: string;
+  avatarUrl?: string;
 }
 
 export interface FeedData {

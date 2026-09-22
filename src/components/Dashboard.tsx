@@ -33,6 +33,9 @@ const TapasModal = dynamic(() => import('./TapasModal'), {
 const TelegramFeed = dynamic(() => import('./TelegramFeed'), {
   loading: () => <TabLoadingSkeleton title="Cargando Canales de Noticias..." />
 });
+const InstagramFeed = dynamic(() => import('./InstagramFeed'), {
+  loading: () => <TabLoadingSkeleton title="Sincronizando Redes Sociales & Instagram..." />
+});
 
 const WeatherAlertMap = dynamic(() => import('./WeatherAlertMap'), {
     ssr: false,
@@ -107,6 +110,22 @@ const WikiAppLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
       d="M180 135 C 230 115, 300 70, 420 50 C 350 75, 260 115, 200 132 C 160 142, 110 138, 95 133 C 120 125, 150 120, 180 135 Z" 
       fill="#ffffff" 
     />
+  </svg>
+);
+
+const InstagramIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
   </svg>
 );
 
@@ -654,6 +673,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
           {[
             { id: 'home', icon: LayoutDashboard, label: 'Panel de Control', sub: 'Home' },
             { id: 'explore', icon: Compass, label: 'Fuentes de Inteligencia', sub: 'Feeds' },
+            { id: 'instagram', icon: InstagramIcon, label: 'Redes Sociales', sub: 'Instagram', color: 'text-rose-500' },
             { id: 'boletines', icon: Newspaper, label: 'Digesto & Boletines', sub: 'Digesto' },
             { id: 'weather', icon: Cloud, label: 'Clima & Alertas', sub: 'Clima' },
             { id: 'guia', icon: Map, label: 'Guía Fueguina', sub: 'Naturaleza & Senderos', color: 'text-emerald-500' },
@@ -722,7 +742,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                       <div className="flex items-center gap-2">
                         <ChevronRight className="w-3.5 h-3.5 text-text-tertiary hidden lg:block" />
                         <span className="text-[10px] md:text-[11px] font-bold text-text-tertiary uppercase tracking-[0.2em] font-mono hidden sm:block">
-                            {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'boletines' ? 'Digesto & Boletines Oficiales' : activeTab === 'security' ? 'Centro de Auditoría' : activeTab === 'logistics' ? 'Control de Tráfico' : activeTab === 'radio' ? 'Dial & Streaming Fueguino' : 'Sistema'}
+                            {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'instagram' ? 'Redes Sociales & Instagram' : activeTab === 'boletines' ? 'Digesto & Boletines Oficiales' : activeTab === 'security' ? 'Centro de Auditoría' : activeTab === 'logistics' ? 'Control de Tráfico' : activeTab === 'radio' ? 'Dial & Streaming Fueguino' : 'Sistema'}
                         </span>
                       </div>
                    </div>
@@ -1794,6 +1814,11 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                   {/* BOLETINES OFICIALES */}
                   {activeTab === 'boletines' && <BoletinesDashboard />}
+
+                  {/* REDES SOCIALES / INSTAGRAM */}
+                  {activeTab === 'instagram' && (
+                    <InstagramFeed articles={articles} feeds={feeds} />
+                  )}
 
                   {/* 5. REPORTS DASHBOARD (NEW) */}
                   {activeTab === 'reports' && (

@@ -1,5 +1,32 @@
 [
     {
+        "id": "instagram-la-gentetv",
+        "name": "La Gente TV",
+        "username": "la_gentetv",
+        "url": "https://openrss.org/instagram.com/la_gentetv",
+        "type": "instagram",
+        "scope": "provincial",
+        "category": "noticias"
+    },
+    {
+        "id": "instagram-findelmundo",
+        "name": "Turismo Tierra del Fuego",
+        "username": "findelmundo.gob.ar",
+        "url": "https://openrss.org/instagram.com/findelmundo.gob.ar",
+        "type": "instagram",
+        "scope": "provincial",
+        "category": "turismo"
+    },
+    {
+        "id": "instagram-justiciatdf",
+        "name": "Poder Judicial TDF",
+        "username": "justiciatdf",
+        "url": "https://openrss.org/instagram.com/justiciatdf",
+        "type": "instagram",
+        "scope": "provincial",
+        "category": "institucional"
+    },
+    {
         "id": "infobae-com",
         "name": "Infobae.com",
         "url": "https://www.infobae.com/arc/outboundfeeds/rss/",
