@@ -36,6 +36,9 @@ const TelegramFeed = dynamic(() => import('./TelegramFeed'), {
 const InstagramFeed = dynamic(() => import('./InstagramFeed'), {
   loading: () => <TabLoadingSkeleton title="Sincronizando Redes Sociales & Instagram..." />
 });
+const HomeInstagramSection = dynamic(() => import('./HomeInstagramSection'), {
+  loading: () => <TabLoadingSkeleton title="Cargando Redes Sociales Fueguinas..." />
+});
 
 const WeatherAlertMap = dynamic(() => import('./WeatherAlertMap'), {
     ssr: false,
@@ -484,6 +487,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
     religion: { label: 'Religión y Sociedad', icon: '🕊️' },
     gremial: { label: 'Gremial / Sindical', icon: '🤝' },
     institucional: { label: 'Institucionales y Oficiales', icon: '🏛️' },
+    turismo: { label: 'Turismo Fin del Mundo', icon: '🌲' },
     policial: { label: 'Policiales', icon: '🚨' },
     otras: { label: 'Otras Temáticas', icon: '🔍' }
   };
@@ -751,6 +755,16 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     {/* Modo Vistas */}
                     {(activeTab === 'home' || activeTab === 'explore') && (
                       <>
+
+                        {/* BOTÓN ACCESO DIRECTO A REDES SOCIALES */}
+                        <button
+                          onClick={() => setActiveTab('instagram')}
+                          className="flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-purple-600/10 text-rose-600 dark:text-rose-400 border-rose-500/25 hover:from-rose-500 hover:to-purple-600 hover:text-white dark:hover:text-white hover:border-transparent shadow-sm shrink-0 group"
+                          title="Explorar Redes Sociales de Tierra del Fuego"
+                        >
+                          <InstagramIcon className="w-4 h-4 text-rose-500 group-hover:text-white transition-colors" />
+                          <span className="hidden sm:inline">Redes</span>
+                        </button>
 
                         {/* 1. BOTÓN VER TAPAS DE DIARIOS (Estilo Digesto & Boletines) */}
                         <button
@@ -1798,6 +1812,14 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
                       {/* SIDE PANEL REMOVED AND MOVED TO TOP DROPDOWN */}
                   </div>
+
+                  {/* SECCIÓN DE REDES SOCIALES FUEGUINAS (INSTAGRAM) */}
+                  {activeTab === 'home' && (
+                    <HomeInstagramSection 
+                      articles={articles} 
+                      onViewFullFeed={() => setActiveTab('instagram')} 
+                    />
+                  )}
 
                   {activeTab === 'home' && <TelegramFeed articles={initialArticles} onSelectArticle={setSelectedArticle} />}
                 </div>
@@ -2867,7 +2889,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
             {/* BOTÓN MÁS... */}
             {(() => {
-              const isMoreActive = ['guia', 'boletines', 'security', 'logistics', 'reports'].includes(activeTab) || isMobileMoreOpen;
+              const isMoreActive = ['guia', 'boletines', 'security', 'logistics', 'reports', 'instagram'].includes(activeTab) || isMobileMoreOpen;
               return (
                 <button 
                   onClick={() => setIsMobileMoreOpen(!isMobileMoreOpen)} 
@@ -2928,6 +2950,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
               <div className="grid grid-cols-2 gap-3 pt-1">
                 {[
+                  { id: 'instagram', icon: InstagramIcon, title: 'Redes Sociales', desc: 'Instagram & Cuentas Oficiales', color: 'text-rose-500 bg-rose-500/10' },
                   { id: 'guia', icon: Map, title: 'Guía Fueguina', desc: 'Senderos & Turismo', color: 'text-emerald-500 bg-emerald-500/10' },
                   { id: 'boletines', icon: Newspaper, title: 'Digesto & Boletines', desc: 'Leyes y Decretos', color: 'text-blue-500 bg-blue-500/10' },
                   { id: 'security', icon: ShieldCheck, title: 'Seguridad', desc: 'Ruta 3 & Auditoría', color: 'text-red-500 bg-red-500/10' },
