@@ -46,9 +46,10 @@ export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedPro
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
 
-  // Filtrar solo artículos provenientes de Instagram
+  // Filtrar solo artículos provenientes de Instagram ordenados por fecha más reciente
   const instagramArticles = useMemo(() => {
-    return articles.filter(a => a.sourceType === 'instagram' || a.sourceId.startsWith('instagram-'));
+    const list = articles.filter(a => a.sourceType === 'instagram' || a.sourceId.startsWith('instagram-'));
+    return list.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
   }, [articles]);
 
   // Lista única de cuentas disponibles para las pestañas de filtro
@@ -279,7 +280,11 @@ export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedPro
                     {/* Ring degradado característico de Instagram */}
                     <div className="w-10 h-10 rounded-full p-[2px] bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 shrink-0 shadow-sm">
                       <div className="w-full h-full rounded-full bg-white dark:bg-[#141416] flex items-center justify-center overflow-hidden">
-                        <InstagramIcon className="w-5 h-5 text-rose-500" />
+                        {art.avatarUrl ? (
+                          <img src={art.avatarUrl} alt={username} className="w-full h-full object-cover" />
+                        ) : (
+                          <InstagramIcon className="w-5 h-5 text-rose-500" />
+                        )}
                       </div>
                     </div>
 
@@ -317,13 +322,13 @@ export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedPro
                 </div>
 
                 {/* IMAGEN DE LA PUBLICACIÓN */}
-                <div className="relative aspect-square sm:aspect-[4/3] w-full bg-slate-100 dark:bg-[#0c0c0d] overflow-hidden">
+                <div className="relative aspect-[4/5] w-full bg-slate-900 overflow-hidden flex items-center justify-center">
                   {art.thumbnail ? (
                     <img
                       src={art.thumbnail}
                       alt={art.title || `Publicación de @${username}`}
                       loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         // Fallback estético si la URL de Instagram caduca
                         (e.target as HTMLElement).style.display = 'none';

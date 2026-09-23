@@ -130,63 +130,69 @@ function getInstagramFallbackArticles(feed: FeedSource): Article[] {
     const username = feed.username || feed.url.split('instagram.com/')[1]?.split(/[/?#]/)[0] || feed.name;
     const now = Date.now();
 
-    const fallbackByAccount: Record<string, { title: string; description: string; thumbnail: string; link: string }[]> = {
+    const fallbackByAccount: Record<string, { title: string; description: string; thumbnail: string; avatarUrl?: string; link: string }[]> = {
         'la_gentetv': [
             {
-                title: "🔴 #URGENTE | Operativo de prevención vial en Ruta 3",
-                description: "🔴 #URGENTE | Operativo de prevención vial en Ruta Nacional N° 3 por presencia de escarcha matinal y nieve en la zona cordillerana. Vialidad Nacional y Protección Civil recomiendan transitar con extrema precaución, luces bajas encendidas y cubiertas de invierno reglamentarias.\n\n📡 Cobertura especial con móviles en vivo desde Ushuaia y Río Grande.\n\n#LaGenteTV #TierraDelFuego #Ruta3 #TransitoTDF #Noticias",
-                thumbnail: "https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?w=800&auto=format&fit=crop&q=80",
+                title: "Estudiantes secundarios comenzaron un acampe en reclamo de soluciones edilicias",
+                description: "Estudiantes secundarios comenzaron un acampe en reclamo de soluciones edilicias por parte del Gobierno Provincial.\n\n📍 Ushuaia, Tierra del Fuego · Colegio Técnico Olga B. de Arko.\n\n📡 Cobertura exclusiva de La Gente TV Tierra del Fuego con móviles en vivo.\n\n#LaGenteTV #TierraDelFuego #Ushuaia #Educacion #ColegioTecnico #NoticiasTDF",
+                thumbnail: "/images/instagram/la_gentetv_post1_acampe.jpg",
+                avatarUrl: "/images/instagram/la_gentetv_avatar.jpg",
                 link: "https://www.instagram.com/la_gentetv"
             },
             {
-                title: "🎙️ Balance económico y comercial de la temporada en Río Grande",
-                description: "🎙️ Balance comercial y productivo en la zona norte provincial. Entrevistamos a representantes del sector mercantil e industrial sobre las expectativas de abastecimiento, promociones locales y reactivación laboral para este semestre.\n\nSeguí toda la actualidad informativa por la señal de La Gente TV.",
-                thumbnail: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80",
+                title: "«No me grabes porque no tengo ganas», dijo la funcionaria tras evitar a la Prensa",
+                description: "«No me grabes porque no tengo ganas», dijo la funcionaria tras evitar a la Prensa por reclamos de padres en el gimnasio de la Escuela N°31 de Ushuaia.\n\n📍 Ushuaia, Tierra del Fuego · Escuela N°31.\n\n#LaGenteTV #Escuela31 #Ushuaia #Educacion #TDF #Prensa",
+                thumbnail: "/images/instagram/la_gentetv_post2_escuela31.jpg",
+                avatarUrl: "/images/instagram/la_gentetv_avatar.jpg",
                 link: "https://www.instagram.com/la_gentetv"
             },
             {
-                title: "🚨 Capacitación de Bomberos Voluntarios en rescate técnico",
-                description: "Efectivos de Bomberos Voluntarios de Ushuaia y Río Grande llevaron a cabo una intensa jornada de instrucción y maniobras de rescate en estructuras colapsadas y zonas agrestes de alta montaña.\n\n#SeguridadTDF #Bomberos #Ushuaia",
-                thumbnail: "https://images.unsplash.com/photo-1527525443983-6e60c75fff46?w=800&auto=format&fit=crop&q=80",
+                title: "«No podemos tolerar que nos vengan a mentir en la cara», manifestó Daniel Guzmán",
+                description: "«No podemos tolerar que nos vengan a mentir en la cara, no a nosotros, sino a los compañeros muertos», manifestó el veterano de Malvinas Daniel Guzmán durante una masiva movilización contra el Gobierno Provincial.\n\n📍 Ushuaia, Tierra del Fuego.\n\n#LaGenteTV #Malvinas #Soberania #TierraDelFuego #Veteranos #Ushuaia",
+                thumbnail: "/images/instagram/la_gentetv_post3_malvinas.jpg",
+                avatarUrl: "/images/instagram/la_gentetv_avatar.jpg",
                 link: "https://www.instagram.com/la_gentetv"
             }
         ],
         'findelmundo.gob.ar': [
             {
-                title: "🍂 Los colores mágicos del otoño en el Fin del Mundo",
-                description: "🍂 Los bosques de lengas y ñires comienzan a pintar el paisaje fueguino de tonalidades cobrizas, ocres y carmesí. Es una de las épocas más impactantes para recorrer senderos, admirar el Canal Beagle y contemplar los lagos Fagnano y Escondido.\n\n⚠️ Si vas a salir a caminar, recordá registrar tu recorrido en la app de senderos y llevar indumentaria en capas.\n\n#FinDelMundo #TierraDelFuego #Ushuaia #TurismoArgentina #VisitArgentina",
-                thumbnail: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=80",
+                title: "🍂 Los colores mágicos del otoño en los senderos del Fin del Mundo",
+                description: "🍂 Los bosques de lengas y ñires pintan el paisaje fueguino de tonalidades cobrizas y carmesí. Ideal para recorrer la Laguna Esmeralda, senderos del Parque Nacional y el Canal Beagle.\n\n⚠️ Recordá registrar tu salida en la app oficial de senderos antes de iniciar tu recorrido.\n\n#FinDelMundo #TierraDelFuego #Ushuaia #TurismoArgentina #VisitArgentina #SenderosTDF",
+                thumbnail: "/images/laguna-esmeralda.jpg",
+                avatarUrl: "/images/cabo-san-pablo.jpg",
                 link: "https://www.instagram.com/findelmundo.gob.ar"
             },
             {
-                title: "❄️ Anticipando la temporada invernal 2026",
-                description: "🏔️ Preparativos a pleno en los centros invernales de Tierra del Fuego. Circuitos de esquí de fondo, esquí alpino en Cerro Castor, paseos en raquetas y gastronomía fueguina con centolla y cordero. ¡Te esperamos para vivir el verdadero invierno austral!\n\n#CerroCastor #Nieve #InviernoTDF #UshuaiaNieve",
-                thumbnail: "https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800&auto=format&fit=crop&q=80",
+                title: "❄️ Preparativos en marcha para la temporada de nieve en Tierra del Fuego",
+                description: "🏔️ Pistas de esquí alpino en Cerro Castor, circuitos de fondo en los valles y paseos con raquetas en los centros invernales de Tierra del Fuego. ¡Te esperamos para vivir el verdadero invierno austral!\n\n#Nieve #CerroCastor #InviernoTDF #Ushuaia #FinDelMundo",
+                thumbnail: "/images/glaciar-martial.jpg",
+                avatarUrl: "/images/cabo-san-pablo.jpg",
                 link: "https://www.instagram.com/findelmundo.gob.ar"
             },
             {
-                title: "🐧 Navegaciones en el Canal Beagle y avistaje de fauna",
-                description: "Una experiencia inolvidable frente al Faro Les Eclaireurs, Isla de los Pájaros y la colonia de lobos marinos. Navegá el mítico canal que une océanos en el confín del planeta.\n\n#CanalBeagle #FaroDelFinDelMundo #TDF",
-                thumbnail: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop&q=80",
+                title: "🐧 Navegaciones en el Canal Beagle y circuito Faro Les Eclaireurs",
+                description: "Una experiencia inolvidable recorriendo las colonias de lobos marinos y aves australes en el mítico canal que une dos océanos en el confín del planeta.\n\n#CanalBeagle #FaroFinDelMundo #TDF #Turismo #Patagonia",
+                thumbnail: "/images/senda-costera.jpg",
+                avatarUrl: "/images/cabo-san-pablo.jpg",
                 link: "https://www.instagram.com/findelmundo.gob.ar"
             }
         ],
         'justiciatdf': [
             {
-                title: "⚖️ Concurso público de antecedentes en los Distritos Norte y Sur",
-                description: "⚖️ El Superior Tribunal de Justicia de Tierra del Fuego informa la apertura del concurso de antecedentes y oposición para cubrir cargos técnicos y jurisdiccionales en Ushuaia y Río Grande.\n\n📄 Las bases y el formulario de inscripción digital están disponibles en el portal web institucional del Poder Judicial: www.justierradelfuego.gov.ar.\n\n#PoderJudicial #JusticiaTDF #ConcursoPublico #STJ",
+                title: "⚖️ Concurso público de antecedentes y oposición en Distritos Norte y Sur",
+                description: "⚖️ El Superior Tribunal de Justicia de Tierra del Fuego informa la apertura del concurso de antecedentes y oposición para cubrir cargos técnicos y jurisdiccionales en Ushuaia y Río Grande.\n\n📄 Las bases y el formulario digital están disponibles en www.justierradelfuego.gov.ar.\n\n#PoderJudicial #JusticiaTDF #ConcursoPublico #STJ #TierraDelFuego",
                 thumbnail: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&auto=format&fit=crop&q=80",
                 link: "https://www.instagram.com/justiciatdf"
             },
             {
-                title: "🏛️ Modernización digital del expediente electrónico y mediación",
-                description: "Avanza la digitalización integral de procesos con la implementación de nuevas herramientas de firma electrónica y notificaciones automáticas para optimizar los tiempos de resolución ciudadana.\n\n#JusticiaAbierta #ModernizacionJudicial #TierraDelFuego",
+                title: "🏛️ Modernización digital del expediente electrónico y mediación judicial",
+                description: "Avanza la digitalización integral de procesos con nuevas herramientas de firma electrónica y notificaciones automáticas para optimizar los tiempos de resolución ciudadana.\n\n#JusticiaAbierta #ModernizacionJudicial #TierraDelFuego #STJ",
                 thumbnail: "https://images.unsplash.com/photo-1450133064473-71024230f91b?w=800&auto=format&fit=crop&q=80",
                 link: "https://www.instagram.com/justiciatdf"
             },
             {
-                title: "📢 Programa de Acceso a la Justicia en barrios de Ushuaia y Tolhuin",
-                description: "Equipos móviles de la Dirección de Mediación y Defensorías Públicas brindaron asesoramiento legal gratuito y orientación comunitaria a vecinos en centros barriales de Tolhuin y Río Grande.\n\n#AccesoALaJusticia #MediacionComunitaria #TDF",
+                title: "📢 Programa de Acceso a la Justicia en barrios de Tolhuin y Río Grande",
+                description: "Equipos móviles de la Dirección de Mediación y Defensorías Públicas brindaron orientación legal comunitaria gratuita a vecinos en centros barriales de la provincia.\n\n#AccesoALaJusticia #MediacionComunitaria #TDF #PoderJudicial",
                 thumbnail: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80",
                 link: "https://www.instagram.com/justiciatdf"
             }
@@ -208,7 +214,10 @@ function getInstagramFallbackArticles(feed: FeedSource): Article[] {
         description: p.description,
         link: p.link,
         thumbnail: p.thumbnail,
-        pubDate: new Date(now - idx * 3600 * 1000 * 4).toISOString(),
+        avatarUrl: p.avatarUrl,
+        pubDate: idx === 0 
+            ? new Date(now - 18 * 60 * 1000).toISOString() 
+            : new Date(now - idx * 3600 * 1000 * 4).toISOString(),
         sourceId: feed.id,
         sourceName: feed.name,
         sourceType: 'instagram',

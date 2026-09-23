@@ -40,9 +40,10 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
 
-  // Filtrar solo artículos de Instagram
+  // Filtrar solo artículos de Instagram ordenados estrictamente por fecha más reciente
   const instagramArticles = useMemo(() => {
-    return articles.filter(a => a.sourceType === 'instagram' || (a.sourceId && a.sourceId.startsWith('instagram-')));
+    const list = articles.filter(a => a.sourceType === 'instagram' || (a.sourceId && a.sourceId.startsWith('instagram-')));
+    return list.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
   }, [articles]);
 
   // Lista única de cuentas
@@ -158,7 +159,7 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-gray-400 mt-0.5">
-              Publicaciones destacadas de medios de comunicación, turismo y organismos provinciales.
+              Publicaciones destacadas y actualizadas en tiempo real de medios y organismos provinciales.
             </p>
           </div>
         </div>
@@ -230,8 +231,12 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
               <div className="p-3.5 flex items-center justify-between border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.01]">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-8 h-8 rounded-full p-[1.5px] bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 shrink-0">
-                    <div className="w-full h-full rounded-full bg-white dark:bg-[#14161b] flex items-center justify-center">
-                      <InstagramIcon className="w-4 h-4 text-rose-500" />
+                    <div className="w-full h-full rounded-full bg-white dark:bg-[#14161b] flex items-center justify-center overflow-hidden">
+                      {art.avatarUrl ? (
+                        <img src={art.avatarUrl} alt={username} className="w-full h-full object-cover" />
+                      ) : (
+                        <InstagramIcon className="w-4 h-4 text-rose-500" />
+                      )}
                     </div>
                   </div>
                   <div className="min-w-0 flex flex-col">
@@ -251,19 +256,19 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
 
               {/* IMAGEN PRINCIPAL */}
               {art.thumbnail && (
-                <div className="relative aspect-[16/10] sm:aspect-[4/3] w-full bg-slate-100 dark:bg-black/30 overflow-hidden">
+                <div className="relative aspect-[4/5] w-full bg-slate-900 overflow-hidden flex items-center justify-center">
                   <img
                     src={art.thumbnail}
                     alt={art.title}
                     loading="lazy"
                     decoding="async"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => {
                       (e.currentTarget as HTMLElement).style.display = 'none';
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                    <span className="text-[10px] font-bold text-white bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-lg">
+                    <span className="text-[10px] font-bold text-white bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-lg">
                       Publicación Original
                     </span>
                   </div>
