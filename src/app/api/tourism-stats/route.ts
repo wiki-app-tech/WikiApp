@@ -36,10 +36,10 @@ export async function GET(request: Request) {
     if (type === 'hotel') {
       return NextResponse.json({ success: true, data: hotelStats });
     }
-    if (type === 'cruises') {
+    if (type === 'cruises' || type === 'cruise') {
       return NextResponse.json({ success: true, data: cruiseStats });
     }
-    if (type === 'flights') {
+    if (type === 'flights' || type === 'flight') {
       return NextResponse.json({ success: true, data: flightsData });
     }
 

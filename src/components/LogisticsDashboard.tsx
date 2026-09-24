@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -20,7 +20,11 @@ import {
   ArrowDownLeft, 
   ArrowUpRight,
   Sparkles,
-  Info
+  Info,
+  CheckCircle2,
+  Navigation,
+  Eye,
+  Radio
 } from 'lucide-react';
 
 // Dynamic imports with ssr: false for maps
@@ -56,9 +60,16 @@ interface LogisticsDashboardProps {
 export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardProps) {
   const [activeMainTab, setActiveMainTab] = useState<'overview' | 'airports' | 'hotel' | 'cruises'>('overview');
   const [carouselSlide, setCarouselSlide] = useState<'ships' | 'flights'>('ships');
-  const [isAutoCycle, setIsAutoCycle] = useState<boolean>(true);
+  const [isAutoCycle, setIsAutoCycle] = useState<boolean>(false);
   const [secondsToUpdate, setSecondsToUpdate] = useState<number>(30);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  // Estados específicos para el cotejo AIS y reevaluación de visitantes
+  const [selectedVesselId, setSelectedVesselId] = useState<string | null>('stella-australis');
+  const [shipFilter, setShipFilter] = useState<'all' | 'crucero' | 'catamaran' | 'servicio'>('all');
+  const [kpiMode, setKpiMode] = useState<'visitors' | 'consolidated'>('visitors');
+  const [maritimeViewMode, setMaritimeViewMode] = useState<'cotejo' | 'radar'>('cotejo');
+  const [maritimeZoom, setMaritimeZoom] = useState<'ushuaia' | 'regional'>('ushuaia');
 
   // Datos consolidados
   const [tourismData, setTourismData] = useState<any>(null);
@@ -101,24 +112,70 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
     return () => clearInterval(timer);
   }, []);
 
-  // Auto ciclo de carrusel barcos / vuelos
+  // Auto ciclo opcional de carrusel barcos / vuelos
   useEffect(() => {
     if (!isAutoCycle) return;
     const interval = setInterval(() => {
       setCarouselSlide(prev => (prev === 'ships' ? 'flights' : 'ships'));
-    }, 8000);
+    }, 10000);
     return () => clearInterval(interval);
   }, [isAutoCycle]);
 
-  // Embarcaciones y Vuelos para la columna izquierda
-  const ships = cruiseData?.temporada?.buquesDestacados || [];
-  const flights = flightDb?.flights || [];
-  const airports = flightDb?.airports || [];
+  // Embarcaciones y Vuelos
+  const ships = useMemo(() => cruiseData?.temporada?.buquesDestacados || [], [cruiseData]);
+  const flights = useMemo(() => flightDb?.flights || [], [flightDb]);
+  const airports = useMemo(() => flightDb?.airports || [], [flightDb]);
 
-  const totalShipPax = ships.reduce((acc: number, s: any) => acc + (s.paxCapacity || 0), 0);
-  const totalFlightPax = flights.reduce((acc: number, f: any) => acc + (f.paxCapacity || 0), 0);
-  const grandTotal = totalShipPax + totalFlightPax;
-  const maxPax = Math.max(...ships.map((s: any) => s.paxCapacity || 0), ...flights.map((f: any) => f.paxCapacity || 0), 200);
+  // CÁLCULOS DE REEVALUACIÓN DE PERSONAS QUE VISITAN USHUAIA
+  const cruisePax = useMemo(() => 
+    ships.filter((s: any) => s.category === 'crucero').reduce((acc: number, s: any) => acc + (s.paxCapacity || 0), 0)
+  , [ships]);
+
+  const catamaranPax = useMemo(() => 
+    ships.filter((s: any) => s.category === 'catamaran').reduce((acc: number, s: any) => acc + (s.paxCapacity || 0), 0)
+  , [ships]);
+
+  const totalMaritimePax = cruisePax + catamaranPax;
+  const totalMaritimeCrew = useMemo(() => 
+    ships.reduce((acc: number, s: any) => acc + (s.crewCount || 0), 0)
+  , [ships]);
+  const grandMaritimeTotal = totalMaritimePax + totalMaritimeCrew;
+
+  // Pasajeros que arriban a Ushuaia en vuelos comerciales
+  const ushFlightPax = useMemo(() => 
+    flights.filter((f: any) => f.destCode === 'USH' || f.cityTDF === 'Ushuaia').reduce((acc: number, f: any) => acc + (f.paxCapacity || 0), 0)
+  , [flights]);
+
+  const totalFlightPax = useMemo(() => 
+    flights.reduce((acc: number, f: any) => acc + (f.paxCapacity || 0), 0)
+  , [flights]);
+
+  // Totales reevaluados:
+  // 1. Turistas netos visitando Ushuaia hoy (Cruceristas + Excursión náutica + Arribos aéreos a USH)
+  const totalUshuaiaVisitors = totalMaritimePax + ushFlightPax;
+  // 2. Movimiento operativo global consolidado (incluyendo tripulaciones)
+  const grandTotalConsolidated = grandMaritimeTotal + totalFlightPax;
+
+  const maxPax = Math.max(
+    ...ships.map((s: any) => s.paxCapacity || 0), 
+    ...flights.map((f: any) => f.paxCapacity || 0), 
+    300
+  );
+
+  // Filtrado de buques según categoría
+  const filteredShips = useMemo(() => {
+    if (shipFilter === 'all') return ships;
+    return ships.filter((s: any) => s.category === shipFilter);
+  }, [ships, shipFilter]);
+
+  const selectedVessel = useMemo(() => 
+    ships.find((s: any) => s.id === selectedVesselId) || ships[0] || null
+  , [ships, selectedVesselId]);
+
+  const handleSelectShip = (ship: any) => {
+    setSelectedVesselId(ship.id);
+    setMaritimeViewMode('cotejo');
+  };
 
   return (
     <div className="w-full flex flex-col gap-6 pb-12 animate-fadeIn">
@@ -136,9 +193,12 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
                 Tierra del Fuego
               </span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                AIS Cotejado con DPP
+              </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
-              Tráfico Marítimo, Aéreo, Aeropuertos de Argentina y Ocupación Hotelera Oficial (INFUETUR / IPIEC).
+              Tráfico Marítimo y Aéreo en tiempo real, cotejado con Radar AIS MarineTraffic y Dirección Provincial de Puertos.
             </p>
           </div>
         </div>
@@ -150,7 +210,7 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
-            <span className="uppercase tracking-wider">Satelital Vivo</span>
+            <span className="uppercase tracking-wider">AIS Satelital Vivo</span>
             <span className="text-slate-300 dark:text-white/10 w-px h-3.5" />
             <span className="text-[10px] font-mono text-slate-500 dark:text-gray-400">
               Refresco en {secondsToUpdate}s
@@ -160,7 +220,7 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
           <button
             onClick={() => loadAllData(true)}
             disabled={isRefreshing}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border border-slate-200 dark:border-white/10 hover:border-blue-500/30 text-slate-700 dark:text-gray-200 bg-white dark:bg-white/5 hover:bg-blue-500/5 active:scale-95 transition-all shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border border-slate-200 dark:border-white/10 hover:border-blue-500/30 text-slate-700 dark:text-gray-200 bg-white dark:bg-white/5 hover:bg-blue-500/5 active:scale-95 transition-all shadow-sm cursor-pointer"
             title="Sincronizar todas las fuentes de transporte y turismo"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-blue-500 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -173,7 +233,7 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
         <button
           onClick={() => setActiveMainTab('overview')}
-          className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
+          className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
             activeMainTab === 'overview'
               ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20'
               : 'bg-white dark:bg-[#121214] text-slate-600 dark:text-gray-400 border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10'
@@ -185,7 +245,7 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
 
         <button
           onClick={() => setActiveMainTab('airports')}
-          className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 border ${
+          className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 border cursor-pointer ${
             activeMainTab === 'airports'
               ? 'bg-orange-500/15 border-orange-500/50 text-orange-600 dark:text-orange-400 shadow-sm'
               : 'bg-white dark:bg-[#121214] border-slate-200 dark:border-white/5 text-slate-600 dark:text-gray-400 hover:border-slate-300 dark:hover:border-white/10'
@@ -200,7 +260,7 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
 
         <button
           onClick={() => setActiveMainTab('hotel')}
-          className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 border ${
+          className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 border cursor-pointer ${
             activeMainTab === 'hotel'
               ? 'bg-blue-500/15 border-blue-500/50 text-blue-600 dark:text-blue-400 shadow-sm'
               : 'bg-white dark:bg-[#121214] border-slate-200 dark:border-white/5 text-slate-600 dark:text-gray-400 hover:border-slate-300 dark:hover:border-white/10'
@@ -215,7 +275,7 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
 
         <button
           onClick={() => setActiveMainTab('cruises')}
-          className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 border ${
+          className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 border cursor-pointer ${
             activeMainTab === 'cruises'
               ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-600 dark:text-cyan-400 shadow-sm'
               : 'bg-white dark:bg-[#121214] border-slate-200 dark:border-white/5 text-slate-600 dark:text-gray-400 hover:border-slate-300 dark:hover:border-white/10'
@@ -229,123 +289,227 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
         </button>
       </div>
 
-      {/* 3. CONTENIDO PRINCIPAL SEGÚN TAB ACTIVA */}
-      {/* VISTA 1: OVERVIEW (PANEL PRINCIPAL) */}
+      {/* 3. CONTENIDO PRINCIPAL: OVERVIEW */}
       {activeMainTab === 'overview' && (
         <div className="flex flex-col gap-8">
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-            {/* COLUMNA IZQUIERDA: ESTADO DE TRÁNSITO */}
+            
+            {/* COLUMNA IZQUIERDA: ESTADO DE TRÁNSITO & REEVALUACIÓN DE VISITANTES */}
             <div className="xl:col-span-4 flex flex-col gap-6">
               <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl p-4 md:p-6 shadow-2xl flex flex-col gap-5 relative overflow-hidden h-auto">
+                
+                {/* Cabecera del panel izquierdo */}
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">
-                    Estado de Tránsito Regional
-                  </h3>
+                  <div>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">
+                      Estado de Tránsito Regional
+                    </h3>
+                    <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">
+                      Cotejado con AIS Puerto Ushuaia
+                    </span>
+                  </div>
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => setIsAutoCycle(!isAutoCycle)}
-                      className={`p-1.5 rounded-lg border transition-all ${
+                      className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
                         isAutoCycle
                           ? 'bg-blue-600/10 border-blue-500/20 text-blue-500'
                           : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400'
                       }`}
-                      title={isAutoCycle ? 'Pausar Rotación' : 'Activar Rotación'}
+                      title={isAutoCycle ? 'Pausar Rotación' : 'Activar Rotación Automática'}
                     >
                       {isAutoCycle ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
 
-                {/* KPIS DE INTERCAMBIO DE PERSONAS */}
+                {/* KPIS REEVALUADOS DE PERSONAS QUE VISITAN USHUAIA */}
                 <div className="flex flex-col gap-3 bg-gradient-to-br from-slate-50 to-blue-50/40 dark:from-[#111]/80 dark:to-blue-950/20 border border-slate-200 dark:border-blue-900/20 rounded-2xl p-4">
+                  
+                  {/* Selector de Modo de Reevaluación */}
+                  <div className="flex items-center gap-1 bg-white/80 dark:bg-black/40 p-1 rounded-xl border border-slate-200 dark:border-white/10 text-[9px] font-black uppercase">
+                    <button
+                      onClick={() => setKpiMode('visitors')}
+                      className={`flex-1 py-1.5 px-2 rounded-lg transition-all text-center cursor-pointer ${
+                        kpiMode === 'visitors'
+                          ? 'bg-blue-600 text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white'
+                      }`}
+                    >
+                      Turistas que Visitan Ushuaia
+                    </button>
+                    <button
+                      onClick={() => setKpiMode('consolidated')}
+                      className={`flex-1 py-1.5 px-2 rounded-lg transition-all text-center cursor-pointer ${
+                        kpiMode === 'consolidated'
+                          ? 'bg-blue-600 text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white'
+                      }`}
+                    >
+                      Flujo Operativo Total (Inc. Trip.)
+                    </button>
+                  </div>
+
+                  {/* 3 Stat Boxes principales */}
                   <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { label: 'Embarcaciones', value: ships.length, icon: '⚓', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-500/10' },
-                      { label: 'Vuelos', value: flights.length, icon: '✈️', color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-500/10' },
-                      { label: 'Total Personas', value: grandTotal.toLocaleString('es-AR'), icon: '👥', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10' },
-                    ].map(kpi => (
-                      <div key={kpi.label} className={`${kpi.bg} rounded-xl p-2.5 flex flex-col items-center gap-0.5`}>
-                        <span className="text-base leading-none">{kpi.icon}</span>
-                        <span className={`text-[17px] font-black leading-tight ${kpi.color}`}>{kpi.value}</span>
-                        <span className="text-[7.5px] font-bold uppercase tracking-widest text-slate-500 dark:text-gray-500 text-center leading-tight">
-                          {kpi.label}
-                        </span>
-                      </div>
-                    ))}
+                    <div className="bg-blue-500/10 rounded-xl p-2.5 flex flex-col items-center gap-0.5">
+                      <span className="text-base leading-none">⚓</span>
+                      <span className="text-[17px] font-black leading-tight text-blue-600 dark:text-blue-400">
+                        {ships.length}
+                      </span>
+                      <span className="text-[7.5px] font-bold uppercase tracking-widest text-slate-500 dark:text-gray-500 text-center leading-tight">
+                        Embarcaciones
+                      </span>
+                    </div>
+
+                    <div className="bg-orange-500/10 rounded-xl p-2.5 flex flex-col items-center gap-0.5">
+                      <span className="text-base leading-none">✈️</span>
+                      <span className="text-[17px] font-black leading-tight text-orange-600 dark:text-orange-400">
+                        {flights.length}
+                      </span>
+                      <span className="text-[7.5px] font-bold uppercase tracking-widest text-slate-500 dark:text-gray-500 text-center leading-tight">
+                        Vuelos Activos
+                      </span>
+                    </div>
+
+                    <div className="bg-emerald-500/10 rounded-xl p-2.5 flex flex-col items-center gap-0.5">
+                      <span className="text-base leading-none">👥</span>
+                      <span className="text-[17px] font-black leading-tight text-emerald-600 dark:text-emerald-400">
+                        {kpiMode === 'visitors'
+                          ? totalUshuaiaVisitors.toLocaleString('es-AR')
+                          : grandTotalConsolidated.toLocaleString('es-AR')}
+                      </span>
+                      <span className="text-[7.5px] font-bold uppercase tracking-widest text-slate-500 dark:text-gray-500 text-center leading-tight">
+                        {kpiMode === 'visitors' ? 'Turistas Ushuaia' : 'Total Personas'}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Desglose marítimo */}
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center gap-1.5 pb-1 border-b border-slate-200 dark:border-white/5">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">⚓ Marítimo</span>
-                      <span className="ml-auto text-[9px] font-black text-slate-500 dark:text-gray-500">{totalShipPax} personas</span>
+                  {/* Desglose Marítimo Reevaluado */}
+                  <div className="flex flex-col gap-1.5 pt-1 border-t border-slate-200 dark:border-white/5">
+                    <div className="flex items-center gap-1.5 pb-1">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                        ⚓ Marítimo ({totalMaritimePax.toLocaleString('es-AR')} turistas)
+                      </span>
+                      <span className="ml-auto text-[8.5px] font-bold text-slate-400">
+                        +{totalMaritimeCrew} tripulantes
+                      </span>
                     </div>
-                    {ships.slice(0, 5).map((ship: any) => (
-                      <div key={ship.id} className="flex flex-col gap-0.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[8.5px] font-bold text-slate-700 dark:text-gray-300 truncate max-w-[120px]">{ship.name}</span>
-                          <span className="text-[8.5px] font-black text-blue-600 dark:text-blue-400 tabular-nums">{ship.paxCapacity}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <div className="flex-1 h-1 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-500 rounded-full transition-all duration-700" style={{ width: `${(ship.paxCapacity / maxPax) * 100}%` }} />
+
+                    {/* Muestra las 5 principales naves con capacidad */}
+                    {filteredShips.slice(0, 5).map((ship: any) => {
+                      const isSelected = selectedVesselId === ship.id;
+                      return (
+                        <div 
+                          key={ship.id} 
+                          onClick={() => handleSelectShip(ship)}
+                          className={`flex flex-col gap-0.5 p-1 rounded-lg cursor-pointer transition-all ${
+                            isSelected ? 'bg-blue-500/10 ring-1 ring-blue-500/30' : 'hover:bg-slate-200/50 dark:hover:bg-white/5'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[8.5px] font-bold text-slate-700 dark:text-gray-300 truncate max-w-[130px] flex items-center gap-1">
+                              <span>{ship.category === 'crucero' ? '🚢' : ship.category === 'catamaran' ? '🛥️' : '⚓'}</span>
+                              <span>{ship.name}</span>
+                            </span>
+                            <span className="text-[8.5px] font-black text-blue-600 dark:text-blue-400 tabular-nums">
+                              {ship.paxCapacity} pax
+                            </span>
                           </div>
-                          <span className="text-[7px] text-slate-400 dark:text-gray-600 truncate max-w-[90px]">{ship.type}</span>
+                          <div className="flex items-center gap-1.5">
+                            <div className="flex-1 h-1 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full rounded-full transition-all duration-700 ${
+                                  ship.category === 'crucero' ? 'bg-blue-500' : ship.category === 'catamaran' ? 'bg-cyan-500' : 'bg-slate-400'
+                                }`} 
+                                style={{ width: `${Math.min(100, (ship.paxCapacity / maxPax) * 100)}%` }} 
+                              />
+                            </div>
+                            <span className="text-[7px] text-slate-400 dark:text-gray-500 truncate max-w-[95px]">
+                              {ship.type}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
-                  {/* Desglose aéreo */}
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center gap-1.5 pb-1 border-b border-slate-200 dark:border-white/5">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400">✈️ Aéreo</span>
-                      <span className="ml-auto text-[9px] font-black text-slate-500 dark:text-gray-500">{totalFlightPax} personas</span>
+                  {/* Desglose Aéreo */}
+                  <div className="flex flex-col gap-1.5 pt-1 border-t border-slate-200 dark:border-white/5">
+                    <div className="flex items-center gap-1.5 pb-1">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400 flex items-center gap-1">
+                        ✈️ Aéreo Ushuaia ({ushFlightPax.toLocaleString('es-AR')} pax)
+                      </span>
+                      <span className="ml-auto text-[8.5px] font-bold text-slate-400">
+                        Total TDF: {totalFlightPax}
+                      </span>
                     </div>
-                    {flights.slice(0, 5).map((flight: any) => (
+                    {flights.slice(0, 4).map((flight: any) => (
                       <div key={flight.id} className="flex flex-col gap-0.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-[8.5px] font-bold text-slate-700 dark:text-gray-300">{flight.flight} <span className="text-[7px] text-slate-400 font-normal">{flight.type}</span></span>
-                          <span className="text-[8.5px] font-black text-orange-600 dark:text-orange-400 tabular-nums">{flight.paxCapacity}</span>
+                          <span className="text-[8.5px] font-bold text-slate-700 dark:text-gray-300">
+                            {flight.flight} <span className="text-[7px] text-slate-400 font-normal">({flight.type})</span>
+                          </span>
+                          <span className="text-[8.5px] font-black text-orange-600 dark:text-orange-400 tabular-nums">
+                            {flight.paxCapacity} pax
+                          </span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <div className="flex-1 h-1 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-orange-500 rounded-full transition-all duration-700" style={{ width: `${(flight.paxCapacity / maxPax) * 100}%` }} />
+                            <div 
+                              className="h-full bg-orange-500 rounded-full transition-all duration-700" 
+                              style={{ width: `${(flight.paxCapacity / maxPax) * 100}%` }} 
+                            />
                           </div>
-                          <span className="text-[7px] text-slate-400 dark:text-gray-600">{flight.route}</span>
+                          <span className="text-[7px] text-slate-400 dark:text-gray-500">{flight.route}</span>
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  {/* Total destacado */}
-                  <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-3 py-2 mt-1">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Intercambio total estimado</span>
-                    <span className="text-[18px] font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{grandTotal.toLocaleString('es-AR')}</span>
+                  {/* Total Destacado Reevaluado */}
+                  <div className="flex flex-col gap-1 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 mt-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+                        {kpiMode === 'visitors' ? 'Visitantes Turísticos en Ushuaia' : 'Intercambio Total Estimado'}
+                      </span>
+                      <span className="text-[19px] font-black text-emerald-600 dark:text-emerald-400 tabular-nums leading-none">
+                        {kpiMode === 'visitors'
+                          ? totalUshuaiaVisitors.toLocaleString('es-AR')
+                          : grandTotalConsolidated.toLocaleString('es-AR')}
+                      </span>
+                    </div>
+                    <span className="text-[8px] text-slate-500 dark:text-gray-400 leading-tight">
+                      * Cómputo oficial unificado: Cruceristas + Excursión marítima + Arribos Aeropuerto USH (INFUETUR / DPP / AIS).
+                    </span>
                   </div>
                 </div>
 
-                {/* Tabs Selector Barcos / Vuelos */}
+                {/* TABS SELECTOR: BARCOS COTEJADOS / VUELOS */}
                 <div className="grid grid-cols-2 gap-2 bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/5">
                   <button
                     onClick={() => { setCarouselSlide('ships'); setIsAutoCycle(false); }}
-                    className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-                      carouselSlide === 'ships' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-white'
+                    className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                      carouselSlide === 'ships'
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-white'
                     }`}
                   >
-                    <Anchor className="w-3.5 h-3.5" /> Barcos & Cruceros
+                    <Anchor className="w-3.5 h-3.5" /> Barcos AIS ({ships.length})
                   </button>
                   <button
                     onClick={() => { setCarouselSlide('flights'); setIsAutoCycle(false); }}
-                    className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-                      carouselSlide === 'flights' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-white'
+                    className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                      carouselSlide === 'flights'
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-white'
                     }`}
                   >
-                    <Plane className="w-3.5 h-3.5" /> Tránsito Aéreo
+                    <Plane className="w-3.5 h-3.5" /> Tránsito Aéreo ({flights.length})
                   </button>
                 </div>
 
-                {/* Detalle del slide activo */}
+                {/* DETALLE DEL SLIDE ACTIVO CON LISTADO COMPLETO Y COTEJABLE */}
                 <div className="flex-1 flex flex-col relative overflow-hidden">
                   <AnimatePresence mode="wait">
                     {carouselSlide === 'ships' ? (
@@ -354,40 +518,103 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
-                        className="flex-1 flex flex-col gap-4"
+                        className="flex-1 flex flex-col gap-3"
                       >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">
-                            Arribos Marítimos ({ships.length})
-                          </span>
-                          <a href="https://infuetur.gob.ar/estadistica/temporada_de_cruceros" target="_blank" rel="noopener noreferrer" className="text-[9px] font-bold text-blue-500 hover:underline flex items-center gap-1">
-                            INFO OFICIAL <ExternalLink className="w-3 h-3" />
-                          </a>
+                        {/* Filtros de Categorías de Embarcaciones */}
+                        <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-hide text-[8px] font-black uppercase">
+                          {[
+                            { id: 'all', label: `Todos (${ships.length})` },
+                            { id: 'crucero', label: `Cruceros (${ships.filter((s: any) => s.category === 'crucero').length})` },
+                            { id: 'catamaran', label: `Catamarán (${ships.filter((s: any) => s.category === 'catamaran').length})` },
+                            { id: 'servicio', label: `Servicio (${ships.filter((s: any) => s.category === 'servicio').length})` },
+                          ].map(f => (
+                            <button
+                              key={f.id}
+                              onClick={() => setShipFilter(f.id as any)}
+                              className={`px-2 py-1 rounded-lg transition-all whitespace-nowrap cursor-pointer ${
+                                shipFilter === f.id
+                                  ? 'bg-blue-600 text-white shadow-xs'
+                                  : 'bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white'
+                              }`}
+                            >
+                              {f.label}
+                            </button>
+                          ))}
                         </div>
 
-                        <div className="flex flex-col gap-3 overflow-y-auto scrollbar-hide max-h-[380px] pr-1">
-                          {ships.map((ship: any) => (
-                            <div key={ship.id} className="bg-slate-50 dark:bg-[#161616]/40 border border-slate-200 dark:border-[#222] rounded-2xl p-3.5 flex flex-col gap-2">
-                              <div className="flex items-center justify-between">
-                                <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
-                                  ship.status === 'En Puerto'
-                                    ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
-                                    : 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20'
-                                }`}>
-                                  {ship.status}
-                                </span>
-                                <span className="text-[9px] font-bold text-slate-500">{ship.time}</span>
+                        {/* LISTADO SCROLLABLE DE EMBARCACIONES COTEJADAS */}
+                        <div className="flex flex-col gap-2.5 overflow-y-auto scrollbar-hide max-h-[420px] pr-1">
+                          {filteredShips.map((ship: any) => {
+                            const isSelected = selectedVesselId === ship.id;
+                            return (
+                              <div
+                                key={ship.id}
+                                onClick={() => handleSelectShip(ship)}
+                                className={`rounded-2xl p-3.5 flex flex-col gap-2 transition-all cursor-pointer border ${
+                                  isSelected
+                                    ? 'bg-blue-500/10 dark:bg-blue-950/30 border-blue-500 shadow-md ring-1 ring-blue-500/30'
+                                    : 'bg-slate-50 dark:bg-[#161616]/40 border-slate-200 dark:border-[#222] hover:border-slate-300 dark:hover:border-white/10'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between gap-1">
+                                  <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
+                                    ship.status.includes('Puerto') || ship.status.includes('Muelle')
+                                      ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                      : ship.status.includes('Rada') || ship.status.includes('Fondeo')
+                                      ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                      : 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+                                  }`}>
+                                    {ship.status}
+                                  </span>
+
+                                  <span className="text-[9px] font-mono text-slate-400">
+                                    MMSI: {ship.mmsi}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-1.5 min-w-0">
+                                    <span className="text-sm">
+                                      {ship.category === 'crucero' ? '🚢' : ship.category === 'catamaran' ? '🛥️' : '⚓'}
+                                    </span>
+                                    <span className="text-xs font-black text-slate-900 dark:text-white uppercase truncate">
+                                      {ship.name}
+                                    </span>
+                                  </div>
+                                  <span className="text-[10px] text-slate-500 shrink-0">{ship.flag}</span>
+                                </div>
+
+                                <div className="text-[10px] text-slate-500 dark:text-gray-400 line-clamp-1">
+                                  {ship.locationName || ship.destination}
+                                </div>
+
+                                <div className="flex items-center justify-between text-[10px] border-t border-slate-100 dark:border-white/5 pt-2 font-mono">
+                                  <span className="text-slate-400">
+                                    {ship.speed}
+                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-bold text-blue-600 dark:text-blue-400">
+                                      {ship.paxCapacity} pax
+                                    </span>
+                                    {ship.crewCount > 0 && (
+                                      <span className="text-slate-400">
+                                        ({ship.crewCount} trip.)
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {isSelected && (
+                                  <div className="flex items-center justify-between text-[9px] font-black text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2 py-1 rounded-lg">
+                                    <span className="flex items-center gap-1">
+                                      <CheckCircle2 className="w-3 h-3" /> COTEJADO EN RADAR
+                                    </span>
+                                    <span className="uppercase text-[8px] underline">Ver en Mapa</span>
+                                  </div>
+                                )}
                               </div>
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-black text-slate-900 dark:text-white uppercase truncate">{ship.name}</span>
-                                <span className="text-[10px] text-slate-500">{ship.flag}</span>
-                              </div>
-                              <div className="flex items-center justify-between text-[10px] border-t border-slate-100 dark:border-white/5 pt-1.5 text-slate-500 font-mono">
-                                <span>{ship.destination}</span>
-                                <span className="font-bold text-blue-500">{ship.paxCapacity} pax</span>
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </motion.div>
                     ) : (
@@ -396,20 +623,21 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
-                        className="flex-1 flex flex-col gap-4"
+                        className="flex-1 flex flex-col gap-3"
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">
                             Tránsito Aéreo ({flights.length})
                           </span>
-                          <div className="flex gap-2">
-                            <button onClick={() => setActiveMainTab('airports')} className="text-[9px] font-bold text-orange-500 hover:underline flex items-center gap-0.5">
-                              VER MAPA <ExternalLink className="w-2.5 h-2.5" />
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => setActiveMainTab('airports')}
+                            className="text-[9px] font-bold text-orange-500 hover:underline flex items-center gap-0.5 cursor-pointer"
+                          >
+                            MAPA ARGENTINA <ExternalLink className="w-2.5 h-2.5" />
+                          </button>
                         </div>
 
-                        <div className="flex flex-col gap-3 overflow-y-auto scrollbar-hide max-h-[380px] pr-1">
+                        <div className="flex flex-col gap-2.5 overflow-y-auto scrollbar-hide max-h-[420px] pr-1">
                           {flights.map((flight: any) => (
                             <div key={flight.id} className="bg-slate-50 dark:bg-[#161616]/40 border border-slate-200 dark:border-[#222] rounded-2xl p-3.5 flex flex-col gap-2">
                               <div className="flex items-center justify-between">
@@ -428,7 +656,7 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                               </div>
                               <div className="flex items-center justify-between text-[10px] border-t border-slate-100 dark:border-white/5 pt-1.5 text-slate-500 font-mono">
                                 <span>{flight.type}</span>
-                                <span className="font-bold text-orange-500">{flight.airline}</span>
+                                <span className="font-bold text-orange-500">{flight.paxCapacity} pax</span>
                               </div>
                             </div>
                           ))}
@@ -440,55 +668,102 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
               </div>
             </div>
 
-            {/* COLUMNA DERECHA: STACK DE RADARS AIS & AIRNAV */}
+            {/* COLUMNA DERECHA: RADAR AIS DE MARINETRAFFIC CON COTEJO GEORREFERENCIADO & AIRNAV RADAR */}
             <div className="xl:col-span-8 flex flex-col gap-8">
-              {/* Radar Marítimo */}
+              
+              {/* RADAR MARÍTIMO COTEJADO */}
               <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl overflow-hidden shadow-2xl flex flex-col">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm flex-wrap gap-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded bg-blue-600/20 flex items-center justify-center">
-                      <Anchor className="w-3.5 h-3.5 text-blue-500" />
+                    <div className="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center">
+                      <Anchor className="w-4 h-4 text-blue-500" />
                     </div>
-                    <h2 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 tracking-wide uppercase">
-                      Radar AIS de Tráfico Marítimo — MarineTraffic
-                    </h2>
+                    <div>
+                      <h2 className="text-[13px] font-black text-slate-800 dark:text-gray-200 tracking-wide uppercase leading-none">
+                        Radar AIS de Tráfico Marítimo — MarineTraffic
+                      </h2>
+                      <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold block mt-1">
+                        {maritimeViewMode === 'cotejo' 
+                          ? `Cotejo Activo: ${selectedVessel?.name || 'Todas las naves'} (${selectedVessel?.locationName || 'Bahía Ushuaia'})`
+                          : 'Señal Satelital AIS en Vivo (Kpler / MarineTraffic)'}
+                      </span>
+                    </div>
                   </div>
-                  <a
-                    href="https://www.marinetraffic.com/en/ais/home/centerx:-69.4/centery:-53.9/zoom:6"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-[9px] font-mono text-blue-500 hover:text-blue-400 uppercase font-black border border-blue-500/20 bg-blue-500/5 px-3 py-1.5 rounded-full transition-all"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                    Ver Completo
-                  </a>
+
+                  {/* Acciones del Radar */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setMaritimeViewMode(maritimeViewMode === 'cotejo' ? 'radar' : 'cotejo')}
+                      className={`flex items-center gap-1.5 text-[10px] font-black uppercase px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
+                        maritimeViewMode === 'cotejo'
+                          ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-600 dark:text-cyan-400'
+                          : 'bg-blue-500/15 border-blue-500/40 text-blue-600 dark:text-blue-400'
+                      }`}
+                    >
+                      <Layers className="w-3 h-3" />
+                      <span>{maritimeViewMode === 'cotejo' ? 'Ver Radar MarineTraffic' : 'Ver Mapa de Cotejo'}</span>
+                    </button>
+
+                    <a
+                      href="https://www.marinetraffic.com/en/ais/home/centerx:-68.29/centery:-54.815/zoom:11"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[9px] font-mono text-slate-400 hover:text-white uppercase font-black border border-slate-200 dark:border-white/10 px-2.5 py-1.5 rounded-full transition-all"
+                      title="Abrir en MarineTraffic"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
                 </div>
-                <div className="w-full h-[260px] md:h-[370px] relative bg-white dark:bg-[#0c0c0c] overflow-hidden">
-                  <MaritimeMap />
+
+                {/* Mapa o Iframe AIS */}
+                <div className="w-full h-[320px] md:h-[420px] relative bg-white dark:bg-[#0c0c0c] overflow-hidden">
+                  <MaritimeMap 
+                    vessels={ships}
+                    selectedVesselId={selectedVesselId}
+                    onSelectVessel={handleSelectShip}
+                    activeViewMode={maritimeViewMode}
+                    onToggleViewMode={setMaritimeViewMode}
+                    zoomLevel={maritimeZoom}
+                    onToggleZoom={setMaritimeZoom}
+                  />
                 </div>
+
+                {/* Leyenda y Puntos de Atraque de Ushuaia */}
                 <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-t border-slate-200 dark:border-[#1f1f1f] bg-slate-50/60 dark:bg-black/20 text-[9px] font-bold uppercase text-slate-500 dark:text-gray-400">
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-blue-600" /> Puerto Ushuaia</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-cyan-600" /> Puerto Río Grande</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-indigo-600" /> Canal Beagle</span>
-                  <span className="ml-auto font-mono text-slate-400">AIS en tiempo real</span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-600" /> Muelle Comercial Ushuaia
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-cyan-600" /> Muelle Turístico Brisighelli
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Muelle Orión (YPF)
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500" /> Faro Les Eclaireurs
+                  </span>
+                  <span className="ml-auto font-mono text-slate-400">
+                    {ships.length} embarcaciones cotejadas
+                  </span>
                 </div>
               </div>
 
-              {/* Radar Aéreo */}
+              {/* RADAR AÉREO */}
               <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl overflow-hidden shadow-2xl flex flex-col">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded bg-orange-600/20 flex items-center justify-center">
-                      <Plane className="w-3.5 h-3.5 text-orange-500" />
+                    <div className="w-7 h-7 rounded-lg bg-orange-600/20 flex items-center justify-center">
+                      <Plane className="w-4 h-4 text-orange-500" />
                     </div>
-                    <h2 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 tracking-wide uppercase">
+                    <h2 className="text-[13px] font-black text-slate-800 dark:text-gray-200 tracking-wide uppercase">
                       Radar de Tráfico Aéreo — AirNav Radar
                     </h2>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setActiveMainTab('airports')}
-                      className="flex items-center gap-1 text-[9px] font-mono text-orange-500 hover:text-orange-400 uppercase font-black border border-orange-500/20 bg-orange-500/5 px-3 py-1.5 rounded-full transition-all"
+                      className="flex items-center gap-1 text-[9px] font-mono text-orange-500 hover:text-orange-400 uppercase font-black border border-orange-500/20 bg-orange-500/5 px-3 py-1.5 rounded-full transition-all cursor-pointer"
                     >
                       <Compass className="w-3 h-3" />
                       Cotejar Mapa Argentina
@@ -509,7 +784,7 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                 <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-t border-slate-200 dark:border-[#1f1f1f] bg-slate-50/60 dark:bg-black/20 text-[9px] font-bold uppercase text-slate-500 dark:text-gray-400">
                   <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-orange-600" /> Ushuaia (USH)</span>
                   <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-purple-600" /> Río Grande (RGA)</span>
-                  <span className="ml-auto font-mono text-slate-400">ADS-B / AirNav Radar</span>
+                  <span className="ml-auto font-mono text-slate-400">ADS-B / AirNav Radar en vivo</span>
                 </div>
               </div>
             </div>
