@@ -756,9 +756,14 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                     <div className="w-7 h-7 rounded-lg bg-orange-600/20 flex items-center justify-center">
                       <Plane className="w-4 h-4 text-orange-500" />
                     </div>
-                    <h2 className="text-[13px] font-black text-slate-800 dark:text-gray-200 tracking-wide uppercase">
-                      Radar de Tráfico Aéreo — AirNav Radar
-                    </h2>
+                    <div>
+                      <h2 className="text-[13px] font-black text-slate-800 dark:text-gray-200 tracking-wide uppercase leading-none">
+                        Radar de Tráfico Aéreo — FlightAware
+                      </h2>
+                      <span className="text-[10px] text-orange-600 dark:text-orange-400 font-bold block mt-1">
+                        Posicionado en Tierra del Fuego · Espacio Aéreo Ushuaia (SAWH) & Río Grande (SAWE)
+                      </span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -769,22 +774,24 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                       Cotejar Mapa Argentina
                     </button>
                     <a
-                      href="https://es.airnavradar.com/#@-53.73,-68.22,7z"
+                      href="https://es.flightaware.com/live/airport/SAWH"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1 text-[9px] font-mono text-slate-400 hover:text-white uppercase font-black border border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-full transition-all"
+                      title="Abrir en FlightAware Oficial"
                     >
                       <ExternalLink className="w-3 h-3" />
+                      <span>FlightAware</span>
                     </a>
                   </div>
                 </div>
-                <div className="w-full h-[260px] md:h-[370px] relative bg-white dark:bg-[#0c0c0c] overflow-hidden">
+                <div className="w-full h-[280px] md:h-[390px] relative bg-white dark:bg-[#0c0c0c] overflow-hidden">
                   <AirMap />
                 </div>
                 <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-t border-slate-200 dark:border-[#1f1f1f] bg-slate-50/60 dark:bg-black/20 text-[9px] font-bold uppercase text-slate-500 dark:text-gray-400">
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-orange-600" /> Ushuaia (USH)</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-purple-600" /> Río Grande (RGA)</span>
-                  <span className="ml-auto font-mono text-slate-400">ADS-B / AirNav Radar en vivo</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-orange-600" /> Ushuaia (USH / SAWH)</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-purple-600" /> Río Grande (RGA / SAWE)</span>
+                  <span className="ml-auto font-mono text-slate-400">&copy; FlightAware &mdash; Radar aéreo en vivo</span>
                 </div>
               </div>
             </div>
@@ -803,16 +810,29 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
         <div className="flex flex-col gap-6">
           <ArgentinaAirportsMap airports={airports} flights={flights} />
 
-          {/* Tracker complementario de AirNav para cotejo directo */}
+          {/* Tracker complementario de FlightAware para cotejo directo */}
           <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl overflow-hidden shadow-2xl flex flex-col">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-[#1f1f1f]">
               <div className="flex items-center gap-3">
                 <Plane className="w-5 h-5 text-orange-500" />
-                <h3 className="text-sm font-black uppercase text-slate-900 dark:text-white">
-                  Tracker en Tiempo Real para Cotejar — AirNav Radar
-                </h3>
+                <div>
+                  <h3 className="text-sm font-black uppercase text-slate-900 dark:text-white leading-none">
+                    Tracker en Tiempo Real para Cotejar — FlightAware
+                  </h3>
+                  <span className="text-[10px] text-slate-500 dark:text-gray-400 mt-1 block">
+                    Radar limpio de tráfico aéreo posicionado en Tierra del Fuego
+                  </span>
+                </div>
               </div>
-              <span className="text-[10px] font-mono text-slate-400">Vuelos de cabotaje en ruta a TDF</span>
+              <a
+                href="https://es.flightaware.com/live/airport/SAWH"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-[10px] font-mono text-orange-500 hover:text-orange-400 uppercase font-black border border-orange-500/20 bg-orange-500/5 px-3 py-1.5 rounded-full transition-all"
+              >
+                <span>FlightAware</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
             </div>
             <div className="w-full h-[320px] md:h-[420px] relative bg-white dark:bg-[#0c0c0c]">
               <AirMap />
