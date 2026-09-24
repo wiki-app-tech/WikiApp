@@ -156,44 +156,47 @@ function getInstagramFallbackArticles(feed: FeedSource): Article[] {
         ],
         'findelmundo.gob.ar': [
             {
-                title: "🍂 Los colores mágicos del otoño en los senderos del Fin del Mundo",
-                description: "🍂 Los bosques de lengas y ñires pintan el paisaje fueguino de tonalidades cobrizas y carmesí. Ideal para recorrer la Laguna Esmeralda, senderos del Parque Nacional y el Canal Beagle.\n\n⚠️ Recordá registrar tu salida en la app oficial de senderos antes de iniciar tu recorrido.\n\n#FinDelMundo #TierraDelFuego #Ushuaia #TurismoArgentina #VisitArgentina #SenderosTDF",
-                thumbnail: "/images/laguna-esmeralda.jpg",
-                avatarUrl: "/images/cabo-san-pablo.jpg",
+                title: "Sigue vigente el uso obligatorio de cubiertas de invierno en la ruta",
+                description: "🚗 Sigue vigente el uso obligatorio de cubiertas de invierno (con clavos o siliconadas) para transitar por la Ruta Nacional N°3 y caminos provinciales.\n\n❄️ El Operativo Invierno Seguro continúa activo para resguardar la seguridad vial en toda la provincia.\n\n📞 Ante cualquier emergencia vial comunicarse al 911 (Bomberos/Policías) o 107 (Emergencias médicas).\n\n#GobiernoTDF #OperativoInvierno #SeguridadVial #Ruta3 #TierraDelFuego #Ushuaia #Tolhuin #RioGrande",
+                thumbnail: "/images/instagram/findelmundo_post1_cubiertas.jpg",
+                avatarUrl: "/images/instagram/findelmundo_avatar.jpg",
                 link: "https://www.instagram.com/findelmundo.gob.ar"
             },
             {
-                title: "❄️ Preparativos en marcha para la temporada de nieve en Tierra del Fuego",
-                description: "🏔️ Pistas de esquí alpino en Cerro Castor, circuitos de fondo en los valles y paseos con raquetas en los centros invernales de Tierra del Fuego. ¡Te esperamos para vivir el verdadero invierno austral!\n\n#Nieve #CerroCastor #InviernoTDF #Ushuaia #FinDelMundo",
-                thumbnail: "/images/glaciar-martial.jpg",
-                avatarUrl: "/images/cabo-san-pablo.jpg",
+                title: "#JuegosFueguinos: Gran participación juvenil en las instancias provinciales",
+                description: "🏆 ¡Pusimos tres disciplinas en marcha! Con gran entusiasmo y espíritu deportivo, cientos de jóvenes de Río Grande, Tolhuin y Ushuaia compiten en las finales provinciales de los #JuegosFueguinos.\n\n👏 Felicitaciones a todos los equipos, entrenadores y familias que acompañan el desarrollo del deporte fueguino.\n\n#JuegosFueguinos2026 #DeporteFueguino #Juventudes #TierraDelFuego #SomosTDF",
+                thumbnail: "/images/instagram/findelmundo_post2_juegos.jpg",
+                avatarUrl: "/images/instagram/findelmundo_avatar.jpg",
                 link: "https://www.instagram.com/findelmundo.gob.ar"
             },
             {
-                title: "🐧 Navegaciones en el Canal Beagle y circuito Faro Les Eclaireurs",
-                description: "Una experiencia inolvidable recorriendo las colonias de lobos marinos y aves australes en el mítico canal que une dos océanos en el confín del planeta.\n\n#CanalBeagle #FaroFinDelMundo #TDF #Turismo #Patagonia",
-                thumbnail: "/images/senda-costera.jpg",
-                avatarUrl: "/images/cabo-san-pablo.jpg",
+                title: "🎉 Día del Estudiante: Modo ON con festivales y actividades en toda la provincia",
+                description: "✌️ ¡Modo ON para el Día del Estudiante y la Primavera en Tierra del Fuego!\n\n🎶 Música en vivo, competencias urbanas, talleres y espacios de recreación para las juventudes fueguinas en Ushuaia y Río Grande.\n\n#DiaDelEstudiante #PrimaveraTDF #JuventudesTDF #FinDelMundo #TierraDelFuego",
+                thumbnail: "/images/instagram/findelmundo_post3_estudiante.jpg",
+                avatarUrl: "/images/instagram/findelmundo_avatar.jpg",
                 link: "https://www.instagram.com/findelmundo.gob.ar"
             }
         ],
         'justiciatdf': [
             {
-                title: "⚖️ Concurso público de antecedentes y oposición en Distritos Norte y Sur",
-                description: "⚖️ El Superior Tribunal de Justicia de Tierra del Fuego informa la apertura del concurso de antecedentes y oposición para cubrir cargos técnicos y jurisdiccionales en Ushuaia y Río Grande.\n\n📄 Las bases y el formulario digital están disponibles en www.justierradelfuego.gov.ar.\n\n#PoderJudicial #JusticiaTDF #ConcursoPublico #STJ #TierraDelFuego",
-                thumbnail: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&auto=format&fit=crop&q=80",
+                title: "1° Encuentro del Observatorio de Jurisprudencia Penal: del precedente a la práctica",
+                description: "⚖️ La Escuela Judicial del Poder Judicial de Tierra del Fuego invita al «1° Encuentro del Observatorio de Jurisprudencia Penal: del precedente a la práctica».\n\n👨‍🏫 A cargo del Dr. Daniel Yakke Araque Santilli (Secretario de Primera Instancia del Juzgado de Instrucción N°1 DJS).\n\n📍 Modalidad Presencial:\n• Ushuaia: Jueves 10 de Septiembre, 14:30 hs (Salón de Actos Conrado Witthaus)\n• Río Grande: Viernes 02 de Octubre, 14:30 hs (SUM Cámara de Apelaciones)\n\n📩 Consultas e inscripciones: escuelajudicial@justierradelfuego.gov.ar\n\n#PoderJudicialTDF #EscuelaJudicial #JurisprudenciaPenal #CapacitacionJudicial #JusticiaTDF",
+                thumbnail: "/images/instagram/justiciatdf_post1_observatorio.jpg",
+                avatarUrl: "/images/instagram/justiciatdf_avatar.jpg",
                 link: "https://www.instagram.com/justiciatdf"
             },
             {
-                title: "🏛️ Modernización digital del expediente electrónico y mediación judicial",
-                description: "Avanza la digitalización integral de procesos con nuevas herramientas de firma electrónica y notificaciones automáticas para optimizar los tiempos de resolución ciudadana.\n\n#JusticiaAbierta #ModernizacionJudicial #TierraDelFuego #STJ",
-                thumbnail: "https://images.unsplash.com/photo-1450133064473-71024230f91b?w=800&auto=format&fit=crop&q=80",
+                title: "Observatorio de Jurisprudencia Penal: Del precedente a la práctica en los Tribunales",
+                description: "🏛️ Con gran convocatoria de magistrados, funcionarios, abogados de la matrícula y personal judicial, se llevó adelante la jornada técnica de análisis jurisprudencial penal en la sede de Ushuaia.\n\nEl encuentro profundizó en el valor del precedente normativo y las resoluciones de tribunales orales.\n\n#JusticiaTDF #PoderJudicial #Jurisprudencia #EscuelaJudicial #TierraDelFuego",
+                thumbnail: "/images/instagram/justiciatdf_post2_disertacion.jpg",
+                avatarUrl: "/images/instagram/justiciatdf_avatar.jpg",
                 link: "https://www.instagram.com/justiciatdf"
             },
             {
-                title: "📢 Programa de Acceso a la Justicia en barrios de Tolhuin y Río Grande",
-                description: "Equipos móviles de la Dirección de Mediación y Defensorías Públicas brindaron orientación legal comunitaria gratuita a vecinos en centros barriales de la provincia.\n\n#AccesoALaJusticia #MediacionComunitaria #TDF #PoderJudicial",
-                thumbnail: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80",
+                title: "15 de Septiembre: Día de la Magistratura y la Función Judicial",
+                description: "⚖️ En el Día de la Magistratura y de la Función Judicial, saludamos a quienes integran este Poder Judicial con compromiso, vocación republicana y responsabilidad al servicio de la comunidad fueguina.\n\n«Compromiso, vocación y responsabilidad al servicio de la Justicia».\n\n#DiaDeLaMagistratura #PoderJudicial #JusticiaTDF #TierraDelFuego",
+                thumbnail: "/images/instagram/justiciatdf_post3_magistratura.jpg",
+                avatarUrl: "/images/instagram/justiciatdf_avatar.jpg",
                 link: "https://www.instagram.com/justiciatdf"
             }
         ]

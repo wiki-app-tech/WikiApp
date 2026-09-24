@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ExternalLink, 
@@ -14,7 +14,10 @@ import {
   PlusCircle, 
   X, 
   ChevronDown, 
-  ChevronUp
+  ChevronUp,
+  RefreshCw,
+  Send,
+  CheckCircle2
 } from 'lucide-react';
 import type { Article, FeedSource } from '@/types';
 
@@ -40,17 +43,123 @@ interface InstagramFeedProps {
 }
 
 export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedProps) {
+  const [liveArticles, setLiveArticles] = useState<Article[]>(articles);
   const [selectedAccount, setSelectedAccount] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [lastSyncTime, setLastSyncTime] = useState<Date>(new Date());
+
+  // Formulario para publicar nuevo post al instante
+  const [postAccount, setPostAccount] = useState<string>('la_gentetv');
+  const [postTitle, setPostTitle] = useState<string>('');
+  const [postDescription, setPostDescription] = useState<string>('');
+  const [postThumbnail, setPostThumbnail] = useState<string>('');
+  const [isSubmittingPost, setIsSubmittingPost] = useState<boolean>(false);
+  const [postSuccessMsg, setPostSuccessMsg] = useState<string | null>(null);
+
+  // Actualizar si las props iniciales cambian
+  useEffect(() => {
+    if (articles && articles.length > 0) {
+      setLiveArticles(articles);
+    }
+  }, [articles]);
+
+  // Sincronización automática periódica con /api/instagram
+  const syncInstagramFeed = useCallback(async (silent = true) => {
+    if (!silent) setIsRefreshing(true);
+    try {
+      const res = await fetch('/api/instagram', { cache: 'no-store' });
+      if (!res.ok) throw new Error('Network error');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.articles) && data.articles.length > 0) {
+        setLiveArticles(prev => {
+          const nonIg = prev.filter(
+            a => a.sourceType !== 'instagram' && !a.sourceId?.startsWith('instagram-') && !a.id?.startsWith('ig-')
+          );
+          return [...data.articles, ...nonIg];
+        });
+        setLastSyncTime(new Date());
+      }
+    } catch (err) {
+      console.warn('Auto-update sync warning:', err);
+    } finally {
+      if (!silent) setIsRefreshing(false);
+    }
+  }, []);
+
+  // Intervalo de auto-actualización cada 45 segundos + listener cuando el usuario vuelve a la pestaña
+  useEffect(() => {
+    const timer = setInterval(() => {
+      syncInstagramFeed(true);
+    }, 45000);
+
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        syncInstagramFeed(true);
+      }
+    };
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibility);
+    }
+
+    return () => {
+      clearInterval(timer);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibility);
+      }
+    };
+  }, [syncInstagramFeed]);
+
+  const handlePublishNewPost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!postTitle.trim()) return;
+
+    setIsSubmittingPost(true);
+    setPostSuccessMsg(null);
+
+    try {
+      const res = await fetch('/api/instagram', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: postAccount,
+          title: postTitle.trim(),
+          description: postDescription.trim() || postTitle.trim(),
+          thumbnail: postThumbnail.trim() || undefined,
+          pubDate: new Date().toISOString()
+        })
+      });
+
+      const data = await res.json();
+      if (data.success && data.article) {
+        setLiveArticles(prev => [data.article, ...prev]);
+        setPostSuccessMsg(`¡Publicación de @${postAccount} actualizada y visible al instante!`);
+        setPostTitle('');
+        setPostDescription('');
+        setPostThumbnail('');
+        setTimeout(() => {
+          setShowAddModal(false);
+          setPostSuccessMsg(null);
+        }, 1800);
+      }
+    } catch (err: any) {
+      console.error('Error publishing instagram post:', err);
+    } finally {
+      setIsSubmittingPost(false);
+    }
+  };
 
   // Filtrar solo artículos provenientes de Instagram ordenados por fecha más reciente
   const instagramArticles = useMemo(() => {
-    const list = articles.filter(a => a.sourceType === 'instagram' || a.sourceId.startsWith('instagram-'));
+    const list = liveArticles.filter(
+      a => a.sourceType === 'instagram' || a.sourceId?.startsWith('instagram-') || a.id?.startsWith('ig-')
+    );
     return list.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-  }, [articles]);
+  }, [liveArticles]);
 
   // Lista única de cuentas disponibles para las pestañas de filtro
   const accounts = useMemo(() => {
@@ -170,18 +279,29 @@ export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedPro
           </div>
         </div>
 
-        <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold">
+        <div className="flex items-center gap-2.5 w-full md:w-auto justify-end flex-wrap">
+          <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold shadow-sm">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Sincronizado</span>
+            <span className="hidden sm:inline">Auto-actualización (45s)</span>
+            <span className="sm:hidden">En Vivo</span>
           </div>
 
           <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:opacity-90 transition-opacity shadow-sm"
+            onClick={() => syncInstagramFeed(false)}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border border-slate-200 dark:border-white/10 hover:border-rose-500/30 text-slate-700 dark:text-gray-200 bg-white dark:bg-white/5 hover:bg-rose-500/5 active:scale-95 transition-all shadow-sm"
+            title="Sincronizar y verificar nuevos posteos de Instagram"
           >
-            <PlusCircle className="w-4 h-4" />
-            <span>Agregar Cuentas</span>
+            <RefreshCw className={`w-3.5 h-3.5 text-rose-500 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>{isRefreshing ? 'Sincronizando...' : 'Actualizar'}</span>
+          </button>
+
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:opacity-90 active:scale-95 transition-all shadow-sm"
+          >
+            <PlusCircle className="w-4 h-4 text-rose-500" />
+            <span>Publicar / Sincronizar</span>
           </button>
         </div>
       </header>
@@ -259,11 +379,12 @@ export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedPro
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredArticles.map((art) => {
+          {filteredArticles.map((art, idx) => {
             const username = art.username || art.sourceId.replace('instagram-', '');
             const isExpanded = !!expandedCards[art.id];
             const isLongText = (art.description || '').length > 150;
             const postUrl = art.link || `https://www.instagram.com/${username}`;
+            const isNewest = idx === 0 && selectedAccount === 'all' && !searchQuery;
 
             return (
               <motion.article
@@ -272,7 +393,11 @@ export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedPro
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className="group flex flex-col bg-white dark:bg-[#141416] border border-slate-200/90 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300"
+                className={`group flex flex-col bg-white dark:bg-[#141416] border rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ${
+                  isNewest
+                    ? 'border-rose-500/60 ring-2 ring-rose-500/20 shadow-rose-500/10'
+                    : 'border-slate-200/90 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'
+                }`}
               >
                 {/* CABECERA DE LA TARJETA */}
                 <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.01]">
@@ -305,7 +430,13 @@ export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedPro
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
+                    {isNewest && (
+                      <span className="hidden sm:inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-full">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                        Más Reciente
+                      </span>
+                    )}
                     <span className="text-[11px] text-slate-400 dark:text-gray-500 font-mono shrink-0">
                       {formatPostDate(art.pubDate)}
                     </span>
@@ -434,7 +565,7 @@ export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedPro
         </div>
       )}
 
-      {/* 4. MODAL / GUÍA PARA AGREGAR MÁS CUENTAS PÚBLICAS */}
+      {/* 4. MODAL / PUBLICAR O AGREGAR CUENTAS PÚBLICAS */}
       <AnimatePresence>
         {showAddModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
@@ -450,12 +581,19 @@ export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedPro
             >
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center">
-                    <PlusCircle className="w-5 h-5" />
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-[2px] shadow-sm">
+                    <div className="w-full h-full bg-white dark:bg-[#141416] rounded-[14px] flex items-center justify-center">
+                      <InstagramIcon className="w-5 h-5 text-rose-500" />
+                    </div>
                   </div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                    Cómo agregar más cuentas de Instagram
-                  </h3>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                      Actualización de Instagram en Vivo
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-gray-400">
+                      Publicá un posteo al instante o configurá nuevas cuentas públicas.
+                    </p>
+                  </div>
                 </div>
                 <button
                   onClick={() => setShowAddModal(false)}
@@ -465,39 +603,99 @@ export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedPro
                 </button>
               </div>
 
-              <div className="text-xs text-slate-600 dark:text-gray-300 space-y-3 leading-relaxed">
-                <p>
-                  Para agregar nuevas cuentas públicas a esta sección, solo debes añadir un nuevo bloque dentro del archivo <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-rose-500 font-mono">public/data/feeds.json</code>:
-                </p>
-
-                <div className="bg-slate-900 text-slate-200 p-3.5 rounded-2xl font-mono text-[11px] overflow-x-auto border border-white/10">
-{`{
-  "id": "instagram-nombrecuenta",
-  "name": "Nombre de la Cuenta",
-  "username": "usuario_instagram",
-  "url": "https://openrss.org/instagram.com/usuario_instagram",
-  "type": "instagram",
-  "scope": "provincial",
-  "category": "noticias"
-}`}
+              {postSuccessMsg ? (
+                <div className="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex flex-col items-center justify-center text-center gap-2">
+                  <CheckCircle2 className="w-10 h-10 text-emerald-500 animate-bounce" />
+                  <h4 className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                    {postSuccessMsg}
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-gray-400">
+                    El post ya está colocado en la primera posición de la grilla.
+                  </p>
                 </div>
+              ) : (
+                <form onSubmit={handlePublishNewPost} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-700 dark:text-gray-300">
+                      Cuenta emisora
+                    </label>
+                    <select
+                      value={postAccount}
+                      onChange={(e) => setPostAccount(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/40"
+                    >
+                      <option value="la_gentetv">@la_gentetv (La Gente TV)</option>
+                      <option value="findelmundo.gob.ar">@findelmundo.gob.ar (Gobierno TDF)</option>
+                      <option value="justiciatdf">@justiciatdf (Poder Judicial TDF)</option>
+                    </select>
+                  </div>
 
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-3.5 flex items-start gap-2.5 text-amber-700 dark:text-amber-400 text-[11px]">
-                  <Info className="w-4 h-4 shrink-0 mt-0.5" />
-                  <span>
-                    <strong>Requisito clave</strong>: La cuenta debe ser <strong>100% pública</strong> para que los motores RSS puedan indexar sus fotos y textos sin requerir inicio de sesión.
-                  </span>
-                </div>
-              </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-700 dark:text-gray-300">
+                      Titular o extracto principal
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ej: Nuevo operativo de seguridad vial en Ruta 3"
+                      value={postTitle}
+                      onChange={(e) => setPostTitle(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/40"
+                    />
+                  </div>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-white/5 flex justify-end">
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="px-5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-900"
-                >
-                  Entendido
-                </button>
-              </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-700 dark:text-gray-300">
+                      Texto / Copy completo (con hashtags)
+                    </label>
+                    <textarea
+                      rows={3}
+                      placeholder="Escribí el contenido del posteo tal cual fue publicado en Instagram..."
+                      value={postDescription}
+                      onChange={(e) => setPostDescription(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/40 resize-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-700 dark:text-gray-300">
+                      Imagen o foto (URL o ruta local, opcional)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Ej: /images/instagram/findelmundo_post1_cubiertas.jpg o URL web"
+                      value={postThumbnail}
+                      onChange={(e) => setPostThumbnail(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/40"
+                    />
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-between gap-3">
+                    <span className="text-[11px] text-slate-400 dark:text-gray-500 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Se publica al tope en vivo
+                    </span>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmittingPost || !postTitle.trim()}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white shadow-md shadow-rose-500/20 disabled:opacity-50 transition-all active:scale-95"
+                    >
+                      {isSubmittingPost ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          <span>Publicando...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-3.5 h-3.5" />
+                          <span>Publicar y Sincronizar</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
             </motion.div>
           </div>
         )}

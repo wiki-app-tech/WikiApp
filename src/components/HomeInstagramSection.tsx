@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { 
   ExternalLink, 
@@ -10,7 +10,9 @@ import {
   Sparkles, 
   ChevronRight,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  RefreshCw,
+  Radio
 } from 'lucide-react';
 import type { Article } from '@/types';
 
@@ -36,15 +38,74 @@ interface HomeInstagramSectionProps {
 }
 
 export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeInstagramSectionProps) {
+  const [liveArticles, setLiveArticles] = useState<Article[]>(articles);
   const [selectedAccount, setSelectedAccount] = useState<string>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [lastSyncTime, setLastSyncTime] = useState<Date>(new Date());
+
+  // Actualizar si las props iniciales cambian
+  useEffect(() => {
+    if (articles && articles.length > 0) {
+      setLiveArticles(articles);
+    }
+  }, [articles]);
+
+  // Sincronización automática periódica con /api/instagram
+  const syncInstagramFeed = useCallback(async (silent = true) => {
+    if (!silent) setIsRefreshing(true);
+    try {
+      const res = await fetch('/api/instagram', { cache: 'no-store' });
+      if (!res.ok) throw new Error('Network error');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.articles) && data.articles.length > 0) {
+        setLiveArticles(prev => {
+          const nonIg = prev.filter(
+            a => a.sourceType !== 'instagram' && !a.sourceId?.startsWith('instagram-') && !a.id?.startsWith('ig-')
+          );
+          return [...data.articles, ...nonIg];
+        });
+        setLastSyncTime(new Date());
+      }
+    } catch (err) {
+      console.warn('Auto-update sync warning:', err);
+    } finally {
+      if (!silent) setIsRefreshing(false);
+    }
+  }, []);
+
+  // Intervalo de auto-actualización cada 45 segundos + listener cuando el usuario vuelve a la pestaña activa
+  useEffect(() => {
+    const timer = setInterval(() => {
+      syncInstagramFeed(true);
+    }, 45000);
+
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        syncInstagramFeed(true);
+      }
+    };
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibility);
+    }
+
+    return () => {
+      clearInterval(timer);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibility);
+      }
+    };
+  }, [syncInstagramFeed]);
 
   // Filtrar solo artículos de Instagram ordenados estrictamente por fecha más reciente
   const instagramArticles = useMemo(() => {
-    const list = articles.filter(a => a.sourceType === 'instagram' || (a.sourceId && a.sourceId.startsWith('instagram-')));
+    const list = liveArticles.filter(
+      a => a.sourceType === 'instagram' || (a.sourceId && a.sourceId.startsWith('instagram-')) || a.id?.startsWith('ig-')
+    );
     return list.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-  }, [articles]);
+  }, [liveArticles]);
 
   // Lista única de cuentas
   const accounts = useMemo(() => {
@@ -164,13 +225,25 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
           </div>
         </div>
 
-        <button
-          onClick={onViewFullFeed}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white shadow-md shadow-rose-500/20 hover:shadow-lg transition-all group shrink-0"
-        >
-          <span>Ver Módulo Completo</span>
-          <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
-        </button>
+        <div className="flex items-center gap-2.5 shrink-0 w-full md:w-auto justify-end">
+          <button
+            onClick={() => syncInstagramFeed(false)}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border border-slate-200 dark:border-white/10 hover:border-rose-500/30 text-slate-700 dark:text-gray-200 bg-white dark:bg-white/5 hover:bg-rose-500/5 active:scale-95 transition-all shadow-sm"
+            title="Sincronizar y verificar nuevos posteos de Instagram"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-rose-500 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">{isRefreshing ? 'Sincronizando...' : 'Actualizar'}</span>
+          </button>
+
+          <button
+            onClick={onViewFullFeed}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white shadow-md shadow-rose-500/20 hover:shadow-lg transition-all group shrink-0"
+          >
+            <span>Ver Módulo Completo</span>
+            <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
       </div>
 
       {/* 2. CHIPS DE FILTRO POR CUENTA */}
@@ -212,11 +285,12 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
 
       {/* 3. GRILLA DE TARJETAS DE INSTAGRAM EN HOME */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {displayedArticles.map(art => {
+        {displayedArticles.map((art, idx) => {
           const username = art.username || art.sourceId.replace('instagram-', '');
           const isExpanded = !!expandedCards[art.id];
           const isLongText = (art.description || '').length > 140;
           const postUrl = art.link || `https://www.instagram.com/${username}`;
+          const isNewest = idx === 0 && selectedAccount === 'all';
 
           return (
             <motion.article
@@ -225,7 +299,11 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25 }}
-              className="group flex flex-col bg-white dark:bg-[#14161b] border border-slate-200/90 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-rose-500/30 transition-all duration-300"
+              className={`group flex flex-col bg-white dark:bg-[#14161b] border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ${
+                isNewest
+                  ? 'border-rose-500/50 ring-1 ring-rose-500/20 shadow-rose-500/5'
+                  : 'border-slate-200/90 dark:border-white/10 hover:border-rose-500/30'
+              }`}
             >
               {/* CABECERA DE LA TARJETA */}
               <div className="p-3.5 flex items-center justify-between border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.01]">
@@ -249,9 +327,17 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
                   </div>
                 </div>
 
-                <span className="text-[10px] font-medium text-slate-400 dark:text-gray-500 font-mono shrink-0">
-                  {formatPostDate(art.pubDate)}
-                </span>
+                <div className="flex items-center gap-2 shrink-0">
+                  {isNewest && (
+                    <span className="hidden sm:inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-full">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                      Más Reciente
+                    </span>
+                  )}
+                  <span className="text-[10px] font-medium text-slate-400 dark:text-gray-500 font-mono">
+                    {formatPostDate(art.pubDate)}
+                  </span>
+                </div>
               </div>
 
               {/* IMAGEN PRINCIPAL */}
