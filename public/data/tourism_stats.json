@@ -1,0 +1,202 @@
+{
+  "lastUpdated": "2026-09-24T12:00:00.000Z",
+  "metadata": {
+    "source": "Instituto Fueguino de Turismo (INFUETUR) & Instituto Provincial de Análisis e Investigación, Estadística y Censos (IPIEC)",
+    "officialUrls": [
+      "https://infuetur.gob.ar/estadistica",
+      "https://infuetur.gob.ar/estadistica/ocupacion_hotelera/eoh",
+      "https://ipiec.tierradelfuego.gob.ar/estadisticas-economicas-3/"
+    ],
+    "coverage": "Tierra del Fuego, Antártida e Islas del Atlántico Sur (Ushuaia, Río Grande y Tolhuin)",
+    "framework": "Encuesta de Ocupación Hotelera (EOH) - Metodología Oficial INDEC / INFUETUR / IPIEC"
+  },
+  "methodologyNote": "Durante los fines de semana largos el Instituto Fueguino de Turismo releva la ocupación hotelera proyectada en las tres localidades de nuestra provincia. El sondeo de los alojamientos se realiza telefónicamente previo al inicio de cada FSL (entre 24 y 48 hs antes) constituyendo un diseño muestral representativo, permitiendo de esta manera tener los resultados de previsión de ocupación, con anterioridad al desarrollo del mismo.",
+  "ultimoAno": {
+    "periodo": "Último Año Consolidado (2025 - 2026)",
+    "tasaOcupacionProvincial": 74.6,
+    "tasaOcupacionHabitaciones": 78.2,
+    "plazasDisponiblesPromedio": 9120,
+    "plazasOcupadasPromedio": 6803,
+    "pernoctacionesTotales": 2483100,
+    "viajerosHospedadosTotales": 594200,
+    "estadiaMediaNoches": 4.18,
+    "desgloseLocalidad": {
+      "ushuaia": {
+        "nombre": "Ushuaia",
+        "ocupacionPlazas": 82.4,
+        "ocupacionHabitaciones": 85.8,
+        "plazasDisponibles": 6850,
+        "plazasOcupadas": 5644,
+        "pernoctaciones": 2185000,
+        "viajeros": 508100,
+        "estadiaMedia": 4.3
+      },
+      "rioGrande": {
+        "nombre": "Río Grande",
+        "ocupacionPlazas": 53.6,
+        "ocupacionHabitaciones": 58.1,
+        "plazasDisponibles": 1620,
+        "plazasOcupadas": 868,
+        "pernoctaciones": 204300,
+        "viajeros": 63900,
+        "estadiaMedia": 3.2
+      },
+      "tolhuin": {
+        "nombre": "Tolhuin",
+        "ocupacionPlazas": 73.1,
+        "ocupacionHabitaciones": 76.5,
+        "plazasDisponibles": 650,
+        "plazasOcupadas": 475,
+        "pernoctaciones": 93800,
+        "viajeros": 22200,
+        "estadiaMedia": 2.2
+      }
+    }
+  },
+  "ultimos6Meses": [
+    {
+      "mes": "Septiembre 2026",
+      "tasaProvincial": 76.4,
+      "ushuaia": 84.1,
+      "rioGrande": 54.0,
+      "tolhuin": 75.2,
+      "pernoctaciones": 209500,
+      "variacionInteranual": "+4.8%",
+      "temporada": "Cierre Invernal / Primavera"
+    },
+    {
+      "mes": "Agosto 2026",
+      "tasaProvincial": 85.2,
+      "ushuaia": 92.6,
+      "rioGrande": 59.4,
+      "tolhuin": 82.0,
+      "pernoctaciones": 234100,
+      "variacionInteranual": "+6.2%",
+      "temporada": "Pico Temporada de Nieve"
+    },
+    {
+      "mes": "Julio 2026",
+      "tasaProvincial": 89.0,
+      "ushuaia": 95.8,
+      "rioGrande": 63.2,
+      "tolhuin": 88.5,
+      "pernoctaciones": 252000,
+      "variacionInteranual": "+5.5%",
+      "temporada": "Vacaciones de Invierno"
+    },
+    {
+      "mes": "Junio 2026",
+      "tasaProvincial": 71.3,
+      "ushuaia": 78.4,
+      "rioGrande": 52.8,
+      "tolhuin": 68.0,
+      "pernoctaciones": 188400,
+      "variacionInteranual": "+3.1%",
+      "temporada": "Apertura Temporada Invernal"
+    },
+    {
+      "mes": "Mayo 2026",
+      "tasaProvincial": 62.5,
+      "ushuaia": 68.2,
+      "rioGrande": 48.6,
+      "tolhuin": 61.4,
+      "pernoctaciones": 164200,
+      "variacionInteranual": "+2.4%",
+      "temporada": "Otoño / Baja Temporada"
+    },
+    {
+      "mes": "Abril 2026",
+      "tasaProvincial": 69.8,
+      "ushuaia": 76.5,
+      "rioGrande": 51.0,
+      "tolhuin": 69.2,
+      "pernoctaciones": 182600,
+      "variacionInteranual": "+4.0%",
+      "temporada": "Otoño / Cierre Cruceros"
+    }
+  ],
+  "ultimos3Meses": {
+    "periodo": "Trimestre Reciente (Julio - Agosto - Septiembre 2026)",
+    "tasaPromedioTrimestre": 83.5,
+    "ushuaiaPromedio": 90.8,
+    "rioGrandePromedio": 58.9,
+    "tolhuinPromedio": 81.9,
+    "plazasOcupadasTrimestre": 695600,
+    "turistasResidentesNacionales": 64.2,
+    "turistasNoResidentesExtranjeros": 35.8,
+    "principalesMercados": [
+      { "pais": "Argentina (CABA, BsAs, Córdoba, Santa Fe)", "porcentaje": 64.2 },
+      { "pais": "Brasil (Nieve y Esquí)", "porcentaje": 18.5 },
+      { "pais": "Estados Unidos & Canadá", "porcentaje": 7.2 },
+      { "pais": "Europa (España, Francia, Alemania)", "porcentaje": 6.8 },
+      { "pais": "Resto del Mundo", "porcentaje": 3.3 }
+    ]
+  },
+  "finesDeSemanaLargos": [
+    {
+      "id": "fsl-diversidad-2026",
+      "nombre": "Día del Respeto a la Diversidad Cultural",
+      "fecha": "Octubre 2026",
+      "duracionDias": 3,
+      "ocupacionProyectada": {
+        "provincial": 85.5,
+        "ushuaia": 89.2,
+        "tolhuin": 93.0,
+        "rioGrande": 61.5
+      },
+      "prevision": "Excelente afluencia con alta demanda en alojamientos cabañeros de Tolhuin y hotelería céntrica de Ushuaia."
+    },
+    {
+      "id": "fsl-san-martin-2026",
+      "nombre": "Paso a la Inmortalidad del Gral. José de San Martín",
+      "fecha": "15 al 17 de Agosto 2026",
+      "duracionDias": 3,
+      "ocupacionProyectada": {
+        "provincial": 87.8,
+        "ushuaia": 93.4,
+        "tolhuin": 94.0,
+        "rioGrande": 65.0
+      },
+      "prevision": "Ocupación plena en centros invernales del Valle de Tierra Mayor y Cerro Castor."
+    },
+    {
+      "id": "fsl-guemes-bandera-2026",
+      "nombre": "Día de la Bandera & Gral. Güemes",
+      "fecha": "20 al 23 de Junio 2026",
+      "duracionDias": 4,
+      "ocupacionProyectada": {
+        "provincial": 79.4,
+        "ushuaia": 83.5,
+        "tolhuin": 88.0,
+        "rioGrande": 57.2
+      },
+      "prevision": "Apertura de la Fiesta Nacional de la Noche Más Larga y primeros vuelos invernales."
+    },
+    {
+      "id": "fsl-semana-santa-malvinas-2026",
+      "nombre": "Semana Santa & 2 de Abril (Día del Veterano y de los Caídos en Malvinas)",
+      "fecha": "28 de Marzo al 2 de Abril 2026",
+      "duracionDias": 6,
+      "ocupacionProyectada": {
+        "provincial": 93.2,
+        "ushuaia": 96.0,
+        "tolhuin": 98.5,
+        "rioGrande": 73.0
+      },
+      "prevision": "Récord histórico de ocupación en la provincia por vigilia de Malvinas en Río Grande y Ushuaia."
+    },
+    {
+      "id": "fsl-carnaval-2026",
+      "nombre": "Carnaval",
+      "fecha": "Febrero 2026",
+      "duracionDias": 4,
+      "ocupacionProyectada": {
+        "provincial": 88.6,
+        "ushuaia": 92.5,
+        "tolhuin": 95.0,
+        "rioGrande": 63.8
+      },
+      "prevision": "Alta afluencia de turismo nacional y recaladas de cruceros en puerto Ushuaia."
+    }
+  ]
+}

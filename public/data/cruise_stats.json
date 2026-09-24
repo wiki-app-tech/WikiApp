@@ -1,0 +1,127 @@
+{
+  "lastUpdated": "2026-09-24T12:00:00.000Z",
+  "fuente": "Instituto Fueguino de Turismo (INFUETUR) & Dirección Provincial de Puertos (DPP)",
+  "urlOficial": "https://infuetur.gob.ar/estadistica/temporada_de_cruceros",
+  "temporada": {
+    "nombre": "Temporada Oficial de Cruceros Ushuaia (Octubre - Abril)",
+    "periodo": "2026 - 2027",
+    "totalRecaladasEstimadas": 592,
+    "totalPasajerosYTripulantes": 254800,
+    "muellePrincipal": "Muelle Comercial Ushuaia (Longitud 420m - Doble frente de atraque)",
+    "distribucionSegmentos": [
+      {
+        "tipo": "Cruceros Antárticos (Expedición)",
+        "recaladas": 428,
+        "porcentaje": 72.3,
+        "descripcion": "Buques polares clase hielo con destino a la Península Antártica, Islas Shetland del Sur y Mar de Weddell.",
+        "color": "#2563eb"
+      },
+      {
+        "tipo": "Cruceros Bioceánicos",
+        "recaladas": 114,
+        "porcentaje": 19.3,
+        "descripcion": "Travesías interoceánicas entre Buenos Aires, Cabo de Hornos, Canal Beagle y Valparaíso.",
+        "color": "#0e7490"
+      },
+      {
+        "tipo": "Cruceros No Antárticos / Regionales",
+        "recaladas": 50,
+        "porcentaje": 8.4,
+        "descripcion": "Rutas costeras patagónicas e Islas del Atlántico Sur.",
+        "color": "#7c3aed"
+      }
+    ],
+    "buquesDestacados": [
+      {
+        "id": "stella-australis",
+        "name": "Stella Australis",
+        "type": "Crucero de Expedición Bioceánico",
+        "flag": "Chile 🇨🇱",
+        "agencyName": "Australis Patagonia",
+        "agencyUrl": "https://www.australis.com/",
+        "paxCapacity": 210,
+        "lengthMeters": 89,
+        "speed": "12.4 nudos",
+        "destination": "Canal Beagle / Cabo de Hornos",
+        "status": "En Puerto",
+        "time": "Arribado 07:15",
+        "image": "https://images.unsplash.com/photo-1548574505-5e239809ee19?w=600&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": "le-commandant-charcot",
+        "name": "Le Commandant Charcot",
+        "type": "Rompehielos Polar Antártico de Lujo",
+        "flag": "Francia 🇫🇷",
+        "agencyName": "Ponant Expeditions",
+        "agencyUrl": "https://www.ponant.com/",
+        "paxCapacity": 245,
+        "lengthMeters": 150,
+        "speed": "14.8 nudos",
+        "destination": "Península Antártica",
+        "status": "Arribando",
+        "time": "ETA 14:30",
+        "image": "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=600&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": "ultramarine",
+        "name": "Ultramarine",
+        "type": "Crucero Polar Avanzado",
+        "flag": "Islas Marshall 🇲🇭",
+        "agencyName": "Quark Expeditions",
+        "agencyUrl": "https://www.quarkexpeditions.com/",
+        "paxCapacity": 199,
+        "lengthMeters": 128,
+        "speed": "15.1 nudos",
+        "destination": "Base Esperanza / Antártida",
+        "status": "En Fondeo",
+        "time": "Fondeado Bahía Ushuaia",
+        "image": "https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=600&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": "world-navigator",
+        "name": "World Navigator",
+        "type": "Crucero Bioceánico & Antártico",
+        "flag": "Portugal 🇵🇹",
+        "agencyName": "Atlas Ocean Voyages",
+        "agencyUrl": "https://www.atlasoceanvoyages.com/",
+        "paxCapacity": 196,
+        "lengthMeters": 126,
+        "speed": "13.5 nudos",
+        "destination": "Canal Beagle / Ushuaia",
+        "status": "En Navegación",
+        "time": "ETA Mañana 08:00",
+        "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": "ezequiel-ms",
+        "name": "Ezequiel MS",
+        "type": "Catamarán Turístico Beagle",
+        "flag": "Argentina 🇦🇷",
+        "agencyName": "Tolkeyen Patagonia",
+        "agencyUrl": "https://www.tolkeyenpatagonia.com/",
+        "paxCapacity": 90,
+        "lengthMeters": 28,
+        "speed": "18.2 nudos",
+        "destination": "Faro Les Eclaireurs",
+        "status": "En Navegación",
+        "time": "En Excursión",
+        "image": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": "asturiano-ii",
+        "name": "Asturiano II",
+        "type": "Carguero de Abastecimiento",
+        "flag": "Argentina 🇦🇷",
+        "agencyName": "Naviera Sur",
+        "agencyUrl": "https://www.dpp.gob.ar/",
+        "paxCapacity": 20,
+        "lengthMeters": 74,
+        "speed": "10.0 nudos",
+        "destination": "Puerto Ushuaia",
+        "status": "En Puerto",
+        "time": "Descarga de Combustible",
+        "image": "https://images.unsplash.com/photo-1516117172878-fd2c41f4a759?w=600&auto=format&fit=crop&q=80"
+      }
+    ]
+  }
+}
