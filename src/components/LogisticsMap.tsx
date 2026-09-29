@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl, Circle, Tooltip, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { Anchor, Compass, ExternalLink, Ship, Users, Eye, Layers } from 'lucide-react';
+import { Anchor, Compass, ExternalLink, Ship, Users, Eye, Layers, Plane, MapPin, RotateCw, Maximize2 } from 'lucide-react';
 
 // Fix default icon para Next.js
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -366,24 +366,140 @@ export const MaritimeMap = ({
   );
 };
 
-/* ─── COMPONENTE AÉREO: FLIGHTAWARE LIMPIO Y POSICIONADO EN TIERRA DEL FUEGO ─── */
+/* ─── COMPONENTE AÉREO: WIDGET OFICIAL AIRNAV RADARBOX (TIERRA DEL FUEGO) ─── */
 export interface AirMapProps {
   airportCode?: 'TDF' | 'SAWH' | 'SAWE';
   className?: string;
+  zoom?: number;
+  lat?: number;
+  lng?: number;
+  mapstyle?: number;
+  showToolbar?: boolean;
 }
 
-export const AirMap = ({ airportCode = 'TDF', className = '' }: AirMapProps) => (
-  <div className={`w-full h-full relative bg-[#0a0d14] overflow-hidden ${className}`}>
-    <iframe
-      id="flightaware-map"
-      name="flightaware-map"
-      src="/api/flightaware-map"
-      width="100%"
-      height="100%"
-      frameBorder="0"
-      style={{ border: 0, display: 'block', width: '100%', height: '100%' }}
-      title="FlightAware — Radar de Tráfico Aéreo en Tiempo Real (Tierra del Fuego)"
-      allowFullScreen
-    />
-  </div>
-);
+export const AirMap = ({ 
+  airportCode = 'TDF', 
+  className = '',
+  zoom,
+  lat,
+  lng,
+  mapstyle = 1,
+  showToolbar = true
+}: AirMapProps) => {
+  const [selectedFocus, setSelectedFocus] = useState<'TDF' | 'SAWH' | 'SAWE'>(airportCode);
+  const [currentStyle, setCurrentStyle] = useState<number>(mapstyle);
+  const [iframeKey, setIframeKey] = useState<number>(1);
+
+  // Coordenadas fijas y centradas en Tierra del Fuego
+  let currentLat = -54.4000;
+  let currentLng = -68.1000;
+  let currentZoom = 7;
+
+  if (selectedFocus === 'SAWH') {
+    currentLat = -54.8433;
+    currentLng = -68.2956;
+    currentZoom = 9;
+  } else if (selectedFocus === 'SAWE') {
+    currentLat = -53.7778;
+    currentLng = -67.7494;
+    currentZoom = 9;
+  }
+
+  if (lat !== undefined) currentLat = lat;
+  if (lng !== undefined) currentLng = lng;
+  if (zoom !== undefined) currentZoom = zoom;
+
+  // URL del widget oficial de AirNav RadarBox con variables personalizadas (lat, lng, z, mapstyle)
+  const widgetSrc = `https://www.airnavradar.com/?widget=1&lat=${currentLat}&lng=${currentLng}&z=${currentZoom}&zoom=${currentZoom}&mapstyle=${currentStyle}&showLabels=true`;
+
+  return (
+    <div className={`w-full h-full relative bg-[#0a0d14] flex flex-col overflow-hidden ${className}`}>
+      {/* Sub-barra de controles rápidos si está activada */}
+      {showToolbar && (
+        <div className="flex items-center justify-between gap-2 px-3 py-1.5 bg-[#0e121b] border-b border-white/5 text-[10px] font-mono z-10 shrink-0">
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+            <span className="text-slate-400 font-bold uppercase text-[9px] mr-1">Foco:</span>
+            <button
+              type="button"
+              onClick={() => setSelectedFocus('TDF')}
+              className={`px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
+                selectedFocus === 'TDF'
+                  ? 'bg-orange-500 text-white shadow-sm'
+                  : 'bg-white/5 text-slate-400 hover:text-white'
+              }`}
+            >
+              📍 TDF Centrado
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedFocus('SAWH')}
+              className={`px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
+                selectedFocus === 'SAWH'
+                  ? 'bg-orange-500 text-white shadow-sm'
+                  : 'bg-white/5 text-slate-400 hover:text-white'
+              }`}
+            >
+              🛫 Ushuaia (SAWH)
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedFocus('SAWE')}
+              className={`px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
+                selectedFocus === 'SAWE'
+                  ? 'bg-orange-500 text-white shadow-sm'
+                  : 'bg-white/5 text-slate-400 hover:text-white'
+              }`}
+            >
+              🛬 Río Grande (SAWE)
+            </button>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setCurrentStyle(prev => (prev === 1 ? 0 : 1))}
+              className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all cursor-pointer text-[9px]"
+              title="Cambiar diseño visual del fondo (mapstyle)"
+            >
+              {currentStyle === 1 ? 'Modo Oscuro' : 'Modo Claro'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIframeKey(k => k + 1)}
+              className="p-1 rounded-md bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all cursor-pointer"
+              title="Recargar radar"
+            >
+              <RotateCw className="w-2.5 h-2.5 text-orange-400" />
+            </button>
+            <a
+              href={`https://www.airnavradar.com/?lat=${currentLat}&lng=${currentLng}&z=${currentZoom}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-orange-400 hover:text-orange-300 font-bold flex items-center gap-0.5 text-[9px] underline"
+              title="Abrir en AirNav RadarBox web completa"
+            >
+              Web <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* Widget Iframe oficial de AirNav RadarBox */}
+      <div className="flex-1 w-full h-full relative overflow-hidden bg-[#07090e]">
+        <iframe
+          key={`${selectedFocus}-${currentStyle}-${iframeKey}`}
+          id="airnav-radarbox-map"
+          name="airnav-radarbox-map"
+          src={widgetSrc}
+          width="100%"
+          height="100%"
+          frameBorder="0"
+          style={{ border: 0, display: 'block', width: '100%', height: '100%' }}
+          title="AirNav RadarBox — Radar de Tráfico Aéreo en Tiempo Real (Tierra del Fuego)"
+          allowFullScreen
+          allow="geolocation; autoplay; fullscreen"
+        />
+      </div>
+    </div>
+  );
+};

@@ -15,7 +15,8 @@ import {
   Sparkles,
   Search,
   CheckCircle2,
-  Clock
+  Clock,
+  Globe2
 } from 'lucide-react';
 
 // Custom icons for Leaflet
@@ -208,40 +209,55 @@ export default function ArgentinaAirportsMap({
           </div>
         </div>
 
-        {/* CONTROLES DE DIRECCIÓN (ARRIBOS / PARTIDAS) */}
-        <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/10 self-stretch sm:self-auto">
-          <button
-            onClick={() => setSelectedDirection('all')}
-            className={`flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              selectedDirection === 'all'
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm'
-                : 'text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
+        {/* CONTROLES DE DIRECCIÓN Y RADAR SATELITAL 3D */}
+        <div className="flex items-center gap-2 flex-wrap self-stretch sm:self-auto">
+          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/10 flex-1 sm:flex-none">
+            <button
+              onClick={() => setSelectedDirection('all')}
+              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                selectedDirection === 'all'
+                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm'
+                  : 'text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Todos ({flights.length})
+            </button>
+            <button
+              onClick={() => setSelectedDirection('arrival')}
+              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${
+                selectedDirection === 'arrival'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-gray-400 hover:text-blue-500'
+              }`}
+            >
+              <ArrowDownLeft className="w-3 h-3" />
+              <span>Arribos</span>
+            </button>
+            <button
+              onClick={() => setSelectedDirection('departure')}
+              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${
+                selectedDirection === 'departure'
+                  ? 'bg-rose-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-gray-400 hover:text-rose-500'
+              }`}
+            >
+              <ArrowUpRight className="w-3 h-3" />
+              <span>Partidas</span>
+            </button>
+          </div>
+
+          <a
+            href="https://godsviewai.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-xs font-mono font-bold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 transition-all shadow-sm"
+            title="Abrir radar satelital 3D global en GodsViewAI"
           >
-            Todos ({flights.length})
-          </button>
-          <button
-            onClick={() => setSelectedDirection('arrival')}
-            className={`flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${
-              selectedDirection === 'arrival'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-gray-400 hover:text-blue-500'
-            }`}
-          >
-            <ArrowDownLeft className="w-3 h-3" />
-            <span>Arribos</span>
-          </button>
-          <button
-            onClick={() => setSelectedDirection('departure')}
-            className={`flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${
-              selectedDirection === 'departure'
-                ? 'bg-rose-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-gray-400 hover:text-rose-500'
-            }`}
-          >
-            <ArrowUpRight className="w-3 h-3" />
-            <span>Partidas</span>
-          </button>
+            <Globe2 className="w-3.5 h-3.5 text-cyan-500 animate-spin-slow" />
+            <span className="hidden sm:inline">Radar</span>
+            <span>GodsViewAI 3D</span>
+            <ExternalLink className="w-2.5 h-2.5" />
+          </a>
         </div>
       </div>
 
@@ -455,17 +471,32 @@ export default function ArgentinaAirportsMap({
                       Cap: {f.paxCapacity} pax
                     </span>
 
-                    <a
-                      href={`https://es.airnavradar.com/?search=${f.flight.replace(/\s+/g, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex items-center gap-1 text-orange-500 hover:text-orange-600 font-bold hover:underline"
-                      title="Cotejar en AirNav Radar en Vivo"
-                    >
-                      <span>Cotejar en Radar</span>
-                      <ExternalLink className="w-2.5 h-2.5" />
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href="https://godsviewai.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1 text-cyan-500 hover:text-cyan-600 dark:text-cyan-400 dark:hover:text-cyan-300 font-bold hover:underline"
+                        title="Ver en GodsViewAI 3D en Vivo"
+                      >
+                        <Globe2 className="w-2.5 h-2.5" />
+                        <span>GodsViewAI 3D</span>
+                        <ExternalLink className="w-2.5 h-2.5" />
+                      </a>
+                      <span className="text-slate-300 dark:text-gray-600">·</span>
+                      <a
+                        href={`https://es.airnavradar.com/?search=${f.flight.replace(/\s+/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1 text-orange-500 hover:text-orange-600 font-bold hover:underline"
+                        title="Cotejar en AirNav Radar en Vivo"
+                      >
+                        <span>AirNav</span>
+                        <ExternalLink className="w-2.5 h-2.5" />
+                      </a>
+                    </div>
                   </div>
                 </div>
               );
