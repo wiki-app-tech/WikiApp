@@ -79,7 +79,7 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
   const [shipFilter, setShipFilter] = useState<'all' | 'crucero' | 'catamaran' | 'servicio'>('all');
   const [kpiMode, setKpiMode] = useState<'visitors' | 'consolidated'>('visitors');
   const [maritimeViewMode, setMaritimeViewMode] = useState<'cotejo' | 'radar'>('cotejo');
-  const [maritimeZoom, setMaritimeZoom] = useState<'ushuaia' | 'regional'>('ushuaia');
+  const [maritimeZoom, setMaritimeZoom] = useState<'ushuaia' | 'beagle' | 'regional'>('ushuaia');
 
   // Datos consolidados
   const [tourismData, setTourismData] = useState<any>(null);
@@ -208,7 +208,7 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
-              Tráfico Marítimo y Aéreo en tiempo real, cotejado con Radar AIS MarineTraffic y Dirección Provincial de Puertos.
+              Tráfico Marítimo y Aéreo en tiempo real, cotejado con Radar AIS VesselFinder, OpenCPN y Dirección Provincial de Puertos.
             </p>
           </div>
         </div>
@@ -714,10 +714,10 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
               </div>
             </div>
 
-            {/* COLUMNA DERECHA: RADAR AIS DE MARINETRAFFIC CON COTEJO GEORREFERENCIADO & AIRNAV RADAR */}
+            {/* COLUMNA DERECHA: RADAR AIS DE VESSELFINDER CON COTEJO GEORREFERENCIADO & AIRNAV RADAR */}
             <div className="xl:col-span-8 flex flex-col gap-8">
               
-              {/* RADAR MARÍTIMO COTEJADO */}
+              {/* RADAR MARÍTIMO COTEJADO (VESSELFINDER & OPENCPN) */}
               <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl overflow-hidden shadow-2xl flex flex-col">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm flex-wrap gap-2">
                   <div className="flex items-center gap-3">
@@ -726,18 +726,18 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                     </div>
                     <div>
                       <h2 className="text-[13px] font-black text-slate-800 dark:text-gray-200 tracking-wide uppercase leading-none">
-                        Radar AIS de Tráfico Marítimo — MarineTraffic
+                        Radar AIS de Tráfico Marítimo — VesselFinder & OpenCPN
                       </h2>
                       <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold block mt-1">
                         {maritimeViewMode === 'cotejo' 
                           ? `Cotejo Activo: ${selectedVessel?.name || 'Todas las naves'} (${selectedVessel?.locationName || 'Bahía Ushuaia'})`
-                          : 'Señal Satelital AIS en Vivo (Kpler / MarineTraffic)'}
+                          : 'Señal Satelital AIS en Vivo (Widget Oficial VesselFinder · OpenCPN)'}
                       </span>
                     </div>
                   </div>
 
                   {/* Acciones del Radar */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <button
                       onClick={() => setMaritimeViewMode(maritimeViewMode === 'cotejo' ? 'radar' : 'cotejo')}
                       className={`flex items-center gap-1.5 text-[10px] font-black uppercase px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
@@ -747,15 +747,27 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                       }`}
                     >
                       <Layers className="w-3 h-3" />
-                      <span>{maritimeViewMode === 'cotejo' ? 'Ver Radar MarineTraffic' : 'Ver Mapa de Cotejo'}</span>
+                      <span>{maritimeViewMode === 'cotejo' ? 'Ver Radar VesselFinder' : 'Ver Cotejo DPP'}</span>
                     </button>
 
                     <a
-                      href="https://www.marinetraffic.com/en/ais/home/centerx:-68.29/centery:-54.815/zoom:11"
+                      href="https://opencpn.org/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[9px] font-mono text-cyan-600 dark:text-cyan-400 hover:text-cyan-300 uppercase font-black border border-cyan-500/20 bg-cyan-500/10 px-2.5 py-1.5 rounded-full transition-all"
+                      title="OpenCPN — Chart Plotter & Navigational Software Oficial"
+                    >
+                      <Compass className="w-3 h-3" />
+                      <span>OpenCPN</span>
+                      <ExternalLink className="w-2.5 h-2.5" />
+                    </a>
+
+                    <a
+                      href="https://www.vesselfinder.com/?bbox=-69.5,-55.5,-67.0,-54.2"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1 text-[9px] font-mono text-slate-400 hover:text-white uppercase font-black border border-slate-200 dark:border-white/10 px-2.5 py-1.5 rounded-full transition-all"
-                      title="Abrir en MarineTraffic"
+                      title="Abrir en VesselFinder Oficial"
                     >
                       <ExternalLink className="w-3 h-3" />
                     </a>
@@ -790,7 +802,7 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                     <span className="w-2.5 h-2.5 rounded-full bg-red-500" /> Faro Les Eclaireurs
                   </span>
                   <span className="ml-auto font-mono text-slate-400">
-                    {ships.length} embarcaciones cotejadas
+                    &copy; VesselFinder AIS · Cartografía OpenCPN ({ships.length} embarcaciones)
                   </span>
                 </div>
               </div>
