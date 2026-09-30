@@ -282,7 +282,6 @@ export default function OsirisMap({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [iframeKey, setIframeKey] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [useProxy, setUseProxy] = useState(true);
   const [showLayerDrawer, setShowLayerDrawer] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [liveStats, setLiveStats] = useState<any>({
@@ -359,12 +358,9 @@ export default function OsirisMap({
     setIframeKey((k) => k + 1);
   };
 
-  // Generar URL del mapa
+  // Generar URL del mapa a través del proxy backend local
   const layersParam = activeLayers.join(',');
-  const directUrl = `https://osirisai.live/?layers=${encodeURIComponent(layersParam)}`;
-  const iframeSrc = useProxy
-    ? `/api/osiris-embed?layers=${encodeURIComponent(layersParam)}`
-    : directUrl;
+  const iframeSrc = `/api/osiris-embed?layers=${encodeURIComponent(layersParam)}`;
 
   const filteredLayers = useMemo(() => {
     if (activeCategory === 'all') return OSIRIS_AVAILABLE_LAYERS;
@@ -456,17 +452,11 @@ export default function OsirisMap({
             )}
           </button>
 
-          {/* Abrir OSIRIS Directo */}
-          <a
-            href={directUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-3 py-1.5 rounded-xl text-[11px] font-mono font-black uppercase tracking-wider bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white shadow-md shadow-cyan-600/25 transition-all flex items-center gap-1.5 cursor-pointer"
-            title="Abrir OSIRIS oficial con esta configuración de capas"
-          >
-            <span>Abrir OSIRIS Web</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
+          {/* Indicador de Vista Directa Backend */}
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-mono font-bold bg-cyan-950/60 text-cyan-300 border border-cyan-800/40">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+            <span>Vista Directa Backend</span>
+          </div>
         </div>
       </div>
 
@@ -589,19 +579,17 @@ export default function OsirisMap({
           </div>
         )}
 
-        {/* IFRAME PRINCIPAL */}
+        {/* IFRAME PRINCIPAL (Vista directa del back del sitio, sandbox sin permitir top-navigation) */}
         <iframe
           key={`${iframeKey}-${activeLayers.join('_')}`}
-          src={iframeSrc}
+          src={`/api/osiris-embed?layers=${encodeURIComponent(activeLayers.join(','))}`}
           className="w-full h-full border-0 block"
           title="OSIRIS — Plataforma de Inteligencia Global de Código Abierto (OSINT)"
+          sandbox="allow-scripts allow-same-origin allow-forms"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
           referrerPolicy="no-referrer-when-downgrade"
           onLoad={() => setIsLoading(false)}
-          onError={() => {
-            setIsLoading(false);
-            setUseProxy(false);
-          }}
+          onError={() => setIsLoading(false)}
         />
 
         {/* DRAWER INTERACTIVO FLOTANTE DE CAPAS TÁCTICAS */}
@@ -728,14 +716,10 @@ export default function OsirisMap({
         </div>
         <div className="flex items-center gap-3 ml-auto">
           <span>&copy; OSIRIS &mdash; Open Source Intelligence</span>
-          <a
-            href={directUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-cyan-400 hover:text-cyan-300 underline flex items-center gap-1 font-bold"
-          >
-            Visitar osirisai.live <ExternalLink className="w-2.5 h-2.5" />
-          </a>
+          <span className="text-cyan-400 font-bold flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Integración Nativa sin Redirección
+          </span>
         </div>
       </div>
     </div>

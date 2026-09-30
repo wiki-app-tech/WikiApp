@@ -25,8 +25,26 @@ export async function GET(request: Request) {
 
     let html = await res.text();
 
-    // 1. Inyectar <base href="https://osirisai.live/"> para cargar todos los chunks y recursos estáticos
-    html = html.replace('<head>', '<head><base href="https://osirisai.live/">');
+    // 1. Inyectar <base href="https://osirisai.live/" target="_self"> para cargar recursos y mantener navegación interna
+    html = html.replace(
+      '<head>',
+      `<head>
+      <base href="https://osirisai.live/" target="_self">
+      <script>
+        // Prevenir redirecciones externas o intentos de salir del marco
+        try {
+          window.onbeforeunload = null;
+          document.addEventListener('click', function(e) {
+            var el = e.target.closest('a');
+            if (el) {
+              if (el.target === '_top' || el.target === '_blank' || el.target === '_parent') {
+                el.target = '_self';
+              }
+            }
+          }, true);
+        } catch(e) {}
+      </script>`
+    );
 
     // 2. Modificar el título para integrarlo en WikiApp
     html = html.replace(
@@ -46,12 +64,12 @@ export async function GET(request: Request) {
     return new NextResponse(
       `<!DOCTYPE html>
       <html>
-        <head><meta charset="utf-8"><title>OSIRIS Error</title></head>
+        <head><meta charset="utf-8"><title>OSIRIS Conexión</title></head>
         <body style="background:#02050e;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;">
-          <div>
-            <h2 style="color:#06b6d4;">Cargando OSIRIS Global Tactical Map</h2>
-            <p style="color:#94a3b8;font-size:13px;">No se pudo establecer conexión directa con el servidor proxy. Puedes abrir la plataforma directamente:</p>
-            <a href="https://osirisai.live/" target="_blank" style="display:inline-block;margin-top:10px;padding:8px 16px;background:#0891b2;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;font-size:12px;">Abrir OSIRIS Web Oficial</a>
+          <div style="padding:20px;max-width:420px;border:1px solid rgba(6,182,212,0.2);border-radius:16px;background:rgba(8,13,26,0.8);">
+            <h2 style="color:#06b6d4;font-size:16px;margin:0 0 8px;">Vista Táctica Global OSIRIS</h2>
+            <p style="color:#94a3b8;font-size:12px;margin:0 0 16px;">Sincronizando flujo de datos satelitales, buques y sensores con el backend...</p>
+            <button onclick="window.location.reload()" style="padding:8px 18px;background:#0891b2;color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:12px;cursor:pointer;">Reintentar Conexión</button>
           </div>
         </body>
       </html>`,

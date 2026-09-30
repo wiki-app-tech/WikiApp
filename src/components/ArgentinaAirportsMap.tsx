@@ -245,19 +245,6 @@ export default function ArgentinaAirportsMap({
               <span>Partidas</span>
             </button>
           </div>
-
-          <a
-            href="https://godsviewai.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-xs font-mono font-bold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 transition-all shadow-sm"
-            title="Abrir radar satelital 3D global en GodsViewAI"
-          >
-            <Globe2 className="w-3.5 h-3.5 text-cyan-500 animate-spin-slow" />
-            <span className="hidden sm:inline">Radar</span>
-            <span>GodsViewAI 3D</span>
-            <ExternalLink className="w-2.5 h-2.5" />
-          </a>
         </div>
       </div>
 
@@ -472,19 +459,6 @@ export default function ArgentinaAirportsMap({
                     </span>
 
                     <div className="flex items-center gap-2">
-                      <a
-                        href="https://godsviewai.com/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-1 text-cyan-500 hover:text-cyan-600 dark:text-cyan-400 dark:hover:text-cyan-300 font-bold hover:underline"
-                        title="Ver en GodsViewAI 3D en Vivo"
-                      >
-                        <Globe2 className="w-2.5 h-2.5" />
-                        <span>GodsViewAI 3D</span>
-                        <ExternalLink className="w-2.5 h-2.5" />
-                      </a>
-                      <span className="text-slate-300 dark:text-gray-600">·</span>
                       <a
                         href={`https://es.airnavradar.com/?search=${f.flight.replace(/\s+/g, '')}`}
                         target="_blank"
