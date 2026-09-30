@@ -1,7 +1,55 @@
-import React, { useState, useMemo, useEffect } from 'react';
+'use client';
+
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Search, Calendar, Info, Shield, ExternalLink, CloudRain, Car, FileText, AlertTriangle, BookOpen, X, Filter, RefreshCw, Wifi, Radio } from 'lucide-react';
+import { 
+  Send, 
+  Search, 
+  Calendar, 
+  Info, 
+  Shield, 
+  ExternalLink, 
+  CloudRain, 
+  Car, 
+  FileText, 
+  AlertTriangle, 
+  BookOpen, 
+  X, 
+  Filter, 
+  RefreshCw, 
+  Radio, 
+  ChevronLeft, 
+  ChevronRight, 
+  Play, 
+  Pause, 
+  Maximize2, 
+  Copy, 
+  Check, 
+  Share2, 
+  Clock, 
+  SlidersHorizontal,
+  LayoutGrid,
+  Columns
+} from 'lucide-react';
 import type { Article } from '@/types';
+
+// Ícono SVG oficial de WhatsApp
+function WhatsAppIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+    </svg>
+  );
+}
+
+// Ícono SVG oficial de Telegram
+function TelegramIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.197 1.006.128.832.926z"/>
+    </svg>
+  );
+}
 
 interface TelegramMessage {
   id: number;
@@ -18,26 +66,30 @@ interface TelegramFeedProps {
   onSelectArticle?: (article: Article) => void;
 }
 
-interface UnifiedFeedItem {
+export interface UnifiedFeedItem {
   id: string;
   date: Date;
+  dateFormatted: string;
+  friendlyDate: string;
   timeStr: string;
+  formattedTime: string;
   sender: string;
   category: 'clima' | 'transito' | 'institucional' | 'seguridad' | 'noticia';
-  title?: string;
+  title: string;
   content: string;
+  shortContent: string;
   thumbnail?: string;
   link?: string;
   isImportant?: boolean;
   rawArticle?: Article;
 }
 
-// Helper to strip HTML tags from RSS descriptions
+// Limpieza de etiquetas HTML
 function stripHtml(html: string = '') {
-  return html.replace(/<[^>]*>/g, '').trim();
+  return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-// Helper to format Date into YYYY-MM-DD in local time
+// Formateo de fecha YYYY-MM-DD
 function formatYMD(d: Date): string {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -45,24 +97,39 @@ function formatYMD(d: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-// Helper to display friendly date & time string
-function formatDisplayDate(d: Date, timeStr: string): string {
-  const todayYMD = formatYMD(new Date());
-  const itemYMD = formatYMD(d);
-  
-  if (itemYMD === todayYMD) {
-    return `Hoy ${timeStr} hs`;
-  }
-  
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  if (itemYMD === formatYMD(yesterday)) {
-    return `Ayer ${timeStr} hs`;
-  }
-  
+// Formateo integral de Fecha y Hora
+function formatArticleDateTime(d: Date, timeStr: string) {
   const day = String(d.getDate()).padStart(2, '0');
   const month = String(d.getMonth() + 1).padStart(2, '0');
-  return `${day}/${month} ${timeStr} hs`;
+  const year = d.getFullYear();
+  const dateFormatted = `${day}/${month}/${year}`;
+
+  const todayYMD = formatYMD(new Date());
+  const itemYMD = formatYMD(d);
+  let friendlyDate = `${day}/${month}`;
+  if (itemYMD === todayYMD) {
+    friendlyDate = 'Hoy';
+  } else {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (itemYMD === formatYMD(yesterday)) {
+      friendlyDate = 'Ayer';
+    }
+  }
+
+  let formattedTime = timeStr;
+  if (!formattedTime.includes(':')) {
+    formattedTime = `${timeStr}:00`;
+  }
+  if (!formattedTime.toLowerCase().includes('hs')) {
+    formattedTime = `${formattedTime} hs`;
+  }
+
+  return {
+    dateFormatted,
+    friendlyDate: `${friendlyDate} · ${day}/${month}`,
+    formattedTime
+  };
 }
 
 export default function TelegramFeed({ articles = [], onSelectArticle }: TelegramFeedProps) {
@@ -75,72 +142,76 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
   const [lastSyncTime, setLastSyncTime] = useState<string>('En tiempo real');
   const [liveToast, setLiveToast] = useState<string | null>(null);
 
-  // Synchronize internal state if parent prop updates
+  // Estados del Slider Lateral
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+  const [viewMode, setViewMode] = useState<'slider' | 'grid'>('slider');
+
+  // Estado para la nota ampliada (Modal de lectura)
+  const [expandedItem, setExpandedItem] = useState<UnifiedFeedItem | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Sincronizar artículos si cambian los props
   useEffect(() => {
     if (articles && articles.length > 0) {
       setFeedArticles(articles);
     }
   }, [articles]);
 
-  // Alert messages (simulated official alerts) with recent timestamps
+  // Cerrar modal al presionar Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setExpandedItem(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Alertas oficiales simuladas/reales de Tierra del Fuego
   const alerts: TelegramMessage[] = [
     {
       id: 1,
-      date: '2026-08-07',
-      time: '11:30',
+      date: '2026-09-30',
+      time: '09:30',
       sender: 'Defensa Civil TDF',
       category: 'clima',
-      content: '⚠️ ALERTA METEOROLÓGICA: Se registran ráfagas intensas superiores a 95 km/h en el área del Canal Beagle y zona centro. Se solicita precaución extrema en la vía pública y asegurar chapas o estructuras de obra.',
+      content: '⚠️ ALERTA METEOROLÓGICA: Se registran ráfagas intensas superiores a 85 km/h en el área del Canal Beagle y zona centro. Se solicita precaución extrema en la vía pública y asegurar chapas o estructuras de obra.',
       isImportant: true
     },
     {
       id: 2,
-      date: '2026-08-07',
-      time: '10:15',
+      date: '2026-09-30',
+      time: '08:15',
       sender: 'Vialidad Provincial TDF',
       category: 'transito',
-      content: '🚗 ESTADO DE RUTA 3: Calzada transitable con extrema precaución entre Tolhuin y Ushuaia (Paso Garibaldi). Presencia de hielo negro y nieve escarchada en zonas de sombra. Equipos invernales esparciendo sal y urea.',
+      content: '🚗 ESTADO DE RUTA 3: Calzada transitable con extrema precaución entre Tolhuin y Ushuaia (Paso Garibaldi). Presencia de lloviznas y escarcha en zonas de sombra. Equipos de control apostados en ruta.',
       isImportant: false
     },
     {
       id: 3,
-      date: '2026-08-07',
-      time: '08:45',
+      date: '2026-09-29',
+      time: '18:45',
       sender: 'Gobierno de Tierra del Fuego',
       category: 'institucional',
-      content: '📢 COMUNICADO OFICIAL: Apertura de la inscripción online al Programa Provincial de Becas Universitarias y Terciarias 2026. Consultá requisitos y documentación en el sitio oficial del Ministerio de Educación.',
+      content: '📢 COMUNICADO OFICIAL: Apertura de la inscripción online al Programa Provincial de Becas Universitarias y Terciarias. Consultá requisitos y documentación en el sitio oficial del Ministerio de Educación.',
       isImportant: false
     },
     {
       id: 4,
-      date: '2026-08-06',
-      time: '19:20',
+      date: '2026-09-29',
+      time: '15:20',
       sender: 'Defensa Civil Ushuaia',
       category: 'seguridad',
       content: '🚨 ATENCIÓN CIUDADANA: Se recuerda la vigencia de la prohibición de encendido de fuego en zonas boscosas no habilitadas por el Plan Provincial de Manejo del Fuego. Denuncias preventivas al 103 o 911.',
       isImportant: true
-    },
-    {
-      id: 5,
-      date: '2026-08-06',
-      time: '14:10',
-      sender: 'Ministerio de Salud TDF',
-      category: 'institucional',
-      content: '🏥 CAMPAÑA DE SALUD: Cronograma de vacunación antigripal y libreta sanitaria en los Centros de Atención Primaria (CAPS) de Río Grande, Tolhuin y Ushuaia.',
-      isImportant: false
-    },
-    {
-      id: 6,
-      date: '2026-08-05',
-      time: '16:50',
-      sender: 'Policía de Tierra del Fuego',
-      category: 'seguridad',
-      content: '🛡️ OPERATIVO CONTROL DE TRÁNSITO: Se despliegan controles vehiculares preventivos y de verificación de cubiertas sílice/cadenas en los accesos a Río Grande y Ushuaia.',
-      isImportant: false
     }
   ];
 
-  // REAL-TIME FETCH FUNCTION (impacts view automatically)
+  // Sincronización en tiempo real
   const fetchLiveFeeds = async (showNotification = false) => {
     setIsRefreshing(true);
     try {
@@ -150,9 +221,9 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
         if (data.articles && Array.isArray(data.articles) && data.articles.length > 0) {
           const prevLength = feedArticles.length;
           setFeedArticles(data.articles);
-          
+
           const now = new Date();
-          const timeStr = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          const timeStr = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
           setLastSyncTime(timeStr);
 
           if (showNotification || data.articles.length > prevLength) {
@@ -162,17 +233,17 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
         }
       }
     } catch (err) {
-      console.warn('Live RSS feed poll failed, retaining cache:', err);
+      console.warn('Live RSS feed poll failed:', err);
     } finally {
       setIsRefreshing(false);
       setAutoSeconds(25);
     }
   };
 
-  // AUTOMATED REAL-TIME POLLING EFFECT (Runs every 25 seconds)
+  // Temporizador de refresco periódico
   useEffect(() => {
     const timer = setInterval(() => {
-      setAutoSeconds(prev => {
+      setAutoSeconds((prev) => {
         if (prev <= 1) {
           fetchLiveFeeds(false);
           return 25;
@@ -184,104 +255,245 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
     return () => clearInterval(timer);
   }, [feedArticles]);
 
-  // Merge alerts and news articles into a single chronological feed
-  const unifiedFeed = useMemo(() => {
+  // Unificación de noticias y alertas en orden cronológico estricto
+  const unifiedFeed: UnifiedFeedItem[] = useMemo(() => {
     const items: UnifiedFeedItem[] = [];
 
-    // Add official alerts
-    alerts.forEach(alert => {
+    // Alertas
+    alerts.forEach((alert) => {
       const dateObj = new Date(`${alert.date}T${alert.time}:00`);
+      const { dateFormatted, friendlyDate, formattedTime } = formatArticleDateTime(dateObj, alert.time);
+      const cleanContent = stripHtml(alert.content);
+
       items.push({
         id: `alert-${alert.id}`,
         date: dateObj,
+        dateFormatted,
+        friendlyDate,
         timeStr: alert.time,
+        formattedTime,
         sender: alert.sender,
         category: alert.category,
-        content: alert.content,
+        title: alert.sender,
+        content: cleanContent,
+        shortContent: cleanContent.length > 170 ? cleanContent.slice(0, 170).trim() + '...' : cleanContent,
         isImportant: alert.isImportant
       });
     });
 
-    // Add loaded live news articles
-    feedArticles.forEach(article => {
+    // Artículos RSS
+    feedArticles.forEach((article) => {
       const dateObj = new Date(article.pubDate);
       const isValid = !isNaN(dateObj.getTime());
+      const rawDate = isValid ? dateObj : new Date();
       const timeStr = isValid
         ? dateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
-        : '00:00';
+        : '12:00';
+
+      const { dateFormatted, friendlyDate, formattedTime } = formatArticleDateTime(rawDate, timeStr);
+      const cleanContent = stripHtml(article.description || article.title);
 
       items.push({
         id: `article-${article.id}`,
-        date: isValid ? dateObj : new Date(),
-        timeStr: timeStr,
-        sender: article.sourceName || 'Noticias TDF',
+        date: rawDate,
+        dateFormatted,
+        friendlyDate,
+        timeStr,
+        formattedTime,
+        sender: article.sourceName || 'Noticias Regionales',
         category: 'noticia',
-        title: article.title,
-        content: stripHtml(article.description),
+        title: article.title || 'Sin título',
+        content: cleanContent,
+        shortContent: cleanContent.length > 170 ? cleanContent.slice(0, 170).trim() + '...' : cleanContent,
         thumbnail: article.thumbnail,
         link: article.link,
         rawArticle: article
       });
     });
 
-    // STRICT SORT: Descending by date and time (newest uploaded item FIRST at index 0)
+    // Orden descendente (la más reciente primero)
     return items.sort((a, b) => b.date.getTime() - a.date.getTime());
   }, [alerts, feedArticles]);
 
-  // Filter feed items by search input & selected calendar date
+  // Filtrado por buscador y por fecha de calendario
   const filteredFeed = useMemo(() => {
     let result = unifiedFeed;
 
-    // Filter by selected date (YYYY-MM-DD)
     if (selectedDate) {
-      result = result.filter(item => formatYMD(item.date) === selectedDate);
+      result = result.filter((item) => formatYMD(item.date) === selectedDate);
     }
 
-    // Filter by search text
     if (searchTerm.trim()) {
       const query = searchTerm.toLowerCase();
-      result = result.filter(item =>
-        item.content.toLowerCase().includes(query) ||
-        (item.title && item.title.toLowerCase().includes(query)) ||
-        item.sender.toLowerCase().includes(query) ||
-        item.category.toLowerCase().includes(query)
+      result = result.filter(
+        (item) =>
+          item.content.toLowerCase().includes(query) ||
+          item.title.toLowerCase().includes(query) ||
+          item.sender.toLowerCase().includes(query) ||
+          item.category.toLowerCase().includes(query)
       );
     }
 
-    return result.slice(0, 50); // display top 50 matches
+    return result;
   }, [searchTerm, selectedDate, unifiedFeed]);
 
+  // Lógica de desplazamiento del Slider Lateral
+  const scrollToIndex = (index: number) => {
+    if (!sliderRef.current) return;
+    const container = sliderRef.current;
+    const cards = container.querySelectorAll<HTMLElement>('[data-slider-card]');
+    if (cards[index]) {
+      const card = cards[index];
+      const cardLeft = card.offsetLeft - container.offsetLeft - 16;
+      container.scrollTo({
+        left: Math.max(0, cardLeft),
+        behavior: 'smooth'
+      });
+      setCurrentIndex(index);
+    }
+  };
+
+  const handleNext = () => {
+    if (filteredFeed.length === 0) return;
+    const next = (currentIndex + 1) % filteredFeed.length;
+    scrollToIndex(next);
+  };
+
+  const handlePrev = () => {
+    if (filteredFeed.length === 0) return;
+    const prev = (currentIndex - 1 + filteredFeed.length) % filteredFeed.length;
+    scrollToIndex(prev);
+  };
+
+  // Pase automático (Autoplay) cada 4.5 segundos
+  useEffect(() => {
+    if (viewMode !== 'slider' || !isAutoPlay || isHovered || filteredFeed.length <= 1) return;
+    const timer = setInterval(() => {
+      handleNext();
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [viewMode, isAutoPlay, isHovered, currentIndex, filteredFeed.length]);
+
+  // Detección de índice al deslizar manualmente
+  const handleSliderScroll = () => {
+    if (!sliderRef.current) return;
+    const container = sliderRef.current;
+    const scrollLeft = container.scrollLeft;
+    const cards = container.querySelectorAll<HTMLElement>('[data-slider-card]');
+    if (cards.length === 0) return;
+
+    let closest = 0;
+    let minDiff = Infinity;
+    cards.forEach((card, idx) => {
+      const cardLeft = card.offsetLeft - container.offsetLeft - 16;
+      const diff = Math.abs(cardLeft - scrollLeft);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = idx;
+      }
+    });
+    setCurrentIndex(closest);
+  };
+
+  // Formateo de mensaje para compartir
+  const getSharePayload = (item: UnifiedFeedItem) => {
+    const title = item.title || 'Noticia de Último Momento';
+    const excerpt = item.shortContent || '';
+    const source = item.sender || 'Noticias TDF';
+    const date = item.dateFormatted;
+    const time = item.formattedTime;
+    const link = item.link || (typeof window !== 'undefined' ? window.location.href : '');
+
+    const whatsappText = [
+      `📰 *${title}*`,
+      '',
+      `${excerpt}`,
+      '',
+      `📌 *Fuente:* ${source}`,
+      `🕒 *Fecha:* ${date} · ${time}`,
+      link ? `🔗 ${link}` : ''
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    const telegramText = [
+      `📰 ${title}`,
+      '',
+      `${excerpt}`,
+      '',
+      `📌 Fuente: ${source} (${date} · ${time})`
+    ].join('\n');
+
+    return { whatsappText, telegramText, link };
+  };
+
+  // Compartir en WhatsApp
+  const handleShareWhatsApp = (item: UnifiedFeedItem, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const { whatsappText } = getSharePayload(item);
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappText)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  // Compartir en Telegram
+  const handleShareTelegram = (item: UnifiedFeedItem, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const { telegramText, link } = getSharePayload(item);
+    const shareUrl = link || (typeof window !== 'undefined' ? window.location.href : '');
+    const url = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(telegramText)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  // Copiar mensaje al portapapeles
+  const handleCopyMessage = async (item: UnifiedFeedItem, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const { whatsappText } = getSharePayload(item);
+    try {
+      await navigator.clipboard.writeText(whatsappText);
+      setCopiedId(item.id);
+      setLiveToast('✅ Noticia copiada para enviar');
+      setTimeout(() => {
+        setCopiedId(null);
+        setLiveToast(null);
+      }, 2500);
+    } catch (err) {
+      console.warn('Copy error:', err);
+    }
+  };
+
+  // Helper de badge por categoría
   const getCategoryBadge = (category: string) => {
     switch (category) {
       case 'clima':
         return {
-          icon: <CloudRain className="w-3 h-3 text-sky-500" />,
-          classes: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20'
+          label: 'Clima',
+          icon: <CloudRain className="w-3 h-3 text-sky-400" />,
+          classes: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/25'
         };
       case 'transito':
         return {
-          icon: <Car className="w-3 h-3 text-emerald-500" />,
-          classes: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+          label: 'Rutas & Vialidad',
+          icon: <Car className="w-3 h-3 text-emerald-400" />,
+          classes: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25'
         };
       case 'institucional':
         return {
-          icon: <FileText className="w-3 h-3 text-blue-500" />,
-          classes: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
+          label: 'Oficial',
+          icon: <FileText className="w-3 h-3 text-blue-400" />,
+          classes: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/25'
         };
       case 'seguridad':
         return {
-          icon: <Shield className="w-3 h-3 text-orange-500" />,
-          classes: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20'
+          label: 'Seguridad',
+          icon: <Shield className="w-3 h-3 text-amber-400" />,
+          classes: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25'
         };
       case 'noticia':
-        return {
-          icon: <Send className="w-3 h-3 text-violet-500" />,
-          classes: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20'
-        };
       default:
         return {
-          icon: <Info className="w-3 h-3 text-slate-500" />,
-          classes: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20'
+          label: 'Noticia',
+          icon: <Radio className="w-3 h-3 text-violet-400" />,
+          classes: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/25'
         };
     }
   };
@@ -291,9 +503,9 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl p-5 md:p-6 shadow-2xl flex flex-col gap-5 overflow-hidden w-full mt-6 relative"
+      className="bg-white dark:bg-[#0b0d13] border border-slate-200 dark:border-white/10 rounded-3xl p-5 md:p-6 shadow-2xl flex flex-col gap-4 overflow-hidden w-full mt-6 relative"
     >
-      {/* REAL-TIME TOAST ALERT */}
+      {/* TOAST DE FEEDBACK EN VIVO */}
       <AnimatePresence>
         {liveToast && (
           <motion.div
@@ -308,76 +520,130 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
         )}
       </AnimatePresence>
 
-      {/* HEADER DE LA TARJETA */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100 dark:border-white/5">
+      {/* HEADER: TÍTULO, BADGE EN VIVO Y CONTROLES */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-3 border-b border-slate-100 dark:border-white/5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-blue-500/15 flex items-center justify-center relative shadow-inner">
-            <Send className="w-5 h-5 text-blue-500 rotate-[345deg]" />
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center relative shadow-lg shadow-blue-500/20 shrink-0">
+            <Radio className="w-5 h-5 text-white animate-pulse" />
             <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-sm md:text-base font-black text-slate-900 dark:text-white uppercase tracking-wider font-display">
                 Últimas noticias
               </h2>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 rounded-md text-[9px] font-black uppercase tracking-widest">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                En Vivo ({autoSeconds}s)
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                En Vivo ({filteredFeed.length})
+              </span>
+              <span className="text-[10px] font-mono text-slate-400 dark:text-gray-400 hidden sm:inline">
+                Sincro: {autoSeconds}s
               </span>
             </div>
             <p className="text-slate-500 dark:text-gray-400 text-xs flex items-center gap-1.5 mt-0.5">
-              Repositorio de alertas oficiales y noticias provinciales en tiempo real. 
-              <span className="text-[10px] font-mono text-slate-400 hidden sm:inline">Última sincro: {lastSyncTime}</span>
+              Slider automático en tiempo real con opción de ampliar y compartir por WhatsApp y Telegram.
             </p>
           </div>
         </div>
 
-        {/* CONTROLES: Actualizar en Vivo, Buscador, Calendario y Canal */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {/* Botón de Sincronización Manual */}
-          <button
-            onClick={() => fetchLiveFeeds(true)}
-            disabled={isRefreshing}
-            className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-200 rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-white/5 cursor-pointer disabled:opacity-50"
-            title="Sincronizar noticias en vivo ahora"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-blue-500 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Sincronizar</span>
-          </button>
+        {/* CONTROLES: Slider/Grid, Play/Pause, Fechas, Búsqueda y Sincro */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Switch Slider / Grilla */}
+          <div className="flex items-center bg-slate-100 dark:bg-white/5 p-0.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs">
+            <button
+              onClick={() => setViewMode('slider')}
+              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 font-bold transition-all cursor-pointer ${
+                viewMode === 'slider'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Vista de Slider Lateral"
+            >
+              <Columns className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline text-[11px]">Slider</span>
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 font-bold transition-all cursor-pointer ${
+                viewMode === 'grid'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Vista de Grilla"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline text-[11px]">Mosaico</span>
+            </button>
+          </div>
+
+          {/* Controles de Reproducción y Flechas (Solo en modo Slider) */}
+          {viewMode === 'slider' && (
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-0.5 rounded-xl border border-slate-200 dark:border-white/10">
+              <button
+                onClick={() => setIsAutoPlay(!isAutoPlay)}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  isAutoPlay
+                    ? 'text-emerald-500 hover:bg-emerald-500/10'
+                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'
+                }`}
+                title={isAutoPlay ? 'Pausar avance automático' : 'Activar avance automático'}
+              >
+                {isAutoPlay ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              </button>
+              <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10" />
+              <button
+                onClick={handlePrev}
+                className="p-1.5 rounded-lg text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all cursor-pointer"
+                title="Noticia anterior"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={handleNext}
+                className="p-1.5 rounded-lg text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all cursor-pointer"
+                title="Noticia siguiente"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
 
           {/* Buscador de texto */}
           <div className="relative">
             <input
               type="text"
-              placeholder="Buscar noticias..."
+              placeholder="Buscar..."
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 rounded-xl py-2 pl-3 pr-8 text-xs font-medium text-slate-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 transition-all w-32 sm:w-40"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl py-1.5 pl-3 pr-7 text-xs font-medium text-slate-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 transition-all w-28 sm:w-36"
             />
-            <Search className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+            <Search className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
           </div>
 
           {/* Botón de Calendario para Filtro por Día */}
           <div className="relative">
             <button
               onClick={() => setShowDatePicker(!showDatePicker)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
                 selectedDate
                   ? 'bg-blue-600 text-white border-blue-500 shadow-md'
-                  : 'bg-slate-50 dark:bg-black/40 text-slate-700 dark:text-gray-300 border-slate-200 dark:border-white/5 hover:border-blue-500/30'
+                  : 'bg-slate-50 dark:bg-black/40 text-slate-700 dark:text-gray-300 border-slate-200 dark:border-white/10 hover:border-blue-500/30'
               }`}
-              title="Filtrar noticias por día"
+              title="Filtrar noticias por fecha"
             >
               <Calendar className={`w-3.5 h-3.5 ${selectedDate ? 'text-white' : 'text-blue-500'}`} />
               <span className="text-[11px]">
                 {selectedDate ? selectedDate.split('-').reverse().join('/') : 'Fecha'}
               </span>
               {selectedDate && (
-                <span 
-                  onClick={(e) => { e.stopPropagation(); setSelectedDate(''); }}
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedDate('');
+                  }}
                   className="ml-1 hover:bg-white/20 p-0.5 rounded-full transition-colors"
                   title="Quitar filtro de fecha"
                 >
@@ -386,7 +652,7 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
               )}
             </button>
 
-            {/* Dropdown de Selector de Fecha */}
+            {/* Dropdown de Calendario */}
             <AnimatePresence>
               {showDatePicker && (
                 <motion.div
@@ -397,9 +663,9 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
                 >
                   <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
                     <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-gray-400 flex items-center gap-1">
-                      <Calendar className="w-3 h-3 text-blue-500" /> Filtrar noticias por día
+                      <Calendar className="w-3 h-3 text-blue-500" /> Filtrar por día
                     </span>
-                    <button 
+                    <button
                       onClick={() => setShowDatePicker(false)}
                       className="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"
                     >
@@ -407,29 +673,23 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
                     </button>
                   </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-slate-600 dark:text-gray-400 uppercase">
-                      Seleccionar Fecha:
-                    </label>
-                    <input
-                      type="date"
-                      value={selectedDate}
-                      onChange={(e) => {
-                        setSelectedDate(e.target.value);
-                        setShowDatePicker(false);
-                      }}
-                      className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 cursor-pointer"
-                    />
-                  </div>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => {
+                      setSelectedDate(e.target.value);
+                      setShowDatePicker(false);
+                    }}
+                    className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 cursor-pointer"
+                  />
 
-                  {/* Acceso Rápido: Hoy / Ayer / Ver Todas */}
                   <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
                     <button
                       onClick={() => {
                         setSelectedDate(formatYMD(new Date()));
                         setShowDatePicker(false);
                       }}
-                      className="flex-1 py-1.5 px-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 rounded-lg text-[9px] font-black uppercase text-center cursor-pointer"
+                      className="flex-1 py-1 px-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 rounded-lg text-[9px] font-black uppercase text-center cursor-pointer"
                     >
                       Hoy
                     </button>
@@ -440,7 +700,7 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
                         setSelectedDate(formatYMD(y));
                         setShowDatePicker(false);
                       }}
-                      className="flex-1 py-1.5 px-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-[9px] font-black uppercase text-center cursor-pointer"
+                      className="flex-1 py-1 px-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-gray-300 hover:bg-slate-200 rounded-lg text-[9px] font-black uppercase text-center cursor-pointer"
                     >
                       Ayer
                     </button>
@@ -450,7 +710,7 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
                           setSelectedDate('');
                           setShowDatePicker(false);
                         }}
-                        className="py-1.5 px-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg text-[9px] font-black uppercase text-center cursor-pointer"
+                        className="py-1 px-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg text-[9px] font-black uppercase text-center cursor-pointer"
                       >
                         Todas
                       </button>
@@ -461,162 +721,440 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
             </AnimatePresence>
           </div>
 
-          <a
-            href="https://t.me/+rkKMfpVR3G0yMDBh"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-md hover:shadow-blue-500/10 active:scale-95 shrink-0"
+          {/* Sincronización Manual */}
+          <button
+            onClick={() => fetchLiveFeeds(true)}
+            disabled={isRefreshing}
+            className="p-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-200 rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-white/10 cursor-pointer disabled:opacity-50"
+            title="Sincronizar ahora"
           >
-            Canal <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+            <RefreshCw className={`w-3.5 h-3.5 text-blue-500 ${isRefreshing ? 'animate-spin' : ''}`} />
+          </button>
         </div>
       </div>
 
-      {/* Indicador de Filtro Activo por Fecha */}
+      {/* INDICADOR DE FILTRO ACTIVO */}
       {selectedDate && (
         <div className="flex items-center justify-between bg-blue-500/10 border border-blue-500/20 rounded-xl px-3.5 py-2 text-xs">
           <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium">
             <Filter className="w-3.5 h-3.5" />
-            <span>Filtro de fecha activo: <strong>{selectedDate.split('-').reverse().join('/')}</strong></span>
-            <span className="text-[10px] opacity-75">({filteredFeed.length} noticias encontradas)</span>
+            <span>
+              Filtro de fecha: <strong>{selectedDate.split('-').reverse().join('/')}</strong>
+            </span>
+            <span className="text-[10px] opacity-75">({filteredFeed.length} noticias)</span>
           </div>
           <button
             onClick={() => setSelectedDate('')}
             className="text-[10px] font-black uppercase text-blue-500 hover:underline cursor-pointer"
           >
-            Mostrar todas las noticias
+            Ver todas
           </button>
         </div>
       )}
 
-      {/* FEED DE MENSAJES — EN TIEMPO REAL Y ORDENADO CRONOLÓGICAMENTE */}
-      <div className="max-h-[460px] overflow-y-auto pr-1 flex flex-col gap-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-white/5">
-        <AnimatePresence mode="popLayout">
-          {filteredFeed.map((item, idx) => {
-            const badge = getCategoryBadge(item.category);
-            const friendlyDateStr = formatDisplayDate(item.date, item.timeStr);
+      {/* CONTENEDOR: SLIDER LATERAL O GRILLA */}
+      {viewMode === 'slider' ? (
+        <div className="relative group/slider w-full">
+          {/* TRACK DEL SLIDER LATERAL */}
+          <div
+            ref={sliderRef}
+            onScroll={handleSliderScroll}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className="flex gap-4 overflow-x-auto scroll-smooth pb-4 pt-1 px-1 scrollbar-hide snap-x snap-mandatory"
+          >
+            {filteredFeed.map((item, idx) => {
+              const badge = getCategoryBadge(item.category);
 
-            return (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-                transition={{ delay: Math.min(idx * 0.04, 0.3) }}
-                className={`p-4 rounded-2xl border transition-all flex flex-col gap-2.5 relative group ${
-                  item.isImportant
-                    ? 'bg-red-500/[0.02] border-red-500/25 dark:border-red-500/20'
-                    : 'bg-slate-50/50 dark:bg-white/[0.01] border-slate-200 dark:border-white/5 hover:border-blue-500/20 dark:hover:border-blue-500/15'
-                }`}
-              >
-                {/* Cabecera del mensaje con emisor, categoría y fecha/hora exacta */}
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase text-slate-800 dark:text-white tracking-wider flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                      {item.sender}
-                    </span>
-                    {item.isImportant && (
-                      <span className="text-[8px] font-black uppercase px-2 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded flex items-center gap-1">
-                        <AlertTriangle className="w-2.5 h-2.5" /> Importante
+              return (
+                <div
+                  key={item.id}
+                  data-slider-card
+                  onClick={() => setExpandedItem(item)}
+                  className={`snap-start shrink-0 w-[295px] sm:w-[350px] md:w-[380px] bg-slate-50/80 dark:bg-[#12151f]/90 border border-slate-200 dark:border-white/10 hover:border-blue-500/40 rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer relative group/card ${
+                    item.isImportant ? 'border-red-500/30 bg-red-500/[0.02]' : ''
+                  }`}
+                >
+                  {/* IMAGEN / THUMBNAIL (16:9 con hover effect) */}
+                  <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-slate-900/80 relative border border-slate-200/50 dark:border-white/5 shrink-0 shadow-inner">
+                    {item.thumbnail ? (
+                      <img
+                        src={item.thumbnail}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-blue-950 text-slate-500 gap-2 p-3 text-center">
+                        <Radio className="w-8 h-8 text-blue-500/40" />
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                          {item.sender}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Badge de Categoría flotante sobre imagen */}
+                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10">
+                      <div className={`px-2 py-0.5 rounded-md border text-[9px] font-black uppercase tracking-wider backdrop-blur-md flex items-center gap-1 ${badge.classes}`}>
+                        {badge.icon}
+                        <span>{badge.label}</span>
+                      </div>
+                      {item.isImportant && (
+                        <span className="text-[8px] font-black uppercase px-2 py-0.5 bg-red-600 text-white rounded-md shadow-md animate-pulse">
+                          Alerta
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Botón flotante para Ampliar al hacer hover */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <span className="px-3 py-1.5 rounded-full bg-blue-600 text-white text-[11px] font-bold flex items-center gap-1.5 shadow-lg transform translate-y-2 group-hover/card:translate-y-0 transition-all">
+                        <Maximize2 className="w-3.5 h-3.5" /> Ampliar Nota
                       </span>
-                    )}
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    {/* Badge de Categoría */}
-                    <div className={`px-2 py-0.5 rounded-md border text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${badge.classes}`}>
-                      {badge.icon}
-                      {item.category === 'clima' ? 'Clima' : item.category === 'transito' ? 'Rutas' : item.category === 'institucional' ? 'Gobierno' : item.category === 'seguridad' ? 'Seguridad' : 'Noticia'}
+                  {/* CUERPO: FUENTE, FECHA/HORA, TÍTULO Y REDACCIÓN CORTA */}
+                  <div className="flex flex-col gap-2 flex-1">
+                    {/* Fuente + Fecha y Hora exacta */}
+                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 dark:text-gray-400 border-b border-slate-100 dark:border-white/5 pb-2">
+                      <span className="font-bold text-blue-600 dark:text-cyan-400 uppercase tracking-wide truncate max-w-[150px]">
+                        • {item.sender}
+                      </span>
+                      <span className="flex items-center gap-1 shrink-0 font-medium">
+                        <Clock className="w-3 h-3 text-slate-400" />
+                        <span>{item.dateFormatted}</span>
+                        <span className="text-slate-300 dark:text-gray-600">·</span>
+                        <span className="text-slate-800 dark:text-gray-300 font-bold">{item.formattedTime}</span>
+                      </span>
                     </div>
 
-                    {/* Fecha y Hora Exacta de Publicación */}
-                    <span className="text-[9.5px] text-slate-500 dark:text-gray-400 font-mono font-bold flex items-center gap-1 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md border border-slate-200 dark:border-white/5">
-                      <Calendar className="w-3 h-3 text-blue-500" />
-                      {friendlyDateStr}
-                    </span>
-                  </div>
-                </div>
+                    {/* Título de la noticia */}
+                    <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white leading-snug line-clamp-2 font-display group-hover/card:text-blue-500 dark:group-hover/card:text-cyan-400 transition-colors">
+                      {item.title}
+                    </h3>
 
-                {/* Contenido (con thumbnail si tiene) */}
-                <div className="flex flex-col md:flex-row gap-4 items-start">
-                  {item.thumbnail && (
-                    <div className="w-full md:w-40 aspect-[16/10] shrink-0 overflow-hidden rounded-xl relative shadow-md border border-slate-200 dark:border-white/5">
-                      <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
-                    </div>
-                  )}
-                  <div className="flex-1 flex flex-col gap-1.5">
-                    {item.title && (
-                      <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white leading-snug font-display">
-                        {item.title}
-                      </h3>
-                    )}
-                    <p className="text-xs md:text-[12.5px] leading-relaxed text-slate-700 dark:text-gray-300 font-medium whitespace-pre-wrap line-clamp-3">
-                      {item.content}
+                    {/* Redacción Corta */}
+                    <p className="text-[11px] sm:text-xs text-slate-600 dark:text-gray-300 line-clamp-3 leading-relaxed font-normal">
+                      {item.shortContent}
                     </p>
                   </div>
-                </div>
 
-                {/* Pie con enlaces interactivos (Instant View / Open link / Share) */}
-                <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex flex-wrap gap-3 justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="text-[8.5px] text-slate-400 dark:text-gray-500 uppercase tracking-widest font-mono">
-                    {item.link ? 'Instant View disponible' : 'Canal ID: +rkKMfpVR3G0yMDBh'}
-                  </span>
-                  
-                  <div className="flex items-center gap-3">
-                    {/* Botón de Vista Rápida (Instant View) */}
-                    {item.rawArticle && onSelectArticle && (
+                  {/* FOOTER: BOTÓN DE AMPLIAR + BOTONES RÁPIDOS DE WHATSAPP Y TELEGRAM */}
+                  <div className="pt-2.5 border-t border-slate-200/70 dark:border-white/5 flex items-center justify-between gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedItem(item);
+                      }}
+                      className="flex items-center gap-1.5 text-[11px] font-bold text-blue-600 dark:text-cyan-400 hover:text-blue-700 dark:hover:text-cyan-300 transition-colors cursor-pointer"
+                    >
+                      <Maximize2 className="w-3.5 h-3.5" />
+                      <span>Ampliar</span>
+                    </button>
+
+                    <div className="flex items-center gap-1.5">
+                      {/* Compartir WhatsApp */}
                       <button
-                        onClick={() => onSelectArticle(item.rawArticle!)}
-                        className="flex items-center gap-1.5 text-[9.5px] font-black uppercase text-violet-500 hover:text-violet-400 transition-colors cursor-pointer"
-                        title="Abrir vista de lectura limpia"
+                        onClick={(e) => handleShareWhatsApp(item, e)}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/25 transition-all text-[10px] font-bold flex items-center gap-1 cursor-pointer shadow-sm"
+                        title="Compartir noticia en WhatsApp"
                       >
-                        <BookOpen className="w-3.5 h-3.5" /> Vista Rápida
+                        <WhatsAppIcon className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">WhatsApp</span>
                       </button>
-                    )}
 
-                    {/* Botón de Enlace Original */}
-                    {item.link ? (
-                      <a
-                        href={item.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[9.5px] font-black uppercase text-blue-500 hover:text-blue-400 flex items-center gap-1 tracking-wider transition-colors"
+                      {/* Compartir Telegram */}
+                      <button
+                        onClick={(e) => handleShareTelegram(item, e)}
+                        className="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500 text-sky-600 dark:text-sky-400 hover:text-white border border-sky-500/25 transition-all text-[10px] font-bold flex items-center gap-1 cursor-pointer shadow-sm"
+                        title="Compartir noticia en Telegram"
                       >
-                        Ver Original <ExternalLink className="w-3 h-3" />
-                      </a>
-                    ) : (
-                      <a
-                        href="https://t.me/+rkKMfpVR3G0yMDBh"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[9.5px] font-black uppercase text-blue-500 hover:text-blue-400 flex items-center gap-1 tracking-wider transition-colors"
+                        <TelegramIcon className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Telegram</span>
+                      </button>
+
+                      {/* Copiar Mensaje */}
+                      <button
+                        onClick={(e) => handleCopyMessage(item, e)}
+                        className="p-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10 transition-all cursor-pointer"
+                        title="Copiar texto de la noticia"
                       >
-                        Ver en Telegram <ExternalLink className="w-3 h-3" />
-                      </a>
-                    )}
+                        {copiedId === item.id ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </motion.div>
+              );
+            })}
+          </div>
+
+          {/* BARRA DE PROGRESO Y CONTADOR DE SLIDES */}
+          <div className="flex items-center justify-between pt-2 px-1 text-[11px] font-mono text-slate-400 dark:text-gray-400 border-t border-slate-100 dark:border-white/5">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-slate-700 dark:text-gray-200">
+                Nota {currentIndex + 1} de {filteredFeed.length}
+              </span>
+              <span className="text-slate-300 dark:text-gray-600">·</span>
+              <span className="flex items-center gap-1 text-[10px]">
+                {isAutoPlay && !isHovered ? (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                    <span className="text-emerald-500">Pase automático activo (4.5s)</span>
+                  </>
+                ) : (
+                  <span className="text-slate-400">Pausado (hover/manual)</span>
+                )}
+              </span>
+            </div>
+
+            {/* Indicador de Barra de Progreso */}
+            <div className="hidden sm:flex items-center gap-1 w-32 bg-slate-200 dark:bg-white/10 h-1.5 rounded-full overflow-hidden">
+              <div
+                className="bg-blue-600 dark:bg-cyan-500 h-full rounded-full transition-all duration-300"
+                style={{
+                  width: `${Math.min(100, ((currentIndex + 1) / Math.max(1, filteredFeed.length)) * 100)}%`
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* VISTA DE GRILLA / MOSAICO ALTERNATIVA */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto pr-1 scrollbar-thin">
+          {filteredFeed.map((item) => {
+            const badge = getCategoryBadge(item.category);
+
+            return (
+              <div
+                key={item.id}
+                onClick={() => setExpandedItem(item)}
+                className="bg-slate-50/80 dark:bg-[#12151f]/90 border border-slate-200 dark:border-white/10 hover:border-blue-500/40 rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-md hover:shadow-xl transition-all cursor-pointer group"
+              >
+                {item.thumbnail && (
+                  <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-slate-900 relative">
+                    <img
+                      src={item.thumbnail}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md border text-[9px] font-black uppercase tracking-wider backdrop-blur-md flex items-center gap-1 bg-black/60 text-white border-white/20">
+                      {badge.icon}
+                      <span>{badge.label}</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-1.5 flex-1">
+                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
+                    <span className="font-bold text-blue-600 dark:text-cyan-400 uppercase">• {item.sender}</span>
+                    <span>{item.dateFormatted} · {item.formattedTime}</span>
+                  </div>
+                  <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white line-clamp-2 font-display">
+                    {item.title}
+                  </h3>
+                  <p className="text-[11px] text-slate-600 dark:text-gray-300 line-clamp-3 leading-relaxed">
+                    {item.shortContent}
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpandedItem(item);
+                    }}
+                    className="text-[11px] font-bold text-blue-600 dark:text-cyan-400 flex items-center gap-1"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" /> Ampliar
+                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={(e) => handleShareWhatsApp(item, e)}
+                      className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-colors"
+                      title="WhatsApp"
+                    >
+                      <WhatsAppIcon className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => handleShareTelegram(item, e)}
+                      className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500 hover:bg-sky-500 hover:text-white transition-colors"
+                      title="Telegram"
+                    >
+                      <TelegramIcon className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
             );
           })}
-        </AnimatePresence>
+        </div>
+      )}
 
-        {filteredFeed.length === 0 && (
-          <div className="text-center py-12 text-slate-400 dark:text-gray-500 flex flex-col items-center justify-center gap-2">
-            <Send className="w-8 h-8 opacity-30 rotate-[345deg] text-blue-500 mb-1" />
-            <span className="text-xs font-black uppercase tracking-wider">No se encontraron noticias ni alertas</span>
-            {selectedDate && (
-              <button
-                onClick={() => setSelectedDate('')}
-                className="mt-2 text-xs font-bold text-blue-500 hover:underline cursor-pointer"
-              >
-                Limpiar filtro de fecha ({selectedDate})
-              </button>
-            )}
+      {/* ESTADO VACÍO SI NO HAY NOTICIAS TRAS FILTRAR */}
+      {filteredFeed.length === 0 && (
+        <div className="text-center py-12 text-slate-400 dark:text-gray-500 flex flex-col items-center justify-center gap-2">
+          <Send className="w-8 h-8 opacity-30 rotate-[345deg] text-blue-500 mb-1" />
+          <span className="text-xs font-black uppercase tracking-wider">No se encontraron noticias</span>
+          {selectedDate && (
+            <button
+              onClick={() => setSelectedDate('')}
+              className="mt-2 text-xs font-bold text-blue-500 hover:underline cursor-pointer"
+            >
+              Quitar filtro de fecha ({selectedDate})
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* MODAL DE LECTURA AMPLIADA ("PERMITA INGRESAR Y AMPLIAR LA NOTA") */}
+      <AnimatePresence>
+        {expandedItem && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-[#0e111a] border border-slate-200 dark:border-white/15 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl relative animate-in zoom-in-95 duration-200"
+            >
+              {/* Header del Modal */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02]">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-black uppercase tracking-wider text-blue-600 dark:text-cyan-400 font-mono">
+                    • {expandedItem.sender}
+                  </span>
+                  <div
+                    className={`px-2 py-0.5 rounded-md border text-[9px] font-black uppercase tracking-wider flex items-center gap-1 ${
+                      getCategoryBadge(expandedItem.category).classes
+                    }`}
+                  >
+                    {getCategoryBadge(expandedItem.category).icon}
+                    <span>{getCategoryBadge(expandedItem.category).label}</span>
+                  </div>
+                  {expandedItem.isImportant && (
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 bg-red-600 text-white rounded-md">
+                      Alerta Oficial
+                    </span>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setExpandedItem(null)}
+                  className="p-1.5 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-500 dark:text-gray-300 transition-colors cursor-pointer"
+                  title="Cerrar (Esc)"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Contenido Ampliado con Scroll */}
+              <div className="p-5 md:p-6 overflow-y-auto flex flex-col gap-4 scrollbar-thin">
+                {/* Imagen en Alta Resolución si existe */}
+                {expandedItem.thumbnail && (
+                  <div className="w-full aspect-[16/9] max-h-[320px] rounded-2xl overflow-hidden bg-slate-900 border border-slate-200 dark:border-white/10 shadow-lg shrink-0">
+                    <img
+                      src={expandedItem.thumbnail}
+                      alt={expandedItem.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
+                {/* Fecha y Hora Exacta */}
+                <div className="flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-gray-400">
+                  <Calendar className="w-3.5 h-3.5 text-blue-500" />
+                  <span>Publicado: <strong>{expandedItem.dateFormatted}</strong></span>
+                  <span className="text-slate-300 dark:text-gray-600">·</span>
+                  <Clock className="w-3.5 h-3.5 text-blue-500" />
+                  <span>Hora: <strong>{expandedItem.formattedTime}</strong></span>
+                </div>
+
+                {/* Título Completo */}
+                <h1 className="text-base sm:text-lg md:text-xl font-black text-slate-900 dark:text-white leading-snug font-display">
+                  {expandedItem.title}
+                </h1>
+
+                {/* Redacción Completa */}
+                <div className="text-xs sm:text-sm text-slate-700 dark:text-gray-200 leading-relaxed font-normal whitespace-pre-wrap border-t border-slate-100 dark:border-white/10 pt-4">
+                  {expandedItem.content}
+                </div>
+              </div>
+
+              {/* Footer del Modal con Botones Rápidos para Compartir */}
+              <div className="p-4 md:px-6 bg-slate-50 dark:bg-black/40 border-t border-slate-100 dark:border-white/10 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* WhatsApp */}
+                  <button
+                    onClick={() => handleShareWhatsApp(expandedItem)}
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-emerald-600/20 transition-all cursor-pointer active:scale-95"
+                  >
+                    <WhatsAppIcon className="w-4 h-4" />
+                    <span>Compartir en WhatsApp</span>
+                  </button>
+
+                  {/* Telegram */}
+                  <button
+                    onClick={() => handleShareTelegram(expandedItem)}
+                    className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-sky-600/20 transition-all cursor-pointer active:scale-95"
+                  >
+                    <TelegramIcon className="w-4 h-4" />
+                    <span>Compartir en Telegram</span>
+                  </button>
+
+                  {/* Copiar */}
+                  <button
+                    onClick={() => handleCopyMessage(expandedItem)}
+                    className="px-3 py-2 rounded-xl bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 text-slate-700 dark:text-gray-200 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    {copiedId === expandedItem.id ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-500" />
+                        <span>Copiado</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copiar Mensaje</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2 ml-auto">
+                  {/* Vista de lectura limpia si está disponible */}
+                  {expandedItem.rawArticle && onSelectArticle && (
+                    <button
+                      onClick={() => {
+                        onSelectArticle(expandedItem.rawArticle!);
+                        setExpandedItem(null);
+                      }}
+                      className="px-3 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <BookOpen className="w-3.5 h-3.5" />
+                      <span>Vista Lectura</span>
+                    </button>
+                  )}
+
+                  {/* Enlace original */}
+                  {expandedItem.link && (
+                    <a
+                      href={expandedItem.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2 rounded-xl border border-slate-300 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-gray-300 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    >
+                      <span>Web Original</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         )}
-      </div>
+      </AnimatePresence>
     </motion.div>
   );
 }
