@@ -22,6 +22,7 @@ import {
   Share2
 } from 'lucide-react';
 import type { Article } from '@/types';
+import { shareToTelegram, InstantViewExplainerBadge, isValidUrl } from '@/utils/telegramInstantView';
 
 // Ícono SVG oficial de Instagram
 export const InstagramIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
@@ -346,12 +347,22 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  // Compartir en Telegram
+  // Compartir en Telegram (con soporte Instant View según https://instantview.telegram.org/)
   const handleShareTelegram = (art: Article, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    const { telegramText, postUrl } = getSharePayload(art);
-    const url = `https://t.me/share/url?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(telegramText)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    const sourceName = art.sourceName || (art.sourceId === 'la_gentetv' ? 'La Gente TV' : art.sourceId === 'justiciatdf' ? 'Poder Judicial TDF' : 'Turismo Tierra del Fuego');
+    const username = art.username || art.sourceId || 'redes_tdf';
+    const dateFormatted = art.pubDate ? new Date(art.pubDate).toLocaleDateString('es-AR') : 'Reciente';
+    const formattedTime = art.pubDate ? new Date(art.pubDate).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) + ' hs' : '';
+
+    shareToTelegram({
+      url: art.link,
+      title: art.title,
+      excerpt: art.description ? stripHtml(art.description).substring(0, 200) : '',
+      source: `${sourceName} (@${username})`,
+      date: dateFormatted,
+      time: formattedTime
+    });
   };
 
   // Copiar mensaje al portapapeles
@@ -703,14 +714,19 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
                         <span className="hidden sm:inline">WhatsApp</span>
                       </button>
 
-                      {/* Compartir Telegram */}
+                      {/* Compartir Telegram con Instant View */}
                       <button
                         onClick={(e) => handleShareTelegram(art, e)}
-                        className="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500 text-sky-600 dark:text-sky-400 hover:text-white border border-sky-500/25 transition-all text-[10px] font-bold flex items-center gap-1 cursor-pointer shadow-sm"
-                        title="Compartir noticia en Telegram"
+                        className="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500 text-sky-600 dark:text-sky-400 hover:text-white border border-sky-500/25 transition-all text-[10px] font-bold flex items-center gap-1 cursor-pointer shadow-sm group/btn"
+                        title={isValidUrl(art.link) ? "Compartir en Telegram con Vista Rápida (⚡ Instant View) | instantview.telegram.org" : "Compartir noticia en Telegram"}
                       >
                         <TelegramIcon className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">Telegram</span>
+                        {isValidUrl(art.link) && (
+                          <span className="text-[9px] bg-sky-500/20 text-sky-500 dark:text-sky-300 px-1 py-0.2 rounded font-black group-hover/btn:bg-white/20 group-hover/btn:text-white transition-colors" title="Instant View disponible">
+                            ⚡ IV
+                          </span>
+                        )}
                       </button>
 
                       {/* Copiar Mensaje */}
@@ -822,10 +838,15 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
                     </button>
                     <button
                       onClick={(e) => handleShareTelegram(art, e)}
-                      className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500 hover:bg-sky-500 hover:text-white transition-colors"
-                      title="Telegram"
+                      className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500 hover:bg-sky-500 hover:text-white transition-colors relative group/tg"
+                      title={isValidUrl(art.link) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Telegram"}
                     >
                       <TelegramIcon className="w-3.5 h-3.5" />
+                      {isValidUrl(art.link) && (
+                        <span className="absolute -top-1 -right-1 text-[8px] bg-amber-400 text-black px-0.5 rounded font-black leading-none" title="Instant View disponible">
+                          ⚡
+                        </span>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -919,14 +940,25 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
                     <span>Compartir en WhatsApp</span>
                   </button>
 
-                  {/* Telegram */}
+                  {/* Telegram con Instant View */}
                   <button
                     onClick={() => handleShareTelegram(expandedArticle)}
                     className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-sky-600/20 transition-all cursor-pointer active:scale-95"
+                    title={isValidUrl(expandedArticle.link) ? "Compartir en Telegram con Vista Rápida (Instant View sin tiempos de carga)" : "Compartir en Telegram"}
                   >
                     <TelegramIcon className="w-4 h-4" />
                     <span>Compartir en Telegram</span>
+                    {isValidUrl(expandedArticle.link) && (
+                      <span className="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded font-black tracking-normal">
+                        ⚡ Instant View
+                      </span>
+                    )}
                   </button>
+
+                  {/* Enlace oficial Instant Views Explained si existe la URL */}
+                  {isValidUrl(expandedArticle.link) && (
+                    <InstantViewExplainerBadge />
+                  )}
 
                   {/* Copiar */}
                   <button

@@ -32,6 +32,7 @@ import {
   Columns
 } from 'lucide-react';
 import type { Article } from '@/types';
+import { shareToTelegram, InstantViewExplainerBadge, isValidUrl } from '@/utils/telegramInstantView';
 
 // Ícono SVG oficial de WhatsApp
 function WhatsAppIcon({ className = 'w-4 h-4' }: { className?: string }) {
@@ -435,13 +436,17 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  // Compartir en Telegram
+  // Compartir en Telegram (con soporte Instant View según https://instantview.telegram.org/)
   const handleShareTelegram = (item: UnifiedFeedItem, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    const { telegramText, link } = getSharePayload(item);
-    const shareUrl = link || (typeof window !== 'undefined' ? window.location.href : '');
-    const url = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(telegramText)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    shareToTelegram({
+      url: item.link,
+      title: item.title,
+      excerpt: item.shortContent,
+      source: item.sender,
+      date: item.dateFormatted,
+      time: item.formattedTime
+    });
   };
 
   // Copiar mensaje al portapapeles
@@ -864,14 +869,19 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
                         <span className="hidden sm:inline">WhatsApp</span>
                       </button>
 
-                      {/* Compartir Telegram */}
+                      {/* Compartir Telegram con Instant View */}
                       <button
                         onClick={(e) => handleShareTelegram(item, e)}
-                        className="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500 text-sky-600 dark:text-sky-400 hover:text-white border border-sky-500/25 transition-all text-[10px] font-bold flex items-center gap-1 cursor-pointer shadow-sm"
-                        title="Compartir noticia en Telegram"
+                        className="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500 text-sky-600 dark:text-sky-400 hover:text-white border border-sky-500/25 transition-all text-[10px] font-bold flex items-center gap-1 cursor-pointer shadow-sm group/btn"
+                        title={isValidUrl(item.link) ? "Compartir en Telegram con Vista Rápida (⚡ Instant View) | instantview.telegram.org" : "Compartir noticia en Telegram"}
                       >
                         <TelegramIcon className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">Telegram</span>
+                        {isValidUrl(item.link) && (
+                          <span className="text-[9px] bg-sky-500/20 text-sky-500 dark:text-sky-300 px-1 py-0.2 rounded font-black group-hover/btn:bg-white/20 group-hover/btn:text-white transition-colors" title="Instant View disponible">
+                            ⚡ IV
+                          </span>
+                        )}
                       </button>
 
                       {/* Copiar Mensaje */}
@@ -982,10 +992,15 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
                     </button>
                     <button
                       onClick={(e) => handleShareTelegram(item, e)}
-                      className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500 hover:bg-sky-500 hover:text-white transition-colors"
-                      title="Telegram"
+                      className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500 hover:bg-sky-500 hover:text-white transition-colors relative group/tg"
+                      title={isValidUrl(item.link) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Telegram"}
                     >
                       <TelegramIcon className="w-3.5 h-3.5" />
+                      {isValidUrl(item.link) && (
+                        <span className="absolute -top-1 -right-1 text-[8px] bg-amber-400 text-black px-0.5 rounded font-black leading-none" title="Instant View disponible">
+                          ⚡
+                        </span>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -1094,14 +1109,25 @@ export default function TelegramFeed({ articles = [], onSelectArticle }: Telegra
                     <span>Compartir en WhatsApp</span>
                   </button>
 
-                  {/* Telegram */}
+                  {/* Telegram con Instant View */}
                   <button
                     onClick={() => handleShareTelegram(expandedItem)}
                     className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-sky-600/20 transition-all cursor-pointer active:scale-95"
+                    title={isValidUrl(expandedItem.link) ? "Compartir en Telegram con Vista Rápida (Instant View sin tiempos de carga)" : "Compartir en Telegram"}
                   >
                     <TelegramIcon className="w-4 h-4" />
                     <span>Compartir en Telegram</span>
+                    {isValidUrl(expandedItem.link) && (
+                      <span className="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded font-black tracking-normal">
+                        ⚡ Instant View
+                      </span>
+                    )}
                   </button>
+
+                  {/* Enlace oficial Instant Views Explained si existe la URL */}
+                  {isValidUrl(expandedItem.link) && (
+                    <InstantViewExplainerBadge />
+                  )}
 
                   {/* Copiar */}
                   <button

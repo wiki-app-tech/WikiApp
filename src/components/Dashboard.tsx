@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import type { Article, FeedSource } from '@/types';
 import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, AlertTriangle, Info, Newspaper, Eye, Check, Type } from 'lucide-react';
+import { shareToTelegram, InstantViewExplainerBadge, isValidUrl } from '@/utils/telegramInstantView';
 import { useTheme } from 'next-themes';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -1153,11 +1154,25 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                       <MessageCircle className="w-4 h-4" />
                                     </button>
                                     <button 
-                                      onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(heroArticle.link)}&text=${encodeURIComponent(heroArticle.title)}`, '_blank'); }} 
-                                      className="p-2 bg-white/10 hover:bg-blue-600 text-white rounded-xl transition-all backdrop-blur" 
-                                      title="Compartir por Telegram"
+                                      onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        shareToTelegram({
+                                          url: heroArticle.link,
+                                          title: heroArticle.title,
+                                          excerpt: heroArticle.description,
+                                          source: heroArticle.sourceName || heroArticle.sourceId,
+                                          date: heroArticle.pubDate ? new Date(heroArticle.pubDate).toLocaleDateString('es-AR') : ''
+                                        });
+                                      }} 
+                                      className="p-2 bg-white/10 hover:bg-blue-600 text-white rounded-xl transition-all backdrop-blur relative group/tg" 
+                                      title={isValidUrl(heroArticle.link) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Compartir por Telegram"}
                                     >
                                       <Send className="w-4 h-4" />
+                                      {isValidUrl(heroArticle.link) && (
+                                        <span className="absolute -top-1 -right-1 text-[8px] bg-amber-400 text-black px-1 rounded-full font-black leading-none py-0.5">
+                                          ⚡
+                                        </span>
+                                      )}
                                     </button>
                                   </div>
                                 </div>
@@ -1424,7 +1439,27 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         </div>
                                                         <div className="hidden md:flex items-center gap-2 mt-3 sm:mt-0 shrink-0 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
                                                             <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-500 dark:text-gray-400 hover:text-green-500 rounded-xl transition-all" title="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-500 dark:text-gray-400 hover:text-blue-500 rounded-xl transition-all" title="Compartir en Telegram"><Send className="w-4 h-4" /></button>
+                                                            <button 
+                                                              onClick={(e) => { 
+                                                                e.stopPropagation(); 
+                                                                shareToTelegram({
+                                                                  url: article.link,
+                                                                  title: article.title,
+                                                                  excerpt: article.description,
+                                                                  source: article.sourceName || article.sourceId,
+                                                                  date: article.pubDate ? new Date(article.pubDate).toLocaleDateString('es-AR') : ''
+                                                                });
+                                                              }} 
+                                                              className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-500 dark:text-gray-400 hover:text-blue-500 rounded-xl transition-all relative" 
+                                                              title={isValidUrl(article.link) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Compartir en Telegram"}
+                                                            >
+                                                              <Send className="w-4 h-4" />
+                                                              {isValidUrl(article.link) && (
+                                                                <span className="absolute -top-1 -right-1 text-[8px] bg-amber-400 text-black px-1 rounded-full font-black leading-none py-0.5">
+                                                                  ⚡
+                                                                </span>
+                                                              )}
+                                                            </button>
                                                         </div>
                                                     </motion.div>
                                                 );
@@ -1497,7 +1532,27 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                         </div>
                                                         <div className="hidden md:flex absolute bottom-4 right-4 items-center gap-2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 bg-white dark:bg-black/80 backdrop-blur-xl p-2 rounded-xl border border-slate-200 dark:border-white/10 shadow-xl">
                                                             <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-lg transition-all" title="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-lg transition-all" title="Compartir en Telegram"><Send className="w-4 h-4" /></button>
+                                                            <button 
+                                                              onClick={(e) => { 
+                                                                e.stopPropagation(); 
+                                                                shareToTelegram({
+                                                                  url: article.link,
+                                                                  title: article.title,
+                                                                  excerpt: article.description,
+                                                                  source: article.sourceName || article.sourceId,
+                                                                  date: article.pubDate ? new Date(article.pubDate).toLocaleDateString('es-AR') : ''
+                                                                });
+                                                              }} 
+                                                              className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-lg transition-all relative" 
+                                                              title={isValidUrl(article.link) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Compartir en Telegram"}
+                                                            >
+                                                              <Send className="w-4 h-4" />
+                                                              {isValidUrl(article.link) && (
+                                                                <span className="absolute -top-1 -right-1 text-[8px] bg-amber-400 text-black px-1 rounded-full font-black leading-none py-0.5">
+                                                                  ⚡
+                                                                </span>
+                                                              )}
+                                                            </button>
                                                         </div>
                                                     </motion.div>
                                                 );
@@ -1575,7 +1630,27 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                                 <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider border-b-2 border-blue-600/20 group-hover:border-blue-600 transition-all pb-1">Seguir leyendo</span>
                                                                 <div className="hidden md:flex items-center gap-3 ml-auto opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
                                                                     <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en WhatsApp"><MessageCircle className="w-5 h-5" /></button>
-                                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/share/url?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.title)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en Telegram"><Send className="w-5 h-5" /></button>
+                                                                    <button 
+                                                                      onClick={(e) => { 
+                                                                        e.stopPropagation(); 
+                                                                        shareToTelegram({
+                                                                          url: article.link,
+                                                                          title: article.title,
+                                                                          excerpt: article.description,
+                                                                          source: article.sourceName || article.sourceId,
+                                                                          date: article.pubDate ? new Date(article.pubDate).toLocaleDateString('es-AR') : ''
+                                                                        });
+                                                                      }} 
+                                                                      className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5 relative" 
+                                                                      title={isValidUrl(article.link) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Compartir en Telegram"}
+                                                                    >
+                                                                      <Send className="w-5 h-5" />
+                                                                      {isValidUrl(article.link) && (
+                                                                        <span className="absolute -top-1 -right-1 text-[9px] bg-amber-400 text-black px-1 rounded-full font-black leading-none py-0.5">
+                                                                          ⚡
+                                                                        </span>
+                                                                      )}
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2881,10 +2956,22 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                         <MessageCircle className="w-4 h-4" /> WhatsApp
                       </button>
                       <button 
-                        onClick={() => window.open(`https://t.me/share/url?url=${encodeURIComponent(selectedArticle.link)}&text=${encodeURIComponent(selectedArticle.title)}`, '_blank')}
+                        onClick={() => shareToTelegram({
+                          url: selectedArticle.link,
+                          title: selectedArticle.title,
+                          excerpt: selectedArticle.description,
+                          source: selectedArticle.sourceName || selectedArticle.sourceId,
+                          date: selectedArticle.pubDate ? new Date(selectedArticle.pubDate).toLocaleDateString('es-AR') : ''
+                        })}
                         className="flex items-center gap-2 px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md"
+                        title={isValidUrl(selectedArticle.link) ? "Compartir en Telegram con Vista Rápida (Instant View sin tiempos de carga)" : "Compartir en Telegram"}
                       >
                         <Send className="w-4 h-4" /> Telegram
+                        {isValidUrl(selectedArticle.link) && (
+                          <span className="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded font-black tracking-normal">
+                            ⚡ Instant View
+                          </span>
+                        )}
                       </button>
                       <button 
                         onClick={() => {
@@ -2898,6 +2985,12 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                         <Share2 className="w-4 h-4" /> Copiar Enlace
                       </button>
                     </div>
+
+                    {isValidUrl(selectedArticle.link) && (
+                      <div className="flex justify-center -mt-2">
+                        <InstantViewExplainerBadge />
+                      </div>
+                    )}
 
                     <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center mt-2">Continúa leyendo la versión completa en el sitio oficial</p>
                     <a 

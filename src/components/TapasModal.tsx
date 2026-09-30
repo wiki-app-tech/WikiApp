@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ZoomIn, ZoomOut, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink, Loader2, Globe, Flag, Map } from 'lucide-react';
+import { shareToTelegram, InstantViewExplainerBadge, isValidUrl } from '@/utils/telegramInstantView';
 
 interface TapasItem {
   id: string;
@@ -224,7 +225,13 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
     if (platform === 'whatsapp') {
       window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
     } else {
-      window.open(`https://t.me/share/url?url=${encodeURIComponent(selectedItem.coverUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
+      shareToTelegram({
+        url: selectedItem.coverUrl || selectedItem.url,
+        title: `Tapa de ${selectedItem.name}`,
+        excerpt: headline ? `"${headline}"${summary ? ` — ${summary}` : ''}` : (summary || undefined),
+        source: `${selectedItem.name} (${categoryLabel})`,
+        date: selectedItem.date
+      });
     }
   };
 
@@ -274,7 +281,13 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
     if (platform === 'whatsapp') {
       window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
     } else {
-      window.open(`https://t.me/share/url?url=${encodeURIComponent(item.coverUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
+      shareToTelegram({
+        url: item.coverUrl || item.url,
+        title: `Tapa de ${item.name}`,
+        excerpt: userHeadline ? `"${userHeadline}"${userSummary ? ` — ${userSummary}` : ''}` : (userSummary || undefined),
+        source: `${item.name} (${categoryLabel})`,
+        date: item.date
+      });
     }
   };
 
@@ -446,9 +459,11 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                                 e.stopPropagation();
                                 handleQuickShare(item, 'telegram');
                               }}
-                              className="share-btn flex-1 py-1.5 bg-sky-600/90 hover:bg-sky-550 text-white rounded-xl text-[9px] font-black uppercase tracking-wider transition-all text-center"
+                              className="share-btn flex-1 py-1.5 bg-sky-600/90 hover:bg-sky-500 text-white rounded-xl text-[9px] font-black uppercase tracking-wider transition-all text-center flex items-center justify-center gap-1"
+                              title={isValidUrl(item.coverUrl) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Telegram"}
                             >
-                              Telegram
+                              <span>Telegram</span>
+                              {isValidUrl(item.coverUrl) && <span className="text-[8px] bg-white/20 px-1 py-0.2 rounded font-black">⚡ IV</span>}
                             </button>
                           </div>
                         </div>
@@ -597,10 +612,19 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                             <button
                               onClick={() => handleShare('telegram')}
                               className="py-2 bg-sky-600 hover:bg-sky-550 active:scale-95 transition-all text-white rounded-xl text-[9px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow"
+                              title={selectedItem && isValidUrl(selectedItem.coverUrl) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Telegram"}
                             >
-                              Telegram
+                              <span>Telegram</span>
+                              {selectedItem && isValidUrl(selectedItem.coverUrl) && (
+                                <span className="text-[8px] bg-white/20 px-1 py-0.2 rounded font-black">⚡ Instant View</span>
+                              )}
                             </button>
                           </div>
+                          {selectedItem && isValidUrl(selectedItem.coverUrl) && (
+                            <div className="flex justify-center mt-2">
+                              <InstantViewExplainerBadge compact />
+                            </div>
+                          )}
                         </div>
 
                         {/* Reading Advice */}
