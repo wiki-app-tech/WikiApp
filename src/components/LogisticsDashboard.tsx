@@ -27,10 +27,21 @@ import {
   Radio,
   Globe2,
   Maximize2,
-  Flame
+  Flame,
+  Camera,
+  AlertTriangle,
+  Activity,
+  Shield,
+  Zap,
+  Cable
 } from 'lucide-react';
 
 // Dynamic imports with ssr: false for maps
+const OsirisMap = dynamic(
+  () => import('./OsirisMap'),
+  { ssr: false, loading: () => <div className="w-full h-[550px] bg-[#02050e] flex items-center justify-center text-cyan-400 font-mono text-xs">Cargando Plataforma de Inteligencia Global OSIRIS...</div> }
+);
+
 const MaritimeMap = dynamic(
   () => import('./LogisticsMap').then(m => ({ default: m.MaritimeMap })),
   { ssr: false, loading: () => <div className="w-full h-full bg-[#0a0a0c] flex items-center justify-center text-slate-500 font-mono text-xs">Cargando Radar Marítimo...</div> }
@@ -66,10 +77,10 @@ interface LogisticsDashboardProps {
 }
 
 export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardProps) {
-  const [activeMainTab, setActiveMainTab] = useState<'overview' | 'airports' | 'godsview' | 'hotel' | 'cruises'>('overview');
+  const [activeMainTab, setActiveMainTab] = useState<'overview' | 'airports' | 'godsview' | 'osiris' | 'hotel' | 'cruises'>('overview');
   const [carouselSlide, setCarouselSlide] = useState<'ships' | 'flights'>('ships');
-  const [airRadarMode, setAirRadarMode] = useState<'godsview' | 'airnav'>('airnav');
-  const [airportTrackerMode, setAirportTrackerMode] = useState<'godsview' | 'airnav'>('airnav');
+  const [airRadarMode, setAirRadarMode] = useState<'osiris' | 'godsview' | 'airnav'>('osiris');
+  const [airportTrackerMode, setAirportTrackerMode] = useState<'osiris' | 'godsview' | 'airnav'>('airnav');
   const [isAutoCycle, setIsAutoCycle] = useState<boolean>(false);
   const [secondsToUpdate, setSecondsToUpdate] = useState<number>(30);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -265,6 +276,22 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
           <span>Mapa Aeropuertos Argentina</span>
           <span className="px-1.5 py-0.2 rounded-full bg-orange-500/10 text-[10px] font-mono">
             {flights.length} vuelos
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveMainTab('osiris')}
+          className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 border cursor-pointer ${
+            activeMainTab === 'osiris'
+              ? 'bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 text-white shadow-lg shadow-cyan-500/25 border-cyan-400'
+              : 'bg-white dark:bg-[#121214] border-slate-200 dark:border-white/5 text-slate-600 dark:text-gray-400 hover:border-slate-300 dark:hover:border-white/10'
+          }`}
+        >
+          <div className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+          <Globe2 className="w-4 h-4 text-cyan-400" />
+          <span>OSIRIS Inteligencia Global</span>
+          <span className="px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-mono font-bold">
+            OSINT Multidominio
           </span>
         </button>
 
@@ -807,12 +834,14 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                 </div>
               </div>
 
-              {/* RADAR AÉREO & SATELITAL EN TIEMPO REAL (GODSVIEWAI & FLIGHTAWARE) */}
+              {/* RADAR GLOBAL & TELEMETRÍA MULTIDOMINIO (OSIRIS, GODSVIEWAI & AIRNAV) */}
               <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-3xl overflow-hidden shadow-2xl flex flex-col">
                 <div className="flex flex-wrap items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-lg bg-orange-600/20 flex items-center justify-center">
-                      {airRadarMode === 'godsview' ? (
+                    <div className="w-7 h-7 rounded-lg bg-cyan-600/20 flex items-center justify-center">
+                      {airRadarMode === 'osiris' ? (
+                        <Globe2 className="w-4 h-4 text-cyan-400 animate-spin-slow" />
+                      ) : airRadarMode === 'godsview' ? (
                         <Globe2 className="w-4 h-4 text-cyan-400 animate-spin-slow" />
                       ) : (
                         <Plane className="w-4 h-4 text-orange-500" />
@@ -820,31 +849,35 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                     </div>
                     <div>
                       <h2 className="text-[13px] font-black text-slate-800 dark:text-gray-200 tracking-wide uppercase leading-none">
-                        {airRadarMode === 'godsview' 
+                        {airRadarMode === 'osiris'
+                          ? 'Mapa Táctico Global OSINT — OSIRIS'
+                          : airRadarMode === 'godsview' 
                           ? 'Radar Satelital 3D Global — GodsViewAI' 
                           : 'Radar de Tráfico Aéreo — AirNav RadarBox'}
                       </h2>
-                      <span className="text-[10px] text-orange-600 dark:text-orange-400 font-bold block mt-1">
-                        {airRadarMode === 'godsview'
+                      <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold block mt-1">
+                        {airRadarMode === 'osiris'
+                          ? 'Líneas Marítimas · Buques AIS · Satélites · CCTV · Sismos · Incendios · Clima · Nuclear · Incidentes'
+                          : airRadarMode === 'godsview'
                           ? 'Vuelos en Vivo · Telemetría 3D · Buques AIS · Focos Térmicos & Clima Satelital'
                           : 'Widget Oficial Centrado en Tierra del Fuego · Espacio Aéreo Ushuaia (SAWH) & Río Grande (SAWE)'}
                       </span>
                     </div>
                   </div>
 
-                  {/* SELECTOR DE RADAR: GODSVIEWAI 3D vs AIRNAV RADARBOX */}
+                  {/* SELECTOR DE RADAR: OSIRIS vs GODSVIEWAI 3D vs AIRNAV RADARBOX */}
                   <div className="flex items-center gap-2 flex-wrap">
                     <div className="flex items-center bg-slate-100 dark:bg-white/5 p-0.5 rounded-full border border-slate-200 dark:border-white/10 text-[10px] font-mono font-bold">
                       <button
-                        onClick={() => setAirRadarMode('airnav')}
+                        onClick={() => setAirRadarMode('osiris')}
                         className={`px-3 py-1 rounded-full transition-all cursor-pointer flex items-center gap-1.5 ${
-                          airRadarMode === 'airnav'
-                            ? 'bg-orange-600 text-white shadow-sm'
+                          airRadarMode === 'osiris'
+                            ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-sm'
                             : 'text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-white'
                         }`}
                       >
-                        <Plane className="w-3 h-3" />
-                        <span>AirNav RadarBox TDF</span>
+                        <Globe2 className="w-3 h-3 text-cyan-200" />
+                        <span>OSIRIS Global</span>
                       </button>
                       <button
                         onClick={() => setAirRadarMode('godsview')}
@@ -857,15 +890,26 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                         <Globe2 className="w-3 h-3" />
                         <span>GodsViewAI 3D</span>
                       </button>
+                      <button
+                        onClick={() => setAirRadarMode('airnav')}
+                        className={`px-3 py-1 rounded-full transition-all cursor-pointer flex items-center gap-1.5 ${
+                          airRadarMode === 'airnav'
+                            ? 'bg-orange-600 text-white shadow-sm'
+                            : 'text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-white'
+                        }`}
+                      >
+                        <Plane className="w-3 h-3" />
+                        <span>AirNav TDF</span>
+                      </button>
                     </div>
 
                     <button
-                      onClick={() => setActiveMainTab('godsview')}
+                      onClick={() => setActiveMainTab('osiris')}
                       className="flex items-center gap-1 text-[9px] font-mono text-cyan-600 dark:text-cyan-400 hover:text-cyan-300 uppercase font-black border border-cyan-500/25 bg-cyan-500/10 px-3 py-1.5 rounded-full transition-all cursor-pointer"
-                      title="Abrir vista satelital inmersiva completa"
+                      title="Abrir consola táctica completa de OSIRIS"
                     >
                       <Maximize2 className="w-3 h-3" />
-                      <span>Vista 3D Completa</span>
+                      <span>Consola OSIRIS Completa</span>
                     </button>
 
                     <button
@@ -877,21 +921,41 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                     </button>
 
                     <a
-                      href={airRadarMode === 'godsview' ? 'https://godsviewai.com/' : 'https://www.airnavradar.com/?lat=-54.4000&lng=-68.1000&z=7'}
+                      href={
+                        airRadarMode === 'osiris'
+                          ? 'https://osirisai.live/?layers=maritime,satellites,cctv,cctv_previews,live_news,earthquakes,fires,weather,radiation,infrastructure,global_incidents,cables,sdk_sea,sdk_naval'
+                          : airRadarMode === 'godsview'
+                          ? 'https://godsviewai.com/'
+                          : 'https://www.airnavradar.com/?lat=-54.4000&lng=-68.1000&z=7'
+                      }
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1 text-[9px] font-mono text-slate-400 hover:text-white uppercase font-black border border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-full transition-all"
-                      title={airRadarMode === 'godsview' ? 'Abrir GodsViewAI Oficial' : 'Abrir AirNav RadarBox Oficial'}
+                      title={
+                        airRadarMode === 'osiris'
+                          ? 'Abrir OSIRIS Web Oficial'
+                          : airRadarMode === 'godsview'
+                          ? 'Abrir GodsViewAI Oficial'
+                          : 'Abrir AirNav RadarBox Oficial'
+                      }
                     >
                       <ExternalLink className="w-3 h-3" />
-                      <span>{airRadarMode === 'godsview' ? 'GodsViewAI' : 'AirNav RadarBox'}</span>
+                      <span>
+                        {airRadarMode === 'osiris'
+                          ? 'OSIRIS'
+                          : airRadarMode === 'godsview'
+                          ? 'GodsViewAI'
+                          : 'AirNav RadarBox'}
+                      </span>
                     </a>
                   </div>
                 </div>
 
                 {/* VISTA DEL RADAR SELECCIONADO */}
                 <div className="w-full relative bg-white dark:bg-[#0c0c0c] overflow-hidden">
-                  {airRadarMode === 'godsview' ? (
+                  {airRadarMode === 'osiris' ? (
+                    <OsirisMap heightClass="h-[420px] md:h-[540px]" compact={true} showToolbar={true} />
+                  ) : airRadarMode === 'godsview' ? (
                     <GodsViewMap heightClass="h-[380px] md:h-[500px]" showControlBar={false} showFeaturePills={true} />
                   ) : (
                     <div className="w-full h-[320px] md:h-[450px] relative bg-white dark:bg-[#0c0c0c] overflow-hidden">
@@ -901,7 +965,18 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
                 </div>
 
                 {/* FOOTER DEL RADAR */}
-                {airRadarMode === 'godsview' ? (
+                {airRadarMode === 'osiris' ? (
+                  <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-t border-slate-200 dark:border-[#1f1f1f] bg-slate-50/60 dark:bg-black/20 text-[9px] font-bold uppercase text-slate-500 dark:text-gray-400">
+                    <span className="flex items-center gap-1.5 text-cyan-600 dark:text-cyan-400"><Anchor className="w-3 h-3" /> Líneas Marítimas & Rutas</span>
+                    <span className="flex items-center gap-1.5"><Ship className="w-3 h-3 text-blue-500" /> Buques AIS</span>
+                    <span className="flex items-center gap-1.5"><Radio className="w-3 h-3 text-purple-500" /> Satélites</span>
+                    <span className="flex items-center gap-1.5"><Camera className="w-3 h-3 text-emerald-500" /> CCTV Mundial</span>
+                    <span className="flex items-center gap-1.5"><Activity className="w-3 h-3 text-amber-500" /> Sismos</span>
+                    <span className="flex items-center gap-1.5"><Flame className="w-3 h-3 text-rose-500" /> Incendios</span>
+                    <span className="flex items-center gap-1.5"><Zap className="w-3 h-3 text-yellow-500" /> Nuclear</span>
+                    <span className="ml-auto font-mono text-cyan-500">&copy; OSIRIS &mdash; Open Source Intelligence</span>
+                  </div>
+                ) : airRadarMode === 'godsview' ? (
                   <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-t border-slate-200 dark:border-[#1f1f1f] bg-slate-50/60 dark:bg-black/20 text-[9px] font-bold uppercase text-slate-500 dark:text-gray-400">
                     <span className="flex items-center gap-1.5 text-cyan-600 dark:text-cyan-400"><Globe2 className="w-3 h-3" /> Globo Interactivo 3D</span>
                     <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-500" /> Vuelos con Cockpit View</span>
@@ -1072,14 +1147,96 @@ export default function LogisticsDashboard({ onBackToHome }: LogisticsDashboardP
         </div>
       )}
 
-      {/* VISTA 3: OCUPACIÓN HOTELERA COMPLETA */}
+      {/* VISTA 4: OSIRIS GLOBAL TACTICAL INTEL (OSINT MULTIDOMINIO) */}
+      {activeMainTab === 'osiris' && (
+        <div className="flex flex-col gap-6">
+          <OsirisMap heightClass="h-[600px] md:h-[780px]" showToolbar={true} />
+
+          {/* Tarjetas tácticas de los 4 grandes dominios de OSIRIS */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white dark:bg-[#11141c] border border-slate-200 dark:border-cyan-500/20 rounded-2xl p-5 shadow-lg flex flex-col gap-3">
+              <div className="flex items-center gap-2.5 text-cyan-500 dark:text-cyan-400">
+                <div className="w-8 h-8 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+                  <Ship className="w-4 h-4 text-cyan-400" />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-wider font-display text-slate-900 dark:text-white">
+                  Líneas Marítimas & Flota
+                </h3>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Rutas y corredores de navegación oceánica, cables submarinos de fibra óptica, posicionamiento AIS de cargueros y despliegues de la flota naval global.
+              </p>
+              <div className="mt-auto pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px] font-mono text-cyan-600 dark:text-cyan-400">
+                <span>Shipping Lanes</span>
+                <span>Cables Submarinos</span>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-[#11141c] border border-slate-200 dark:border-purple-500/20 rounded-2xl p-5 shadow-lg flex flex-col gap-3">
+              <div className="flex items-center gap-2.5 text-purple-500 dark:text-purple-400">
+                <div className="w-8 h-8 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                  <Radio className="w-4 h-4 text-purple-400" />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-wider font-display text-slate-900 dark:text-white">
+                  Satélites & Espacio
+                </h3>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Seguimiento orbital de constelaciones LEO (Starlink, OneWeb), satélites de reconocimiento militar, GPS/GLONASS y ciclo solar día/noche en tiempo real.
+              </p>
+              <div className="mt-auto pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px] font-mono text-purple-600 dark:text-purple-400">
+                <span>+18.700 Satélites</span>
+                <span>Órbitas Activas</span>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-[#11141c] border border-slate-200 dark:border-emerald-500/20 rounded-2xl p-5 shadow-lg flex flex-col gap-3">
+              <div className="flex items-center gap-2.5 text-emerald-500 dark:text-emerald-400">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                  <Camera className="w-4 h-4 text-emerald-400" />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-wider font-display text-slate-900 dark:text-white">
+                  CCTV & Vigilancia Urbana
+                </h3>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Red mundial de más de 39.000 cámaras públicas de video vigilancia, cámaras de tráfico vial, puertos comerciales y previsualizaciones en vivo.
+              </p>
+              <div className="mt-auto pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
+                <span>+39.500 Cámaras</span>
+                <span>Live Previews</span>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-[#11141c] border border-slate-200 dark:border-amber-500/20 rounded-2xl p-5 shadow-lg flex flex-col gap-3">
+              <div className="flex items-center gap-2.5 text-amber-500 dark:text-amber-400">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                  <AlertTriangle className="w-4 h-4 text-amber-400" />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-wider font-display text-slate-900 dark:text-white">
+                  Sismos, Incendios & Nuclear
+                </h3>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Terremotos USGS/EMSC en vivo, focos de fuego satelital NASA FIRMS, clima severo y reactores nucleares mundiales con sensores radiológicos.
+              </p>
+              <div className="mt-auto pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px] font-mono text-amber-600 dark:text-amber-400">
+                <span>NASA FIRMS / USGS</span>
+                <span>Reactores Activos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* VISTA 5: OCUPACIÓN HOTELERA COMPLETA */}
       {activeMainTab === 'hotel' && (
         <div className="flex flex-col gap-6">
           <HotelOccupancyCard initialData={tourismData} onRefresh={() => loadAllData(true)} />
         </div>
       )}
 
-      {/* VISTA 4: TEMPORADA DE CRUCEROS COMPLETA */}
+      {/* VISTA 6: TEMPORADA DE CRUCEROS COMPLETA */}
       {activeMainTab === 'cruises' && (
         <div className="flex flex-col gap-6">
           <CruiseSeasonCard initialData={cruiseData} />
