@@ -24,6 +24,18 @@ const ACCOUNT_METADATA: Record<string, { sourceName: string; avatarUrl: string; 
     avatarUrl: '/images/instagram/justiciatdf_avatar.jpg',
     category: 'institucional',
     defaultLink: 'https://www.instagram.com/justiciatdf'
+  },
+  'informatetdf': {
+    sourceName: 'InforMate TDF',
+    avatarUrl: '/images/instagram/informatetdf_avatar.jpg',
+    category: 'noticias',
+    defaultLink: 'https://www.instagram.com/informatetdf'
+  },
+  'sumemostolhuin': {
+    sourceName: 'Sumemos Tolhuin',
+    avatarUrl: '/images/instagram/sumemostolhuin_avatar.jpg',
+    category: 'comunidad',
+    defaultLink: 'https://www.instagram.com/sumemostolhuin'
   }
 };
 

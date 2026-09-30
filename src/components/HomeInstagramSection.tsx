@@ -170,16 +170,25 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
       const data = await res.json();
       if (data.success && Array.isArray(data.articles) && data.articles.length > 0) {
         setLiveArticles(prev => {
+          const prevIg = prev.filter(
+            a => a.sourceType === 'instagram' || a.sourceId?.startsWith('instagram-') || a.id?.startsWith('ig-')
+          );
+          const prevIds = new Set(prevIg.map(a => a.id));
+          const hasNew = data.articles.some((a: Article) => !prevIds.has(a.id));
+
+          if (hasNew && silent) {
+            setLiveToast('⚡ Nueva publicación de Instagram sincronizada automáticamente');
+            setTimeout(() => setLiveToast(null), 3500);
+          } else if (!silent) {
+            setLiveToast('📸 Feed de Instagram actualizado en tiempo real');
+            setTimeout(() => setLiveToast(null), 3000);
+          }
+
           const nonIg = prev.filter(
             a => a.sourceType !== 'instagram' && !a.sourceId?.startsWith('instagram-') && !a.id?.startsWith('ig-')
           );
           return [...data.articles, ...nonIg];
         });
-
-        if (!silent) {
-          setLiveToast('📸 Feed de Instagram actualizado en tiempo real');
-          setTimeout(() => setLiveToast(null), 3000);
-        }
       }
     } catch (err) {
       console.warn('Auto-update sync warning:', err);
@@ -188,11 +197,16 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
     }
   }, []);
 
-  // Intervalo de auto-actualización cada 45 segundos
+  // Sincronizar inmediatamente al montar la vista
+  useEffect(() => {
+    syncInstagramFeed(true);
+  }, [syncInstagramFeed]);
+
+  // Intervalo de auto-actualización cada 20 segundos (detección automática constante)
   useEffect(() => {
     const timer = setInterval(() => {
       syncInstagramFeed(true);
-    }, 45000);
+    }, 20000);
 
     const handleVisibility = () => {
       if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
@@ -350,8 +364,14 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
   // Compartir en Telegram (con soporte Instant View según https://instantview.telegram.org/)
   const handleShareTelegram = (art: Article, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    const sourceName = art.sourceName || (art.sourceId === 'la_gentetv' ? 'La Gente TV' : art.sourceId === 'justiciatdf' ? 'Poder Judicial TDF' : 'Turismo Tierra del Fuego');
-    const username = art.username || art.sourceId || 'redes_tdf';
+    const sourceName = art.sourceName || (
+      art.username === 'informatetdf' || art.sourceId === 'instagram-informatetdf' ? 'InforMate TDF' :
+      art.username === 'sumemostolhuin' || art.sourceId === 'instagram-sumemostolhuin' ? 'Sumemos Tolhuin' :
+      art.sourceId === 'la_gentetv' || art.sourceId === 'instagram-la-gentetv' ? 'La Gente TV' :
+      art.sourceId === 'justiciatdf' || art.sourceId === 'instagram-justiciatdf' ? 'Poder Judicial TDF' :
+      'Gobierno de Tierra del Fuego'
+    );
+    const username = art.username || art.sourceId?.replace('instagram-', '') || 'redes_tdf';
     const dateFormatted = art.pubDate ? new Date(art.pubDate).toLocaleDateString('es-AR') : 'Reciente';
     const formattedTime = art.pubDate ? new Date(art.pubDate).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) + ' hs' : '';
 

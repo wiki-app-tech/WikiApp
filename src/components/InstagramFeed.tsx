@@ -90,11 +90,16 @@ export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedPro
     }
   }, []);
 
-  // Intervalo de auto-actualización cada 45 segundos + listener cuando el usuario vuelve a la pestaña
+  // Sincronización inmediata al montar
+  useEffect(() => {
+    syncInstagramFeed(true);
+  }, [syncInstagramFeed]);
+
+  // Intervalo de auto-actualización cada 20 segundos + listener cuando el usuario vuelve a la pestaña
   useEffect(() => {
     const timer = setInterval(() => {
       syncInstagramFeed(true);
-    }, 45000);
+    }, 20000);
 
     const handleVisibility = () => {
       if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
@@ -627,6 +632,8 @@ export default function InstagramFeed({ articles, feeds = [] }: InstagramFeedPro
                       <option value="la_gentetv">@la_gentetv (La Gente TV)</option>
                       <option value="findelmundo.gob.ar">@findelmundo.gob.ar (Gobierno TDF)</option>
                       <option value="justiciatdf">@justiciatdf (Poder Judicial TDF)</option>
+                      <option value="informatetdf">@informatetdf (InforMate TDF)</option>
+                      <option value="sumemostolhuin">@sumemostolhuin (Sumemos Tolhuin)</option>
                     </select>
                   </div>
 

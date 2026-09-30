@@ -199,6 +199,38 @@ function getInstagramFallbackArticles(feed: FeedSource): Article[] {
                 avatarUrl: "/images/instagram/justiciatdf_avatar.jpg",
                 link: "https://www.instagram.com/justiciatdf"
             }
+        ],
+        'informatetdf': [
+            {
+                title: "Vialidad intensifica el despeje de nieve y hielo en Paso Garibaldi sobre Ruta 3",
+                description: "❄️ Operativo de invierno en Ruta Nacional N°3: Vialidad Nacional y Defensa Civil continúan con los trabajos intensivos de riego de salmuera y despeje de calzada en el tramo de Paso Garibaldi.\n\n⚠️ Se recuerda la obligatoriedad de cubiertas con clavos o siliconadas para vehículos livianos y cadenas para transporte pesado.\n\n📍 Tierra del Fuego · Paso Garibaldi · Ruta 3\n\n#InforMateTDF #Ruta3 #PasoGaribaldi #TransitoTDF #Ushuaia #Tolhuin #RioGrande",
+                thumbnail: "/images/instagram/informatetdf_post1_garibaldi.jpg",
+                avatarUrl: "/images/instagram/informatetdf_avatar.jpg",
+                link: "https://www.instagram.com/informatetdf"
+            },
+            {
+                title: "Llegada récord de cruceros al Puerto de Ushuaia con más de 3.500 turistas",
+                description: "🚢 Intenso movimiento en el Puerto de Ushuaia con el amarre simultáneo de grandes embarcaciones turísticas y expediciones antárticas.\n\n🏔️ Comercios y servicios locales destacan el impacto positivo de la temporada en la economía de la capital fueguina.\n\n📍 Ushuaia, Tierra del Fuego · Muelle Comercial.\n\n#InforMateTDF #PuertoUshuaia #TurismoTDF #Antartida #Ushuaia #FinDelMundo",
+                thumbnail: "/images/instagram/informatetdf_post2_puerto.jpg",
+                avatarUrl: "/images/instagram/informatetdf_avatar.jpg",
+                link: "https://www.instagram.com/informatetdf"
+            }
+        ],
+        'sumemostolhuin': [
+            {
+                title: "Encuentro cultural y comunitario en las costas del Lago Fagnano (Khami)",
+                description: "🌊 ¡Hermosa jornada compartida en el Corazón de la Isla! Familias y vecinos de Tolhuin disfrutaron de música en vivo, reconocimientos a antiguos pobladores y actividades al aire libre sobre las costas de nuestro querido Lago Fagnano.\n\n❤️ Sigamos sumando por nuestra identidad, nuestras raíces y el crecimiento de nuestra comunidad.\n\n📍 Tolhuin · Lago Fagnano · Tierra del Fuego\n\n#SumemosTolhuin #CorazonDeLaIsla #Tolhuin #LagoFagnano #AntiguosPobladores #TierraDelFuego",
+                thumbnail: "/images/instagram/sumemostolhuin_post1_fagnano.jpg",
+                avatarUrl: "/images/instagram/sumemostolhuin_avatar.jpg",
+                link: "https://www.instagram.com/sumemostolhuin"
+            },
+            {
+                title: "Mercado de Productores y Emprendedores locales: Impulso a la producción de Tolhuin",
+                description: "🪵 Con gran éxito se desarrolló una nueva edición del Mercado de Productores Locales de Tolhuin, presentando artesanías en madera de lenga, panificados caseros, dulces de frutos rojos y calafate.\n\n🚀 Desde Sumemos Tolhuin seguimos apoyando a los trabajadores autogestionados y emprendimientos que potencian nuestra economía local.\n\n📍 Tolhuin, Tierra del Fuego · Salón Comunitario\n\n#SumemosTolhuin #SumemosProduccion #Emprendedores #TolhuinProductivo #HechoEnTolhuin",
+                thumbnail: "/images/instagram/sumemostolhuin_post2_taller.jpg",
+                avatarUrl: "/images/instagram/sumemostolhuin_avatar.jpg",
+                link: "https://www.instagram.com/sumemostolhuin"
+            }
         ]
     };
 

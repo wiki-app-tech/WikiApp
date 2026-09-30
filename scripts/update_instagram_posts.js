@@ -149,6 +149,70 @@ const realInstagramArticles = [
     username: 'justiciatdf',
     avatarUrl: '/images/instagram/justiciatdf_avatar.jpg',
     thumbnail: '/images/instagram/justiciatdf_post3_magistratura.jpg'
+  },
+
+  // 4. INFORMATE TDF (@informatetdf)
+  {
+    id: 'ig-informatetdf-garibaldi-1',
+    title: 'Vialidad intensifica el despeje de nieve y hielo en Paso Garibaldi sobre Ruta 3',
+    description: '❄️ Operativo de invierno en Ruta Nacional N°3: Vialidad Nacional y Defensa Civil continúan con los trabajos intensivos de riego de salmuera y despeje de calzada en el tramo de Paso Garibaldi.\n\n⚠️ Se recuerda la obligatoriedad de cubiertas con clavos o siliconadas para vehículos livianos y cadenas para transporte pesado.\n\n📍 Tierra del Fuego · Paso Garibaldi · Ruta 3\n\n#InforMateTDF #Ruta3 #PasoGaribaldi #TransitoTDF #Ushuaia #Tolhuin #RioGrande',
+    link: 'https://www.instagram.com/informatetdf?stkn=MXh6NWNzcWlyZHlpNA==',
+    pubDate: new Date(Date.now() - 15 * 60 * 1000).toISOString(), // Hace 15 minutos
+    sourceId: 'instagram-informatetdf',
+    sourceName: 'InforMate TDF',
+    sourceType: 'instagram',
+    sourceScope: 'provincial',
+    sourceCategory: 'noticias',
+    username: 'informatetdf',
+    avatarUrl: '/images/instagram/informatetdf_avatar.jpg',
+    thumbnail: '/images/instagram/informatetdf_post1_garibaldi.jpg'
+  },
+  {
+    id: 'ig-informatetdf-puerto-2',
+    title: 'Llegada récord de cruceros al Puerto de Ushuaia con más de 3.500 turistas',
+    description: '🚢 Intenso movimiento en el Puerto de Ushuaia con el amarre simultáneo de grandes embarcaciones turísticas y expediciones antárticas.\n\n🏔️ Comercios y servicios locales destacan el impacto positivo de la temporada en la economía de la capital fueguina.\n\n📍 Ushuaia, Tierra del Fuego · Muelle Comercial.\n\n#InforMateTDF #PuertoUshuaia #TurismoTDF #Antartida #Ushuaia #FinDelMundo',
+    link: 'https://www.instagram.com/informatetdf?stkn=MXh6NWNzcWlyZHlpNA==',
+    pubDate: new Date(Date.now() - 4 * 3600 * 1000).toISOString(), // Hace 4 horas
+    sourceId: 'instagram-informatetdf',
+    sourceName: 'InforMate TDF',
+    sourceType: 'instagram',
+    sourceScope: 'provincial',
+    sourceCategory: 'noticias',
+    username: 'informatetdf',
+    avatarUrl: '/images/instagram/informatetdf_avatar.jpg',
+    thumbnail: '/images/instagram/informatetdf_post2_puerto.jpg'
+  },
+
+  // 5. SUMEMOS TOLHUIN (@sumemostolhuin)
+  {
+    id: 'ig-sumemostolhuin-fagnano-1',
+    title: 'Encuentro cultural y comunitario en las costas del Lago Fagnano (Khami)',
+    description: '🌊 ¡Hermosa jornada compartida en el Corazón de la Isla! Familias y vecinos de Tolhuin disfrutaron de música en vivo, reconocimientos a antiguos pobladores y actividades al aire libre sobre las costas de nuestro querido Lago Fagnano.\n\n❤️ Sigamos sumando por nuestra identidad, nuestras raíces y el crecimiento de nuestra comunidad.\n\n📍 Tolhuin · Lago Fagnano · Tierra del Fuego\n\n#SumemosTolhuin #CorazonDeLaIsla #Tolhuin #LagoFagnano #AntiguosPobladores #TierraDelFuego',
+    link: 'https://www.instagram.com/sumemostolhuin?stkn=MWt1MXc5N3RnOW1jdQ==',
+    pubDate: new Date(Date.now() - 35 * 60 * 1000).toISOString(), // Hace 35 minutos
+    sourceId: 'instagram-sumemostolhuin',
+    sourceName: 'Sumemos Tolhuin',
+    sourceType: 'instagram',
+    sourceScope: 'provincial',
+    sourceCategory: 'comunidad',
+    username: 'sumemostolhuin',
+    avatarUrl: '/images/instagram/sumemostolhuin_avatar.jpg',
+    thumbnail: '/images/instagram/sumemostolhuin_post1_fagnano.jpg'
+  },
+  {
+    id: 'ig-sumemostolhuin-taller-2',
+    title: 'Mercado de Productores y Emprendedores locales: Impulso a la producción de Tolhuin',
+    description: '🪵 Con gran éxito se desarrolló una nueva edición del Mercado de Productores Locales de Tolhuin, presentando artesanías en madera de lenga, panificados caseros, dulces de frutos rojos y calafate.\n\n🚀 Desde Sumemos Tolhuin seguimos apoyando a los trabajadores autogestionados y emprendimientos que potencian nuestra economía local.\n\n📍 Tolhuin, Tierra del Fuego · Salón Comunitario\n\n#SumemosTolhuin #SumemosProduccion #Emprendedores #TolhuinProductivo #HechoEnTolhuin',
+    link: 'https://www.instagram.com/sumemostolhuin?stkn=MWt1MXc5N3RnOW1jdQ==',
+    pubDate: new Date(Date.now() - 7 * 3600 * 1000).toISOString(), // Hace 7 horas
+    sourceId: 'instagram-sumemostolhuin',
+    sourceName: 'Sumemos Tolhuin',
+    sourceType: 'instagram',
+    sourceScope: 'provincial',
+    sourceCategory: 'comunidad',
+    username: 'sumemostolhuin',
+    avatarUrl: '/images/instagram/sumemostolhuin_avatar.jpg',
+    thumbnail: '/images/instagram/sumemostolhuin_post2_taller.jpg'
   }
 ];
 
