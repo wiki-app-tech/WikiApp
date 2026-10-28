@@ -1,30 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Outfit, Cormorant_Garamond } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 
-// Tipografía principal: Inter - cuerpo de texto y lectura limpia
+// Única familia tipográfica sans-serif con soporte de números tabulares en tres pesos: 400, 600 y 700
 const inter = Inter({
   subsets: ["latin"],
+  weight: ["400", "600", "700"],
   variable: "--font-inter",
-  display: "swap",
-  preload: true,
-});
-
-// Tipografía geométrica complementaria
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
-  display: "swap",
-  preload: true,
-});
-
-// Tipografía de lujo esbelta para alta gama: Cormorant Garamond
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  variable: "--font-cormorant",
-  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
   preload: true,
 });
@@ -35,29 +19,30 @@ export const viewport: Viewport = {
   maximumScale: 5,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#1b263b" },
-    { media: "(prefers-color-scheme: dark)", color: "#0d0f17" },
+    { media: "(prefers-color-scheme: light)", color: "#0f4c81" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0f17" },
   ],
 };
 
 export const metadata: Metadata = {
-  title: "WikiApp PRO | Monitor Regional e Inteligencia TDF",
-  description: "Plataforma de alta gama para servicios exclusivos, inteligencia estratégica, clima, radio y noticias de Tierra del Fuego.",
+  title: "WikiApp TDF — Información al día",
+  description:
+    "Portal público de información al día de Tierra del Fuego (Fin del Mundo): estado de Ruta Nacional 3, alertas de Defensa Civil, farmacias de turno y noticias de Ushuaia, Río Grande y Tolhuin.",
   manifest: "/manifest.json",
-  applicationName: "WikiApp PRO",
+  applicationName: "WikiApp TDF",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "WikiApp PRO",
+    title: "WikiApp TDF",
   },
   formatDetection: {
     telephone: false,
   },
   icons: {
     icon: [
+      { url: "/icons/icon.svg", type: "image/svg+xml" },
       { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
       { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
-      { url: "/icons/icon.svg", type: "image/svg+xml" },
     ],
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
@@ -76,7 +61,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="WikiApp PRO" />
+        <meta name="apple-mobile-web-app-title" content="WikiApp TDF" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <script
           dangerouslySetInnerHTML={{
@@ -90,9 +75,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body
-        className={`${inter.variable} ${outfit.variable} ${cormorant.variable} font-sans antialiased`}
-      >
+      <body className={`${inter.variable} font-sans antialiased tabular-nums`}>
         <ThemeProvider>
           {children}
           <PwaInstallPrompt />

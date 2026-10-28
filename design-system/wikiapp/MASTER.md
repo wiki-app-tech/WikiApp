@@ -1,137 +1,70 @@
-# Design System Master File — WikiApp Prestige
+# Design System Master File — WikiApp TDF — Información al día
 
-> **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
-> If that file exists, its rules **override** this Master file.
-> If not, strictly follow the rules below.
+> **IDENTIDAD TERRITORIAL:** Portal público y gratuito de información al día de Tierra del Fuego, Antártida e Islas del Atlántico Sur ("Fin del Mundo"). Se descarta cualquier lenguaje de "servicios exclusivos", "lujo" o "WA PRO".
 
 ---
 
-**Project:** WikiApp Prestige
-**Category:** Exclusive Luxury Brand & High-End Intelligence Services
-**Rule System:** 60-30-10 Distribution Rule
+**Project:** WikiApp TDF — Información al día
+**Category:** Portal Cívico Territorial, Noticias Regionales, Estado de Rutas y Alertas Oficiales
+**Iconography:** Monolineal consistente (`stroke-width: 1.5px`), sin emojis decorativos sueltos.
 
 ---
 
 ## Global Rules
 
-### Color Palette (60-30-10 Rule)
+### Paleta de Colores (Tokens Semánticos, No Decorativos)
 
-| Proportion | Role | Hex / Token | Usage & Semantics |
-|------------|------|-------------|-------------------|
-| **60% Dominant** | Background & Negative Space | `#F7F7F7` (`--color-surface-primary`) | Bone white / pearl gray. Dominantly occupies 60% of visual canvas for airy, clean, and spacious feel. Elevated surfaces: `#FFFFFF`. Sunken: `#EFEFEF`. |
-| **30% Secondary & Structure** | High-Contrast Typography & Boundaries | `#1B263B` (`--color-text-primary`) & `#4A2E35` (`--color-text-secondary`) | Deep navy blue for headings, editorial structure, and high readability. Rich plum for structural boundaries, categories, badges, and brand identity. Tertiary text: `#6E6875`. |
-| **10% Accent** | High-Value CTAs & Delicate Highlights | `#D4AF37` (`--color-accent-primary`) | Soft metallic gold / bronze. Used strictly for high-value action buttons, subtle metallic border trims, active indicators, and delicate micro-glows. Hover: `#C5A028`. |
+| Token | Rol Semántico | Modo Claro | Modo Oscuro |
+|-------|---------------|------------|-------------|
+| `--color-surface-primary` | Lienzo principal de lectura | `#F8FAFC` | `#0B0F17` |
+| `--color-surface-elevated` | Tarjetas, franja fija y contenedores | `#FFFFFF` | `#111827` |
+| `--color-surface-sunken` | Chips inactivos y fondos secundarios | `#F1F5F9` | `#1E293B` |
+| `--color-text-primary` | Títulos y lectura principal | `#0F172A` | `#F8FAFC` |
+| `--color-text-secondary` | Subtítulos, copetes y metadatos | `#334155` | `#CBD5E1` |
+| `--color-text-tertiary` | Horas tabulares y trazabilidad | `#64748B` | `#94A3B8` |
+| `--color-brand-primary` | Identidad territorial (Canal Beagle / Atlántico Sur) | `#0F4C81` | `#38BDF8` |
+| `--color-alert-critical` | Alerta Crítica (corte de ruta / ráfagas >85 km/h) | `#DC2626` (Fondo `#FEF2F2`) | `#F87171` (Fondo `rgba(220,38,38,0.16)`) |
+| `--color-alert-warning` | Alerta Precaución (hielo / cubiertas obligatorias) | `#D97706` (Fondo `#FFFBEB`) | `#FBBF24` (Fondo `rgba(217,119,6,0.16)`) |
+| `--color-alert-info` | Aviso Informativo (trámites, becas, horarios) | `#0284C7` (Fondo `#F0F9FF`) | `#38BDF8` (Fondo `rgba(2,132,199,0.15)`) |
+| `--color-status-ok` | Ruta habilitada / Sin alertas vigentes | `#16A34A` (Fondo `#F0FDF4`) | `#4ADE80` (Fondo `rgba(22,163,74,0.15)`) |
 
-**Contrast & Readability (WCAG AAA):**
-- Contrast ratio between `#1B263B` (Deep Navy) and `#F7F7F7` (Bone White) is **10.8:1** (far exceeds WCAG AAA requirement of 7:1).
-- Contrast ratio between `#4A2E35` (Rich Plum) and `#F7F7F7` is **8.2:1** (WCAG AAA compliant).
-- CTAs in `#D4AF37` (Gold) utilize `#1B263B` bold text for crisp 5.8:1 contrast.
+### Tipografía
 
-### Typography
+- **Familia única:** `Inter` (`--font-inter`), sans-serif de alta legibilidad en pantalla con soporte nativo de números tabulares (`font-variant-numeric: tabular-nums`) para horarios, rutas y métricas climáticas.
+- **Tres pesos únicamente:**
+  - Regular (`400`) — Cuerpo de notas y descripciones
+  - Semibold (`600`) — Subtítulos, chips, etiquetas de fuente y tarjetas Nivel 2
+  - Bold (`700`) — Titulares de Nivel 1 y alertas críticas
+- **Escala tipográfica estandarizada:**
+  - `24px` (`1.5rem`) — Titular Nivel 1 (Destacada de la franja horaria)
+  - `20px` (`1.25rem`) — Encabezados de sección y titular destacado en móvil
+  - `16px` (`1rem`) — Títulos de tarjetas locales Nivel 2 y cuerpo de lectura
+  - `14px` (`0.875rem`) — Resúmenes, cables Nivel 3 e indicadores de la franja superior
+  - `12px` (`0.75rem`) — Metadatos, fuentes agrupadas, trazabilidad ("Sincronizado:") y chips
+- **Interlineado:** `1.4` a `1.5` en cuerpo de texto para lectura ágil sin fatiga visual.
 
-- **Heading / Display Font:** Cormorant Garamond (`--font-cormorant` / `--font-display`)
-- **Body / Sans Font:** Inter (`--font-inter` / `--font-sans`)
-- **Mood:** Distinction, elite sophistication, timeless exclusivity, haute couture, bespoke craftsmanship.
-- **Pairing Rationale:** Refined, slender serif for titles to convey tradition and luxury, paired with clean, perfectly spaced sans-serif for body text.
+### Logo e Identidad Visual
 
-### Spacing Variables
-
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--space-xs` | `4px` / `0.25rem` | Fine badge gaps |
-| `--space-sm` | `8px` / `0.5rem` | Icon inline margins |
-| `--space-md` | `16px` / `1rem` | Standard component padding |
-| `--space-lg` | `24px` / `1.5rem` | Section cards |
-| `--space-xl` | `32px` / `2rem` | Column gutters |
-| `--space-2xl` | `48px` / `3rem` | Generous luxury whitespace |
-| `--space-3xl` | `64px` / `4rem` | Hero & section margins (60% breathing room) |
-
-### Shadows & Depth
-
-| Level | Value | Usage |
-|-------|-------|-------|
-| `--shadow-subtle` | `0 2px 8px rgba(27, 38, 59, 0.03)` | Ultra-light card elevation |
-| `--shadow-premium` | `0 10px 30px -10px rgba(27, 38, 59, 0.06)` | Standard luxury container |
-| `--shadow-gold` | `0 4px 20px -2px rgba(212, 175, 55, 0.28)` | Gold CTA button aura |
-| `--shadow-glass` | `0 8px 32px 0 rgba(74, 46, 53, 0.05)` | Floating glass overlay |
+- **Símbolo:** Ícono monolineal (`1.5px` de trazo) que integra un **faro austral / rosa de los vientos** ("Fin del Mundo") con **ondas de señal/alerta**, legible desde `32px` (favicon) hasta `512px` (ícono de app móvil).
+- **Denominación oficial:** `WikiApp TDF — Información al día` (se abandona el badge `"WA PRO"`).
+- **Categorías temáticas:** Íconos lineales `outline` de `1.5px` de trazo para cada categoría (sin emojis sueltos).
 
 ---
 
-## Component Specifications
+## Arquitectura de Lectura y Alertas
 
-### 1. High-Value CTA Button (10% Gold Accent)
-
-```css
-.btn-gold-luxury {
-  background: linear-gradient(135deg, #d4af37 0%, #c5a028 100%);
-  color: #1b263b;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  padding: 0.75rem 1.75rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(212, 175, 55, 0.6);
-  box-shadow: 0 4px 18px -2px rgba(212, 175, 55, 0.3);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.btn-gold-luxury:hover {
-  background: linear-gradient(135deg, #e0be48 0%, #d4af37 100%);
-  color: #0d1522;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 24px 0 rgba(212, 175, 55, 0.45);
-}
-```
-
-### 2. Secondary Luxury Outline Button (30% Structural Boundary)
-
-```css
-.btn-outline-luxury {
-  background: transparent;
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border-subtle);
-  padding: 0.75rem 1.75rem;
-  border-radius: 9999px;
-  font-weight: 500;
-  letter-spacing: 0.03em;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.btn-outline-luxury:hover {
-  border-color: #d4af37;
-  color: #4a2e35;
-  box-shadow: 0 0 16px rgba(212, 175, 55, 0.15);
-  transform: translateY(-1px);
-}
-```
-
-### 3. Luxury Elevated Card (60% Dominant Space)
-
-```css
-.luxury-card {
-  background-color: var(--color-surface-elevated);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: 1.5rem;
-  box-shadow: 0 10px 30px -10px rgba(27, 38, 59, 0.04);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
-}
-
-.luxury-card:hover {
-  border-color: rgba(212, 175, 55, 0.4);
-  box-shadow: 0 16px 40px -12px rgba(74, 46, 53, 0.08);
-}
-```
-
----
-
-## Anti-Patterns (Strictly Forbidden)
-
-- ❌ **No saturated neon colors** (electric lime, saturated cyan, loud orange)
-- ❌ **No emojis as icons** (use Lucide SVG icons exclusively)
-- ❌ **No noisy, cluttered layouts** (always preserve 60% negative space)
-- ❌ **No harsh box-shadows** (use diffuse, featherlight shadows with navy/plum undertones)
-- ❌ **No abrupt hover changes** (use 250–350ms cubic-bezier transitions)
-- ❌ **No unstyled default browser fonts** (always use Cormorant Garamond for titles and Inter for body)
+1. **Franja de Estado Fija (Sticky Top Bar):**
+   - Siempre visible en la parte superior con tres indicadores simultáneos:
+     1. **Estado de Ruta 3** (ícono + semáforo semántico + fuente oficial).
+     2. **Alerta activa de Defensa Civil** (o `"Sin alertas"`).
+     3. **Farmacia de turno** de la ciudad detectada por geolocalización o elegida por el usuario.
+2. **Jerarquía de 3 Niveles en el Feed:**
+   - **Nivel 1 — Destacada:** 1 nota principal por franja horaria con imagen grande y título a `20–24px`.
+   - **Nivel 2 — Local TDF:** Tarjetas compactas (`título + fuente(s) agrupadas + hora tabular`, sin hashtags visibles) agrupadas por ciudad (`Ushuaia`, `Río Grande`, `Tolhuin`).
+   - **Nivel 3 — Cables Nacionales / Internacionales:** Lista compacta de solo texto colapsada bajo el encabezado `"Otras noticias"`.
+3. **Tarjetas de Alerta Semánticas:**
+   - Fondo tintado (`--color-alert-critical`, `--color-alert-warning`, `--color-alert-info`), ícono lineal de advertencia, título corto en mayúscula de sentencia, organismo emisor (`Defensa Civil`, `Vialidad Nacional`, `Vialidad Provincial`), hora de última sincronización y TTL de caducidad automática, **sin botones de compartir**.
+4. **Módulo Único de Redes Sociales:**
+   - Pestañas por cuenta oficial con autoplay desactivado por defecto y activable por el usuario.
+5. **Filtro Persistente por Ciudad y Categoría:**
+   - Chips compactos visibles sin scroll que recuerdan la última selección del usuario en `localStorage`.

@@ -1,15 +1,15 @@
 {
   "id": "/",
-  "name": "WikiApp PRO | Monitor Regional e Inteligencia TDF",
-  "short_name": "WikiApp PRO",
-  "description": "Plataforma de noticias en vivo, clima, boletines oficiales, radios y monitoreo estratégico de Tierra del Fuego.",
+  "name": "WikiApp TDF — Información al día",
+  "short_name": "WikiApp TDF",
+  "description": "Portal público de información al día de Tierra del Fuego: estado de Ruta 3, alertas de Defensa Civil, farmacias de turno, clima y noticias de Ushuaia, Río Grande y Tolhuin.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "any",
-  "background_color": "#0d0f17",
-  "theme_color": "#1b263b",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f4c81",
   "lang": "es-AR",
   "dir": "ltr",
   "categories": ["news", "weather", "utilities", "navigation"],
@@ -42,9 +42,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Monitor de Noticias",
-      "short_name": "Noticias",
-      "description": "Ver el flujo principal de noticias regionales y nacionales",
+      "name": "Noticias y Estado de Ruta 3",
+      "short_name": "Inicio TDF",
+      "description": "Estado de Ruta 3, alertas de Defensa Civil, farmacia de turno y noticias locales",
       "url": "/?tab=home",
       "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png" }]
     },
@@ -56,7 +56,7 @@
       "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
-      "name": "Radio en Vivo",
+      "name": "Radios en Vivo",
       "short_name": "Radios",
       "description": "Escuchar emisoras fueguinas en vivo",
       "url": "/?tab=radio",
@@ -64,4 +64,3 @@
     }
   ]
 }
-

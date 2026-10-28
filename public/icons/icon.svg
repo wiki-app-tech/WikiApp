@@ -1,40 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0d1522" />
-      <stop offset="55%" stop-color="#1b263b" />
-      <stop offset="100%" stop-color="#2c1b24" />
-    </linearGradient>
-    <linearGradient id="logo-blue" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0095ff" />
-      <stop offset="100%" stop-color="#0066cc" />
-    </linearGradient>
-    <linearGradient id="logo-orange" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff8c00" />
-      <stop offset="100%" stop-color="#e65100" />
-    </linearGradient>
-    <linearGradient id="gold-trim" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#e5cf87" />
-      <stop offset="50%" stop-color="#d4af37" />
-      <stop offset="100%" stop-color="#9e7f1c" />
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="112" fill="url(#bg-grad)" />
-  <rect x="12" y="12" width="488" height="488" rx="102" fill="none" stroke="url(#gold-trim)" stroke-width="4" stroke-opacity="0.45" />
-  <g transform="translate(26, 95) scale(0.92)">
-    <path 
-      d="M20 140 C 90 220, 200 270, 360 210 C 430 180, 480 100, 490 80 C 470 110, 410 170, 340 185 C 240 210, 140 170, 80 135 C 150 160, 240 160, 300 120 C 350 87, 430 40, 480 40 C 410 40, 320 80, 260 110 C 200 140, 110 135, 20 140 Z" 
-      fill="url(#logo-blue)" 
-    />
-    <path 
-      d="M80 135 C 160 80, 300 30, 480 40 C 420 55, 300 110, 220 135 C 160 155, 100 150, 80 135 Z" 
-      fill="url(#logo-orange)" 
-    />
-    <path 
-      d="M180 135 C 230 115, 300 70, 420 50 C 350 75, 260 115, 200 132 C 160 142, 110 138, 95 133 C 120 125, 150 120, 180 135 Z" 
-      fill="#ffffff" 
-    />
-  </g>
-  <text x="256" y="420" text-anchor="middle" fill="#f7f7f7" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="68" letter-spacing="4">WA <tspan fill="#d4af37">PRO</tspan></text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="512" height="512" fill="none">
+  <rect width="32" height="32" rx="7" fill="#0f4c81" />
+  <!-- Ondas de señal / alerta del Fin del Mundo (trazo monolineal 1.5px) -->
+  <path d="M9.5 7.5C7.8 9.2 7.8 12 9.5 13.7" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" />
+  <path d="M6.8 5.2C3.8 8.2 3.8 13 6.8 16" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" opacity="0.75" />
+  <path d="M22.5 7.5C24.2 9.2 24.2 12 22.5 13.7" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" />
+  <path d="M25.2 5.2C28.2 8.2 28.2 13 25.2 16" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" opacity="0.75" />
+  <!-- Faro / Brújula Austral en trazo monolineal 1.5px -->
+  <circle cx="16" cy="10.5" r="2.2" stroke="#ffffff" stroke-width="1.5" />
+  <path d="M13.5 13L11.5 25.5H20.5L18.5 13" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M12.5 18.5H19.5" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+  <path d="M9 25.5H23" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
 </svg>
-

@@ -133,12 +133,12 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [liveToast, setLiveToast] = useState<string | null>(null);
 
-  // Estados del Slider Lateral
+  // Estados del Slider Lateral (Autoplay desactivado por defecto según sistema de diseño)
   const sliderRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlay, setIsAutoPlay] = useState(true);
+  const [isAutoPlay, setIsAutoPlay] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [viewMode, setViewMode] = useState<'slider' | 'grid'>('slider');
+  const [viewMode] = useState<'slider' | 'grid'>('slider');
 
   // Estado para la nota ampliada (Modal de lectura)
   const [expandedArticle, setExpandedArticle] = useState<Article | null>(null);
@@ -468,91 +468,50 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-gray-400 mt-0.5">
-              Slider automático en tiempo real con opción de lectura ampliada y compartir por WhatsApp y Telegram.
+              Publicaciones oficiales de Tierra del Fuego organizadas por cuenta (avance automático opcional).
             </p>
           </div>
         </div>
 
-        {/* CONTROLES DEL SLIDER / GRILLA, PLAY/PAUSE Y VER MÓDULO */}
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0 w-full lg:w-auto justify-end">
-          {/* Switch Slider / Grilla */}
-          <div className="flex items-center bg-slate-100 dark:bg-white/5 p-0.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs">
+        {/* CONTROLES DE NAVEGACIÓN Y OPCIÓN DE AUTOPLAY */}
+        <div className="flex flex-wrap items-center gap-2 shrink-0 w-full lg:w-auto justify-end">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10">
             <button
-              onClick={() => setViewMode('slider')}
-              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 font-bold transition-all cursor-pointer ${
-                viewMode === 'slider'
-                  ? 'bg-rose-500 text-white shadow-sm'
-                  : 'text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
+              onClick={() => setIsAutoPlay(!isAutoPlay)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                isAutoPlay
+                  ? 'bg-emerald-600 text-white'
+                  : 'text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-white/10'
               }`}
-              title="Vista de Slider Lateral"
+              title={isAutoPlay ? 'Desactivar avance automático' : 'Activar avance automático opcional'}
             >
-              <Columns className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline text-[11px]">Slider</span>
+              {isAutoPlay ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              <span>{isAutoPlay ? 'Autoplay activo' : 'Autoplay opcional'}</span>
+            </button>
+            <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10" />
+            <button
+              onClick={handlePrev}
+              className="p-1.5 rounded-lg text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all cursor-pointer"
+              title="Publicación anterior"
+            >
+              <ChevronLeft className="w-4 h-4" />
             </button>
             <button
-              onClick={() => setViewMode('grid')}
-              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 font-bold transition-all cursor-pointer ${
-                viewMode === 'grid'
-                  ? 'bg-rose-500 text-white shadow-sm'
-                  : 'text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-              title="Vista de Mosaico"
+              onClick={handleNext}
+              className="p-1.5 rounded-lg text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all cursor-pointer"
+              title="Publicación siguiente"
             >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline text-[11px]">Mosaico</span>
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Controles de Reproducción y Flechas (Solo en modo Slider) */}
-          {viewMode === 'slider' && (
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-0.5 rounded-xl border border-slate-200 dark:border-white/10">
-              <button
-                onClick={() => setIsAutoPlay(!isAutoPlay)}
-                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                  isAutoPlay
-                    ? 'text-emerald-500 hover:bg-emerald-500/10'
-                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'
-                }`}
-                title={isAutoPlay ? 'Pausar avance automático' : 'Activar avance automático'}
-              >
-                {isAutoPlay ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              </button>
-              <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10" />
-              <button
-                onClick={handlePrev}
-                className="p-1.5 rounded-lg text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all cursor-pointer"
-                title="Publicación anterior"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={handleNext}
-                className="p-1.5 rounded-lg text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all cursor-pointer"
-                title="Publicación siguiente"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-
-          {/* Sincronización Manual */}
           <button
             onClick={() => syncInstagramFeed(false)}
             disabled={isRefreshing}
-            className="p-2 rounded-xl text-xs font-bold border border-slate-200 dark:border-white/10 hover:border-rose-500/30 text-slate-700 dark:text-gray-200 bg-white dark:bg-white/5 hover:bg-rose-500/5 active:scale-95 transition-all shadow-sm"
-            title="Sincronizar y verificar nuevos posteos de Instagram"
+            className="p-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-white/10 text-slate-700 dark:text-gray-200 bg-white dark:bg-white/5 hover:bg-slate-100 transition-all shadow-sm cursor-pointer"
+            title="Sincronizar publicaciones"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-rose-500 ${isRefreshing ? 'animate-spin' : ''}`} />
-          </button>
-
-          {/* Botón Módulo Completo */}
-          <button
-            onClick={onViewFullFeed}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white shadow-md shadow-rose-500/20 hover:shadow-lg transition-all group shrink-0"
-          >
-            <span className="hidden sm:inline">Ver Módulo Completo</span>
-            <span className="sm:hidden">Ver Módulo</span>
-            <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>

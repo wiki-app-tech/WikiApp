@@ -2,8 +2,11 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, AlertTriangle, Info, Newspaper, Eye, Check, Type, Download } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, AlertTriangle, Info, Newspaper, Eye, Check, Type, Download, Cpu, Trophy, Users, Briefcase, Landmark, Trees } from 'lucide-react';
 import { shareToTelegram, InstantViewExplainerBadge, isValidUrl } from '@/utils/telegramInstantView';
+import TdfStickyStatusBar from './TdfStickyStatusBar';
+import TdfThreeTierFeed from './TdfThreeTierFeed';
+import { getActiveTdfAlerts, type TdfCity } from '@/utils/tdfIntelligence';
 import { useTheme } from 'next-themes';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -90,33 +93,19 @@ const AirMap = dynamic(
   }
 );
 
-const WikiAppLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
-  <svg viewBox="0 0 500 320" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="logo-blue" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#0095ff" />
-        <stop offset="100%" stopColor="#0066cc" />
-      </linearGradient>
-      <linearGradient id="logo-orange" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#ff8c00" />
-        <stop offset="100%" stopColor="#e65100" />
-      </linearGradient>
-    </defs>
-    {/* Fondo / Estructura del ojo / ave estilizado en Azul */}
-    <path 
-      d="M20 140 C 90 220, 200 270, 360 210 C 430 180, 480 100, 490 80 C 470 110, 410 170, 340 185 C 240 210, 140 170, 80 135 C 150 160, 240 160, 300 120 C 350 87, 430 40, 480 40 C 410 40, 320 80, 260 110 C 200 140, 110 135, 20 140 Z" 
-      fill="url(#logo-blue)" 
-    />
-    {/* Trazo / Ala Superior Naranja */}
-    <path 
-      d="M80 135 C 160 80, 300 30, 480 40 C 420 55, 300 110, 220 135 C 160 155, 100 150, 80 135 Z" 
-      fill="url(#logo-orange)" 
-    />
-    {/* Detalle Central / Pupila e Iluminación en Blanco */}
-    <path 
-      d="M180 135 C 230 115, 300 70, 420 50 C 350 75, 260 115, 200 132 C 160 142, 110 138, 95 133 C 120 125, 150 120, 180 135 Z" 
-      fill="#ffffff" 
-    />
+const WikiAppLogo = ({ className = "w-9 h-9" }: { className?: string }) => (
+  <svg viewBox="0 0 32 32" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="WikiApp TDF">
+    <rect width="32" height="32" rx="7" fill="#0f4c81" />
+    {/* Ondas de señal / alerta monolineales (1.5px) */}
+    <path d="M9.5 7.5C7.8 9.2 7.8 12 9.5 13.7" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6.8 5.2C3.8 8.2 3.8 13 6.8 16" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" opacity="0.75" />
+    <path d="M22.5 7.5C24.2 9.2 24.2 12 22.5 13.7" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M25.2 5.2C28.2 8.2 28.2 13 25.2 16" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" opacity="0.75" />
+    {/* Faro / Brújula del Fin del Mundo en trazo monolineal 1.5px */}
+    <circle cx="16" cy="10.5" r="2.2" stroke="#ffffff" strokeWidth="1.5" />
+    <path d="M13.5 13L11.5 25.5H20.5L18.5 13" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M12.5 18.5H19.5" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M9 25.5H23" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 );
 
@@ -403,7 +392,56 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
   const [pharmacies, setPharmacies] = useState<{ rio_grande: any[], tolhuin: any[], ushuaia: any[] } | null>(null);
   const [selectedPharmacyCity, setSelectedPharmacyCity] = useState<'ushuaia' | 'rio_grande' | 'tolhuin'>('ushuaia');
+  const [selectedTdfCity, setSelectedTdfCity] = useState<TdfCity>('all');
+  const [isLocating, setIsLocating] = useState<boolean>(false);
   const [activePharmacyIndex, setActivePharmacyIndex] = useState(0);
+
+  // Persistencia de ciudad y categoría en localStorage
+  const handleSelectCity = (city: TdfCity) => {
+    setSelectedTdfCity(city);
+    if (city !== 'all') {
+      setSelectedPharmacyCity(city);
+    }
+    try {
+      localStorage.setItem('wikiapp_tdf_city', city);
+    } catch {
+      // ignore storage error
+    }
+  };
+
+  const handleSelectCategory = (cat: string) => {
+    setActiveCategory(cat);
+    try {
+      localStorage.setItem('wikiapp_tdf_category', cat);
+    } catch {
+      // ignore storage error
+    }
+  };
+
+  // Detección de ciudad fueguina por geolocalización
+  const handleDetectLocation = () => {
+    if (typeof window === 'undefined' || !('geolocation' in navigator)) return;
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude } = pos.coords;
+        let detected: 'ushuaia' | 'rio_grande' | 'tolhuin' = 'ushuaia';
+        if (latitude > -54.15) {
+          detected = 'rio_grande';
+        } else if (latitude >= -54.65 && latitude <= -54.15) {
+          detected = 'tolhuin';
+        } else {
+          detected = 'ushuaia';
+        }
+        handleSelectCity(detected);
+        setIsLocating(false);
+      },
+      () => {
+        setIsLocating(false);
+      },
+      { timeout: 6000 }
+    );
+  };
 
   const fetchPharmacies = () => {
     fetch('/api/pharmacies')
@@ -424,6 +462,23 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
     setMounted(true);
     setTheme('light');
     setSyncTime(new Date().toLocaleTimeString());
+
+    // Restaurar última selección persistida por el usuario (Ciudad y Categoría)
+    try {
+      const savedCity = localStorage.getItem('wikiapp_tdf_city') as TdfCity | null;
+      if (savedCity && ['all', 'ushuaia', 'rio_grande', 'tolhuin'].includes(savedCity)) {
+        setSelectedTdfCity(savedCity);
+        if (savedCity !== 'all') {
+          setSelectedPharmacyCity(savedCity);
+        }
+      }
+      const savedCat = localStorage.getItem('wikiapp_tdf_category');
+      if (savedCat) {
+        setActiveCategory(savedCat);
+      }
+    } catch {
+      // ignore storage error
+    }
     
     // Fetch inicial de farmacias
     fetchPharmacies();
@@ -440,8 +495,6 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         
       setActiveShiftDay(prev => {
         if (prev !== currentShiftDay) {
-          // El día del turno activo cambió (ej. pasó de las 09:00 AM o cambió la fecha de calendario)
-          // Forzar la actualización automática de las farmacias
           fetchPharmacies();
           return currentShiftDay;
         }
@@ -482,19 +535,26 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
     return visible;
   };
 
-  // Extraction of dynamic categories
-  const categoryTranslations: Record<string, { label: string; icon: string }> = {
-    general: { label: 'Noticias Generales', icon: '📰' },
-    tecnologia: { label: 'Tecnología y Ciencia', icon: '💻' },
-    economia: { label: 'Economía y Finanzas', icon: '📈' },
-    deportes: { label: 'Deportes', icon: '⚽' },
-    religion: { label: 'Religión y Sociedad', icon: '🕊️' },
-    gremial: { label: 'Gremial / Sindical', icon: '🤝' },
-    institucional: { label: 'Institucionales y Oficiales', icon: '🏛️' },
-    turismo: { label: 'Turismo Fin del Mundo', icon: '🌲' },
-    policial: { label: 'Policiales', icon: '🚨' },
-    otras: { label: 'Otras Temáticas', icon: '🔍' }
+  // Set de íconos lineales consistentes (outline, 1.5px de trazo, sin emojis sueltos)
+  const categoryTranslations: Record<string, { label: string; Icon: React.ComponentType<{ className?: string }> }> = {
+    general: { label: 'Generales', Icon: Newspaper },
+    noticias: { label: 'Locales TDF', Icon: MapPin },
+    tecnologia: { label: 'Tecnología', Icon: Cpu },
+    economia: { label: 'Economía', Icon: TrendingUp },
+    deportes: { label: 'Deportes', Icon: Trophy },
+    religion: { label: 'Sociedad', Icon: Users },
+    gremial: { label: 'Gremiales', Icon: Briefcase },
+    institucional: { label: 'Institucional', Icon: Landmark },
+    turismo: { label: 'Turismo', Icon: Trees },
+    policial: { label: 'Policiales', Icon: ShieldAlert },
+    otras: { label: 'Otras', Icon: Compass }
   };
+
+  // Alertas activas clasificadas por nivel, segmentadas por ciudad y con caducidad TTL
+  const activeTdfAlerts = useMemo(
+    () => getActiveTdfAlerts(articles, feedsMap, selectedTdfCity, syncTime),
+    [articles, feedsMap, selectedTdfCity, syncTime]
+  );
 
   const availableCategories = useMemo(() => {
       const matchingFeeds = activeScope === 'all' 
@@ -669,9 +729,9 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
-                className="text-lg font-black tracking-tighter text-text-primary whitespace-nowrap font-display"
+                className="text-[16px] font-bold tracking-tight text-text-primary whitespace-nowrap"
               >
-                WA <span className="text-accent-secondary dark:text-accent-primary">PRO</span>
+                WikiApp <span className="text-[#0f4c81] dark:text-sky-400">TDF</span>
               </motion.span>
             )}
           </AnimatePresence>
@@ -679,23 +739,23 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
 
         <nav className="flex-1 w-full space-y-1 overflow-y-auto scrollbar-hide py-2 px-2">
           {[
-            { id: 'home', icon: LayoutDashboard, label: 'Panel de Control', sub: 'Home' },
-            { id: 'explore', icon: Compass, label: 'Fuentes de Inteligencia', sub: 'Feeds' },
-            { id: 'instagram', icon: InstagramIcon, label: 'Redes Sociales', sub: 'Instagram', color: 'text-rose-500' },
-            { id: 'boletines', icon: Newspaper, label: 'Digesto & Boletines', sub: 'Digesto' },
-            { id: 'weather', icon: Cloud, label: 'Clima & Alertas', sub: 'Clima' },
-            { id: 'guia', icon: Map, label: 'Guía Fueguina', sub: 'Naturaleza & Senderos', color: 'text-emerald-500' },
-            { id: 'reports', icon: FileText, label: 'Análisis Estratégico', sub: 'Informes' },
-            { id: 'security', icon: ShieldCheck, label: 'Centro de Seguridad', sub: 'Seguridad', color: 'text-red-500', activeBg: 'bg-red-500' },
-            { id: 'radio', icon: Radio, label: 'Dial & Streaming', sub: 'En Vivo' },
-            { id: 'logistics', icon: Anchor, label: 'Tráfico Regional', sub: 'Arribos' }
+            { id: 'home', icon: LayoutDashboard, label: 'Información al día', sub: 'Inicio TDF' },
+            { id: 'explore', icon: Compass, label: 'Directorio de Medios', sub: 'Fuentes' },
+            { id: 'instagram', icon: InstagramIcon, label: 'Redes Sociales', sub: 'Cuentas TDF' },
+            { id: 'boletines', icon: Newspaper, label: 'Digesto y Boletines', sub: 'Oficial' },
+            { id: 'weather', icon: Cloud, label: 'Clima y Alertas', sub: 'Meteorología' },
+            { id: 'guia', icon: Map, label: 'Guía Fueguina', sub: 'Senderos y Servicios' },
+            { id: 'reports', icon: FileText, label: 'Informes Provinciales', sub: 'Reportes' },
+            { id: 'security', icon: ShieldCheck, label: 'Mapa de Seguridad', sub: 'Prevención' },
+            { id: 'radio', icon: Radio, label: 'Radios en Vivo', sub: 'Emisoras' },
+            { id: 'logistics', icon: Anchor, label: 'Arribos y Vuelos', sub: 'Tráfico' }
           ].map((item) => (
             <button 
               key={item.id}
               onClick={() => setActiveTab(item.id)} 
-              className={`relative w-full flex items-center gap-4 px-3 py-3 rounded-xl group transition-all duration-200 ${activeTab === item.id ? (item.id === 'security' ? 'bg-red-500/10 text-red-500' : 'bg-accent-primary/10 text-accent-primary dark:text-accent-primary') : 'text-text-secondary dark:text-text-tertiary hover:bg-surface-sunken'}`}
+              className={`relative w-full flex items-center gap-4 px-3 py-2.5 rounded-xl group transition-all duration-200 cursor-pointer ${activeTab === item.id ? 'bg-[#0f4c81]/10 text-[#0f4c81] dark:text-sky-400' : 'text-text-secondary hover:bg-surface-sunken'}`}
             >
-              <item.icon className={`w-5 h-5 shrink-0 ${activeTab === item.id ? (item.color || 'text-accent-primary') : 'group-hover:scale-110 transition-transform'}`} />
+              <item.icon className="w-5 h-5 stroke-[1.5] shrink-0" />
               
               <AnimatePresence>
                 {isSidebarExpanded && (
@@ -705,8 +765,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     exit={{ opacity: 0, x: -10 }}
                     className="flex flex-col items-start overflow-hidden"
                   >
-                    <span className="text-[13px] font-bold whitespace-nowrap">{item.label}</span>
-                    <span className="text-[10px] font-medium opacity-60 uppercase tracking-widest">{item.sub}</span>
+                    <span className="text-[14px] font-semibold whitespace-nowrap">{item.label}</span>
+                    <span className="text-[12px] font-normal text-text-tertiary">{item.sub}</span>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -714,7 +774,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
               {activeTab === item.id && (
                 <motion.div 
                   layoutId="active-nav-indicator"
-                  className={`absolute left-0 w-1 h-6 rounded-r-full ${item.id === 'security' ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-accent-primary shadow-[0_0_10px_rgba(212,175,55,0.5)]'}`} 
+                  className="absolute left-0 w-1 h-6 rounded-r-full bg-[#0f4c81] dark:bg-sky-400" 
                 />
               )}
             </button>
@@ -724,19 +784,11 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         <div className="w-full px-2 space-y-1 pb-4 border-t border-border-subtle pt-4">
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('open-pwa-install-modal'))}
-              className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-accent-primary bg-accent-primary/10 hover:bg-accent-primary/20 transition-all group cursor-pointer"
+              className="w-full flex items-center gap-4 px-3 py-2.5 rounded-xl text-[#0f4c81] dark:text-sky-400 bg-[#0f4c81]/10 hover:bg-[#0f4c81]/20 transition-all group cursor-pointer"
               title="Descargar App Web en tu dispositivo"
             >
-              <Download className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
-              {isSidebarExpanded && <span className="text-[13px] font-bold">Descargar App</span>}
-            </button>
-            <button className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-text-secondary hover:bg-surface-sunken transition-all group">
-              <Search className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
-              {isSidebarExpanded && <span className="text-[13px] font-bold">Búsqueda Rápida</span>}
-            </button>
-            <button className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-text-secondary hover:bg-surface-sunken transition-all group">
-              <Settings className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
-              {isSidebarExpanded && <span className="text-[13px] font-bold">Configuración</span>}
+              <Download className="w-5 h-5 stroke-[1.5] shrink-0" />
+              {isSidebarExpanded && <span className="text-[14px] font-semibold">Descargar App</span>}
             </button>
         </div>
       </motion.aside>
@@ -744,21 +796,20 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
       {/* 2. MAIN CONTENT AREA */}
       <main className="flex-1 flex flex-col min-w-0 relative">
         
-        {/* PREMIUM TOP NAVIGATION */}
-        <div className="px-3 py-2 md:px-8 md:py-3.5 shrink-0 z-30 sticky top-0 bg-surface-elevated/70 backdrop-blur-2xl border-b border-border-subtle shadow-glass safe-top">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
+        {/* CABECERA PRINCIPAL: WikiApp TDF — Información al día */}
+        <div className="px-3 py-2.5 md:px-6 shrink-0 z-40 sticky top-0 bg-surface-elevated/95 backdrop-blur-md border-b border-border-subtle safe-top">
+            <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-2 flex-wrap">
                 <div className="flex items-center gap-3">
-                   <div className="lg:hidden mr-2 shrink-0">
-                      <WikiAppLogo className="w-10 h-10" />
+                   <div className="lg:hidden mr-1 shrink-0">
+                      <WikiAppLogo className="w-9 h-9" />
                    </div>
-                   <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3">
-                      <h1 className="text-xl md:text-2xl font-black text-text-primary tracking-tighter uppercase font-display">
-                         WA <span className="text-[10px] bg-accent-primary/20 px-2 py-0.5 rounded-full text-accent-primary font-black border border-accent-primary/20 ml-1">PRO</span>
+                   <div className="flex flex-col md:flex-row md:items-baseline gap-0.5 md:gap-2.5">
+                      <h1 className="text-[20px] md:text-[24px] font-bold text-text-primary tracking-tight">
+                         WikiApp <span className="text-[#0f4c81] dark:text-sky-400">TDF</span>
                       </h1>
                       <div className="flex items-center gap-2">
-                        <ChevronRight className="w-3.5 h-3.5 text-text-tertiary hidden lg:block" />
-                        <span className="text-[10px] md:text-[11px] font-bold text-text-tertiary uppercase tracking-[0.2em] font-mono hidden sm:block">
-                            {activeTab === 'home' ? 'Monitor Regional' : activeTab === 'explore' ? 'Fuentes de Inteligencia' : activeTab === 'instagram' ? 'Redes Sociales & Instagram' : activeTab === 'boletines' ? 'Digesto & Boletines Oficiales' : activeTab === 'security' ? 'Centro de Auditoría' : activeTab === 'logistics' ? 'Control de Tráfico' : activeTab === 'radio' ? 'Dial & Streaming Fueguino' : 'Sistema'}
+                        <span className="text-[12px] md:text-[14px] font-semibold text-text-secondary">
+                            — Información al día
                         </span>
                       </div>
                    </div>
@@ -969,114 +1020,66 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                 </div>
             </div>
         </div>
-                     {/* 🖥️ MODERNA BARRA DE HERRAMIENTAS - FILTROS + TABS */}
-            {(activeTab === 'home' || activeTab === 'explore') && (
-                <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-3 xl:gap-5 py-2 md:py-3.5 px-3 md:px-6 border-b border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.01] backdrop-blur-3xl xl:sticky xl:top-[64px] relative top-0 z-20 transition-all duration-300">
 
-                    {/* FILTRO DE CATEGORÍAS (DROPDOWN) */}
-                    <div className="flex items-center gap-2 md:gap-3 w-full xl:w-auto">
-                        <div className="px-2.5 py-1.5 md:px-3 md:py-2 bg-slate-100/50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 flex items-center gap-2 shrink-0">
-                            <ListFilter className="w-4 h-4 text-blue-500" />
-                            <span className="text-[10px] md:text-[11px] font-bold text-slate-600 dark:text-gray-400 uppercase tracking-widest hidden xs:inline">Clasificación</span>
-                        </div>
-                        <div className="relative flex-1 xl:w-64 group">
-                            <select 
-                                value={activeCategory}
-                                onChange={(e) => setActiveCategory(e.target.value)}
-                                className="w-full bg-slate-100/50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl py-2 px-3.5 text-[11px] font-bold uppercase text-slate-700 dark:text-gray-300 focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer"
-                            >
-                                <option value="all">Todas las subcategorías</option>
-                                {availableCategories.map(cat => {
-                                    const trans = categoryTranslations[cat] || { label: cat, icon: '📰' };
-                                    return (
-                                        <option key={cat} value={cat}>
-                                            {trans.icon} {trans.label}
-                                        </option>
-                                    );
-                                })}
-                            </select>
-                            <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 rotate-90 pointer-events-none" />
-                        </div>
-                    </div>
+        {/* 1. FRANJA DE ESTADO FIJA (STICKY) EN LA PARTE SUPERIOR:
+            Estado de Ruta 3 + Alerta activa de Defensa Civil + Farmacia de turno */}
+        <TdfStickyStatusBar
+          selectedCity={selectedTdfCity}
+          onSelectCity={handleSelectCity}
+          activeAlerts={activeTdfAlerts}
+          activePharmacy={getVisiblePharmacies(selectedPharmacyCity)[0] || null}
+          pharmacyCityName={
+            selectedPharmacyCity === 'rio_grande'
+              ? 'Río Grande'
+              : selectedPharmacyCity === 'tolhuin'
+              ? 'Tolhuin'
+              : 'Ushuaia'
+          }
+          syncTime={syncTime}
+          onDetectLocation={handleDetectLocation}
+          isLocating={isLocating}
+        />
 
-                    {/* DROPDOWN DE COBERTURA GEOGRÁFICA INTERACTIVO & RESPONSIVO */}
-                    {(activeTab === 'home' || activeTab === 'explore') && (
-                        <div className="relative">
-                            <button
-                                onClick={() => setIsCoverageDropdownOpen(!isCoverageDropdownOpen)}
-                                className="flex items-center gap-2 px-3 py-2 bg-slate-100/80 dark:bg-black/50 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-gray-300 hover:bg-slate-200/55 dark:hover:bg-white/[0.04] shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                            >
-                                {activeScope === 'all' && <LayoutGrid className="w-4 h-4 text-blue-500" />}
-                                {activeScope === 'internacional' && <Globe className="w-4 h-4 text-orange-500" />}
-                                {activeScope === 'nacional' && <Flag className="w-4 h-4 text-sky-500" />}
-                                {activeScope === 'provincial' && <Map className="w-4 h-4 text-emerald-500" />}
-                                
-                                <span className="font-sans tracking-wide">
-                                    Cobertura: {
-                                        activeScope === 'all' ? 'Todo el panorama' :
-                                        activeScope === 'internacional' ? 'Internacional' :
-                                        activeScope === 'nacional' ? 'Nacional Argentina' : 'Provincial (TDF)'
-                                    }
-                                </span>
-                                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-300 ${isCoverageDropdownOpen ? 'rotate-180' : ''}`} />
-                            </button>
-                            
-                            <AnimatePresence>
-                                {isCoverageDropdownOpen && (
-                                    <>
-                                        <div 
-                                            className="fixed inset-0 z-30" 
-                                            onClick={() => setIsCoverageDropdownOpen(false)}
-                                        />
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            transition={{ duration: 0.15 }}
-                                            className="absolute left-0 mt-2 w-72 bg-white/95 dark:bg-[#0c0c0c]/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-2 z-40 flex flex-col gap-1"
-                                        >
-                                            {[
-                                                { id: 'all', label: 'Todo el panorama', desc: 'Todo el universo de noticias', icon: LayoutGrid, color: 'text-blue-500 bg-blue-500/10' },
-                                                { id: 'internacional', label: 'Internacional', desc: 'Medios de cobertura internacional', icon: Globe, color: 'text-orange-500 bg-orange-500/10' },
-                                                { id: 'nacional', label: 'Nacional Argentina', desc: 'Medios nacionales de Argentina', icon: Flag, color: 'text-sky-500 bg-sky-500/10' },
-                                                { id: 'provincial', label: 'Provincial (TDF)', desc: 'Noticias de Tierra del Fuego', icon: Map, color: 'text-emerald-500 bg-emerald-500/10' }
-                                            ].map((item) => {
-                                                const Icon = item.icon;
-                                                const isSelected = activeScope === item.id;
-                                                return (
-                                                    <button
-                                                        key={item.id}
-                                                        onClick={() => {
-                                                            setActiveScope(item.id);
-                                                            setActiveCategory('all');
-                                                            setIsCoverageDropdownOpen(false);
-                                                        }}
-                                                        className={`flex items-center gap-3 p-2.5 rounded-xl text-left transition-all ${
-                                                            isSelected 
-                                                                ? 'bg-blue-600 text-white shadow-md' 
-                                                                : 'hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-gray-300'
-                                                        }`}
-                                                    >
-                                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isSelected ? 'bg-white/20 text-white' : item.color}`}>
-                                                            <Icon className="w-4 h-4" />
-                                                        </div>
-                                                        <div className="flex flex-col min-w-0">
-                                                            <span className="text-xs font-bold uppercase tracking-wider leading-none">{item.label}</span>
-                                                            <span className={`text-[11px] mt-1 leading-normal ${isSelected ? 'text-blue-100' : 'text-slate-400 dark:text-gray-400'}`}>{item.desc}</span>
-                                                        </div>
-                                                    </button>
-                                                );
-                                            })}
-                                        </motion.div>
-                                    </>
-                                )}
-                            </AnimatePresence>
-                        </div>
-                    )}
+        {/* 5. FILTRO PERSISTENTE POR CATEGORÍA Y CIUDAD (CHIPS COMPACTOS SIN SCROLL VERTICAL, CON ÍCONOS LINEALES 1.5PX) */}
+        {(activeTab === 'home' || activeTab === 'explore') && (
+          <div className="bg-surface-elevated border-b border-border-subtle px-3 py-2 md:px-6 shrink-0 z-20">
+            <div className="max-w-[1440px] mx-auto flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+              <button
+                type="button"
+                onClick={() => handleSelectCategory('all')}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
+                  activeCategory === 'all'
+                    ? 'bg-[#0f4c81] text-white'
+                    : 'bg-surface-sunken text-text-secondary hover:bg-slate-200 dark:hover:bg-slate-800'
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5 stroke-[1.5]" />
+                <span>Todas las temáticas</span>
+              </button>
 
-
-                </div>
-            )}
+              {availableCategories.map((cat) => {
+                const trans = categoryTranslations[cat] || { label: cat, Icon: Compass };
+                const CatIcon = trans.Icon;
+                const isSelected = activeCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => handleSelectCategory(cat)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
+                      isSelected
+                        ? 'bg-[#0f4c81] text-white'
+                        : 'bg-surface-sunken text-text-secondary hover:bg-slate-200 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <CatIcon className="w-3.5 h-3.5 stroke-[1.5]" />
+                    <span>{trans.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* CONTENIDO SCROLL */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-6 lg:p-8 relative z-10 scrollbar-hide">
@@ -1100,269 +1103,23 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     </div>
                   )}
 
-                  {/* BENTO GRID EDITORIAL DE ALTO IMPACTO (HOME) */}
-                  {!search && activeTab === 'home' && topVisualArticles.length > 0 && (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5">
-                        {/* 1. HERO FEATURE CARD */}
-                        {(() => {
-                          const heroArticle = topVisualArticles[0];
-                          const isVid = isYouTube(heroArticle.link);
-                          const sourceName = feedsMap.get(heroArticle.sourceId)?.name || 'Central';
-                          return (
-                            <motion.div
-                              initial={{ opacity: 0, y: 15 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              onClick={() => setSelectedArticle(heroArticle)}
-                              className="lg:col-span-7 xl:col-span-8 group relative min-h-[340px] sm:min-h-[390px] lg:min-h-[420px] rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 cursor-pointer shadow-xl press-effect flex flex-col justify-end p-6 md:p-8 bg-slate-900"
-                            >
-                              {heroArticle.thumbnail ? (
-                                <img 
-                                  src={heroArticle.thumbnail} 
-                                  alt="" 
-                                  loading="lazy"
-                                  decoding="async"
-                                  className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 group-hover:opacity-85 transition-all duration-700" 
-                                />
-                              ) : (
-                                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-950 to-black"></div>
-                              )}
-                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
-                              
-                              {/* Badges superiores */}
-                              <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-                                <div className="flex items-center gap-2">
-                                  <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-600 text-white backdrop-blur shadow-md">
-                                    {sourceName}
-                                  </span>
-                                  <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-black/50 text-slate-200 border border-white/10 backdrop-blur font-mono">
-                                    {getRelativeTime(heroArticle.pubDate)}
-                                  </span>
-                                </div>
-                                {isVid && (
-                                  <div className="bg-red-600 text-white p-2 rounded-full backdrop-blur shadow-lg">
-                                    <PlayCircle className="w-5 h-5" />
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Contenido Hero */}
-                              <div className="relative z-10 flex flex-col gap-2.5">
-                                <span className="text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
-                                  <Flame className="w-3.5 h-3.5" /> Portada Destacada
-                                </span>
-                                <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white leading-tight line-clamp-3 font-display drop-shadow-md">
-                                  {heroArticle.title}
-                                </h2>
-                                {heroArticle.description && (
-                                  <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 leading-relaxed max-w-2xl font-normal hidden sm:block">
-                                    {stripHtml(heroArticle.description)}
-                                  </p>
-                                )}
-                                <div className="flex items-center gap-4 mt-2 pt-2 border-t border-white/10">
-                                  <span className="text-xs font-bold text-blue-400 uppercase tracking-wider group-hover:underline flex items-center gap-1">
-                                    Leer artículo <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
-                                  </span>
-                                  <div className="flex items-center gap-2 ml-auto">
-                                    <button 
-                                      onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(heroArticle.title + ' ' + heroArticle.link)}`, '_blank'); }} 
-                                      className="p-2 bg-white/10 hover:bg-emerald-600 text-white rounded-xl transition-all backdrop-blur" 
-                                      title="Compartir por WhatsApp"
-                                    >
-                                      <MessageCircle className="w-4 h-4" />
-                                    </button>
-                                    <button 
-                                      onClick={(e) => { 
-                                        e.stopPropagation(); 
-                                        shareToTelegram({
-                                          url: heroArticle.link,
-                                          title: heroArticle.title,
-                                          excerpt: heroArticle.description,
-                                          source: heroArticle.sourceName || heroArticle.sourceId,
-                                          date: heroArticle.pubDate ? new Date(heroArticle.pubDate).toLocaleDateString('es-AR') : ''
-                                        });
-                                      }} 
-                                      className="p-2 bg-white/10 hover:bg-blue-600 text-white rounded-xl transition-all backdrop-blur relative group/tg" 
-                                      title={isValidUrl(heroArticle.link) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Compartir por Telegram"}
-                                    >
-                                      <Send className="w-4 h-4" />
-                                      {isValidUrl(heroArticle.link) && (
-                                        <span className="absolute -top-1 -right-1 text-[8px] bg-amber-400 text-black px-1 rounded-full font-black leading-none py-0.5">
-                                          ⚡
-                                        </span>
-                                      )}
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </motion.div>
-                          );
-                        })()}
-
-                        {/* 2. SIDE BENTO UTILITIES (Col 5 / 4) */}
-                        <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-4">
-                          {/* Bento Card: Estado Vial TDF */}
-                          <div 
-                            onClick={() => setActiveTab('security')}
-                            className="bg-white dark:bg-[#10141c] border border-slate-200/80 dark:border-white/10 rounded-3xl p-5 shadow-lg hover:border-blue-500/40 transition-all cursor-pointer flex flex-col justify-between flex-1 group"
-                          >
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center">
-                                  <Car className="w-4 h-4" />
-                                </div>
-                                <div>
-                                  <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                                    Ruta Nacional 3
-                                  </h3>
-                                  <span className="text-[10px] text-slate-500 dark:text-gray-400">Tránsito & Monitoreo</span>
-                                </div>
-                              </div>
-                              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Habilitada
-                              </span>
-                            </div>
-
-                            <div className="space-y-1.5 my-2">
-                              <div className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5">
-                                <span className="font-medium text-slate-700 dark:text-gray-300">San Sebastián ➔ R. Grande</span>
-                                <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">Normal</span>
-                              </div>
-                              <div className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5">
-                                <span className="font-medium text-slate-700 dark:text-gray-300">R. Grande ➔ Tolhuin</span>
-                                <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">Normal</span>
-                              </div>
-                              <div className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5">
-                                <span className="font-medium text-slate-700 dark:text-gray-300">Paso Garibaldi (Montaña)</span>
-                                <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">Precaución</span>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/5 text-[11px] font-bold text-blue-600 dark:text-blue-400">
-                              <span>Ver mapa de alertas</span>
-                              <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
-                            </div>
-                          </div>
-
-                          {/* Bento Card: Farmacia de Turno Hoy Flash */}
-                          <div className="bg-white dark:bg-[#10141c] border border-slate-200/80 dark:border-white/10 rounded-3xl p-5 shadow-lg flex flex-col justify-between flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-                                  <Plus className="w-4 h-4" />
-                                </div>
-                                <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                                  Farmacia de Turno
-                                </h3>
-                              </div>
-                              <div className="flex gap-1 bg-slate-100 dark:bg-white/5 p-0.5 rounded-lg">
-                                {(['ushuaia', 'rio_grande', 'tolhuin'] as const).map(city => (
-                                  <button
-                                    key={city}
-                                    onClick={() => setSelectedPharmacyCity(city)}
-                                    className={`text-[9px] font-bold uppercase px-2 py-1 rounded-md transition-all ${
-                                      selectedPharmacyCity === city
-                                        ? 'bg-blue-600 text-white shadow-sm'
-                                        : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
-                                    }`}
-                                  >
-                                    {city === 'rio_grande' ? 'RGA' : city === 'ushuaia' ? 'USH' : 'TOL'}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-
-                            {(() => {
-                              const list = getVisiblePharmacies(selectedPharmacyCity);
-                              const activePharm = list[0];
-                              if (!activePharm) {
-                                return (
-                                  <div className="py-3 text-center text-xs text-slate-400">
-                                    Cargando turno...
-                                  </div>
-                                );
-                              }
-                              return (
-                                <div className="flex flex-col gap-1 py-1">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-sm font-bold text-slate-900 dark:text-white">
-                                      {activePharm.nombre}
-                                    </span>
-                                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                                      Turno Activo
-                                    </span>
-                                  </div>
-                                  <p className="text-xs text-slate-500 dark:text-gray-400">
-                                    {activePharm.direccion}
-                                  </p>
-                                  <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-gray-500 mt-2 pt-2 border-t border-slate-100 dark:border-white/5">
-                                    <span className="font-mono">Hasta las 09:00 hs</span>
-                                    {activePharm.telefono && (
-                                      <a 
-                                        href={`tel:${activePharm.telefono}`}
-                                        className="text-blue-600 dark:text-blue-400 font-bold hover:underline"
-                                      >
-                                        Tel: {activePharm.telefono}
-                                      </a>
-                                    )}
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Sub-tarjetas Bento secundarias (si existen 2da y 3ra nota) */}
-                      {topVisualArticles.length > 1 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {topVisualArticles.slice(1, 3).map((article, idx) => {
-                            const isVid = isYouTube(article.link);
-                            const sourceName = feedsMap.get(article.sourceId)?.name || 'Central';
-                            return (
-                              <motion.div
-                                key={'sub-bento-' + article.id}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 * (idx + 1) }}
-                                onClick={() => setSelectedArticle(article)}
-                                className="bg-white dark:bg-[#10141c] border border-slate-200/80 dark:border-white/10 rounded-2xl p-4 flex gap-4 items-center hover:border-blue-500/50 hover-lift cursor-pointer shadow-md group"
-                              >
-                                {article.thumbnail && (
-                                  <div className="w-24 h-24 sm:w-28 sm:h-24 rounded-xl overflow-hidden shrink-0 relative shadow-sm">
-                                    <img src={article.thumbnail} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                                    {isVid && (
-                                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                                        <PlayCircle className="w-6 h-6 text-white" />
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                                <div className="flex flex-col gap-1.5 min-w-0 flex-1">
-                                  <div className="flex items-center gap-2 text-xs">
-                                    <span className="font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">
-                                      {sourceName}
-                                    </span>
-                                    <span className="text-[11px] text-slate-400 font-mono">
-                                      {getRelativeTime(article.pubDate)}
-                                    </span>
-                                  </div>
-                                  <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 font-display group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                    {article.title}
-                                  </h3>
-                                </div>
-                              </motion.div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
+                  {/* JERARQUÍA DE 3 NIVELES + TARJETAS DE ALERTA SEMÁNTICAS + RESUMEN DEL DÍA (HOME) */}
+                  {activeTab === 'home' && (
+                    <TdfThreeTierFeed
+                      articles={filteredArticles}
+                      feedsMap={feedsMap}
+                      selectedCity={selectedTdfCity}
+                      activeCategory={activeCategory}
+                      activeAlerts={activeTdfAlerts}
+                      onSelectArticle={setSelectedArticle}
+                      syncTime={syncTime}
+                    />
                   )}
 
+                  {activeTab === "explore" && (
                   <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-                      {/* MAIN CONTENT FEED LIST */}
-                      <div className={`${activeTab === "home" ? "xl:col-span-8" : "xl:col-span-12"} flex flex-col gap-6`}>
-                         {(activeTab === "home" || activeTab === "explore") && (
+                      {/* DIRECTORIO DE MEDIOS (EXPLORE) */}
+                      <div className="xl:col-span-12 flex flex-col gap-6">
                          <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
                             <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm sticky top-0 z-10">
                                 <div className="flex items-center gap-3">
@@ -1685,239 +1442,19 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                     <div className="p-8 text-center text-sm text-slate-500 dark:text-gray-500">Sin artículos recientes compatibles.</div>
                                  )}
                                  
-                                 {/* VER + BUTTON FOR HOME */}
-                                 {activeTab === 'home' && !search && (filteredArticles.length - topVisualArticles.length) > 10 && (
-                                    <div className="p-6 border-t border-slate-200 dark:border-[#1f1f1f] flex justify-center bg-white dark:bg-[#0e0e0e]/50">
-                                        <button 
-                                            onClick={() => setActiveTab('explore')}
-                                            className="flex items-center gap-2 px-6 py-2.5 bg-slate-100 dark:bg-[#1a1a1a] hover:bg-slate-200 dark:bg-[#222] border border-slate-300 dark:border-[#333] rounded-full text-[11px] font-black uppercase tracking-widest text-blue-500 hover:text-blue-400 transition-all group font-bold"
-                                        >
-                                            Ver + Noticias <ChevronRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-                                        </button>
-                                    </div>
-                                 )}
                              </motion.div>
                            </div>
-                         )}
                       </div>
-
-                      {/* RIGHT COLUMN (CHECKLIST) FOR HOME */}
-                      {activeTab === 'home' && (
-                        <div className="flex xl:col-span-4 flex-col gap-6 w-full xl:w-auto mt-4 xl:mt-0">
-                            <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-2xl p-5 shadow-2xl flex flex-col gap-6">
-                                <div className="flex items-center justify-between text-slate-700 dark:text-gray-300">
-                                    <h2 className="text-[13px] font-bold tracking-wide flex items-center gap-2">
-                                        <Map className="w-4 h-4 text-orange-500" />
-                                        Estado de Rutas TDF
-                                    </h2>
-                                    <span className="flex h-2 w-2 relative">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                    </span>
-                                </div>
-                                <div className="flex flex-col gap-4">
-                                    
-                                    {/* TRAMO 1 */}
-                                    <div className="bg-slate-100 dark:bg-[#161616]/40 backdrop-blur-md border border-slate-300 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative group hover:border-blue-500/50 hover:bg-slate-100 dark:bg-[#1a1a1a]/60 cursor-pointer transition-all shadow-sm">
-                                        <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-blue-500"/></div>
-                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-gray-500">Tramo Norte</h4>
-                                        <h3 className="text-[13px] font-bold text-slate-900 dark:text-white">San Sebastián - Río Grande</h3>
-                                        <p className="text-[11px] text-slate-600 dark:text-gray-400 mt-1 mb-2 leading-relaxed opacity-80 group-hover:opacity-100">Tránsito habilitado. Monitoreo oficial por condiciones climáticas de la zona.</p>
-                                        <a href="https://www.facebook.com/SuDefensaCivil/" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-slate-300 dark:border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-blue-500 hover:text-blue-400 transition-colors">
-                                            Fuente: Defensa Civil <ExternalLink className="w-3 h-3"/>
-                                        </a>
-                                    </div>
-
-                                    {/* TRAMO 2 */}
-                                    <div className="bg-slate-100 dark:bg-[#161616]/40 backdrop-blur-md border border-slate-300 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative group hover:border-emerald-500/50 hover:bg-slate-100 dark:bg-[#1a1a1a]/60 cursor-pointer transition-all shadow-sm">
-                                        <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-emerald-500"/></div>
-                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-gray-500">Tramo Centro</h4>
-                                        <h3 className="text-[13px] font-bold text-slate-900 dark:text-white">Río Grande - Tolhuin</h3>
-                                        <p className="text-[11px] text-slate-600 dark:text-gray-400 mt-1 mb-2 leading-relaxed opacity-80 group-hover:opacity-100">Precaución permanente en zona geológica. Reportarse a los puestos de control.</p>
-                                        <a href="https://www.argentina.gob.ar/transporte/vialidad-nacional/estado-de-rutas" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-slate-300 dark:border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-emerald-500 hover:text-emerald-400 transition-colors">
-                                            Fuente: Vialidad Nacional <ExternalLink className="w-3 h-3"/>
-                                        </a>
-                                    </div>
-
-                                    {/* TRAMO 3 */}
-                                    <div className="bg-slate-100 dark:bg-[#161616]/40 backdrop-blur-md border border-slate-300 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative group hover:border-orange-500/50 hover:bg-slate-100 dark:bg-[#1a1a1a]/60 cursor-pointer transition-all shadow-sm">
-                                        <div className="absolute top-4 right-4"><Car className="w-4 h-4 text-orange-400"/></div>
-                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-gray-500">Tramo Sur</h4>
-                                        <h3 className="text-[13px] font-bold text-slate-900 dark:text-white">Tolhuin - Lapataia</h3>
-                                        <p className="text-[11px] text-slate-600 dark:text-gray-400 mt-1 mb-2 leading-relaxed opacity-80 group-hover:opacity-100">Zona de montaña. Transitabilidad sujeta a condiciones de hielo y nieve diaria.</p>
-                                        <a href="https://www.facebook.com/direccionprovincialdevialidadTDF/?locale=es_LA" target="_blank" rel="noopener noreferrer" className="mt-auto pt-3 border-t border-slate-300 dark:border-[#222] flex items-center justify-between text-[10px] uppercase font-bold text-orange-400 hover:text-orange-300 transition-colors">
-                                            Fuente: Vialidad Pcial <ExternalLink className="w-3 h-3"/>
-                                        </a>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            {/* TARJETA DE FARMACIAS DE TURNO (UX PREMIUM & AUTO-UPDATE) */}
-                            <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
-                                <div className="flex items-center justify-between text-slate-700 dark:text-gray-300">
-                                    <h2 className="text-[13px] font-bold tracking-wide flex items-center gap-2">
-                                        <Plus className="w-4 h-4 text-emerald-500" />
-                                        Farmacias de Turno
-                                    </h2>
-                                    <div className="flex gap-1 bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/5">
-                                        {(['ushuaia', 'rio_grande', 'tolhuin'] as const).map(city => (
-                                            <button
-                                                key={city}
-                                                onClick={() => {
-                                                    setSelectedPharmacyCity(city);
-                                                    setActivePharmacyIndex(0);
-                                                }}
-                                                className={`text-[9px] font-black uppercase px-2.5 py-1.5 rounded-lg transition-all ${
-                                                    selectedPharmacyCity === city
-                                                        ? 'bg-blue-600 text-white shadow-md'
-                                                        : 'text-slate-500 dark:text-gray-400 hover:text-blue-500 hover:bg-blue-500/10'
-                                                }`}
-                                            >
-                                                {city === 'rio_grande' ? 'R. Grande' : city}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {pharmacies ? (
-                                    <div className="relative min-h-[140px] flex flex-col">
-                                        <AnimatePresence mode="wait">
-                                            {(() => {
-                                                const visibleList = getVisiblePharmacies(selectedPharmacyCity);
-                                                const pharmacy = visibleList[activePharmacyIndex];
-                                                if (!pharmacy) return null;
-
-                                                const pharmacyDayNum = parseInt(pharmacy.fecha);
-                                                const isCurrentShift = pharmacyDayNum === activeShiftDay;
-                                                
-                                                // Verificar si es el próximo turno (mañana del turno activo actual)
-                                                const shiftDate = getActiveShiftDate();
-                                                const tomorrow = new Date(shiftDate.getTime() + 24 * 60 * 60 * 1000);
-                                                const isNextShift = pharmacyDayNum === tomorrow.getDate();
-                                                
-                                                const formattedCityName = selectedPharmacyCity === 'ushuaia' ? 'Ushuaia' : selectedPharmacyCity === 'rio_grande' ? 'Río Grande' : 'Tolhuin';
-                                                
-                                                // Texto detallado y mejorado del período del turno
-                                                const getShiftPeriodText = () => {
-                                                    const now = new Date();
-                                                    if (isCurrentShift) {
-                                                        return now.getHours() < 9 
-                                                            ? 'De Turno: finaliza hoy a las 09:00 hs' 
-                                                            : 'De Turno: finaliza mañana a las 09:00 hs';
-                                                    } else if (isNextShift) {
-                                                        return now.getHours() < 9 
-                                                            ? 'Próximo turno: inicia hoy a las 09:00 hs' 
-                                                            : 'Próximo turno: inicia mañana a las 09:00 hs';
-                                                    }
-                                                    return pharmacy.horario;
-                                                };
-
-                                                return (
-                                                    <motion.div
-                                                        key={`${selectedPharmacyCity}-${activePharmacyIndex}`}
-                                                        initial={{ opacity: 0, x: 20 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        exit={{ opacity: 0, x: -20 }}
-                                                        transition={{ duration: 0.3 }}
-                                                        className="bg-slate-100 dark:bg-[#161616]/40 backdrop-blur-md border border-slate-300 dark:border-[#222] rounded-2xl p-4 flex flex-col gap-2 relative shadow-sm"
-                                                    >
-                                                        <div className="flex items-center justify-between">
-                                                            <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
-                                                                isCurrentShift
-                                                                    ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 animate-pulse'
-                                                                    : isNextShift
-                                                                        ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20'
-                                                                        : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-gray-400'
-                                                            }`}>
-                                                                {isCurrentShift ? 'De Turno' : isNextShift ? 'Próximo Turno' : `${pharmacy.dia} ${pharmacy.fecha}`}
-                                                            </span>
-                                                            <span className="text-[9px] font-bold text-slate-500 dark:text-gray-500">
-                                                                {getShiftPeriodText()}
-                                                            </span>
-                                                        </div>
-
-                                                        <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase mt-1">
-                                                            {pharmacy.nombre}
-                                                        </h3>
-
-                                                        {/* Dirección Interactiva para GPS */}
-                                                        <a
-                                                            href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`Farmacia ${pharmacy.nombre}, ${pharmacy.direccion}, ${formattedCityName}, Tierra del Fuego, Argentina`)}`}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors w-fit group mt-1"
-                                                        >
-                                                            <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0 group-hover:scale-110 transition-transform" />
-                                                            <span className="underline underline-offset-2 decoration-dotted group-hover:decoration-solid">{pharmacy.direccion}</span>
-                                                        </a>
-
-                                                        {/* Teléfonos Interactivos */}
-                                                        <div className="flex flex-wrap gap-2 mt-2 pt-2 border-t border-slate-200 dark:border-white/5">
-                                                            {(() => {
-                                                                const rawPhones = pharmacy.telefono;
-                                                                const cleanPhones = rawPhones.replace(/(Tel\.|Cel\.|CEL\.)/gi, '').trim();
-                                                                const phoneParts = cleanPhones.split(/[\/\–]/).map((p: string) => p.trim()).filter(Boolean);
-                                                                
-                                                                return phoneParts.map((phone: string, idx: number) => {
-                                                                    const telLink = phone.replace(/[^\d+]/g, '');
-                                                                    return (
-                                                                        <a
-                                                                            key={idx}
-                                                                            href={`tel:${telLink}`}
-                                                                            className="flex items-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-emerald-500/20 transition-all cursor-pointer"
-                                                                        >
-                                                                            <svg className="w-3.5 h-3.5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                                                                            </svg>
-                                                                            Llamar: {phone}
-                                                                        </a>
-                                                                    );
-                                                                });
-                                                            })()}
-                                                        </div>
-                                                    </motion.div>
-                                                );
-                                            })()}
-                                        </AnimatePresence>
-
-                                        {/* Indicadores de carrusel */}
-                                        <div className="flex justify-center gap-1.5 mt-3">
-                                            {[0, 1, 2, 3].map(idx => (
-                                                <button
-                                                    key={idx}
-                                                    onClick={() => setActivePharmacyIndex(idx)}
-                                                    className={`w-1.5 h-1.5 rounded-full transition-all ${
-                                                        activePharmacyIndex === idx
-                                                            ? 'bg-blue-600 w-3'
-                                                            : 'bg-slate-300 dark:bg-[#333]'
-                                                    }`}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="h-[140px] flex flex-col items-center justify-center bg-slate-100 dark:bg-[#161616]/40 rounded-2xl border border-slate-300 dark:border-[#222]">
-                                        <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                                        <span className="text-[10px] uppercase font-black text-slate-500 dark:text-gray-500 tracking-wider mt-3">Sincronizando farmacias...</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                      )}
-
-                      {/* SIDE PANEL REMOVED AND MOVED TO TOP DROPDOWN */}
                   </div>
+                  )}
 
-                  {/* SECCIÓN DE REDES SOCIALES FUEGUINAS (INSTAGRAM) */}
+                  {/* 4. UN SOLO MÓDULO DE REDES SOCIALES CON PESTAÑAS POR CUENTA (AUTOPLAY DESACTIVADO POR DEFECTO) */}
                   {activeTab === 'home' && (
                     <HomeInstagramSection 
                       articles={articles} 
                       onViewFullFeed={() => setActiveTab('instagram')} 
                     />
                   )}
-
-                  {activeTab === 'home' && <TelegramFeed articles={initialArticles} onSelectArticle={setSelectedArticle} />}
                 </div>
             )}
 
