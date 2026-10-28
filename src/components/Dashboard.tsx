@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, AlertTriangle, Info, Newspaper, Eye, Check, Type } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, AlertTriangle, Info, Newspaper, Eye, Check, Type, Download } from 'lucide-react';
 import { shareToTelegram, InstantViewExplainerBadge, isValidUrl } from '@/utils/telegramInstantView';
 import { useTheme } from 'next-themes';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
@@ -722,6 +722,14 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         </nav>
 
         <div className="w-full px-2 space-y-1 pb-4 border-t border-border-subtle pt-4">
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-pwa-install-modal'))}
+              className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-accent-primary bg-accent-primary/10 hover:bg-accent-primary/20 transition-all group cursor-pointer"
+              title="Descargar App Web en tu dispositivo"
+            >
+              <Download className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
+              {isSidebarExpanded && <span className="text-[13px] font-bold">Descargar App</span>}
+            </button>
             <button className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-text-secondary hover:bg-surface-sunken transition-all group">
               <Search className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
               {isSidebarExpanded && <span className="text-[13px] font-bold">Búsqueda Rápida</span>}
@@ -939,6 +947,16 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                         </div>
                       </>
                     )}
+
+                    {/* BOTÓN DESCARGAR APP WEB (Android & iOS) */}
+                    <button
+                      onClick={() => window.dispatchEvent(new CustomEvent('open-pwa-install-modal'))}
+                      className="flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border bg-[#d4af37]/15 text-[#1b263b] dark:text-[#e5cf87] border-[#d4af37]/40 hover:bg-[#d4af37] hover:text-[#1b263b] dark:hover:bg-[#d4af37] dark:hover:text-[#1b263b] shadow-sm shrink-0 group"
+                      title="Descargar aplicación web para Android o iOS"
+                    >
+                      <Download className="w-4 h-4 text-[#d4af37] group-hover:text-[#1b263b] transition-colors" />
+                      <span className="hidden xs:inline">App</span>
+                    </button>
                     
                     <div className="hidden sm:flex items-center gap-3 bg-slate-100 dark:bg-white/5 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
                         <div className="flex flex-col text-left">

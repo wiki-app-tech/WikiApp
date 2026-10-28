@@ -1,0 +1,67 @@
+{
+  "id": "/",
+  "name": "WikiApp PRO | Monitor Regional e Inteligencia TDF",
+  "short_name": "WikiApp PRO",
+  "description": "Plataforma de noticias en vivo, clima, boletines oficiales, radios y monitoreo estratégico de Tierra del Fuego.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "any",
+  "background_color": "#0d0f17",
+  "theme_color": "#1b263b",
+  "lang": "es-AR",
+  "dir": "ltr",
+  "categories": ["news", "weather", "utilities", "navigation"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Monitor de Noticias",
+      "short_name": "Noticias",
+      "description": "Ver el flujo principal de noticias regionales y nacionales",
+      "url": "/?tab=home",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Clima y Alertas",
+      "short_name": "Clima",
+      "description": "Pronóstico meteorológico y alertas en Tierra del Fuego",
+      "url": "/?tab=weather",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Radio en Vivo",
+      "short_name": "Radios",
+      "description": "Escuchar emisoras fueguinas en vivo",
+      "url": "/?tab=radio",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}
+
