@@ -1,27 +1,25 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   Car,
   AlertTriangle,
-  ShieldCheck,
   Cross,
-  MapPin,
-  Phone,
-  Bell,
   Clock,
   ChevronDown,
   ChevronUp,
   ChevronLeft,
   ChevronRight,
   Navigation,
-  ExternalLink,
   Thermometer,
-  TrendingUp
+  TrendingUp,
+  Pause,
+  Play,
+  Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TdfAlertItem, TdfCity } from '@/utils/tdfIntelligence';
-import { triggerSegmentedCriticalPush } from '@/utils/tdfIntelligence';
+import { toSentenceCaseTitle } from '@/utils/tdfIntelligence';
 
 export interface PharmacyItem {
   fecha?: string;
@@ -61,23 +59,33 @@ interface TdfStickyStatusBarProps {
   isLocating?: boolean;
 }
 
+interface UnifiedSlide {
+  id: string;
+  kind: 'alert' | 'ruta' | 'farmacia' | 'clima' | 'dolar_oficial' | 'dolar_blue';
+  badgeLabel: string;
+  issuer: string;
+  cityLabel: string;
+  title: string;
+  detail?: string;
+  syncedAt: string;
+  severity: 'critical' | 'warning' | 'info' | 'emerald';
+}
+
 export default function TdfStickyStatusBar({
   selectedCity,
   onSelectCity,
   activeAlerts,
   activePharmacy,
   pharmaciesByCity,
-  pharmacyCityName,
   syncTime,
   onDetectLocation,
   isLocating = false,
 }: TdfStickyStatusBarProps) {
-  const [expandedDetail, setExpandedDetail] = useState<'ruta' | 'alerta' | 'farmacia' | 'clima' | 'dolar' | null>(null);
-  const [pushEnabled, setPushEnabled] = useState<boolean>(false);
-  const [alertIndex, setAlertIndex] = useState<number>(0);
-  const [critIndex, setCritIndex] = useState<number>(0);
-  const [cityCycleIndex, setCityCycleIndex] = useState<number>(0);
-  const [dolarCycleIndex, setDolarCycleIndex] = useState<number>(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const touchStartXRef = useRef<number | null>(null);
 
   const [weatherByCity, setWeatherByCity] = useState<Record<'ushuaia' | 'rio_grande' | 'tolhuin', CityWeatherSummary>>({
     ushuaia: { id: 'ushuaia', name: 'Ushuaia', temp: 6, max: 9, min: 2 },
@@ -102,31 +110,33 @@ export default function TdfStickyStatusBar({
         if (wRes.status === 'fulfilled' && wRes.value.ok) {
           const wJson = await wRes.value.json();
           if (Array.isArray(wJson)) {
-            const nextWeather = { ...weatherByCity };
-            for (const item of wJson) {
-              const maxVal = Array.isArray(item?.daily?.temperatureMax) ? Math.round(item.daily.temperatureMax[0]) : 8;
-              const minVal = Array.isArray(item?.daily?.temperatureMin) ? Math.round(item.daily.temperatureMin[0]) : 1;
-              const curVal = typeof item?.current?.temperature === 'number' ? Math.round(item.current.temperature) : maxVal;
+            setWeatherByCity((prev) => {
+              const next = { ...prev };
+              for (const item of wJson) {
+                const maxVal = Array.isArray(item?.daily?.temperatureMax) ? Math.round(item.daily.temperatureMax[0]) : 8;
+                const minVal = Array.isArray(item?.daily?.temperatureMin) ? Math.round(item.daily.temperatureMin[0]) : 1;
+                const curVal = typeof item?.current?.temperature === 'number' ? Math.round(item.current.temperature) : maxVal;
 
-              if (item.id === 'ushuaia') {
-                nextWeather.ushuaia = { id: 'ushuaia', name: 'Ushuaia', temp: curVal, max: maxVal, min: minVal };
-              } else if (item.id === 'riogrande' || item.id === 'rio_grande') {
-                nextWeather.rio_grande = { id: 'rio_grande', name: 'Río Grande', temp: curVal, max: maxVal, min: minVal };
-              } else if (item.id === 'tolhuin') {
-                nextWeather.tolhuin = { id: 'tolhuin', name: 'Tolhuin', temp: curVal, max: maxVal, min: minVal };
+                if (item.id === 'ushuaia') {
+                  next.ushuaia = { id: 'ushuaia', name: 'Ushuaia', temp: curVal, max: maxVal, min: minVal };
+                } else if (item.id === 'riogrande' || item.id === 'rio_grande') {
+                  next.rio_grande = { id: 'rio_grande', name: 'Río Grande', temp: curVal, max: maxVal, min: minVal };
+                } else if (item.id === 'tolhuin') {
+                  next.tolhuin = { id: 'tolhuin', name: 'Tolhuin', temp: curVal, max: maxVal, min: minVal };
+                }
               }
-            }
-            setWeatherByCity(nextWeather);
+              return next;
+            });
           }
         }
 
         if (dRes.status === 'fulfilled' && dRes.value.ok) {
           const dJson = await dRes.value.json();
           if (dJson?.oficial || dJson?.blue) {
-            setDolarData({
-              oficial: dJson.oficial || dolarData.oficial,
-              blue: dJson.blue || dolarData.blue,
-            });
+            setDolarData((prev) => ({
+              oficial: dJson.oficial || prev.oficial,
+              blue: dJson.blue || prev.blue,
+            }));
           }
         }
       } catch {
@@ -139,167 +149,220 @@ export default function TdfStickyStatusBar({
     return () => clearInterval(interval);
   }, []);
 
-  // Separar alertas críticas y todas las alertas activas para rotación cíclica automática
-  const criticalAlerts = activeAlerts.filter((a) => a.severity === 'critical');
-  const totalAlerts = activeAlerts.length;
-  const currentCyclicAlert = totalAlerts > 0 ? activeAlerts[alertIndex % totalAlerts] : null;
-  const currentCriticalBanner = criticalAlerts.length > 0 ? criticalAlerts[critIndex % criticalAlerts.length] : null;
-
-  // Rotación cíclica automática cada 4 segundos para ciudades (cuando está seleccionado 'all' = TDF) y cotizaciones
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCityCycleIndex((prev) => (prev + 1) % 3);
-      setDolarCycleIndex((prev) => (prev + 1) % 2);
-      if (totalAlerts > 1) {
-        setAlertIndex((prev) => (prev + 1) % totalAlerts);
-      }
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [totalAlerts]);
-
-  useEffect(() => {
-    if (criticalAlerts.length <= 1) return;
-    const timer = setInterval(() => {
-      setCritIndex((prev) => (prev + 1) % criticalAlerts.length);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, [criticalAlerts.length]);
-
-  const cityKeys: ('ushuaia' | 'rio_grande' | 'tolhuin')[] = ['ushuaia', 'rio_grande', 'tolhuin'];
-  const activeCityKey: 'ushuaia' | 'rio_grande' | 'tolhuin' =
-    selectedCity === 'all' ? cityKeys[cityCycleIndex % 3] : selectedCity;
-
-  const cityDisplayLabel =
-    activeCityKey === 'ushuaia'
-      ? 'Ushuaia'
-      : activeCityKey === 'rio_grande'
-      ? 'Río Grande'
-      : 'Tolhuin';
-
-  // Farmacia de turno por ciudad (SOLO EL NOMBRE en la tarjeta compacta)
-  const displayedPharmacy: PharmacyItem | null =
-    pharmaciesByCity ? pharmaciesByCity[activeCityKey] : activePharmacy;
-
-  const displayedWeather = weatherByCity[activeCityKey];
-
-  // Estado de Ruta 3 según ciudad seleccionada/cíclica y alertas viales vigentes
-  const getRuta3Status = () => {
-    const roadCut = criticalAlerts.find((a) => a.type === 'road_cut');
-    if (roadCut) {
-      return {
-        label: 'Corte RN 3',
-        segment: activeCityKey === 'rio_grande' ? 'San Sebastián – R. Grande' : activeCityKey === 'tolhuin' ? 'R. Grande – Tolhuin' : 'Paso Garibaldi',
-        level: 'critical' as const,
-        issuer: roadCut.issuer,
-        detail: roadCut.title,
-      };
-    }
-
-    if (activeCityKey === 'rio_grande') {
-      return {
-        label: 'RN 3 Habilitada',
-        segment: 'San Sebastián – Río Grande',
-        level: 'ok' as const,
-        issuer: 'Vialidad Nacional',
-        detail: 'Calzada despejada y transitable. Precaución por ráfagas laterales en sectores descampados.',
-      };
-    }
-
-    if (activeCityKey === 'tolhuin') {
-      return {
-        label: 'RN 3 Precaución',
-        segment: 'Río Grande – Tolhuin – Garibaldi',
-        level: 'warning' as const,
-        issuer: 'Vialidad Provincial',
-        detail: 'Calzada húmeda en zona alta. Circular con luces bajas encendidas y velocidad precautoria.',
-      };
-    }
-
-    return {
-      label: 'RN 3 Precaución',
-      segment: 'Paso Garibaldi · Ushuaia',
-      level: 'warning' as const,
-      issuer: 'Vialidad Nacional',
-      detail: 'Calzada transitable con precaución en zona de montaña (Paso Garibaldi). Portación de cubiertas de invierno.',
-    };
-  };
-
-  const rutaStatus = getRuta3Status();
   const formattedSync = syncTime ? syncTime.slice(0, 5) + ' hs' : 'En vivo';
+  const formatArs = (val?: number) => (typeof val === 'number' && !isNaN(val) ? `$${val.toLocaleString('es-AR')}` : '--');
 
-  const handleEnablePush = async () => {
-    if (typeof window === 'undefined' || !('Notification' in window)) return;
-    const perm = await Notification.requestPermission();
-    if (perm === 'granted') {
-      setPushEnabled(true);
-      if (criticalAlerts[0]) {
-        triggerSegmentedCriticalPush(criticalAlerts[0], selectedCity);
-      }
+  // Construir UN ÚNICO SLIDER CÍCLICO sin duplicar información:
+  // 1) Estado de Rutas, 2) Farmacia de Turno por ciudad (solo el nombre),
+  // 3) Clima de hoy (Máxima y Mínima) cada ciudad, 4) Dólar Oficial (Compra y Venta),
+  // 5) Dólar Blue (Compra y Venta), y 6) Alertas de Tierra del Fuego (excluyendo las que ya son el estado base de ruta si coinciden)
+  const slides: UnifiedSlide[] = useMemo(() => {
+    const list: UnifiedSlide[] = [];
+
+    // 1. Estado de Rutas TDF
+    const roadCut = activeAlerts.find((a) => a.severity === 'critical' && a.type === 'road_cut');
+    if (roadCut) {
+      list.push({
+        id: 'unified-ruta',
+        kind: 'ruta',
+        badgeLabel: 'Estado de Rutas',
+        issuer: roadCut.issuer,
+        cityLabel: 'RN 3 · TDF',
+        title: roadCut.title,
+        detail: roadCut.description,
+        syncedAt: roadCut.syncedAt || formattedSync,
+        severity: 'critical',
+      });
+    } else {
+      list.push({
+        id: 'unified-ruta',
+        kind: 'ruta',
+        badgeLabel: 'Estado de Rutas',
+        issuer: 'Vialidad Nacional / Provincial',
+        cityLabel: 'RN 3 · TDF',
+        title: 'Ruta Nacional 3 transitable con precaución en Paso Garibaldi · Río Grande – Tolhuin habilitada',
+        detail: 'Portación obligatoria de cubiertas de invierno en zona alta de montaña y luces bajas encendidas.',
+        syncedAt: formattedSync,
+        severity: 'warning',
+      });
     }
-  };
 
-  const cleanPhone = displayedPharmacy?.telefono
-    ? displayedPharmacy.telefono.replace(/(Tel\.|Cel\.|CEL\.)/gi, '').split(/[\/–]/)[0].trim()
-    : '';
-  const telHref = cleanPhone.replace(/[^\d+]/g, '');
+    // 2. Farmacia de Turno por ciudad (SOLO EL NOMBRE)
+    const uName = pharmaciesByCity?.ushuaia?.nombre || activePharmacy?.nombre || 'En sincronización';
+    const rgName = pharmaciesByCity?.rio_grande?.nombre || 'En sincronización';
+    const tName = pharmaciesByCity?.tolhuin?.nombre || 'En sincronización';
 
-  const formatArs = (val?: number) => {
-    if (typeof val !== 'number' || isNaN(val)) return '--';
-    return `$${val.toLocaleString('es-AR')}`;
+    const pharmacyTitle =
+      selectedCity === 'ushuaia'
+        ? `Ushuaia: ${uName}`
+        : selectedCity === 'rio_grande'
+        ? `Río Grande: ${rgName}`
+        : selectedCity === 'tolhuin'
+        ? `Tolhuin: ${tName}`
+        : `Ushuaia: ${uName} · Río Grande: ${rgName} · Tolhuin: ${tName}`;
+
+    list.push({
+      id: 'unified-farmacia',
+      kind: 'farmacia',
+      badgeLabel: 'Farmacia de Turno',
+      issuer: 'Turno 24 hs por ciudad',
+      cityLabel: selectedCity === 'all' ? 'TDF' : selectedCity === 'ushuaia' ? 'Ushuaia' : selectedCity === 'rio_grande' ? 'Río Grande' : 'Tolhuin',
+      title: pharmacyTitle,
+      detail: `Ushuaia: ${uName} | Río Grande: ${rgName} | Tolhuin: ${tName} (Turno vigente hasta las 09:00 hs).`,
+      syncedAt: formattedSync,
+      severity: 'emerald',
+    });
+
+    // 3. Clima de hoy (Máxima y Mínima) de cada ciudad
+    const uW = weatherByCity.ushuaia;
+    const rgW = weatherByCity.rio_grande;
+    const tW = weatherByCity.tolhuin;
+
+    const weatherTitle =
+      selectedCity === 'ushuaia'
+        ? `Ushuaia: Máx ${uW.max}°C / Mín ${uW.min}°C (Actual ${uW.temp}°C)`
+        : selectedCity === 'rio_grande'
+        ? `Río Grande: Máx ${rgW.max}°C / Mín ${rgW.min}°C (Actual ${rgW.temp}°C)`
+        : selectedCity === 'tolhuin'
+        ? `Tolhuin: Máx ${tW.max}°C / Mín ${tW.min}°C (Actual ${tW.temp}°C)`
+        : `Ushuaia: Máx ${uW.max}° / Mín ${uW.min}° · Río Grande: Máx ${rgW.max}° / Mín ${rgW.min}° · Tolhuin: Máx ${tW.max}° / Mín ${tW.min}°`;
+
+    list.push({
+      id: 'unified-clima',
+      kind: 'clima',
+      badgeLabel: 'Clima Hoy',
+      issuer: 'Máxima y Mínima',
+      cityLabel: selectedCity === 'all' ? 'Cada Ciudad' : selectedCity === 'ushuaia' ? 'Ushuaia' : selectedCity === 'rio_grande' ? 'Río Grande' : 'Tolhuin',
+      title: weatherTitle,
+      detail: `Ushuaia: Actual ${uW.temp}°C (Máx ${uW.max}°C / Mín ${uW.min}°C) · Río Grande: Actual ${rgW.temp}°C (Máx ${rgW.max}°C / Mín ${rgW.min}°C) · Tolhuin: Actual ${tW.temp}°C (Máx ${tW.max}°C / Mín ${tW.min}°C).`,
+      syncedAt: formattedSync,
+      severity: 'info',
+    });
+
+    // 4. Cotización Dólar Oficial (Compra y Venta)
+    list.push({
+      id: 'unified-dolar-oficial',
+      kind: 'dolar_oficial',
+      badgeLabel: 'Dólar Oficial',
+      issuer: 'Cotización BNA',
+      cityLabel: 'Compra / Venta',
+      title: `Dólar Oficial — Compra: ${formatArs(dolarData.oficial?.compra)} · Venta: ${formatArs(dolarData.oficial?.venta)}`,
+      detail: `Dólar Oficial: Compra ${formatArs(dolarData.oficial?.compra)} / Venta ${formatArs(dolarData.oficial?.venta)} · Dólar Blue: Compra ${formatArs(dolarData.blue?.compra)} / Venta ${formatArs(dolarData.blue?.venta)}.`,
+      syncedAt: formattedSync,
+      severity: 'info',
+    });
+
+    // 5. Cotización Dólar Blue (Compra y Venta)
+    list.push({
+      id: 'unified-dolar-blue',
+      kind: 'dolar_blue',
+      badgeLabel: 'Dólar Blue',
+      issuer: 'Mercado Informal',
+      cityLabel: 'Compra / Venta',
+      title: `Dólar Blue — Compra: ${formatArs(dolarData.blue?.compra)} · Venta: ${formatArs(dolarData.blue?.venta)}`,
+      detail: `Dólar Blue: Compra ${formatArs(dolarData.blue?.compra)} / Venta ${formatArs(dolarData.blue?.venta)} · Dólar Oficial: Compra ${formatArs(dolarData.oficial?.compra)} / Venta ${formatArs(dolarData.oficial?.venta)}.`,
+      syncedAt: formattedSync,
+      severity: 'emerald',
+    });
+
+    // 6. Alertas de Defensa Civil / Meteorológicas (evitando duplicar las de corte/estado de ruta ya incluidas en el slide 1)
+    for (const a of activeAlerts) {
+      if (a.id === 'official-garibaldi-winter' || a.id === 'official-tolhuin-road') continue;
+      const cLabel =
+        a.city === 'ushuaia'
+          ? 'Ushuaia'
+          : a.city === 'rio_grande'
+          ? 'Río Grande'
+          : a.city === 'tolhuin'
+          ? 'Tolhuin'
+          : 'TDF';
+
+      list.push({
+        id: `unified-alert-${a.id}`,
+        kind: 'alert',
+        badgeLabel: a.severity === 'critical' ? 'Alerta Crítica' : 'Alerta TDF',
+        issuer: a.issuer,
+        cityLabel: cLabel,
+        title: toSentenceCaseTitle(a.title),
+        detail: a.description,
+        syncedAt: a.syncedAt || formattedSync,
+        severity: a.severity,
+      });
+    }
+
+    return list;
+  }, [activeAlerts, pharmaciesByCity, activePharmacy, weatherByCity, dolarData, selectedCity, formattedSync]);
+
+  const total = slides.length;
+  const safeIndex = total > 0 ? currentIndex % total : 0;
+  const currentSlide = slides[safeIndex];
+
+  const handleNext = useCallback(() => {
+    if (total <= 1) return;
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) % total);
+  }, [total]);
+
+  const handlePrev = useCallback(() => {
+    if (total <= 1) return;
+    setDirection(-1);
+    setCurrentIndex((prev) => (prev - 1 + total) % total);
+  }, [total]);
+
+  // Rotación cíclica y automática cada 4.2 segundos
+  useEffect(() => {
+    if (total <= 1 || isPaused) return;
+    const timer = setInterval(() => {
+      handleNext();
+    }, 4200);
+    return () => clearInterval(timer);
+  }, [total, isPaused, handleNext]);
+
+  if (!currentSlide) return null;
+
+  const isCritical = currentSlide.severity === 'critical';
+  const isWarning = currentSlide.severity === 'warning';
+  const isEmerald = currentSlide.severity === 'emerald';
+
+  const cardClass = isCritical
+    ? 'alert-card-critical'
+    : isWarning
+    ? 'alert-card-warning'
+    : 'alert-card-info';
+
+  const badgeBg = isCritical
+    ? 'bg-[#dc2626] text-white'
+    : isWarning
+    ? 'bg-[#d97706] text-white'
+    : isEmerald
+    ? 'bg-[#16a34a] text-white'
+    : 'bg-[#0f4c81] text-white';
+
+  const renderIcon = () => {
+    if (currentSlide.kind === 'ruta') return <Car className="w-3 h-3 stroke-[1.75]" />;
+    if (currentSlide.kind === 'farmacia') return <Cross className="w-3 h-3 stroke-[1.75]" />;
+    if (currentSlide.kind === 'clima') return <Thermometer className="w-3 h-3 stroke-[1.75]" />;
+    if (currentSlide.kind === 'dolar_oficial' || currentSlide.kind === 'dolar_blue') {
+      return <TrendingUp className="w-3 h-3 stroke-[1.75]" />;
+    }
+    if (currentSlide.severity === 'info') return <Info className="w-3 h-3 stroke-[1.75]" />;
+    return <AlertTriangle className="w-3 h-3 stroke-[1.75]" />;
   };
 
   return (
     <div className="sticky top-[52px] sm:top-[56px] z-30 w-full bg-surface-elevated/95 backdrop-blur-md border-b border-border-subtle shadow-xs transition-colors">
-      {/* BANNER FIJO ROJO COMPACTO Y CÍCLICO PARA ALERTAS CRÍTICAS */}
-      {currentCriticalBanner && (
-        <div
-          role="alert"
-          aria-live="assertive"
-          className="w-full bg-[#dc2626] text-white px-3 py-1.5 md:px-6 border-b border-red-800"
-        >
-          <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0 flex-1">
-              <AlertTriangle className="w-4 h-4 stroke-[1.5] shrink-0" />
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={currentCriticalBanner.id}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.2 }}
-                  className="text-[12px] sm:text-[13px] leading-snug truncate"
-                >
-                  <span className="font-bold mr-1.5">Alerta crítica ({currentCriticalBanner.issuer}):</span>
-                  <span className="font-semibold">{currentCriticalBanner.title}</span>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-            <div className="hidden md:flex items-center gap-2 shrink-0 text-[11px] tabular-nums text-red-100">
-              <span>Sinc: {currentCriticalBanner.syncedAt}</span>
-              <span>·</span>
-              <span>TTL {currentCriticalBanner.ttlHours}h</span>
-              {criticalAlerts.length > 1 && (
-                <span className="px-1.5 py-0.2 rounded bg-black/20 font-bold">
-                  {(critIndex % criticalAlerts.length) + 1}/{criticalAlerts.length}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* FRANJA HORIZONTAL COMPACTA: CIUDAD + RUTA 3 + FARMACIA (SOLO NOMBRE) + CLIMA HOY (MÁX/MÍN) + DÓLAR OFICIAL/BLUE */}
       <div className="max-w-[1440px] mx-auto px-2.5 py-1.5 sm:px-4 md:px-6">
-        <div className="flex flex-col xl:grid xl:grid-cols-12 gap-1.5 xl:items-center">
-          {/* Selector de Ciudad / Geolocalización (Col 2) */}
-          <div className="xl:col-span-2 flex items-center justify-between xl:justify-start gap-1 xl:border-r border-border-subtle xl:pr-2">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-1.5 lg:gap-3">
+          {/* Selector compacto de Ciudad (Ushuaia / Río Grande / Tolhuin) */}
+          <div className="flex items-center justify-between lg:justify-start gap-1 shrink-0 lg:border-r border-border-subtle lg:pr-3">
             <button
               type="button"
               onClick={onDetectLocation}
-              className="inline-flex items-center gap-1 px-1.5 py-1 rounded-lg text-[11px] font-semibold bg-surface-sunken hover:bg-slate-200 dark:hover:bg-slate-800 text-text-secondary transition-colors cursor-pointer shrink-0"
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold bg-surface-sunken hover:bg-slate-200 dark:hover:bg-slate-800 text-text-secondary transition-colors cursor-pointer shrink-0"
               title="Detectar mi ciudad por geolocalización"
             >
               <Navigation className={`w-3 h-3 stroke-[1.5] text-[#0f4c81] dark:text-sky-400 ${isLocating ? 'animate-spin' : ''}`} />
+              <span className="hidden xl:inline">Mi zona</span>
             </button>
 
             <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-hide">
@@ -327,281 +390,124 @@ export default function TdfStickyStatusBar({
             </div>
           </div>
 
-          {/* Tarjetas pequeñas horizontales (Deslizable sin robar pantalla en móvil) */}
-          <div className="xl:col-span-10 flex xl:grid xl:grid-cols-4 gap-1.5 overflow-x-auto scrollbar-hide items-stretch">
-            {/* 1. ESTADO DE RUTAS */}
-            <button
-              type="button"
-              onClick={() => setExpandedDetail(expandedDetail === 'ruta' ? null : 'ruta')}
-              className="shrink-0 w-[180px] sm:w-[205px] xl:w-auto flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface-sunken/70 hover:bg-surface-sunken border border-border-subtle transition-colors text-left cursor-pointer min-w-0"
-            >
-              <div className="flex items-center gap-1.5 min-w-0">
-                <span
-                  className={`w-5 h-5 rounded-lg flex items-center justify-center shrink-0 ${
-                    rutaStatus.level === 'critical'
-                      ? 'bg-red-500/15 text-[#dc2626]'
-                      : rutaStatus.level === 'warning'
-                      ? 'bg-amber-500/15 text-[#d97706]'
-                      : 'bg-emerald-500/15 text-[#16a34a]'
-                  }`}
-                >
-                  <Car className="w-3.5 h-3.5 stroke-[1.5]" />
+          {/* ÚNICO SLIDER CÍCLICO Y AUTOMÁTICO EN TARJETA PEQUEÑA (SIN DUPLICADOS) */}
+          <div
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onTouchStart={(e) => {
+              touchStartXRef.current = e.touches[0]?.clientX ?? null;
+              setIsPaused(true);
+            }}
+            onTouchEnd={(e) => {
+              const startX = touchStartXRef.current;
+              const endX = e.changedTouches[0]?.clientX ?? null;
+              if (startX !== null && endX !== null) {
+                const delta = endX - startX;
+                if (Math.abs(delta) > 36) {
+                  if (delta < 0) handleNext();
+                  else handlePrev();
+                }
+              }
+              touchStartXRef.current = null;
+              setTimeout(() => setIsPaused(false), 2500);
+            }}
+            onClick={() => setIsDetailOpen((prev) => !prev)}
+            className={`flex-1 min-w-0 rounded-xl px-3 py-1.5 sm:px-3.5 sm:py-2 ${cardClass} transition-colors cursor-pointer select-none`}
+          >
+            <div className="flex items-center justify-between gap-2">
+              {/* Contenido deslizable en una sola línea compacta para móviles */}
+              <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+                <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide shrink-0 ${badgeBg}`}>
+                  {renderIcon()}
+                  <span>{currentSlide.badgeLabel}</span>
                 </span>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1">
-                    <span className="text-[11px] font-bold text-text-primary truncate">
-                      {rutaStatus.label}
-                    </span>
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                        rutaStatus.level === 'critical'
-                          ? 'bg-[#dc2626]'
-                          : rutaStatus.level === 'warning'
-                          ? 'bg-[#d97706]'
-                          : 'bg-[#16a34a]'
-                      }`}
-                    />
-                  </div>
-                  <span className="text-[10px] text-text-tertiary block truncate">
-                    {rutaStatus.segment}
-                  </span>
-                </div>
-              </div>
-              <ChevronDown className="w-3 h-3 stroke-[1.5] text-text-tertiary shrink-0" />
-            </button>
 
-            {/* 2. FARMACIA DE TURNO POR CIUDAD (SOLO EL NOMBRE) */}
-            <button
-              type="button"
-              onClick={() => setExpandedDetail(expandedDetail === 'farmacia' ? null : 'farmacia')}
-              className="shrink-0 w-[185px] sm:w-[210px] xl:w-auto flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface-sunken/70 hover:bg-surface-sunken border border-border-subtle transition-colors text-left cursor-pointer min-w-0"
-            >
-              <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                <span className="w-5 h-5 rounded-lg bg-emerald-500/15 text-[#16a34a] flex items-center justify-center shrink-0">
-                  <Cross className="w-3 h-3 stroke-[1.5]" />
+                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-[10px] text-text-secondary font-semibold shrink-0 tabular-nums">
+                  {currentSlide.cityLabel}
                 </span>
+
                 <div className="min-w-0 flex-1 overflow-hidden">
                   <AnimatePresence mode="wait" initial={false}>
                     <motion.div
-                      key={`pharm-${activeCityKey}`}
-                      initial={{ opacity: 0, x: 10 }}
+                      key={currentSlide.id}
+                      initial={{ opacity: 0, x: direction * 20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      transition={{ duration: 0.2 }}
+                      exit={{ opacity: 0, x: direction * -20 }}
+                      transition={{ duration: 0.22, ease: 'easeOut' }}
                       className="min-w-0"
                     >
-                      <div className="flex items-center gap-1">
-                        <span className="text-[10px] font-semibold text-[#16a34a] shrink-0">
-                          Turno {cityDisplayLabel}
-                        </span>
-                      </div>
-                      <span className="text-[11px] font-bold text-text-primary block truncate">
-                        {displayedPharmacy ? displayedPharmacy.nombre : 'Farmacia de Turno'}
-                      </span>
+                      <p className="text-[12px] sm:text-[13px] font-bold text-text-primary truncate tabular-nums">
+                        {currentSlide.title}
+                      </p>
                     </motion.div>
                   </AnimatePresence>
                 </div>
               </div>
-              <ChevronDown className="w-3 h-3 stroke-[1.5] text-text-tertiary shrink-0" />
-            </button>
 
-            {/* 3. CLIMA DE HOY (MÁXIMA Y MÍNIMA) POR CADA CIUDAD */}
-            <button
-              type="button"
-              onClick={() => setExpandedDetail(expandedDetail === 'clima' ? null : 'clima')}
-              className="shrink-0 w-[185px] sm:w-[210px] xl:w-auto flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface-sunken/70 hover:bg-surface-sunken border border-border-subtle transition-colors text-left cursor-pointer min-w-0"
-            >
-              <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                <span className="w-5 h-5 rounded-lg bg-sky-500/15 text-[#0284c7] flex items-center justify-center shrink-0">
-                  <Thermometer className="w-3.5 h-3.5 stroke-[1.5]" />
+              {/* Controles compactos del único slider */}
+              <div className="flex items-center gap-0.5 shrink-0 tabular-nums">
+                <span className="text-[10px] font-semibold text-text-tertiary px-1">
+                  {safeIndex + 1}/{total}
                 </span>
-                <div className="min-w-0 flex-1 overflow-hidden">
-                  <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
-                      key={`weather-${activeCityKey}`}
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="min-w-0 tabular-nums"
-                    >
-                      <span className="text-[10px] font-semibold text-text-secondary block truncate">
-                        Clima hoy · {cityDisplayLabel}
-                      </span>
-                      <span className="text-[11px] font-bold text-text-primary block truncate">
-                        Máx {displayedWeather.max}°C · Mín {displayedWeather.min}°C
-                      </span>
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-              </div>
-              <ChevronDown className="w-3 h-3 stroke-[1.5] text-text-tertiary shrink-0" />
-            </button>
-
-            {/* 4. COTIZACIÓN DÓLAR OFICIAL (COMPRA Y VENTA) + DÓLAR BLUE (COMPRA Y VENTA) */}
-            <button
-              type="button"
-              onClick={() => setExpandedDetail(expandedDetail === 'dolar' ? null : 'dolar')}
-              className="shrink-0 w-[205px] sm:w-[225px] xl:w-auto flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface-sunken/70 hover:bg-surface-sunken border border-border-subtle transition-colors text-left cursor-pointer min-w-0"
-            >
-              <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                <span className="w-5 h-5 rounded-lg bg-[#0f4c81]/15 text-[#0f4c81] dark:text-sky-400 flex items-center justify-center shrink-0">
-                  <TrendingUp className="w-3.5 h-3.5 stroke-[1.5]" />
-                </span>
-                <div className="min-w-0 flex-1 overflow-hidden">
-                  <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
-                      key={`dolar-${dolarCycleIndex % 2}`}
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="min-w-0 tabular-nums"
-                    >
-                      {dolarCycleIndex % 2 === 0 ? (
-                        <>
-                          <span className="text-[10px] font-semibold text-[#0f4c81] dark:text-sky-400 block truncate">
-                            Dólar Oficial
-                          </span>
-                          <span className="text-[11px] font-bold text-text-primary block truncate">
-                            C: {formatArs(dolarData.oficial?.compra)} · V: {formatArs(dolarData.oficial?.venta)}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 block truncate">
-                            Dólar Blue
-                          </span>
-                          <span className="text-[11px] font-bold text-text-primary block truncate">
-                            C: {formatArs(dolarData.blue?.compra)} · V: {formatArs(dolarData.blue?.venta)}
-                          </span>
-                        </>
-                      )}
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-              </div>
-              <ChevronDown className="w-3 h-3 stroke-[1.5] text-text-tertiary shrink-0" />
-            </button>
-          </div>
-        </div>
-
-        {/* PANEL DESPLEGABLE DE DETALLE RÁPIDO */}
-        {expandedDetail && (
-          <div className="mt-1.5 pt-2 border-t border-border-subtle text-[13px] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-surface-primary/60 rounded-xl p-2.5">
-            {expandedDetail === 'ruta' && (
-              <>
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-text-tertiary tabular-nums">
-                    <span>Organismo emisor: <strong className="text-text-primary">{rutaStatus.issuer}</strong></span>
-                    <span>·</span>
-                    <span className="inline-flex items-center gap-1">
-                      <Clock className="w-3 h-3 stroke-[1.5]" />
-                      Sincronizado: {formattedSync}
-                    </span>
-                  </div>
-                  <p className="text-[13px] text-text-primary font-semibold">
-                    {rutaStatus.detail}
-                  </p>
-                </div>
-                <a
-                  href="https://www.argentina.gob.ar/transporte/vialidad-nacional/estado-de-rutas"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#0f4c81] dark:text-sky-400 hover:underline shrink-0"
-                >
-                  <span>Parte oficial Vialidad</span>
-                  <ExternalLink className="w-3.5 h-3.5 stroke-[1.5]" />
-                </a>
-              </>
-            )}
-
-            {expandedDetail === 'farmacia' && (
-              <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-2">
-                {(['ushuaia', 'rio_grande', 'tolhuin'] as const).map((ck) => {
-                  const p = pharmaciesByCity ? pharmaciesByCity[ck] : activePharmacy;
-                  const cName = ck === 'ushuaia' ? 'Ushuaia' : ck === 'rio_grande' ? 'Río Grande' : 'Tolhuin';
-                  return (
-                    <div key={ck} className="px-2.5 py-1.5 rounded-lg bg-surface-sunken flex items-center justify-between gap-2">
-                      <div className="min-w-0">
-                        <span className="text-[10px] font-semibold text-[#16a34a] block">{cName}</span>
-                        <span className="text-[12px] font-bold text-text-primary block truncate">
-                          {p ? p.nombre : 'Sin datos'}
-                        </span>
-                      </div>
-                      {p && (
-                        <a
-                          href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`Farmacia ${p.nombre}, ${p.direccion}, ${cName}, Tierra del Fuego`)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[11px] font-semibold text-[#0f4c81] dark:text-sky-400 hover:underline shrink-0"
-                        >
-                          Mapa
-                        </a>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {expandedDetail === 'clima' && (
-              <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-2 tabular-nums">
-                {(['ushuaia', 'rio_grande', 'tolhuin'] as const).map((ck) => {
-                  const w = weatherByCity[ck];
-                  return (
-                    <div key={ck} className="px-2.5 py-1.5 rounded-lg bg-surface-sunken flex items-center justify-between">
-                      <span className="text-[12px] font-bold text-text-primary">{w.name}</span>
-                      <span className="text-[12px] font-semibold text-text-secondary">
-                        Actual {w.temp}°C · <strong className="text-text-primary">Máx {w.max}°C / Mín {w.min}°C</strong>
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {expandedDetail === 'dolar' && (
-              <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2 tabular-nums">
-                <div className="px-3 py-1.5 rounded-lg bg-surface-sunken flex items-center justify-between">
-                  <span className="text-[12px] font-bold text-[#0f4c81] dark:text-sky-400">Dólar Oficial</span>
-                  <span className="text-[12px] font-semibold text-text-primary">
-                    Compra: <strong>{formatArs(dolarData.oficial?.compra)}</strong> · Venta: <strong>{formatArs(dolarData.oficial?.venta)}</strong>
-                  </span>
-                </div>
-                <div className="px-3 py-1.5 rounded-lg bg-surface-sunken flex items-center justify-between">
-                  <span className="text-[12px] font-bold text-emerald-600 dark:text-emerald-400">Dólar Blue</span>
-                  <span className="text-[12px] font-semibold text-text-primary">
-                    Compra: <strong>{formatArs(dolarData.blue?.compra)}</strong> · Venta: <strong>{formatArs(dolarData.blue?.venta)}</strong>
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {expandedDetail === 'alerta' && currentCyclicAlert && (
-              <>
-                <div className="space-y-0.5">
-                  <div className="flex flex-wrap items-center gap-2 text-[11px] text-text-tertiary tabular-nums">
-                    <span>Organismo: <strong className="text-text-primary">{currentCyclicAlert.issuer}</strong></span>
-                    <span>·</span>
-                    <span>Sincronizado: <strong>{currentCyclicAlert.syncedAt}</strong></span>
-                  </div>
-                  <p className="text-[13px] font-semibold text-text-primary">
-                    {currentCyclicAlert.title}
-                  </p>
-                </div>
                 <button
                   type="button"
-                  onClick={handleEnablePush}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-[#0f4c81] text-white hover:bg-[#0c3b66] shrink-0 cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePrev();
+                  }}
+                  className="p-1 rounded hover:bg-black/10 dark:hover:bg-white/10 text-text-secondary transition-colors cursor-pointer"
+                  aria-label="Anterior"
                 >
-                  <Bell className="w-3.5 h-3.5 stroke-[1.5]" />
-                  <span>{pushEnabled ? 'Alertas Push activas' : 'Recibir alertas críticas'}</span>
+                  <ChevronLeft className="w-3.5 h-3.5 stroke-[1.5]" />
                 </button>
-              </>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsPaused((p) => !p);
+                  }}
+                  className="hidden sm:inline-flex p-1 rounded hover:bg-black/10 dark:hover:bg-white/10 text-text-secondary transition-colors cursor-pointer"
+                  aria-label={isPaused ? 'Reanudar' : 'Pausar'}
+                >
+                  {isPaused ? (
+                    <Play className="w-3 h-3 stroke-[1.5]" />
+                  ) : (
+                    <Pause className="w-3 h-3 stroke-[1.5]" />
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNext();
+                  }}
+                  className="p-1 rounded hover:bg-black/10 dark:hover:bg-white/10 text-text-secondary transition-colors cursor-pointer"
+                  aria-label="Siguiente"
+                >
+                  <ChevronRight className="w-3.5 h-3.5 stroke-[1.5]" />
+                </button>
+                <span className="text-text-tertiary pl-0.5">
+                  {isDetailOpen ? (
+                    <ChevronUp className="w-3.5 h-3.5 stroke-[1.5]" />
+                  ) : (
+                    <ChevronDown className="w-3.5 h-3.5 stroke-[1.5]" />
+                  )}
+                </span>
+              </div>
+            </div>
+
+            {/* Detalle desplegable opcional al tocar la tarjeta */}
+            {isDetailOpen && (
+              <div className="mt-1.5 pt-1.5 border-t border-black/10 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-text-secondary tabular-nums">
+                <p className="font-medium">{currentSlide.detail || currentSlide.title}</p>
+                <span className="inline-flex items-center gap-1 text-text-tertiary shrink-0">
+                  <Clock className="w-3 h-3 stroke-[1.5]" />
+                  <span>{currentSlide.issuer} · Sinc: {currentSlide.syncedAt}</span>
+                </span>
+              </div>
             )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

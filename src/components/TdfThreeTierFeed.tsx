@@ -660,14 +660,6 @@ export default function TdfThreeTierFeed({
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* SLIDER CÍCLICO Y AUTOMÁTICO DE TARJETA PEQUEÑA:
-          Estado de Rutas + Farmacia de Turno (solo nombre) + Clima Hoy (Máx/Mín por ciudad) + Dólar Oficial/Blue + Alertas TDF */}
-      <TdfAlertsCyclicSlider
-        alerts={activeAlerts}
-        pharmaciesByCity={pharmaciesByCity}
-        syncTime={syncTime}
-      />
-
       {/* AUTOMATIZACIÓN: RESUMEN DEL DÍA (3-5 NOTAS CLAVE + ESTADO DE RUTA) */}
       <div className="bg-surface-elevated border border-border-subtle rounded-xl overflow-hidden shadow-xs">
         <button
