@@ -1,20 +1,24 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import {
   AlertTriangle,
   Info,
   Clock,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
   ChevronRight,
   MapPin,
   FileText,
   MessageCircle,
   Send,
   Layers,
-  CheckCircle2
+  CheckCircle2,
+  Pause,
+  Play
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { Article, FeedSource } from '@/types';
 import {
   type TdfCity,
@@ -59,11 +63,13 @@ function getCurrentTimeSlotLabel(): string {
 }
 
 /**
- * 3. TARJETA DE ALERTA CON TRATAMIENTO PROPIO
- * Fondo tintado semántico, ícono lineal 1.5px, título en mayúscula de sentencia,
- * trazabilidad de fuente oficial y TTL, SIN botones de compartir (WhatsApp/Telegram).
+ * 3. TARJETA DE ALERTA COMPACTA CON SLIDER CÍCLICO Y AUTOMÁTICO PARA TIERRA DEL FUEGO
+ * - Diseño de tarjeta pequeña que no roba pantalla en dispositivos móviles.
+ * - Pasa todas las alertas vigentes de manera cíclica y automática (cada 4.5s) con soporte táctil (swipe).
+ * - Conserva el fondo tintado semántico (--color-alert-critical/warning/info), ícono lineal 1.5px,
+ *   título en mayúscula de sentencia, organismo oficial, hora de sincronización y TTL, sin botones de compartir.
  */
-export function TdfSemanticAlertCard({ alert }: { alert: TdfAlertItem }) {
+export function TdfSemanticAlertCard({ alert, compact = true }: { alert: TdfAlertItem; compact?: boolean }) {
   const isCritical = alert.severity === 'critical';
   const isWarning = alert.severity === 'warning';
 
@@ -86,55 +92,297 @@ export function TdfSemanticAlertCard({ alert }: { alert: TdfAlertItem }) {
       ? 'Río Grande'
       : alert.city === 'tolhuin'
       ? 'Tolhuin'
-      : 'Toda la Provincia';
+      : 'TDF';
 
   return (
-    <div className={`rounded-xl p-4 ${cardClass} transition-colors`}>
-      <div className="flex items-start gap-3">
+    <div className={`rounded-xl ${compact ? 'px-3 py-2 sm:px-3.5 sm:py-2.5' : 'p-4'} ${cardClass} transition-colors`}>
+      <div className="flex items-start gap-2.5">
         <div className={`mt-0.5 shrink-0 ${iconColor}`}>
           {alert.severity === 'info' ? (
-            <Info className="w-5 h-5 stroke-[1.5]" />
+            <Info className="w-4 h-4 stroke-[1.5]" />
           ) : (
-            <AlertTriangle className="w-5 h-5 stroke-[1.5]" />
+            <AlertTriangle className="w-4 h-4 stroke-[1.5]" />
           )}
         </div>
 
-        <div className="flex-1 min-w-0 space-y-1.5">
-          <div className="flex flex-wrap items-center justify-between gap-2 text-[12px] tabular-nums">
-            <div className="flex items-center gap-2">
-              <span className={`font-bold ${iconColor}`}>
-                {isCritical ? 'Alerta crítica' : isWarning ? 'Precaución operativa' : 'Aviso oficial'}
+        <div className="flex-1 min-w-0 space-y-0.5">
+          <div className="flex flex-wrap items-center justify-between gap-1.5 text-[11px] leading-tight tabular-nums">
+            <div className="flex items-center gap-1.5 min-w-0 truncate">
+              <span className={`font-bold ${iconColor} shrink-0`}>
+                {isCritical ? 'Crítico' : isWarning ? 'Precaución' : 'Aviso'}
               </span>
               <span className="text-text-tertiary">·</span>
-              <span className="font-semibold text-text-primary">{alert.issuer}</span>
-              <span className="px-2 py-0.2 rounded bg-black/5 dark:bg-white/10 text-text-secondary font-semibold">
+              <span className="font-semibold text-text-primary truncate">{alert.issuer}</span>
+              <span className="px-1.5 py-0.2 rounded bg-black/5 dark:bg-white/10 text-text-secondary font-semibold shrink-0">
                 {cityLabel}
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-text-tertiary">
-              <span className="inline-flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 stroke-[1.5]" />
-                Sincronizado: <strong className="text-text-secondary">{alert.syncedAt}</strong>
+            <div className="hidden xs:flex items-center gap-1.5 text-text-tertiary shrink-0">
+              <span className="inline-flex items-center gap-0.5">
+                <Clock className="w-3 h-3 stroke-[1.5]" />
+                <span>{alert.syncedAt}</span>
               </span>
               <span>·</span>
-              <span>Caduca en {alert.ttlHours}h</span>
+              <span>TTL {alert.ttlHours}h</span>
             </div>
           </div>
 
-          {/* Título corto en mayúscula de sentencia (sin gritados en mayúsculas) */}
-          <h3 className="text-[16px] font-bold text-text-primary leading-snug">
+          <h3 className="text-[13px] sm:text-[14px] font-bold text-text-primary leading-snug line-clamp-1 sm:line-clamp-2">
             {toSentenceCaseTitle(alert.title)}
           </h3>
-
-          {alert.description && alert.description !== alert.title && (
-            <p className="text-[14px] text-text-secondary leading-relaxed">
-              {alert.description}
-            </p>
-          )}
         </div>
       </div>
     </div>
+  );
+}
+
+export function TdfAlertsCyclicSlider({ alerts }: { alerts: TdfAlertItem[] }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const touchStartXRef = useRef<number | null>(null);
+
+  const total = alerts.length;
+  const safeIndex = total > 0 ? currentIndex % total : 0;
+  const currentAlert = alerts[safeIndex];
+
+  const handleNext = useCallback(() => {
+    if (total <= 1) return;
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) % total);
+  }, [total]);
+
+  const handlePrev = useCallback(() => {
+    if (total <= 1) return;
+    setDirection(-1);
+    setCurrentIndex((prev) => (prev - 1 + total) % total);
+  }, [total]);
+
+  // Rotación cíclica y automática cada 4.5 segundos
+  useEffect(() => {
+    if (total <= 1 || isPaused) return;
+    const timer = setInterval(() => {
+      handleNext();
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [total, isPaused, handleNext]);
+
+  if (!currentAlert) return null;
+
+  const isCritical = currentAlert.severity === 'critical';
+  const isWarning = currentAlert.severity === 'warning';
+
+  const cardClass = isCritical
+    ? 'alert-card-critical'
+    : isWarning
+    ? 'alert-card-warning'
+    : 'alert-card-info';
+
+  const iconColor = isCritical
+    ? 'text-[#dc2626]'
+    : isWarning
+    ? 'text-[#d97706]'
+    : 'text-[#0284c7]';
+
+  const badgeBg = isCritical
+    ? 'bg-[#dc2626] text-white'
+    : isWarning
+    ? 'bg-[#d97706] text-white'
+    : 'bg-[#0284c7] text-white';
+
+  const cityLabel =
+    currentAlert.city === 'ushuaia'
+      ? 'Ushuaia'
+      : currentAlert.city === 'rio_grande'
+      ? 'Río Grande'
+      : currentAlert.city === 'tolhuin'
+      ? 'Tolhuin'
+      : 'TDF';
+
+  return (
+    <section
+      aria-label="Slider cíclico de alertas vigentes en Tierra del Fuego"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={(e) => {
+        touchStartXRef.current = e.touches[0]?.clientX ?? null;
+        setIsPaused(true);
+      }}
+      onTouchEnd={(e) => {
+        const startX = touchStartXRef.current;
+        const endX = e.changedTouches[0]?.clientX ?? null;
+        if (startX !== null && endX !== null) {
+          const delta = endX - startX;
+          if (Math.abs(delta) > 36) {
+            if (delta < 0) handleNext();
+            else handlePrev();
+          }
+        }
+        touchStartXRef.current = null;
+        setTimeout(() => setIsPaused(false), 2500);
+      }}
+      className={`relative overflow-hidden rounded-xl px-3 py-2 sm:px-3.5 sm:py-2.5 ${cardClass} shadow-xs transition-colors select-none`}
+    >
+      {/* Fila superior compacta: Nivel + Emisor + Ciudad + Sincronización/TTL + Controles del Slider */}
+      <div className="flex items-center justify-between gap-1.5 mb-1 text-[11px] leading-none tabular-nums">
+        <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
+          <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide shrink-0 ${badgeBg}`}>
+            {currentAlert.severity === 'info' ? (
+              <Info className="w-3 h-3 stroke-[1.75]" />
+            ) : (
+              <AlertTriangle className="w-3 h-3 stroke-[1.75]" />
+            )}
+            <span>{isCritical ? 'Crítico' : isWarning ? 'Precaución' : 'Aviso'}</span>
+          </span>
+
+          <span className="font-bold text-text-primary truncate">
+            {currentAlert.issuer}
+          </span>
+
+          <span className="px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-text-secondary font-semibold shrink-0">
+            {cityLabel}
+          </span>
+
+          <span className="hidden md:inline-flex items-center gap-1 text-text-tertiary shrink-0">
+            <span>·</span>
+            <Clock className="w-3 h-3 stroke-[1.5]" />
+            <span>Sinc: <strong className="text-text-secondary">{currentAlert.syncedAt}</strong></span>
+            <span>·</span>
+            <span>TTL {currentAlert.ttlHours}h</span>
+          </span>
+        </div>
+
+        {/* Controles compactos del slider cíclico */}
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-[10px] font-semibold text-text-tertiary px-1 tabular-nums">
+            {safeIndex + 1}/{total}
+          </span>
+
+          {total > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePrev();
+                }}
+                className="p-1 rounded-md hover:bg-black/10 dark:hover:bg-white/10 text-text-secondary transition-colors cursor-pointer"
+                aria-label="Alerta anterior"
+                title="Alerta anterior"
+              >
+                <ChevronLeft className="w-3.5 h-3.5 stroke-[1.5]" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsPaused((p) => !p);
+                }}
+                className="p-1 rounded-md hover:bg-black/10 dark:hover:bg-white/10 text-text-secondary transition-colors cursor-pointer"
+                aria-label={isPaused ? 'Reanudar rotación automática' : 'Pausar rotación automática'}
+                title={isPaused ? 'Reanudar slider automático' : 'Pausar slider automático'}
+              >
+                {isPaused ? (
+                  <Play className="w-3 h-3 stroke-[1.5]" />
+                ) : (
+                  <Pause className="w-3 h-3 stroke-[1.5]" />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNext();
+                }}
+                className="p-1 rounded-md hover:bg-black/10 dark:hover:bg-white/10 text-text-secondary transition-colors cursor-pointer"
+                aria-label="Siguiente alerta"
+                title="Siguiente alerta"
+              >
+                <ChevronRight className="w-3.5 h-3.5 stroke-[1.5]" />
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Cuerpo deslizable ultra-compacto para móviles */}
+      <div
+        onClick={() => setIsDetailOpen((prev) => !prev)}
+        className="relative min-h-[22px] flex items-center justify-between gap-2 cursor-pointer"
+        title="Tocar para ver u ocultar detalle completo de la alerta"
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={currentAlert.id}
+            initial={{ opacity: 0, x: direction * 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction * -24 }}
+            transition={{ duration: 0.24, ease: 'easeOut' }}
+            className="flex-1 min-w-0"
+          >
+            <h3
+              className={`text-[13px] sm:text-[14px] font-bold text-text-primary leading-snug ${
+                isDetailOpen ? '' : 'line-clamp-1 sm:line-clamp-1'
+              }`}
+            >
+              {toSentenceCaseTitle(currentAlert.title)}
+            </h3>
+
+            {isDetailOpen && (
+              <div className="mt-1 space-y-1">
+                {currentAlert.description && currentAlert.description !== currentAlert.title && (
+                  <p className="text-[12px] text-text-secondary leading-relaxed">
+                    {currentAlert.description}
+                  </p>
+                )}
+                <div className="flex flex-wrap items-center gap-2 text-[11px] text-text-tertiary tabular-nums md:hidden">
+                  <span className="inline-flex items-center gap-1">
+                    <Clock className="w-3 h-3 stroke-[1.5]" />
+                    Sincronizado: <strong className="text-text-secondary">{currentAlert.syncedAt}</strong>
+                  </span>
+                  <span>·</span>
+                  <span>Vigencia TTL: {currentAlert.ttlHours}h</span>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Indicadores de puntos + chevron de detalle */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {total > 1 && (
+            <div className="hidden sm:flex items-center gap-1">
+              {alerts.map((a, idx) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDirection(idx > safeIndex ? 1 : -1);
+                    setCurrentIndex(idx);
+                  }}
+                  aria-label={`Ir a alerta ${idx + 1}`}
+                  className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                    idx === safeIndex
+                      ? `w-4 ${isCritical ? 'bg-[#dc2626]' : isWarning ? 'bg-[#d97706]' : 'bg-[#0284c7]'}`
+                      : 'w-1.5 bg-black/15 dark:bg-white/20'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+          <span className={`text-text-tertiary ${iconColor}`}>
+            {isDetailOpen ? (
+              <ChevronUp className="w-3.5 h-3.5 stroke-[1.5]" />
+            ) : (
+              <ChevronDown className="w-3.5 h-3.5 stroke-[1.5]" />
+            )}
+          </span>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -215,18 +463,23 @@ export default function TdfThreeTierFeed({
   const timeSlotLabel = getCurrentTimeSlotLabel();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
+      {/* SLIDER CÍCLICO Y AUTOMÁTICO DE TARJETA COMPACTA PARA TODAS LAS ALERTAS DE TIERRA DEL FUEGO */}
+      {activeAlerts.length > 0 && (
+        <TdfAlertsCyclicSlider alerts={activeAlerts} />
+      )}
+
       {/* AUTOMATIZACIÓN: RESUMEN DEL DÍA (3-5 NOTAS CLAVE + ESTADO DE RUTA) */}
       <div className="bg-surface-elevated border border-border-subtle rounded-xl overflow-hidden shadow-xs">
         <button
           type="button"
           onClick={() => setIsDailySummaryOpen(!isDailySummaryOpen)}
-          className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-surface-sunken/60 transition-colors cursor-pointer"
+          className="w-full flex items-center justify-between px-3.5 py-2.5 sm:px-4 sm:py-3 text-left hover:bg-surface-sunken/60 transition-colors cursor-pointer"
         >
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <FileText className="w-4 h-4 stroke-[1.5] text-[#0f4c81] dark:text-sky-400 shrink-0" />
             <div>
-              <span className="text-[14px] font-bold text-text-primary">
+              <span className="text-[13px] sm:text-[14px] font-bold text-text-primary">
                 Resumen del día en Tierra del Fuego
               </span>
               <span className="hidden sm:inline text-[12px] text-text-tertiary ml-2 tabular-nums">
@@ -234,8 +487,8 @@ export default function TdfThreeTierFeed({
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 text-[12px] font-semibold text-[#0f4c81] dark:text-sky-400">
-            <span>{isDailySummaryOpen ? 'Ocultar resumen' : 'Leer en 30 seg'}</span>
+          <div className="flex items-center gap-1 text-[12px] font-semibold text-[#0f4c81] dark:text-sky-400 shrink-0">
+            <span>{isDailySummaryOpen ? 'Ocultar' : '30 seg'}</span>
             {isDailySummaryOpen ? (
               <ChevronUp className="w-4 h-4 stroke-[1.5]" />
             ) : (
@@ -270,15 +523,6 @@ export default function TdfThreeTierFeed({
           </div>
         )}
       </div>
-
-      {/* SECCIÓN DE TARJETAS DE ALERTA CON TRATAMIENTO PROPIO (SIN BOTONES DE COMPARTIR) */}
-      {activeAlerts.length > 0 && (
-        <section aria-label="Alertas oficiales vigentes" className="space-y-2.5">
-          {activeAlerts.slice(0, 2).map((alert) => (
-            <TdfSemanticAlertCard key={alert.id} alert={alert} />
-          ))}
-        </section>
-      )}
 
       {/* ══════════════════════════════════════════════════════════════════
           NIVEL 1 — DESTACADA: Una nota por franja horaria, imagen grande y título 20-24 px
@@ -550,4 +794,3 @@ export default function TdfThreeTierFeed({
     </div>
   );
 }
-

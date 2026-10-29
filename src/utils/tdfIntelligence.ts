@@ -286,6 +286,20 @@ export function getActiveTdfAlerts(
       expiresAtMs: now + 11 * 3600 * 1000,
       type: 'road_caution',
       editorialConfirmed: true,
+    },
+    {
+      id: 'official-ushuaia-beagle-wind',
+      title: 'Ráfagas de sector sudoeste en zona costera y Canal Beagle; precaución en navegación deportiva',
+      description: 'Defensa Civil Municipal recomienda asegurar objetos sueltos en obras y balcones. Línea de emergencias 103 activa las 24 hs.',
+      severity: 'warning',
+      city: 'ushuaia',
+      issuer: 'Defensa Civil Ushuaia',
+      syncedAt: currentSync,
+      createdAtMs: now - 25 * 60 * 1000,
+      ttlHours: 6,
+      expiresAtMs: now + 5.5 * 3600 * 1000,
+      type: 'wind',
+      editorialConfirmed: true,
     }
   ];
 

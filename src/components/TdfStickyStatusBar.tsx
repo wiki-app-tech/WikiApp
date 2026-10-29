@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Car,
   AlertTriangle,
@@ -12,9 +12,12 @@ import {
   Clock,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   Navigation,
   ExternalLink
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { TdfAlertItem, TdfCity } from '@/utils/tdfIntelligence';
 import { triggerSegmentedCriticalPush } from '@/utils/tdfIntelligence';
 
@@ -50,18 +53,38 @@ export default function TdfStickyStatusBar({
 }: TdfStickyStatusBarProps) {
   const [expandedDetail, setExpandedDetail] = useState<'ruta' | 'alerta' | 'farmacia' | null>(null);
   const [pushEnabled, setPushEnabled] = useState<boolean>(false);
+  const [alertIndex, setAlertIndex] = useState<number>(0);
+  const [critIndex, setCritIndex] = useState<number>(0);
 
-  // Separar alertas críticas (Banner fijo rojo no descartable) y de precaución (Chip ámbar en franja)
+  // Separar alertas críticas y todas las alertas activas para rotación cíclica automática
   const criticalAlerts = activeAlerts.filter((a) => a.severity === 'critical');
-  const warningAlerts = activeAlerts.filter((a) => a.severity === 'warning');
-  const primaryAlert = criticalAlerts[0] || warningAlerts[0] || null;
+  const totalAlerts = activeAlerts.length;
+  const currentCyclicAlert = totalAlerts > 0 ? activeAlerts[alertIndex % totalAlerts] : null;
+  const currentCriticalBanner = criticalAlerts.length > 0 ? criticalAlerts[critIndex % criticalAlerts.length] : null;
+
+  // Rotación cíclica y automática de todas las alertas de Tierra del Fuego cada 4 segundos
+  useEffect(() => {
+    if (totalAlerts <= 1) return;
+    const timer = setInterval(() => {
+      setAlertIndex((prev) => (prev + 1) % totalAlerts);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [totalAlerts]);
+
+  useEffect(() => {
+    if (criticalAlerts.length <= 1) return;
+    const timer = setInterval(() => {
+      setCritIndex((prev) => (prev + 1) % criticalAlerts.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [criticalAlerts.length]);
 
   // Estado de Ruta 3 según ciudad seleccionada y alertas viales vigentes
   const getRuta3Status = () => {
     const roadCut = criticalAlerts.find((a) => a.type === 'road_cut');
     if (roadCut) {
       return {
-        label: 'Corte total RN 3',
+        label: 'Corte RN 3',
         segment: selectedCity === 'rio_grande' ? 'San Sebastián – R. Grande' : selectedCity === 'tolhuin' ? 'R. Grande – Tolhuin' : 'Paso Garibaldi',
         level: 'critical' as const,
         issuer: roadCut.issuer,
@@ -89,7 +112,6 @@ export default function TdfStickyStatusBar({
       };
     }
 
-    // Ushuaia o Todas TDF: destaca Paso Garibaldi
     return {
       label: 'RN 3 Precaución',
       segment: 'Paso Garibaldi · Ushuaia',
@@ -119,46 +141,57 @@ export default function TdfStickyStatusBar({
   const telHref = cleanPhone.replace(/[^\d+]/g, '');
 
   return (
-    <div className="sticky top-[56px] z-30 w-full bg-surface-elevated/95 backdrop-blur-md border-b border-border-subtle shadow-xs transition-colors">
-      {/* BANNER FIJO ROJO PARA ALERTAS CRÍTICAS (NO DESCARTABLE MIENTRAS ESTÉ VIGENTE EN LA FUENTE EMISORA) */}
-      {criticalAlerts.map((crit) => (
+    <div className="sticky top-[52px] sm:top-[56px] z-30 w-full bg-surface-elevated/95 backdrop-blur-md border-b border-border-subtle shadow-xs transition-colors">
+      {/* BANNER FIJO ROJO COMPACTO Y CÍCLICO PARA ALERTAS CRÍTICAS (NO ROBA PANTALLA EN MÓVILES) */}
+      {currentCriticalBanner && (
         <div
-          key={crit.id}
           role="alert"
           aria-live="assertive"
-          className="w-full bg-[#dc2626] text-white px-3 py-2.5 md:px-6 border-b border-red-800"
+          className="w-full bg-[#dc2626] text-white px-3 py-1.5 md:px-6 border-b border-red-800"
         >
-          <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="flex items-start sm:items-center gap-2.5">
-              <AlertTriangle className="w-5 h-5 stroke-[1.5] shrink-0 mt-0.5 sm:mt-0" />
-              <div className="text-[14px] leading-snug">
-                <span className="font-bold mr-2">Alerta crítica:</span>
-                <span className="font-semibold">{crit.title}</span>
-              </div>
+          <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <AlertTriangle className="w-4 h-4 stroke-[1.5] shrink-0" />
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={currentCriticalBanner.id}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-[12px] sm:text-[13px] leading-snug truncate"
+                >
+                  <span className="font-bold mr-1.5">Alerta crítica ({currentCriticalBanner.issuer}):</span>
+                  <span className="font-semibold">{currentCriticalBanner.title}</span>
+                </motion.div>
+              </AnimatePresence>
             </div>
-            <div className="flex items-center gap-3 shrink-0 text-[12px] tabular-nums text-red-100">
-              <span>Fuente: <strong>{crit.issuer}</strong></span>
+            <div className="hidden md:flex items-center gap-2 shrink-0 text-[11px] tabular-nums text-red-100">
+              <span>Sinc: {currentCriticalBanner.syncedAt}</span>
               <span>·</span>
-              <span>Sincronizado: {crit.syncedAt}</span>
-              <span>·</span>
-              <span>Vigencia TTL: {crit.ttlHours}h</span>
+              <span>TTL {currentCriticalBanner.ttlHours}h</span>
+              {criticalAlerts.length > 1 && (
+                <span className="px-1.5 py-0.2 rounded bg-black/20 font-bold">
+                  {(critIndex % criticalAlerts.length) + 1}/{criticalAlerts.length}
+                </span>
+              )}
             </div>
           </div>
         </div>
-      ))}
+      )}
 
-      {/* FRANJA HORIZONTAL ÚNICA CON LOS 3 INDICADORES DE UN VISTAZO */}
-      <div className="max-w-[1440px] mx-auto px-3 py-2 md:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-center">
-          {/* Selector rápido de Ciudad / Geolocalización (Col 3) */}
-          <div className="lg:col-span-3 flex items-center justify-between lg:justify-start gap-1.5 border-b lg:border-b-0 lg:border-r border-border-subtle pb-1.5 lg:pb-0 lg:pr-3">
+      {/* FRANJA HORIZONTAL ULTRA-COMPACTA EN MÓVIL Y ESCRITORIO */}
+      <div className="max-w-[1440px] mx-auto px-2.5 py-1.5 sm:px-4 md:px-6">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-1.5 lg:gap-2 lg:items-center">
+          {/* Fila 1 en móvil / Col 3 en desktop: Selector rápido de Ciudad */}
+          <div className="lg:col-span-3 flex items-center justify-between lg:justify-start gap-1 lg:border-r border-border-subtle lg:pr-2.5">
             <button
               type="button"
               onClick={onDetectLocation}
-              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-semibold bg-surface-sunken hover:bg-slate-200 dark:hover:bg-slate-800 text-text-secondary transition-colors cursor-pointer shrink-0"
-              title="Detectar mi ciudad por geolocalización para filtrar alertas y farmacia de turno"
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold bg-surface-sunken hover:bg-slate-200 dark:hover:bg-slate-800 text-text-secondary transition-colors cursor-pointer shrink-0"
+              title="Detectar mi ciudad por geolocalización"
             >
-              <Navigation className={`w-3.5 h-3.5 stroke-[1.5] text-[#0f4c81] dark:text-sky-400 ${isLocating ? 'animate-spin' : ''}`} />
+              <Navigation className={`w-3 h-3 stroke-[1.5] text-[#0f4c81] dark:text-sky-400 ${isLocating ? 'animate-spin' : ''}`} />
               <span className="hidden xl:inline">Mi zona</span>
             </button>
 
@@ -175,7 +208,7 @@ export default function TdfStickyStatusBar({
                   key={c.id}
                   type="button"
                   onClick={() => onSelectCity(c.id)}
-                  className={`px-2.5 py-1 rounded-lg text-[12px] font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+                  className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[11px] sm:text-[12px] font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                     selectedCity === c.id
                       ? 'bg-[#0f4c81] text-white'
                       : 'text-text-secondary hover:bg-surface-sunken'
@@ -187,16 +220,17 @@ export default function TdfStickyStatusBar({
             </div>
           </div>
 
-          {/* 1. INDICADOR: ESTADO DE RUTA 3 */}
-          <div className="lg:col-span-3">
+          {/* En móvil: grilla compacta de tarjetas pequeñas para Ruta 3, Slider de Alerta y Farmacia sin robar pantalla */}
+          <div className="lg:col-span-9 grid grid-cols-2 sm:grid-cols-3 gap-1.5 lg:gap-2 items-stretch">
+            {/* 1. INDICADOR COMPACTO: ESTADO DE RUTA 3 */}
             <button
               type="button"
               onClick={() => setExpandedDetail(expandedDetail === 'ruta' ? null : 'ruta')}
-              className="w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-surface-sunken/70 hover:bg-surface-sunken border border-border-subtle transition-colors text-left cursor-pointer"
+              className="flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface-sunken/70 hover:bg-surface-sunken border border-border-subtle transition-colors text-left cursor-pointer min-w-0"
             >
-              <div className="flex items-center gap-2 min-w-0">
+              <div className="flex items-center gap-1.5 min-w-0">
                 <span
-                  className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${
+                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-lg flex items-center justify-center shrink-0 ${
                     rutaStatus.level === 'critical'
                       ? 'bg-red-500/15 text-[#dc2626]'
                       : rutaStatus.level === 'warning'
@@ -204,15 +238,15 @@ export default function TdfStickyStatusBar({
                       : 'bg-emerald-500/15 text-[#16a34a]'
                   }`}
                 >
-                  <Car className="w-4 h-4 stroke-[1.5]" />
+                  <Car className="w-3.5 h-3.5 stroke-[1.5]" />
                 </span>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[12px] font-bold text-text-primary truncate">
+                  <div className="flex items-center gap-1">
+                    <span className="text-[11px] sm:text-[12px] font-bold text-text-primary truncate">
                       {rutaStatus.label}
                     </span>
                     <span
-                      className={`w-2 h-2 rounded-full shrink-0 ${
+                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                         rutaStatus.level === 'critical'
                           ? 'bg-[#dc2626]'
                           : rutaStatus.level === 'warning'
@@ -221,114 +255,148 @@ export default function TdfStickyStatusBar({
                       }`}
                     />
                   </div>
-                  <span className="text-[12px] text-text-tertiary block truncate">
+                  <span className="text-[10px] sm:text-[11px] text-text-tertiary block truncate">
                     {rutaStatus.segment}
                   </span>
                 </div>
               </div>
               {expandedDetail === 'ruta' ? (
-                <ChevronUp className="w-3.5 h-3.5 stroke-[1.5] text-text-tertiary shrink-0" />
+                <ChevronUp className="w-3 h-3 stroke-[1.5] text-text-tertiary shrink-0" />
               ) : (
-                <ChevronDown className="w-3.5 h-3.5 stroke-[1.5] text-text-tertiary shrink-0" />
+                <ChevronDown className="w-3 h-3 stroke-[1.5] text-text-tertiary shrink-0" />
               )}
             </button>
-          </div>
 
-          {/* 2. INDICADOR: ALERTA ACTIVA DE DEFENSA CIVIL / VIALIDAD (O "SIN ALERTAS") */}
-          <div className="lg:col-span-3">
+            {/* 2. INDICADOR COMPACTO: FARMACIA DE TURNO */}
             <button
               type="button"
+              onClick={() => setExpandedDetail(expandedDetail === 'farmacia' ? null : 'farmacia')}
+              className="flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface-sunken/70 hover:bg-surface-sunken border border-border-subtle transition-colors text-left cursor-pointer min-w-0"
+            >
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-emerald-500/15 text-[#16a34a] flex items-center justify-center shrink-0">
+                  <Cross className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[1.5]" />
+                </span>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1">
+                    <span className="text-[11px] sm:text-[12px] font-bold text-text-primary truncate">
+                      {activePharmacy ? activePharmacy.nombre : 'Farmacia'}
+                    </span>
+                    <span className="hidden xs:inline text-[10px] font-semibold px-1 py-0.1 rounded bg-emerald-500/15 text-[#16a34a] shrink-0">
+                      {pharmacyCityName}
+                    </span>
+                  </div>
+                  <span className="text-[10px] sm:text-[11px] text-text-tertiary block truncate tabular-nums">
+                    {activePharmacy ? activePharmacy.direccion : 'Sincronizando...'}
+                  </span>
+                </div>
+              </div>
+              {expandedDetail === 'farmacia' ? (
+                <ChevronUp className="w-3 h-3 stroke-[1.5] text-text-tertiary shrink-0" />
+              ) : (
+                <ChevronDown className="w-3 h-3 stroke-[1.5] text-text-tertiary shrink-0" />
+              )}
+            </button>
+
+            {/* 3. TARJETA PEQUEÑA CON SLIDER CÍCLICO AUTOMÁTICO DE ALERTAS TDF */}
+            <div
               onClick={() => setExpandedDetail(expandedDetail === 'alerta' ? null : 'alerta')}
-              className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl border transition-colors text-left cursor-pointer ${
-                primaryAlert?.severity === 'critical'
+              className={`col-span-2 sm:col-span-1 flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-xl border transition-colors text-left cursor-pointer min-w-0 overflow-hidden ${
+                currentCyclicAlert?.severity === 'critical'
                   ? 'alert-card-critical'
-                  : primaryAlert?.severity === 'warning'
+                  : currentCyclicAlert?.severity === 'warning'
                   ? 'alert-card-warning'
                   : 'bg-surface-sunken/70 border-border-subtle'
               }`}
             >
-              <div className="flex items-center gap-2 min-w-0">
-                {primaryAlert ? (
+              <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                {currentCyclicAlert ? (
                   <AlertTriangle
-                    className={`w-4 h-4 stroke-[1.5] shrink-0 ${
-                      primaryAlert.severity === 'critical'
+                    className={`w-3.5 h-3.5 stroke-[1.5] shrink-0 ${
+                      currentCyclicAlert.severity === 'critical'
                         ? 'text-[#dc2626]'
                         : 'text-[#d97706]'
                     }`}
                   />
                 ) : (
-                  <ShieldCheck className="w-4 h-4 stroke-[1.5] text-[#16a34a] shrink-0" />
+                  <ShieldCheck className="w-3.5 h-3.5 stroke-[1.5] text-[#16a34a] shrink-0" />
                 )}
-                <div className="min-w-0">
-                  <span className="text-[12px] font-bold text-text-primary block truncate">
-                    {primaryAlert
-                      ? primaryAlert.severity === 'critical'
-                        ? 'Alerta Crítica Activa'
-                        : 'Precaución · ' + primaryAlert.issuer
-                      : 'Defensa Civil: Sin alertas'}
-                  </span>
-                  <span className="text-[12px] text-text-secondary block truncate">
-                    {primaryAlert ? primaryAlert.title : 'Condiciones normales en la zona'}
-                  </span>
-                </div>
-              </div>
-              {expandedDetail === 'alerta' ? (
-                <ChevronUp className="w-3.5 h-3.5 stroke-[1.5] text-text-tertiary shrink-0" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5 stroke-[1.5] text-text-tertiary shrink-0" />
-              )}
-            </button>
-          </div>
 
-          {/* 3. INDICADOR: FARMACIA DE TURNO DE LA CIUDAD DETECTADA / ELEGIDA */}
-          <div className="lg:col-span-3">
-            <button
-              type="button"
-              onClick={() => setExpandedDetail(expandedDetail === 'farmacia' ? null : 'farmacia')}
-              className="w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-surface-sunken/70 hover:bg-surface-sunken border border-border-subtle transition-colors text-left cursor-pointer"
-            >
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="w-6 h-6 rounded-lg bg-emerald-500/15 text-[#16a34a] flex items-center justify-center shrink-0">
-                  <Cross className="w-3.5 h-3.5 stroke-[1.5]" />
-                </span>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[12px] font-bold text-text-primary truncate">
-                      {activePharmacy ? activePharmacy.nombre : 'Farmacia de Turno'}
-                    </span>
-                    <span className="text-[11px] font-semibold px-1.5 py-0.2 rounded bg-emerald-500/15 text-[#16a34a] shrink-0">
-                      {pharmacyCityName}
-                    </span>
-                  </div>
-                  <span className="text-[12px] text-text-tertiary block truncate tabular-nums">
-                    {activePharmacy ? activePharmacy.direccion : 'Sincronizando turno...'}
-                  </span>
+                <div className="min-w-0 flex-1 overflow-hidden">
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                      key={currentCyclicAlert ? currentCyclicAlert.id : 'no-alerts'}
+                      initial={{ opacity: 0, x: 16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -16 }}
+                      transition={{ duration: 0.22, ease: 'easeOut' }}
+                      className="min-w-0"
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-[10px] sm:text-[11px] font-bold text-text-primary truncate">
+                          {currentCyclicAlert
+                            ? `${currentCyclicAlert.issuer}`
+                            : 'Defensa Civil: Sin alertas'}
+                        </span>
+                        {totalAlerts > 1 && (
+                          <span className="text-[9px] font-bold text-text-tertiary tabular-nums shrink-0">
+                            {(alertIndex % totalAlerts) + 1}/{totalAlerts}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-text-secondary block truncate">
+                        {currentCyclicAlert ? currentCyclicAlert.title : 'Condiciones normales en TDF'}
+                      </span>
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
               </div>
-              {expandedDetail === 'farmacia' ? (
-                <ChevronUp className="w-3.5 h-3.5 stroke-[1.5] text-text-tertiary shrink-0" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5 stroke-[1.5] text-text-tertiary shrink-0" />
+
+              {totalAlerts > 1 && (
+                <div className="flex items-center gap-0.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setAlertIndex((prev) => (prev - 1 + totalAlerts) % totalAlerts);
+                    }}
+                    className="p-0.5 rounded hover:bg-black/10 dark:hover:bg-white/10 text-text-tertiary"
+                    aria-label="Alerta anterior"
+                  >
+                    <ChevronLeft className="w-3 h-3 stroke-[1.5]" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setAlertIndex((prev) => (prev + 1) % totalAlerts);
+                    }}
+                    className="p-0.5 rounded hover:bg-black/10 dark:hover:bg-white/10 text-text-tertiary"
+                    aria-label="Siguiente alerta"
+                  >
+                    <ChevronRight className="w-3 h-3 stroke-[1.5]" />
+                  </button>
+                </div>
               )}
-            </button>
+            </div>
           </div>
         </div>
 
         {/* PANEL DESPLEGABLE DE DETALLE RÁPIDO Y TRAZABILIDAD OFICIAL */}
         {expandedDetail && (
-          <div className="mt-2 pt-2.5 border-t border-border-subtle text-[14px] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-primary/60 rounded-xl p-3">
+          <div className="mt-1.5 pt-2 border-t border-border-subtle text-[13px] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-surface-primary/60 rounded-xl p-2.5">
             {expandedDetail === 'ruta' && (
               <>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-[12px] font-semibold text-text-tertiary tabular-nums">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2 text-[11px] font-semibold text-text-tertiary tabular-nums">
                     <span>Organismo emisor: <strong className="text-text-primary">{rutaStatus.issuer}</strong></span>
                     <span>·</span>
                     <span className="inline-flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 stroke-[1.5]" />
+                      <Clock className="w-3 h-3 stroke-[1.5]" />
                       Sincronizado: {formattedSync}
                     </span>
                   </div>
-                  <p className="text-[14px] text-text-primary font-semibold">
+                  <p className="text-[13px] text-text-primary font-semibold">
                     {rutaStatus.detail}
                   </p>
                 </div>
@@ -346,25 +414,25 @@ export default function TdfStickyStatusBar({
 
             {expandedDetail === 'alerta' && (
               <>
-                <div className="space-y-1">
-                  {primaryAlert ? (
+                <div className="space-y-0.5">
+                  {currentCyclicAlert ? (
                     <>
-                      <div className="flex flex-wrap items-center gap-2 text-[12px] text-text-tertiary tabular-nums">
-                        <span>Organismo: <strong className="text-text-primary">{primaryAlert.issuer}</strong></span>
+                      <div className="flex flex-wrap items-center gap-2 text-[11px] text-text-tertiary tabular-nums">
+                        <span>Organismo: <strong className="text-text-primary">{currentCyclicAlert.issuer}</strong></span>
                         <span>·</span>
-                        <span>Sincronizado: <strong>{primaryAlert.syncedAt}</strong></span>
+                        <span>Sincronizado: <strong>{currentCyclicAlert.syncedAt}</strong></span>
                         <span>·</span>
-                        <span>Caducidad automática (TTL): {primaryAlert.ttlHours} horas</span>
+                        <span>Caducidad (TTL): {currentCyclicAlert.ttlHours}h</span>
                       </div>
-                      <p className="text-[14px] font-semibold text-text-primary">
-                        {primaryAlert.title}
+                      <p className="text-[13px] font-semibold text-text-primary">
+                        {currentCyclicAlert.title}
                       </p>
                       <p className="text-[12px] text-text-secondary">
-                        {primaryAlert.description}
+                        {currentCyclicAlert.description}
                       </p>
                     </>
                   ) : (
-                    <p className="text-[14px] text-text-secondary">
+                    <p className="text-[13px] text-text-secondary">
                       No se registran alertas meteorológicas ni viales críticas vigentes para {pharmacyCityName}. (Sincronizado: {formattedSync})
                     </p>
                   )}
@@ -382,15 +450,15 @@ export default function TdfStickyStatusBar({
 
             {expandedDetail === 'farmacia' && activePharmacy && (
               <>
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2 text-[12px] text-text-tertiary tabular-nums">
+                <div className="space-y-0.5">
+                  <div className="flex flex-wrap items-center gap-2 text-[11px] text-text-tertiary tabular-nums">
                     <span>Ciudad: <strong className="text-text-primary">{pharmacyCityName}</strong></span>
                     <span>·</span>
                     <span>Turno hasta las 09:00 hs</span>
                     <span>·</span>
                     <span>Sincronizado: {formattedSync}</span>
                   </div>
-                  <p className="text-[14px] font-bold text-text-primary">
+                  <p className="text-[13px] font-bold text-text-primary">
                     {activePharmacy.nombre} — <span className="font-normal text-text-secondary">{activePharmacy.direccion}</span>
                   </p>
                 </div>
@@ -422,4 +490,3 @@ export default function TdfStickyStatusBar({
     </div>
   );
 }
-
