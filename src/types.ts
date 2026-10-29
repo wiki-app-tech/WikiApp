@@ -1,4 +1,4 @@
-export type FeedType = 'rss' | 'instagram' | 'facebook' | 'x' | 'telegram';
+export type FeedType = 'rss' | 'web' | 'link' | 'instagram' | 'facebook' | 'x' | 'telegram' | 'youtube';
 
 export enum NewsCategory {
   INTERNATIONAL = 'Internacionales',
@@ -24,6 +24,7 @@ export interface FeedSource {
   id: string;
   name: string;
   url: string;
+  originUrl?: string;
   type: FeedType;
   scope: 'internacional' | 'nacional' | 'provincial';
   category: string;
@@ -36,6 +37,8 @@ export interface Article {
   title: string;
   description: string;
   link: string;
+  originUrl?: string;
+  originSyncedAt?: string;
   thumbnail?: string;
   pubDate: string;
   sourceId: string;
@@ -124,4 +127,3 @@ export interface LiveStreamChannel {
   description?: string;
   isLive?: boolean;
 }
-

@@ -4,8 +4,10 @@ import path from 'path';
 import type { FeedSource, Article } from '@/types';
 import { updateAllFeeds } from '@/services/rssService';
 
-// Incremental Static Regeneration (ISR): regenera en segundo plano cada 5 minutos
-export const revalidate = 300;
+// Incremental Static Regeneration (ISR): regenera desde los sitios de origen cada 3 minutos
+export const revalidate = 180;
+
+const CACHE_MAX_AGE_MS = 3 * 60 * 1000; // 3 minutos
 
 async function getData() {
   const feedsPath = path.join(process.cwd(), 'public/data/feeds.json');
@@ -14,39 +16,51 @@ async function getData() {
   let feedsData: FeedSource[] = [];
   try {
     const feedsFile = await fs.readFile(feedsPath, 'utf8');
-    feedsData = Array.isArray(JSON.parse(feedsFile)) ? JSON.parse(feedsFile) : [];
+    const parsedFeeds = JSON.parse(feedsFile);
+    feedsData = Array.isArray(parsedFeeds) ? parsedFeeds : [];
   } catch (err) {
     console.error('Error reading feeds.json:', err);
   }
 
-  // 1. Intentar servir inmediatamente desde el cache local (articles.json)
+  let cachedArticles: Article[] = [];
+  let isCacheStale = true;
+
   try {
     const articlesFile = await fs.readFile(articlesPath, 'utf8');
     const parsed = JSON.parse(articlesFile);
-    const cachedArticles: Article[] = Array.isArray(parsed) 
-      ? parsed 
+    cachedArticles = Array.isArray(parsed)
+      ? parsed
       : (Array.isArray(parsed?.articles) ? parsed.articles : []);
 
-    if (cachedArticles.length > 0) {
-      return { articles: cachedArticles, feeds: feedsData };
+    if (parsed?.lastUpdated) {
+      const ageMs = Date.now() - new Date(parsed.lastUpdated).getTime();
+      if (!isNaN(ageMs) && ageMs < CACHE_MAX_AGE_MS) {
+        isCacheStale = false;
+      }
     }
-  } catch (err) {
-    console.warn('articles.json not found or invalid, fetching live feeds as fallback...');
+  } catch {
+    console.warn('articles.json not found or invalid, fetching live feeds from origin...');
   }
 
-  // 2. Fallback de emergencia si no hay cache local
-  try {
-    if (feedsData.length > 0) {
-      const articles = await updateAllFeeds(feedsData);
-      return { articles, feeds: feedsData };
+  // Si el caché tiene más de 3 minutos o está vacío, disparamos actualización automática desde los sitios de origen
+  if (feedsData.length > 0 && (cachedArticles.length === 0 || isCacheStale)) {
+    if (cachedArticles.length === 0) {
+      try {
+        const freshArticles = await updateAllFeeds(feedsData, { scope: 'provincial' });
+        return { articles: freshArticles, feeds: feedsData };
+      } catch (error) {
+        console.error('Error fetching initial origin feeds:', error);
+      }
+    } else {
+      // Refresco asíncrono en segundo plano desde los sitios de origen para no bloquear el render inicial
+      updateAllFeeds(feedsData, { scope: 'provincial' }).catch(err =>
+        console.warn('Background origin sync warning:', err)
+      );
     }
-  } catch (error) {
-    console.error('Error fetching live feeds:', error);
   }
 
-  return { articles: [], feeds: feedsData };
+  return { articles: cachedArticles, feeds: feedsData };
 }
-
 
 export default async function Page() {
   const data = await getData();

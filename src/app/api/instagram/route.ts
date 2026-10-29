@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
-import type { Article } from '@/types';
+import type { Article, FeedSource } from '@/types';
+import { fetchSingleFeed } from '@/services/rssService';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+let lastOriginIgSyncMs = 0;
+const IG_ORIGIN_SYNC_COOLDOWN_MS = 45 * 1000; // 45 segundos entre consultas en vivo al origen
 
 const ACCOUNT_METADATA: Record<string, { sourceName: string; avatarUrl: string; category: string; defaultLink: string }> = {
   'la_gentetv': {
@@ -47,10 +51,76 @@ async function getArticlesFromFile(): Promise<{ articles: Article[]; rawData: an
   return { articles: articlesList, rawData: data };
 }
 
-// GET /api/instagram - Retorna los posteos más recientes de Instagram ordenados cronológicamente
+async function syncInstagramSourcesFromOrigin(force = false): Promise<Article[]> {
+  const now = Date.now();
+  const { articles, rawData } = await getArticlesFromFile();
+
+  if (!force && now - lastOriginIgSyncMs < IG_ORIGIN_SYNC_COOLDOWN_MS) {
+    return articles;
+  }
+
+  lastOriginIgSyncMs = now;
+
+  try {
+    const feedsPath = path.join(process.cwd(), 'public/data/feeds.json');
+    const feedsRaw = await fs.readFile(feedsPath, 'utf8');
+    const allFeeds: FeedSource[] = JSON.parse(feedsRaw);
+    const igFeeds = allFeeds.filter(f => f.type === 'instagram');
+
+    if (igFeeds.length === 0) return articles;
+
+    const settled = await Promise.allSettled(igFeeds.map(f => fetchSingleFeed(f, 0)));
+    const freshPosts: Article[] = [];
+
+    for (const res of settled) {
+      if (res.status === 'fulfilled' && Array.isArray(res.value)) {
+        for (const item of res.value) {
+          // Solo inyectar si no es un fallback genérico o si aún no existe en la base
+          const cleanUser = (item.username || '').replace(/^@/, '');
+          const meta = ACCOUNT_METADATA[cleanUser];
+          if (meta && !item.avatarUrl) {
+            item.avatarUrl = meta.avatarUrl;
+          }
+          freshPosts.push(item);
+        }
+      }
+    }
+
+    if (freshPosts.length > 0) {
+      const seenKeys = new Set<string>();
+      const merged: Article[] = [];
+
+      // Priorizar artículos ya guardados con imágenes locales curadas y sumar cualquier post nuevo del origen
+      for (const art of [...articles, ...freshPosts]) {
+        const key = `${art.username || art.sourceId}:${art.title.trim().toLowerCase().slice(0, 60)}`;
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          merged.push(art);
+        }
+      }
+
+      const filePath = path.join(process.cwd(), 'public/data/articles.json');
+      const updatedData = Array.isArray(rawData)
+        ? merged
+        : { ...rawData, lastUpdated: new Date().toISOString(), articles: merged };
+
+      await fs.writeFile(filePath, JSON.stringify(updatedData, null, 2), 'utf8');
+      return merged;
+    }
+  } catch (e) {
+    console.warn('Origin Instagram sync warning:', e);
+  }
+
+  return articles;
+}
+
+// GET /api/instagram - Sincroniza desde origen y retorna los posteos más recientes de Instagram ordenados cronológicamente
 export async function GET(request: Request) {
   try {
-    const { articles } = await getArticlesFromFile();
+    const { searchParams } = new URL(request.url);
+    const force = searchParams.get('force') === '1' || searchParams.get('force') === 'true';
+
+    const articles = await syncInstagramSourcesFromOrigin(force);
     const instagramArticles = articles
       .filter(a => a.sourceType === 'instagram' || a.sourceId?.startsWith('instagram-') || a.id?.startsWith('ig-'))
       .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
@@ -96,6 +166,8 @@ export async function POST(request: Request) {
       title: title.trim(),
       description: (description || title).trim(),
       link: link || meta.defaultLink,
+      originUrl: link || meta.defaultLink,
+      originSyncedAt: new Date().toISOString(),
       thumbnail: thumbnail || meta.avatarUrl,
       avatarUrl: meta.avatarUrl,
       pubDate: pubDate || new Date().toISOString(),

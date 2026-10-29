@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import type { Article, FeedSource } from '@/types';
-import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, AlertTriangle, Info, Newspaper, Eye, Check, Type, Download, Cpu, Trophy, Users, Briefcase, Landmark, Trees } from 'lucide-react';
+import { LayoutDashboard, Compass, Settings, Bookmark, Search, Cloud, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, LayoutGrid, List, LayoutTemplate, X, ExternalLink, Plus, BookmarkCheck, Share2, MoreHorizontal, CheckCircle2, PlayCircle, Play, Pause, Flame, Send, MessageCircle, Map, MapPin, Car, ShieldAlert, Anchor, Plane, FileText, Bell, ShieldCheck, TrendingUp, Shield, ListFilter, Radio, Sun, Moon, Globe, Flag, AlertTriangle, Info, Newspaper, Eye, Check, Type, Download, Cpu, Trophy, Users, Briefcase, Landmark, Trees, RefreshCw } from 'lucide-react';
 import { shareToTelegram, InstantViewExplainerBadge, isValidUrl } from '@/utils/telegramInstantView';
 import TdfStickyStatusBar from './TdfStickyStatusBar';
 import TdfThreeTierFeed from './TdfThreeTierFeed';
@@ -134,19 +134,42 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
     setArticles(initialArticles);
   }, [initialArticles]);
 
-  useAutoRefresh(async () => {
+  const { isRefreshing: isOriginSyncing, triggerRefresh: triggerOriginSync } = useAutoRefresh(async () => {
     try {
-      const res = await fetch('/api/articles');
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.articles && Array.isArray(data.articles) && data.articles.length > 0) {
-          setArticles(data.articles);
+      // 1. Sincronización rápida prioritaria de fuentes provinciales, web, enlaces y redes desde origen
+      const [provRes, igRes] = await Promise.allSettled([
+        fetch('/api/articles?scope=provincial', { cache: 'no-store' }),
+        fetch('/api/instagram?force=1', { cache: 'no-store' }),
+      ]);
+
+      if (provRes.status === 'fulfilled' && provRes.value.ok) {
+        const provData = await provRes.value.json();
+        if (provData?.articles && Array.isArray(provData.articles) && provData.articles.length > 0) {
+          setArticles(provData.articles);
+        }
+      } else if (igRes.status === 'fulfilled' && igRes.value.ok) {
+        const igData = await igRes.value.json();
+        if (igData?.articles && Array.isArray(igData.articles) && igData.articles.length > 0) {
+          setArticles(prev => {
+            const seen = new Set(igData.articles.map((a: Article) => a.id));
+            return [...igData.articles, ...prev.filter(p => !seen.has(p.id))];
+          });
         }
       }
+
+      // 2. Sincronización completa de todas las fuentes (RSS, Web, Enlaces, Redes nacionales/internacionales) en segundo plano
+      fetch('/api/articles?scope=all', { cache: 'no-store' })
+        .then(r => (r.ok ? r.json() : null))
+        .then(allData => {
+          if (allData?.articles && Array.isArray(allData.articles) && allData.articles.length > 0) {
+            setArticles(allData.articles);
+          }
+        })
+        .catch(() => {});
     } catch (err) {
-      console.warn('Auto-refresh background sync failed:', err);
+      console.warn('Auto-refresh origin sync failed:', err);
     }
-  }, { interval: 5 * 60 * 1000, enabled: true });
+  }, { interval: 2 * 60 * 1000, enabled: true, immediate: true });
 
   const feedsMap = useMemo(() => new globalThis.Map<string, FeedSource>(feeds.map(f => [f.id, f])), [feeds]);
 
@@ -662,6 +685,38 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
     }
   };
 
+  // Enriquecimiento automático desde el sitio web de origen al abrir un enlace o artículo en el lector
+  useEffect(() => {
+    if (!selectedArticle || !selectedArticle.link || !selectedArticle.link.startsWith('http')) return;
+    if (selectedArticle.sourceType === 'instagram' || selectedArticle.sourceType === 'telegram') return;
+
+    const plainDesc = (selectedArticle.description || '').replace(/<[^>]*>/g, '').trim();
+    const needsOriginEnrichment = plainDesc.length < 220 || !selectedArticle.thumbnail;
+    if (!needsOriginEnrichment) return;
+
+    let cancelled = false;
+    fetch(`/api/articles?originUrl=${encodeURIComponent(selectedArticle.link)}`, { cache: 'no-store' })
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        if (cancelled || !data?.enriched) return;
+        const { contentHtml, description, thumbnail, originSyncedAt } = data.enriched;
+        setSelectedArticle(prev => {
+          if (!prev || prev.link !== selectedArticle.link) return prev;
+          return {
+            ...prev,
+            description: contentHtml && contentHtml.length > (prev.description || '').length ? contentHtml : (prev.description || description || ''),
+            thumbnail: prev.thumbnail || thumbnail,
+            originSyncedAt: originSyncedAt || prev.originSyncedAt,
+          };
+        });
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedArticle?.id, selectedArticle?.link]);
+
   // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -1009,14 +1064,25 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                       <span className="hidden xs:inline">App</span>
                     </button>
                     
-                    <div className="hidden sm:flex items-center gap-3 bg-slate-100 dark:bg-white/5 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
+                    <button
+                        type="button"
+                        onClick={() => {
+                          triggerOriginSync();
+                          fetchPharmacies();
+                        }}
+                        className="hidden sm:flex items-center gap-2.5 bg-slate-100 hover:bg-slate-200/80 dark:bg-white/5 dark:hover:bg-white/10 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm transition-colors cursor-pointer group"
+                        title="Actualización automática activa desde todos los sitios de origen (Web, RSS, Enlaces y Redes). Clic para sincronizar ahora."
+                    >
+                        <RefreshCw className={`w-3.5 h-3.5 stroke-[1.5] text-[#0f4c81] dark:text-sky-400 ${isOriginSyncing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
                         <div className="flex flex-col text-left">
-                            <span className="text-[8px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest leading-none">Estado del Sistema</span>
-                            <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">
+                            <span className="text-[8px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest leading-none">
+                                {isOriginSyncing ? 'Sincronizando origen...' : 'Auto-Sync Origen Activo'}
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight tabular-nums">
                                 Sincronizado: {syncTime || '...'}
                             </span>
                         </div>
-                    </div>
+                    </button>
                 </div>
             </div>
         </div>
