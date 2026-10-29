@@ -635,8 +635,55 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
           );
         });
     }
-    return result;
+
+    // 4. Orden estricto: de lo más reciente a lo más antiguo
+    return [...result].sort((a, b) => {
+      const timeA = new Date(a.pubDate).getTime() || 0;
+      const timeB = new Date(b.pubDate).getTime() || 0;
+      return timeB - timeA;
+    });
   }, [articles, search, feedsMap, activeScope, activeCategory, blocklist]);
+
+  // Registro persistente de artículos leídos al ingresar a ver la nota completa
+  const [readArticleIds, setReadArticleIds] = useState<Set<string>>(() => new Set());
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('wikiapp_tdf_read_ids');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setReadArticleIds(new Set(parsed));
+        }
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
+
+  const markArticleRead = React.useCallback((idOrLink: string) => {
+    if (!idOrLink) return;
+    setReadArticleIds(prev => {
+      if (prev.has(idOrLink)) return prev;
+      const next = new Set(prev);
+      next.add(idOrLink);
+      try {
+        localStorage.setItem('wikiapp_tdf_read_ids', JSON.stringify(Array.from(next).slice(-500)));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (selectedArticle) {
+      markArticleRead(selectedArticle.id);
+      if (selectedArticle.link) {
+        markArticleRead(selectedArticle.link);
+      }
+    }
+  }, [selectedArticle, markArticleRead]);
 
   const stripHtml = (html: string) => html.replace(/<[^>]*>?/gm, '');
 
@@ -894,125 +941,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                           <span>Tapas</span>
                         </button>
                         
-                        {/* 2. BOTÓN OPCIONES DE VISTA Y LECTURA (Estilo Digesto & Boletines) */}
-                        <div className="relative flex items-center shrink-0">
-                          <button
-                            onClick={() => setIsEyeMenuOpen(!isEyeMenuOpen)}
-                            className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border shadow-sm shrink-0 group ${
-                              isEyeMenuOpen 
-                                ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-500/20' 
-                                : 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/25 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white hover:border-blue-600'
-                            }`}
-                            title="Opciones de Vista y Lectura"
-                          >
-                            <Eye className={`w-4 h-4 ${isEyeMenuOpen ? 'text-white' : 'text-blue-600 dark:text-blue-400 group-hover:text-white'} transition-colors`} />
-                            <span>Vistas</span>
-                          </button>
-
-                          <AnimatePresence>
-                            {isEyeMenuOpen && (
-                              <>
-                                <div 
-                                  className="fixed inset-0 z-40" 
-                                  onClick={() => setIsEyeMenuOpen(false)}
-                                />
-                                <motion.div
-                                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                                  transition={{ duration: 0.15 }}
-                                  className="absolute right-0 top-full mt-2 w-72 bg-[#121417] text-white border border-white/10 rounded-2xl shadow-2xl p-2 z-50 flex flex-col gap-1 backdrop-blur-xl"
-                                >
-                                  {/* Sección 1: Estilo de Presentación */}
-                                  <div className="px-3 py-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-white/5">
-                                    Presentación
-                                  </div>
-                                  <button
-                                    onClick={() => { setViewMode('list'); setIsEyeMenuOpen(false); }}
-                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${viewMode === 'list' ? 'bg-white/10 text-white font-semibold' : 'text-gray-300 hover:bg-white/5'}`}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <List className="w-4 h-4 text-gray-400" />
-                                      <span>Lista</span>
-                                    </div>
-                                    {viewMode === 'list' && <Check className="w-4 h-4 text-blue-400" />}
-                                  </button>
-
-                                  <button
-                                    onClick={() => { setViewMode('grid'); setIsEyeMenuOpen(false); }}
-                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${viewMode === 'grid' ? 'bg-white/10 text-white font-semibold' : 'text-gray-300 hover:bg-white/5'}`}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <LayoutGrid className="w-4 h-4 text-gray-400" />
-                                      <span>Mosaico</span>
-                                    </div>
-                                    {viewMode === 'grid' && <Check className="w-4 h-4 text-blue-400" />}
-                                  </button>
-
-                                  <button
-                                    onClick={() => { setViewMode('magazine'); setIsEyeMenuOpen(false); }}
-                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${viewMode === 'magazine' ? 'bg-white/10 text-white font-semibold' : 'text-gray-300 hover:bg-white/5'}`}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <LayoutTemplate className="w-4 h-4 text-gray-400" />
-                                      <span>Revista</span>
-                                    </div>
-                                    {viewMode === 'magazine' && <Check className="w-4 h-4 text-blue-400" />}
-                                  </button>
-
-                                  {/* Divisor */}
-                                  <div className="my-1 border-t border-white/5" />
-
-                                  {/* Sección 2: Densidad */}
-                                  <div className="px-3 py-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-white/5">
-                                    Densidad
-                                  </div>
-                                  <button
-                                    onClick={() => { setDensity('comfortable'); setIsEyeMenuOpen(false); }}
-                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${density === 'comfortable' ? 'bg-white/10 text-white font-semibold' : 'text-gray-300 hover:bg-white/5'}`}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <List className="w-4 h-4 text-gray-400" />
-                                      <span>Cómodo</span>
-                                    </div>
-                                    {density === 'comfortable' && <Check className="w-4 h-4 text-blue-400" />}
-                                  </button>
-
-                                  <button
-                                    onClick={() => { setDensity('compact'); setIsEyeMenuOpen(false); }}
-                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${density === 'compact' ? 'bg-white/10 text-white font-semibold' : 'text-gray-300 hover:bg-white/5'}`}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <ListFilter className="w-4 h-4 text-gray-400" />
-                                      <span>Compacto</span>
-                                    </div>
-                                    {density === 'compact' && <Check className="w-4 h-4 text-blue-400" />}
-                                  </button>
-
-                                  {/* Divisor */}
-                                  <div className="my-1 border-t border-white/5" />
-
-                                  {/* Sección 3: Filtrar lecturas */}
-                                  <div className="px-3 py-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-white/5">
-                                    Opciones de Lectura
-                                  </div>
-                                  <button
-                                    onClick={() => { setReadFilter('unread'); setIsEyeMenuOpen(false); }}
-                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${readFilter === 'unread' ? 'bg-white/10 text-white font-semibold' : 'text-gray-300 hover:bg-white/5'}`}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <Eye className="w-4 h-4 text-gray-400" />
-                                      <span>Solo sin leer</span>
-                                    </div>
-                                    {readFilter === 'unread' && <Check className="w-4 h-4 text-blue-400" />}
-                                  </button>
-                                </motion.div>
-                              </>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                        
-                        {/* 3. BOTÓN BUSCAR EN EL FLUJO DE NOTICIAS (Estilo Digesto & Boletines) */}
+                        {/* 2. BOTÓN BUSCAR EN EL FLUJO DE NOTICIAS */}
                         <div className="relative flex items-center shrink-0">
                           {isSearchOpen ? (
                             <div className="relative flex items-center">
@@ -1174,8 +1103,8 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                     </div>
                   )}
 
-                  {/* JERARQUÍA DE 3 NIVELES + TARJETAS DE ALERTA SEMÁNTICAS + RESUMEN DEL DÍA (HOME) */}
-                  {activeTab === 'home' && (
+                  {/* FLUJO UNIFICADO DE ARTÍCULOS (DE LO MÁS RECIENTE A LO MÁS ANTIGUO: TARJETA CON IMAGEN / LISTA SIN IMAGEN) */}
+                  {(activeTab === 'home' || activeTab === 'explore') && (
                     <TdfThreeTierFeed
                       articles={filteredArticles}
                       feedsMap={feedsMap}
@@ -1189,327 +1118,10 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                       }}
                       onSelectArticle={setSelectedArticle}
                       syncTime={syncTime}
+                      readArticleIds={readArticleIds}
+                      onMarkArticleRead={markArticleRead}
+                      showDailySummary={activeTab === 'home'}
                     />
-                  )}
-
-                  {activeTab === "explore" && (
-                  <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-                      {/* DIRECTORIO DE MEDIOS (EXPLORE) */}
-                      <div className="xl:col-span-12 flex flex-col gap-6">
-                         <div className="bg-white dark:bg-[#0e0e0e] border border-slate-200 dark:border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
-                            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-[#1f1f1f] bg-white dark:bg-[#0e0e0e]/90 backdrop-blur-sm sticky top-0 z-10">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-6 h-6 rounded bg-blue-600/20 flex items-center justify-center">
-                                        <BookmarkCheck className="w-3.5 h-3.5 text-blue-500" />
-                                    </div>
-                                    <h2 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 tracking-wide uppercase flex items-center gap-1.5 flex-wrap">
-                                        {activeScope === 'all' && activeCategory === 'all' ? (
-                                            <span>Flujo Dinámico</span>
-                                        ) : (
-                                            <>
-                                                {activeScope !== 'all' && (
-                                                    <span className="text-blue-600 dark:text-blue-400">
-                                                        {activeScope === 'internacional' ? 'Internacional' : activeScope === 'nacional' ? 'Nacional Argentina' : 'Provincial TDF'}
-                                                    </span>
-                                                )}
-                                                {activeScope !== 'all' && activeCategory !== 'all' && (
-                                                    <span className="text-slate-400 dark:text-gray-500">/</span>
-                                                )}
-                                                {activeCategory !== 'all' && (
-                                                    <span className="text-slate-500 dark:text-gray-400 font-medium">
-                                                        {categoryTranslations[activeCategory]?.label || activeCategory}
-                                                    </span>
-                                                )}
-                                            </>
-                                        )}
-                                        <span className="text-slate-400 dark:text-gray-600 ml-1.5 font-normal text-[10px] tracking-normal font-mono">({feedArticlesToDisplay.length} resultados)</span>
-                                    </h2>
-                                </div>
-                            </div>
-                                                   <motion.div layout className={`flex ${viewMode === 'list' ? 'flex-col shadow-inner' : viewMode === 'grid' ? 'flex-row flex-wrap p-4 md:p-6 gap-6' : 'flex-col p-2 md:p-4'}`}>
-                                <AnimatePresence mode="popLayout">
-                                    {feedArticlesToDisplay.map(article => {
-                                        const isVid = isYouTube(article.link);
-                                        const sourceName = feedsMap.get(article.sourceId)?.name || 'Fuente';
-
-                                        // VIEW: LIST
-                                                                                // VIEW: LIST
-                                        if (viewMode === 'list') {
-                                            if (density === 'compact') {
-                                                return (
-                                                    <motion.div 
-                                                        initial={{ opacity: 0, x: -10 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        exit={{ opacity: 0, x: 10 }}
-                                                        key={article.id} 
-                                                        onClick={() => setSelectedArticle(article)}
-                                                        className="group flex items-center justify-between px-6 py-2.5 border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.03] cursor-pointer transition-all border-l-4 border-l-transparent hover:border-l-blue-600 relative overflow-hidden"
-                                                    >
-                                                        <div className="flex-1 min-w-0 pr-4">
-                                                            <h3 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-snug transition-colors font-display">
-                                                                {article.title}
-                                                            </h3>
-                                                        </div>
-                                                        <div className="shrink-0 flex items-center gap-3">
-                                                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider bg-blue-500/10 px-2.5 py-0.5 rounded">{sourceName}</span>
-                                                        </div>
-                                                    </motion.div>
-                                                );
-                                            } else {
-                                                return (
-                                                    <motion.div 
-                                                        initial={{ opacity: 0, x: -10 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        exit={{ opacity: 0, x: 10 }}
-                                                        key={article.id} 
-                                                        onClick={() => setSelectedArticle(article)}
-                                                        className="group flex flex-row gap-4 px-4 py-4 md:px-6 md:py-5 border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.03] cursor-pointer transition-all border-l-4 border-l-transparent hover:border-l-blue-600 relative overflow-hidden"
-                                                    >
-                                                        {article.thumbnail && (
-                                                            <div className="w-20 h-20 md:w-28 md:h-20 shrink-0 overflow-hidden rounded-xl relative shadow-md">
-                                                                <img src={article.thumbnail} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                                                            </div>
-                                                        )}
-                                                        <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                                                            <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-wider">
-                                                               <span className="text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">{sourceName}</span>
-                                                               <span className="text-slate-400 dark:text-gray-400 font-mono text-[11px]">{getRelativeTime(article.pubDate)}</span>
-                                                            </div>
-                                                            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug font-display">
-                                                                {article.title}
-                                                            </h3>
-                                                            {article.description ? (
-                                                                <p className="text-xs text-slate-500 dark:text-gray-400 line-clamp-2 leading-relaxed font-normal">
-                                                                    {stripHtml(article.description)}
-                                                                </p>
-                                                            ) : (
-                                                                <p className="text-xs text-slate-400 dark:text-gray-400 italic leading-relaxed">
-                                                                    Esta nota está disponible de forma completa en el portal de origen.
-                                                                </p>
-                                                            )}
-                                                        </div>
-                                                        <div className="hidden md:flex items-center gap-2 mt-3 sm:mt-0 shrink-0 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-500 dark:text-gray-400 hover:text-green-500 rounded-xl transition-all" title="Compartir en WhatsApp" aria-label="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
-                                                            <button 
-                                                              onClick={(e) => { 
-                                                                e.stopPropagation(); 
-                                                                shareToTelegram({
-                                                                  url: article.link,
-                                                                  title: article.title,
-                                                                  excerpt: article.description,
-                                                                  source: article.sourceName || article.sourceId,
-                                                                  date: article.pubDate ? new Date(article.pubDate).toLocaleDateString('es-AR') : ''
-                                                                });
-                                                              }} 
-                                                              className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-500 dark:text-gray-400 hover:text-blue-500 rounded-xl transition-all" 
-                                                              title={isValidUrl(article.link) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
-                                                              aria-label="Compartir en Telegram"
-                                                            >
-                                                              <Send className="w-4 h-4" />
-                                                            </button>
-                                                        </div>
-                                                    </motion.div>
-                                                );
-                                            }
-                                        }
-
-                                        // VIEW: GRID
-                                                                                // VIEW: GRID
-                                        if (viewMode === 'grid') {
-                                            if (density === 'compact') {
-                                                return (
-                                                    <motion.div 
-                                                        initial={{ opacity: 0, scale: 0.95 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        exit={{ opacity: 0, scale: 0.95 }}
-                                                        key={article.id} 
-                                                        onClick={() => setSelectedArticle(article)}
-                                                        className="group relative w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm border border-slate-200 dark:border-white/5 rounded-2xl hover:border-blue-500/50 p-4 transition-all cursor-pointer flex flex-col justify-between"
-                                                    >
-                                                        <h3 className="text-[13px] font-bold text-slate-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-snug line-clamp-3 transition-colors font-display">
-                                                            {article.title}
-                                                        </h3>
-                                                        <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 dark:border-white/5">
-                                                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider bg-blue-500/10 px-2 py-0.5 rounded">{sourceName}</span>
-                                                            <span className="text-[11px] text-slate-500 dark:text-gray-400 font-mono">{getRelativeTime(article.pubDate)}</span>
-                                                        </div>
-                                                    </motion.div>
-                                                );
-                                            } else {
-                                                return (
-                                                    <motion.div 
-                                                        initial={{ opacity: 0, scale: 0.95 }}
-                                                        whileHover={{ y: -4 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        exit={{ opacity: 0, scale: 0.95 }}
-                                                        key={article.id} 
-                                                        onClick={() => setSelectedArticle(article)}
-                                                        className="group relative w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden hover:border-blue-500/50 hover-lift transition-all cursor-pointer flex flex-col"
-                                                    >
-                                                        {article.thumbnail ? (
-                                                            <div className="aspect-[16/10] overflow-hidden relative">
-                                                                <img src={article.thumbnail} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                                                                <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent opacity-60"></div>
-                                                                <div className="absolute top-4 left-4">
-                                                                    <span className="text-xs font-bold text-white uppercase tracking-wider bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10">{sourceName}</span>
-                                                                </div>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="aspect-[16/10] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-black flex items-center justify-center">
-                                                                <FileText className="w-10 h-10 text-slate-300 dark:text-slate-800" />
-                                                            </div>
-                                                        )}
-                                                        <div className="p-5 flex flex-col flex-1 gap-2.5">
-                                                            <div className="flex items-center justify-between">
-                                                                <span className="text-[11px] text-slate-500 dark:text-gray-400 font-semibold uppercase tracking-wider font-mono">{getRelativeTime(article.pubDate)}</span>
-                                                                <Bookmark className="w-3.5 h-3.5 text-slate-300 dark:text-gray-500 hover:text-blue-500 transition-colors" />
-                                                            </div>
-                                                            <h3 className="text-sm font-bold text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-snug line-clamp-2 transition-colors font-display">
-                                                                {article.title}
-                                                            </h3>
-                                                            {article.description ? (
-                                                                <p className="text-xs text-slate-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
-                                                                    {stripHtml(article.description)}
-                                                                </p>
-                                                            ) : (
-                                                                <p className="text-xs text-slate-400 dark:text-gray-400 italic leading-relaxed">
-                                                                    Consulte el informe completo en el enlace del portal original.
-                                                                </p>
-                                                            )}
-                                                        </div>
-                                                        <div className="hidden md:flex absolute bottom-4 right-4 items-center gap-2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 bg-white dark:bg-black/80 backdrop-blur-xl p-2 rounded-xl border border-slate-200 dark:border-white/10 shadow-xl">
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-lg transition-all" title="Compartir en WhatsApp" aria-label="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
-                                                            <button 
-                                                              onClick={(e) => { 
-                                                                e.stopPropagation(); 
-                                                                shareToTelegram({
-                                                                  url: article.link,
-                                                                  title: article.title,
-                                                                  excerpt: article.description,
-                                                                  source: article.sourceName || article.sourceId,
-                                                                  date: article.pubDate ? new Date(article.pubDate).toLocaleDateString('es-AR') : ''
-                                                                });
-                                                              }} 
-                                                              className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-lg transition-all" 
-                                                              title={isValidUrl(article.link) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
-                                                              aria-label="Compartir en Telegram"
-                                                            >
-                                                              <Send className="w-4 h-4" />
-                                                            </button>
-                                                        </div>
-                                                    </motion.div>
-                                                );
-                                            }
-                                        }
-
-
-                                        // VIEW: MAGAZINE
-                                                                                // VIEW: MAGAZINE
-                                        if (viewMode === 'magazine') {
-                                            if (density === 'compact') {
-                                                return (
-                                                    <motion.div 
-                                                        initial={{ opacity: 0, y: 15 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        exit={{ opacity: 0, y: 15 }}
-                                                        key={article.id} 
-                                                        onClick={() => setSelectedArticle(article)}
-                                                        className="group flex flex-col sm:flex-row gap-5 p-5 border-b border-slate-200 dark:border-white/5 hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-all cursor-pointer relative overflow-hidden"
-                                                    >
-                                                        {article.thumbnail && (
-                                                            <div className="w-full sm:w-40 aspect-[16/10] shrink-0 overflow-hidden rounded-2xl relative shadow-md">
-                                                                <img src={article.thumbnail} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                                                            </div>
-                                                        )}
-                                                        <div className="flex flex-col justify-center gap-2 flex-1">
-                                                            <div className="flex items-center gap-3">
-                                                               <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider bg-blue-500/10 px-2 py-0.5 rounded">{sourceName}</span>
-                                                               <span className="text-[11px] text-slate-500 dark:text-gray-400 font-mono">{getRelativeTime(article.pubDate)}</span>
-                                                            </div>
-                                                            <h3 className="text-base font-bold text-slate-900 dark:text-white leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors font-display">
-                                                                {article.title}
-                                                            </h3>
-                                                        </div>
-                                                    </motion.div>
-                                                );
-                                            } else {
-                                                return (
-                                                    <motion.div 
-                                                        initial={{ opacity: 0, y: 30 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        exit={{ opacity: 0, y: 30 }}
-                                                        key={article.id} 
-                                                        onClick={() => setSelectedArticle(article)}
-                                                        className="group flex flex-col lg:flex-row gap-8 md:gap-12 p-6 md:p-10 border-b border-slate-200 dark:border-white/5 hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-all cursor-pointer relative overflow-hidden"
-                                                    >
-                                                        <div className="w-full lg:w-[450px] aspect-[16/10] lg:h-[280px] shrink-0 overflow-hidden rounded-[2.5rem] relative shadow-2xl">
-                                                            <img src={article.thumbnail || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=600'} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2000ms]" />
-                                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                                                            {isVid && (
-                                                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center border border-white/30 opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100">
-                                                                    <PlayCircle className="w-10 h-10 text-white" />
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <div className="flex flex-col flex-1 justify-center gap-5">
-                                                            <div className="flex items-center gap-4">
-                                                               <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider font-mono">{sourceName}</span>
-                                                               <div className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-600"></div>
-                                                               <span className="text-[11px] font-medium text-slate-500 dark:text-gray-400 uppercase tracking-wider font-mono">{getRelativeTime(article.pubDate)}</span>
-                                                            </div>
-                                                            <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white leading-tight tracking-tight transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400 font-display">
-                                                                {article.title}
-                                                            </h3>
-                                                            {article.description ? (
-                                                                <p className="text-base text-slate-700 dark:text-gray-300 leading-relaxed font-normal max-w-3xl">
-                                                                    {stripHtml(article.description)}
-                                                                </p>
-                                                            ) : (
-                                                                <p className="text-base text-slate-500 dark:text-gray-400 italic leading-relaxed font-normal max-w-3xl">
-                                                                    Esta noticia está disponible íntegramente a través de los canales de la agencia emisora. Haga clic en Seguir leyendo para visualizar el artículo completo en su portal original.
-                                                                </p>
-                                                            )}
-                                                            <div className="flex items-center gap-4 mt-2">
-                                                                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider border-b-2 border-blue-600/20 group-hover:border-blue-600 transition-all pb-1">Seguir leyendo</span>
-                                                                <div className="hidden md:flex items-center gap-3 ml-auto opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en WhatsApp" aria-label="Compartir en WhatsApp"><MessageCircle className="w-5 h-5" /></button>
-                                                                    <button 
-                                                                      onClick={(e) => { 
-                                                                        e.stopPropagation(); 
-                                                                        shareToTelegram({
-                                                                          url: article.link,
-                                                                          title: article.title,
-                                                                          excerpt: article.description,
-                                                                          source: article.sourceName || article.sourceId,
-                                                                          date: article.pubDate ? new Date(article.pubDate).toLocaleDateString('es-AR') : ''
-                                                                        });
-                                                                      }} 
-                                                                      className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5" 
-                                                                      title={isValidUrl(article.link) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
-                                                                      aria-label="Compartir en Telegram"
-                                                                    >
-                                                                      <Send className="w-5 h-5" />
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </motion.div>
-                                                );
-                                            }
-                                        }
-
-
-                                        return null;
-                                    })}
-                                </AnimatePresence>
-                                 {feedArticlesToDisplay.length === 0 && (
-                                    <div className="p-8 text-center text-sm text-slate-500 dark:text-gray-500">Sin artículos recientes compatibles.</div>
-                                 )}
-                                 
-                             </motion.div>
-                           </div>
-                      </div>
-                  </div>
                   )}
 
                   {/* 4. UN SOLO MÓDULO DE REDES SOCIALES CON PESTAÑAS POR CUENTA (AUTOPLAY DESACTIVADO POR DEFECTO) */}

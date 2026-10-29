@@ -32,12 +32,19 @@ export interface DeduplicatedArticle extends Article {
 }
 
 /**
- * Elimina etiquetas HTML y hashtags sueltos para lectura limpia en tarjetas Nivel 2
+ * Elimina etiquetas HTML, decodifica entidades HTML y limpia hashtags sueltos
  */
 export function cleanEditorialText(raw: string = ''): string {
   return raw
     .replace(/<[^>]*>?/gm, ' ')
     .replace(/&nbsp;/gi, ' ')
+    .replace(/&gt;/gi, '')
+    .replace(/&lt;/gi, '')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#0*39;|&apos;/gi, "'")
+    .replace(/&#8211;|&#8212;/g, '—')
+    .replace(/&#8220;|&#8221;/g, '"')
     .replace(/#[a-zA-Z0-9_áéíóúÁÉÍÓÚñÑ]+/g, '')
     .replace(/\s+/g, ' ')
     .trim();
@@ -343,7 +350,8 @@ export function deduplicateAndEnrichArticles(
     }
 
     const feed = feedsMap.get(article.sourceId);
-    const sourceName = feed?.name || article.sourceName || 'Medio TDF';
+    const rawSourceName = feed?.name || article.sourceName || 'Medio TDF';
+    const sourceName = cleanEditorialText(rawSourceName).replace(/[>»]+$/g, '').trim() || 'Medio TDF';
     const fp = computeTextFingerprint(article.title, article.description);
 
     if (byFingerprint.has(fp)) {
@@ -376,7 +384,11 @@ export function deduplicateAndEnrichArticles(
     byFingerprint.set(fp, enriched);
   }
 
-  return Array.from(byFingerprint.values());
+  return Array.from(byFingerprint.values()).sort((a, b) => {
+    const tA = new Date(a.pubDate).getTime() || 0;
+    const tB = new Date(b.pubDate).getTime() || 0;
+    return tB - tA;
+  });
 }
 
 /**
