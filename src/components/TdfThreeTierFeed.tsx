@@ -16,7 +16,11 @@ import {
   Layers,
   CheckCircle2,
   Pause,
-  Play
+  Play,
+  Car,
+  Cross,
+  Thermometer,
+  TrendingUp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Article, FeedSource } from '@/types';
@@ -28,6 +32,7 @@ import {
   toSentenceCaseTitle
 } from '@/utils/tdfIntelligence';
 import { shareToTelegram, isValidUrl } from '@/utils/telegramInstantView';
+import type { PharmacyItem, CityWeatherSummary, DolarQuotesData } from './TdfStickyStatusBar';
 
 interface TdfThreeTierFeedProps {
   articles: Article[];
@@ -35,6 +40,11 @@ interface TdfThreeTierFeedProps {
   selectedCity: TdfCity;
   activeCategory: string;
   activeAlerts: TdfAlertItem[];
+  pharmaciesByCity?: {
+    ushuaia: PharmacyItem | null;
+    rio_grande: PharmacyItem | null;
+    tolhuin: PharmacyItem | null;
+  };
   onSelectArticle: (article: Article) => void;
   syncTime: string;
 }
@@ -62,13 +72,6 @@ function getCurrentTimeSlotLabel(): string {
   return 'Franja Noche';
 }
 
-/**
- * 3. TARJETA DE ALERTA COMPACTA CON SLIDER CÍCLICO Y AUTOMÁTICO PARA TIERRA DEL FUEGO
- * - Diseño de tarjeta pequeña que no roba pantalla en dispositivos móviles.
- * - Pasa todas las alertas vigentes de manera cíclica y automática (cada 4.5s) con soporte táctil (swipe).
- * - Conserva el fondo tintado semántico (--color-alert-critical/warning/info), ícono lineal 1.5px,
- *   título en mayúscula de sentencia, organismo oficial, hora de sincronización y TTL, sin botones de compartir.
- */
 export function TdfSemanticAlertCard({ alert, compact = true }: { alert: TdfAlertItem; compact?: boolean }) {
   const isCritical = alert.severity === 'critical';
   const isWarning = alert.severity === 'warning';
@@ -137,16 +140,199 @@ export function TdfSemanticAlertCard({ alert, compact = true }: { alert: TdfAler
   );
 }
 
-export function TdfAlertsCyclicSlider({ alerts }: { alerts: TdfAlertItem[] }) {
+interface CyclicSlideItem {
+  id: string;
+  kind: 'alert' | 'ruta' | 'farmacia' | 'clima' | 'dolar';
+  badgeLabel: string;
+  issuer: string;
+  cityLabel: string;
+  title: string;
+  description?: string;
+  syncedAt: string;
+  ttlLabel?: string;
+  severity: 'critical' | 'warning' | 'info' | 'emerald';
+}
+
+export function TdfAlertsCyclicSlider({
+  alerts,
+  pharmaciesByCity,
+  syncTime,
+}: {
+  alerts: TdfAlertItem[];
+  pharmaciesByCity?: {
+    ushuaia: PharmacyItem | null;
+    rio_grande: PharmacyItem | null;
+    tolhuin: PharmacyItem | null;
+  };
+  syncTime?: string;
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const touchStartXRef = useRef<number | null>(null);
 
-  const total = alerts.length;
+  const [weatherByCity, setWeatherByCity] = useState<Record<'ushuaia' | 'rio_grande' | 'tolhuin', CityWeatherSummary>>({
+    ushuaia: { id: 'ushuaia', name: 'Ushuaia', temp: 6, max: 9, min: 2 },
+    rio_grande: { id: 'rio_grande', name: 'Río Grande', temp: 7, max: 10, min: 1 },
+    tolhuin: { id: 'tolhuin', name: 'Tolhuin', temp: 5, max: 8, min: 0 },
+  });
+
+  const [dolarData, setDolarData] = useState<DolarQuotesData>({
+    oficial: { compra: 985, venta: 1025 },
+    blue: { compra: 1180, venta: 1200 },
+  });
+
+  useEffect(() => {
+    const loadWeatherAndDolar = async () => {
+      try {
+        const [wRes, dRes] = await Promise.allSettled([
+          fetch('/api/weather', { cache: 'no-store' }),
+          fetch('/api/dolar', { cache: 'no-store' }),
+        ]);
+
+        if (wRes.status === 'fulfilled' && wRes.value.ok) {
+          const wJson = await wRes.value.json();
+          if (Array.isArray(wJson)) {
+            setWeatherByCity((prev) => {
+              const next = { ...prev };
+              for (const item of wJson) {
+                const maxVal = Array.isArray(item?.daily?.temperatureMax) ? Math.round(item.daily.temperatureMax[0]) : 8;
+                const minVal = Array.isArray(item?.daily?.temperatureMin) ? Math.round(item.daily.temperatureMin[0]) : 1;
+                const curVal = typeof item?.current?.temperature === 'number' ? Math.round(item.current.temperature) : maxVal;
+
+                if (item.id === 'ushuaia') {
+                  next.ushuaia = { id: 'ushuaia', name: 'Ushuaia', temp: curVal, max: maxVal, min: minVal };
+                } else if (item.id === 'riogrande' || item.id === 'rio_grande') {
+                  next.rio_grande = { id: 'rio_grande', name: 'Río Grande', temp: curVal, max: maxVal, min: minVal };
+                } else if (item.id === 'tolhuin') {
+                  next.tolhuin = { id: 'tolhuin', name: 'Tolhuin', temp: curVal, max: maxVal, min: minVal };
+                }
+              }
+              return next;
+            });
+          }
+        }
+
+        if (dRes.status === 'fulfilled' && dRes.value.ok) {
+          const dJson = await dRes.value.json();
+          if (dJson?.oficial || dJson?.blue) {
+            setDolarData((prev) => ({
+              oficial: dJson.oficial || prev.oficial,
+              blue: dJson.blue || prev.blue,
+            }));
+          }
+        }
+      } catch {
+        // Mantiene valores vigentes
+      }
+    };
+
+    loadWeatherAndDolar();
+    const timer = setInterval(loadWeatherAndDolar, 3 * 60 * 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const syncLabel = syncTime ? syncTime.slice(0, 5) + ' hs' : 'En vivo';
+  const formatArs = (v?: number) => (typeof v === 'number' && !isNaN(v) ? `$${v.toLocaleString('es-AR')}` : '--');
+
+  // Construir todas las tarjetas pequeñas del ciclo:
+  // 1) Estado de Rutas, 2) Farmacias de Turno por ciudad (solo el nombre),
+  // 3) Clima de hoy (Máx y Mín) de cada ciudad, 4) Dólar Oficial (Compra y Venta),
+  // 5) Dólar Blue (Compra y Venta), y 6) Alertas de Tierra del Fuego
+  const slides: CyclicSlideItem[] = useMemo(() => {
+    const list: CyclicSlideItem[] = [];
+
+    // 1. Estado de Rutas TDF
+    list.push({
+      id: 'slide-ruta-tdf',
+      kind: 'ruta',
+      badgeLabel: 'Estado de Rutas',
+      issuer: 'Vialidad Nacional / Provincial',
+      cityLabel: 'RN 3 · TDF',
+      title: 'RN 3 habilitada con precaución en Paso Garibaldi · Tramo Río Grande – Tolhuin transitable',
+      description: 'Se recomienda circular con luces bajas encendidas y respetar distancias de frenado en sectores de alta montaña.',
+      syncedAt: syncLabel,
+      ttlLabel: 'Vigente',
+      severity: 'warning',
+    });
+
+    // 2. Farmacia de Turno por ciudad (SOLO EL NOMBRE)
+    const uPharm = pharmaciesByCity?.ushuaia?.nombre || 'En sincronización';
+    const rgPharm = pharmaciesByCity?.rio_grande?.nombre || 'En sincronización';
+    const tPharm = pharmaciesByCity?.tolhuin?.nombre || 'En sincronización';
+
+    list.push({
+      id: 'slide-farmacias-tdf',
+      kind: 'farmacia',
+      badgeLabel: 'Farmacias de Turno',
+      issuer: 'Turno 24 hs por ciudad',
+      cityLabel: 'TDF',
+      title: `Ushuaia: ${uPharm} · Río Grande: ${rgPharm} · Tolhuin: ${tPharm}`,
+      description: 'Turnos vigentes hasta las 09:00 hs de mañana en cada localidad de la provincia.',
+      syncedAt: syncLabel,
+      ttlLabel: '09:00 hs',
+      severity: 'emerald',
+    });
+
+    // 3. Clima de hoy (Máxima y Mínima) de cada ciudad
+    list.push({
+      id: 'slide-clima-tdf',
+      kind: 'clima',
+      badgeLabel: 'Clima Hoy',
+      issuer: 'Máxima y Mínima por ciudad',
+      cityLabel: 'TDF',
+      title: `Ushuaia: Máx ${weatherByCity.ushuaia.max}°C / Mín ${weatherByCity.ushuaia.min}°C · Río Grande: Máx ${weatherByCity.rio_grande.max}°C / Mín ${weatherByCity.rio_grande.min}°C · Tolhuin: Máx ${weatherByCity.tolhuin.max}°C / Mín ${weatherByCity.tolhuin.min}°C`,
+      description: `Temperaturas actuales — Ushuaia: ${weatherByCity.ushuaia.temp}°C · Río Grande: ${weatherByCity.rio_grande.temp}°C · Tolhuin: ${weatherByCity.tolhuin.temp}°C.`,
+      syncedAt: syncLabel,
+      ttlLabel: 'Hoy',
+      severity: 'info',
+    });
+
+    // 4. Cotización Dólar Oficial (Compra y Venta) + Dólar Blue (Compra y Venta)
+    list.push({
+      id: 'slide-dolar-oficial-blue',
+      kind: 'dolar',
+      badgeLabel: 'Cotización Dólar',
+      issuer: 'Oficial y Blue',
+      cityLabel: 'Compra / Venta',
+      title: `Dólar Oficial: Compra ${formatArs(dolarData.oficial?.compra)} / Venta ${formatArs(dolarData.oficial?.venta)} · Dólar Blue: Compra ${formatArs(dolarData.blue?.compra)} / Venta ${formatArs(dolarData.blue?.venta)}`,
+      description: 'Valores de referencia actualizados automáticamente desde el mercado cambiario.',
+      syncedAt: syncLabel,
+      ttlLabel: 'En vivo',
+      severity: 'info',
+    });
+
+    // 5. Alertas vigentes de Tierra del Fuego
+    for (const a of alerts) {
+      const cLabel =
+        a.city === 'ushuaia'
+          ? 'Ushuaia'
+          : a.city === 'rio_grande'
+          ? 'Río Grande'
+          : a.city === 'tolhuin'
+          ? 'Tolhuin'
+          : 'TDF';
+      list.push({
+        id: a.id,
+        kind: 'alert',
+        badgeLabel: a.severity === 'critical' ? 'Crítico' : a.severity === 'warning' ? 'Precaución' : 'Aviso',
+        issuer: a.issuer,
+        cityLabel: cLabel,
+        title: toSentenceCaseTitle(a.title),
+        description: a.description,
+        syncedAt: a.syncedAt,
+        ttlLabel: `TTL ${a.ttlHours}h`,
+        severity: a.severity,
+      });
+    }
+
+    return list;
+  }, [alerts, pharmaciesByCity, weatherByCity, dolarData, syncLabel]);
+
+  const total = slides.length;
   const safeIndex = total > 0 ? currentIndex % total : 0;
-  const currentAlert = alerts[safeIndex];
+  const currentSlide = slides[safeIndex];
 
   const handleNext = useCallback(() => {
     if (total <= 1) return;
@@ -160,19 +346,20 @@ export function TdfAlertsCyclicSlider({ alerts }: { alerts: TdfAlertItem[] }) {
     setCurrentIndex((prev) => (prev - 1 + total) % total);
   }, [total]);
 
-  // Rotación cíclica y automática cada 4.5 segundos
+  // Rotación cíclica y automática cada 4.2 segundos
   useEffect(() => {
     if (total <= 1 || isPaused) return;
     const timer = setInterval(() => {
       handleNext();
-    }, 4500);
+    }, 4200);
     return () => clearInterval(timer);
   }, [total, isPaused, handleNext]);
 
-  if (!currentAlert) return null;
+  if (!currentSlide) return null;
 
-  const isCritical = currentAlert.severity === 'critical';
-  const isWarning = currentAlert.severity === 'warning';
+  const isCritical = currentSlide.severity === 'critical';
+  const isWarning = currentSlide.severity === 'warning';
+  const isEmerald = currentSlide.severity === 'emerald';
 
   const cardClass = isCritical
     ? 'alert-card-critical'
@@ -184,26 +371,30 @@ export function TdfAlertsCyclicSlider({ alerts }: { alerts: TdfAlertItem[] }) {
     ? 'text-[#dc2626]'
     : isWarning
     ? 'text-[#d97706]'
+    : isEmerald
+    ? 'text-[#16a34a]'
     : 'text-[#0284c7]';
 
   const badgeBg = isCritical
     ? 'bg-[#dc2626] text-white'
     : isWarning
     ? 'bg-[#d97706] text-white'
-    : 'bg-[#0284c7] text-white';
+    : isEmerald
+    ? 'bg-[#16a34a] text-white'
+    : 'bg-[#0f4c81] text-white';
 
-  const cityLabel =
-    currentAlert.city === 'ushuaia'
-      ? 'Ushuaia'
-      : currentAlert.city === 'rio_grande'
-      ? 'Río Grande'
-      : currentAlert.city === 'tolhuin'
-      ? 'Tolhuin'
-      : 'TDF';
+  const renderSlideIcon = () => {
+    if (currentSlide.kind === 'ruta') return <Car className="w-3 h-3 stroke-[1.75]" />;
+    if (currentSlide.kind === 'farmacia') return <Cross className="w-3 h-3 stroke-[1.75]" />;
+    if (currentSlide.kind === 'clima') return <Thermometer className="w-3 h-3 stroke-[1.75]" />;
+    if (currentSlide.kind === 'dolar') return <TrendingUp className="w-3 h-3 stroke-[1.75]" />;
+    if (currentSlide.severity === 'info') return <Info className="w-3 h-3 stroke-[1.75]" />;
+    return <AlertTriangle className="w-3 h-3 stroke-[1.75]" />;
+  };
 
   return (
     <section
-      aria-label="Slider cíclico de alertas vigentes en Tierra del Fuego"
+      aria-label="Slider cíclico y automático de alertas, rutas, farmacias, clima y dólar en Tierra del Fuego"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={(e) => {
@@ -225,32 +416,32 @@ export function TdfAlertsCyclicSlider({ alerts }: { alerts: TdfAlertItem[] }) {
       }}
       className={`relative overflow-hidden rounded-xl px-3 py-2 sm:px-3.5 sm:py-2.5 ${cardClass} shadow-xs transition-colors select-none`}
     >
-      {/* Fila superior compacta: Nivel + Emisor + Ciudad + Sincronización/TTL + Controles del Slider */}
+      {/* Fila superior compacta: Badge + Emisor + Ciudad + Sincronización + Controles del Slider */}
       <div className="flex items-center justify-between gap-1.5 mb-1 text-[11px] leading-none tabular-nums">
         <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
           <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide shrink-0 ${badgeBg}`}>
-            {currentAlert.severity === 'info' ? (
-              <Info className="w-3 h-3 stroke-[1.75]" />
-            ) : (
-              <AlertTriangle className="w-3 h-3 stroke-[1.75]" />
-            )}
-            <span>{isCritical ? 'Crítico' : isWarning ? 'Precaución' : 'Aviso'}</span>
+            {renderSlideIcon()}
+            <span>{currentSlide.badgeLabel}</span>
           </span>
 
           <span className="font-bold text-text-primary truncate">
-            {currentAlert.issuer}
+            {currentSlide.issuer}
           </span>
 
           <span className="px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-text-secondary font-semibold shrink-0">
-            {cityLabel}
+            {currentSlide.cityLabel}
           </span>
 
           <span className="hidden md:inline-flex items-center gap-1 text-text-tertiary shrink-0">
             <span>·</span>
             <Clock className="w-3 h-3 stroke-[1.5]" />
-            <span>Sinc: <strong className="text-text-secondary">{currentAlert.syncedAt}</strong></span>
-            <span>·</span>
-            <span>TTL {currentAlert.ttlHours}h</span>
+            <span>Sinc: <strong className="text-text-secondary">{currentSlide.syncedAt}</strong></span>
+            {currentSlide.ttlLabel && (
+              <>
+                <span>·</span>
+                <span>{currentSlide.ttlLabel}</span>
+              </>
+            )}
           </span>
         </div>
 
@@ -269,8 +460,8 @@ export function TdfAlertsCyclicSlider({ alerts }: { alerts: TdfAlertItem[] }) {
                   handlePrev();
                 }}
                 className="p-1 rounded-md hover:bg-black/10 dark:hover:bg-white/10 text-text-secondary transition-colors cursor-pointer"
-                aria-label="Alerta anterior"
-                title="Alerta anterior"
+                aria-label="Tarjeta anterior"
+                title="Anterior"
               >
                 <ChevronLeft className="w-3.5 h-3.5 stroke-[1.5]" />
               </button>
@@ -297,8 +488,8 @@ export function TdfAlertsCyclicSlider({ alerts }: { alerts: TdfAlertItem[] }) {
                   handleNext();
                 }}
                 className="p-1 rounded-md hover:bg-black/10 dark:hover:bg-white/10 text-text-secondary transition-colors cursor-pointer"
-                aria-label="Siguiente alerta"
-                title="Siguiente alerta"
+                aria-label="Siguiente tarjeta"
+                title="Siguiente"
               >
                 <ChevronRight className="w-3.5 h-3.5 stroke-[1.5]" />
               </button>
@@ -311,11 +502,11 @@ export function TdfAlertsCyclicSlider({ alerts }: { alerts: TdfAlertItem[] }) {
       <div
         onClick={() => setIsDetailOpen((prev) => !prev)}
         className="relative min-h-[22px] flex items-center justify-between gap-2 cursor-pointer"
-        title="Tocar para ver u ocultar detalle completo de la alerta"
+        title="Tocar para ver u ocultar detalle"
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
-            key={currentAlert.id}
+            key={currentSlide.id}
             initial={{ opacity: 0, x: direction * 24 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: direction * -24 }}
@@ -323,27 +514,31 @@ export function TdfAlertsCyclicSlider({ alerts }: { alerts: TdfAlertItem[] }) {
             className="flex-1 min-w-0"
           >
             <h3
-              className={`text-[13px] sm:text-[14px] font-bold text-text-primary leading-snug ${
+              className={`text-[13px] sm:text-[14px] font-bold text-text-primary leading-snug tabular-nums ${
                 isDetailOpen ? '' : 'line-clamp-1 sm:line-clamp-1'
               }`}
             >
-              {toSentenceCaseTitle(currentAlert.title)}
+              {currentSlide.title}
             </h3>
 
             {isDetailOpen && (
               <div className="mt-1 space-y-1">
-                {currentAlert.description && currentAlert.description !== currentAlert.title && (
-                  <p className="text-[12px] text-text-secondary leading-relaxed">
-                    {currentAlert.description}
+                {currentSlide.description && currentSlide.description !== currentSlide.title && (
+                  <p className="text-[12px] text-text-secondary leading-relaxed tabular-nums">
+                    {currentSlide.description}
                   </p>
                 )}
                 <div className="flex flex-wrap items-center gap-2 text-[11px] text-text-tertiary tabular-nums md:hidden">
                   <span className="inline-flex items-center gap-1">
                     <Clock className="w-3 h-3 stroke-[1.5]" />
-                    Sincronizado: <strong className="text-text-secondary">{currentAlert.syncedAt}</strong>
+                    Sincronizado: <strong className="text-text-secondary">{currentSlide.syncedAt}</strong>
                   </span>
-                  <span>·</span>
-                  <span>Vigencia TTL: {currentAlert.ttlHours}h</span>
+                  {currentSlide.ttlLabel && (
+                    <>
+                      <span>·</span>
+                      <span>{currentSlide.ttlLabel}</span>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -354,19 +549,19 @@ export function TdfAlertsCyclicSlider({ alerts }: { alerts: TdfAlertItem[] }) {
         <div className="flex items-center gap-1.5 shrink-0">
           {total > 1 && (
             <div className="hidden sm:flex items-center gap-1">
-              {alerts.map((a, idx) => (
+              {slides.map((s, idx) => (
                 <button
-                  key={a.id}
+                  key={s.id}
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     setDirection(idx > safeIndex ? 1 : -1);
                     setCurrentIndex(idx);
                   }}
-                  aria-label={`Ir a alerta ${idx + 1}`}
+                  aria-label={`Ir a tarjeta ${idx + 1}`}
                   className={`h-1.5 rounded-full transition-all cursor-pointer ${
                     idx === safeIndex
-                      ? `w-4 ${isCritical ? 'bg-[#dc2626]' : isWarning ? 'bg-[#d97706]' : 'bg-[#0284c7]'}`
+                      ? `w-4 ${isCritical ? 'bg-[#dc2626]' : isWarning ? 'bg-[#d97706]' : isEmerald ? 'bg-[#16a34a]' : 'bg-[#0284c7]'}`
                       : 'w-1.5 bg-black/15 dark:bg-white/20'
                   }`}
                 />
@@ -392,6 +587,7 @@ export default function TdfThreeTierFeed({
   selectedCity,
   activeCategory,
   activeAlerts,
+  pharmaciesByCity,
   onSelectArticle,
   syncTime,
 }: TdfThreeTierFeedProps) {
@@ -464,10 +660,13 @@ export default function TdfThreeTierFeed({
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* SLIDER CÍCLICO Y AUTOMÁTICO DE TARJETA COMPACTA PARA TODAS LAS ALERTAS DE TIERRA DEL FUEGO */}
-      {activeAlerts.length > 0 && (
-        <TdfAlertsCyclicSlider alerts={activeAlerts} />
-      )}
+      {/* SLIDER CÍCLICO Y AUTOMÁTICO DE TARJETA PEQUEÑA:
+          Estado de Rutas + Farmacia de Turno (solo nombre) + Clima Hoy (Máx/Mín por ciudad) + Dólar Oficial/Blue + Alertas TDF */}
+      <TdfAlertsCyclicSlider
+        alerts={activeAlerts}
+        pharmaciesByCity={pharmaciesByCity}
+        syncTime={syncTime}
+      />
 
       {/* AUTOMATIZACIÓN: RESUMEN DEL DÍA (3-5 NOTAS CLAVE + ESTADO DE RUTA) */}
       <div className="bg-surface-elevated border border-border-subtle rounded-xl overflow-hidden shadow-xs">

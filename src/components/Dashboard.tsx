@@ -1088,12 +1088,17 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
         </div>
 
         {/* 1. FRANJA DE ESTADO FIJA (STICKY) EN LA PARTE SUPERIOR:
-            Estado de Ruta 3 + Alerta activa de Defensa Civil + Farmacia de turno */}
+            Estado de Ruta 3 + Farmacia de turno por ciudad (solo nombre) + Clima Hoy (Máx/Mín) + Dólar Oficial y Blue */}
         <TdfStickyStatusBar
           selectedCity={selectedTdfCity}
           onSelectCity={handleSelectCity}
           activeAlerts={activeTdfAlerts}
           activePharmacy={getVisiblePharmacies(selectedPharmacyCity)[0] || null}
+          pharmaciesByCity={{
+            ushuaia: getVisiblePharmacies('ushuaia')[0] || null,
+            rio_grande: getVisiblePharmacies('rio_grande')[0] || null,
+            tolhuin: getVisiblePharmacies('tolhuin')[0] || null,
+          }}
           pharmacyCityName={
             selectedPharmacyCity === 'rio_grande'
               ? 'Río Grande'
@@ -1177,6 +1182,11 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                       selectedCity={selectedTdfCity}
                       activeCategory={activeCategory}
                       activeAlerts={activeTdfAlerts}
+                      pharmaciesByCity={{
+                        ushuaia: getVisiblePharmacies('ushuaia')[0] || null,
+                        rio_grande: getVisiblePharmacies('rio_grande')[0] || null,
+                        tolhuin: getVisiblePharmacies('tolhuin')[0] || null,
+                      }}
                       onSelectArticle={setSelectedArticle}
                       syncTime={syncTime}
                     />
