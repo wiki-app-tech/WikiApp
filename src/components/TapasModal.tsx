@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ZoomIn, ZoomOut, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink, Loader2, Globe, Flag, Map } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink, Loader2, Globe, Flag, Map, MessageCircle, Send } from 'lucide-react';
 import { shareToTelegram, InstantViewExplainerBadge, isValidUrl } from '@/utils/telegramInstantView';
 
 interface TapasItem {
@@ -444,26 +444,28 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                             </span>
                           </div>
 
-                          <div className="flex gap-1.5 mt-2">
+                          <div className="flex items-center justify-end gap-1.5 mt-2">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleQuickShare(item, 'whatsapp');
                               }}
-                              className="share-btn flex-1 py-1.5 bg-emerald-600/90 hover:bg-emerald-550 text-white rounded-xl text-[9px] font-black uppercase tracking-wider transition-all text-center"
+                              className="share-btn p-2 bg-emerald-500/15 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/25 rounded-xl transition-all flex items-center justify-center"
+                              title="Compartir en WhatsApp"
+                              aria-label="Compartir en WhatsApp"
                             >
-                              WhatsApp
+                              <MessageCircle className="w-4 h-4" />
                             </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleQuickShare(item, 'telegram');
                               }}
-                              className="share-btn flex-1 py-1.5 bg-sky-600/90 hover:bg-sky-500 text-white rounded-xl text-[9px] font-black uppercase tracking-wider transition-all text-center flex items-center justify-center gap-1"
-                              title={isValidUrl(item.coverUrl) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Telegram"}
+                              className="share-btn p-2 bg-sky-500/15 hover:bg-sky-600 text-sky-400 hover:text-white border border-sky-500/25 rounded-xl transition-all flex items-center justify-center"
+                              title={isValidUrl(item.coverUrl) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
+                              aria-label="Compartir en Telegram"
                             >
-                              <span>Telegram</span>
-                              {isValidUrl(item.coverUrl) && <span className="text-[8px] bg-white/20 px-1 py-0.2 rounded font-black">⚡ IV</span>}
+                              <Send className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
@@ -602,29 +604,24 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                             />
                           </div>
                           
-                          <div className="grid grid-cols-2 gap-2 mt-1">
+                          <div className="flex items-center justify-center gap-2.5 mt-1">
                             <button
                               onClick={() => handleShare('whatsapp')}
-                              className="py-2 bg-emerald-600 hover:bg-emerald-550 active:scale-95 transition-all text-white rounded-xl text-[9px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow"
+                              className="p-2.5 bg-emerald-500/15 hover:bg-emerald-600 active:scale-95 transition-all text-emerald-400 hover:text-white border border-emerald-500/25 rounded-xl flex items-center justify-center shadow"
+                              title="Compartir en WhatsApp"
+                              aria-label="Compartir en WhatsApp"
                             >
-                              WhatsApp
+                              <MessageCircle className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleShare('telegram')}
-                              className="py-2 bg-sky-600 hover:bg-sky-550 active:scale-95 transition-all text-white rounded-xl text-[9px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow"
-                              title={selectedItem && isValidUrl(selectedItem.coverUrl) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Telegram"}
+                              className="p-2.5 bg-sky-500/15 hover:bg-sky-600 active:scale-95 transition-all text-sky-400 hover:text-white border border-sky-500/25 rounded-xl flex items-center justify-center shadow"
+                              title={selectedItem && isValidUrl(selectedItem.coverUrl) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
+                              aria-label="Compartir en Telegram"
                             >
-                              <span>Telegram</span>
-                              {selectedItem && isValidUrl(selectedItem.coverUrl) && (
-                                <span className="text-[8px] bg-white/20 px-1 py-0.2 rounded font-black">⚡ Instant View</span>
-                              )}
+                              <Send className="w-4 h-4" />
                             </button>
                           </div>
-                          {selectedItem && isValidUrl(selectedItem.coverUrl) && (
-                            <div className="flex justify-center mt-2">
-                              <InstantViewExplainerBadge compact />
-                            </div>
-                          )}
                         </div>
 
                         {/* Reading Advice */}

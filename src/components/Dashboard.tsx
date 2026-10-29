@@ -1289,7 +1289,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                             )}
                                                         </div>
                                                         <div className="hidden md:flex items-center gap-2 mt-3 sm:mt-0 shrink-0 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-500 dark:text-gray-400 hover:text-green-500 rounded-xl transition-all" title="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-500 dark:text-gray-400 hover:text-green-500 rounded-xl transition-all" title="Compartir en WhatsApp" aria-label="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
                                                             <button 
                                                               onClick={(e) => { 
                                                                 e.stopPropagation(); 
@@ -1301,15 +1301,11 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                                   date: article.pubDate ? new Date(article.pubDate).toLocaleDateString('es-AR') : ''
                                                                 });
                                                               }} 
-                                                              className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-500 dark:text-gray-400 hover:text-blue-500 rounded-xl transition-all relative" 
-                                                              title={isValidUrl(article.link) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Compartir en Telegram"}
+                                                              className="p-2.5 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-500 dark:text-gray-400 hover:text-blue-500 rounded-xl transition-all" 
+                                                              title={isValidUrl(article.link) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
+                                                              aria-label="Compartir en Telegram"
                                                             >
                                                               <Send className="w-4 h-4" />
-                                                              {isValidUrl(article.link) && (
-                                                                <span className="absolute -top-1 -right-1 text-[8px] bg-amber-400 text-black px-1 rounded-full font-black leading-none py-0.5">
-                                                                  ⚡
-                                                                </span>
-                                                              )}
                                                             </button>
                                                         </div>
                                                     </motion.div>
@@ -1382,7 +1378,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                             )}
                                                         </div>
                                                         <div className="hidden md:flex absolute bottom-4 right-4 items-center gap-2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 bg-white dark:bg-black/80 backdrop-blur-xl p-2 rounded-xl border border-slate-200 dark:border-white/10 shadow-xl">
-                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-lg transition-all" title="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-2 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-lg transition-all" title="Compartir en WhatsApp" aria-label="Compartir en WhatsApp"><MessageCircle className="w-4 h-4" /></button>
                                                             <button 
                                                               onClick={(e) => { 
                                                                 e.stopPropagation(); 
@@ -1394,15 +1390,11 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                                   date: article.pubDate ? new Date(article.pubDate).toLocaleDateString('es-AR') : ''
                                                                 });
                                                               }} 
-                                                              className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-lg transition-all relative" 
-                                                              title={isValidUrl(article.link) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Compartir en Telegram"}
+                                                              className="p-2 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-lg transition-all" 
+                                                              title={isValidUrl(article.link) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
+                                                              aria-label="Compartir en Telegram"
                                                             >
                                                               <Send className="w-4 h-4" />
-                                                              {isValidUrl(article.link) && (
-                                                                <span className="absolute -top-1 -right-1 text-[8px] bg-amber-400 text-black px-1 rounded-full font-black leading-none py-0.5">
-                                                                  ⚡
-                                                                </span>
-                                                              )}
                                                             </button>
                                                         </div>
                                                     </motion.div>
@@ -1480,7 +1472,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                             <div className="flex items-center gap-4 mt-2">
                                                                 <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider border-b-2 border-blue-600/20 group-hover:border-blue-600 transition-all pb-1">Seguir leyendo</span>
                                                                 <div className="hidden md:flex items-center gap-3 ml-auto opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en WhatsApp"><MessageCircle className="w-5 h-5" /></button>
+                                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + article.link)}`, '_blank'); }} className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-green-500/20 text-slate-600 dark:text-gray-400 hover:text-green-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5" title="Compartir en WhatsApp" aria-label="Compartir en WhatsApp"><MessageCircle className="w-5 h-5" /></button>
                                                                     <button 
                                                                       onClick={(e) => { 
                                                                         e.stopPropagation(); 
@@ -1492,15 +1484,11 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                                                           date: article.pubDate ? new Date(article.pubDate).toLocaleDateString('es-AR') : ''
                                                                         });
                                                                       }} 
-                                                                      className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5 relative" 
-                                                                      title={isValidUrl(article.link) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Compartir en Telegram"}
+                                                                      className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-blue-500/20 text-slate-600 dark:text-gray-400 hover:text-blue-500 rounded-2xl transition-all border border-slate-200 dark:border-white/5" 
+                                                                      title={isValidUrl(article.link) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
+                                                                      aria-label="Compartir en Telegram"
                                                                     >
                                                                       <Send className="w-5 h-5" />
-                                                                      {isValidUrl(article.link) && (
-                                                                        <span className="absolute -top-1 -right-1 text-[9px] bg-amber-400 text-black px-1 rounded-full font-black leading-none py-0.5">
-                                                                          ⚡
-                                                                        </span>
-                                                                      )}
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -2579,12 +2567,14 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                   {/* Acciones de pie de artículo: Compartir y Sitio Oficial */}
                   <div className="mt-10 md:mt-16 pt-8 border-t border-slate-200 dark:border-white/10 flex flex-col items-center gap-5">
                     <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">Compartir esta noticia</p>
-                    <div className="flex flex-wrap items-center gap-3 w-full justify-center">
+                    <div className="flex items-center gap-2.5 justify-center">
                       <button 
                         onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(selectedArticle.title + ' ' + selectedArticle.link)}`, '_blank')}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md"
+                        className="p-2.5 bg-emerald-500/15 hover:bg-emerald-600 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/25 rounded-xl transition-all shadow-sm cursor-pointer active:scale-95"
+                        title="Compartir en WhatsApp"
+                        aria-label="Compartir en WhatsApp"
                       >
-                        <MessageCircle className="w-4 h-4" /> WhatsApp
+                        <MessageCircle className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => shareToTelegram({
@@ -2594,15 +2584,11 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                           source: selectedArticle.sourceName || selectedArticle.sourceId,
                           date: selectedArticle.pubDate ? new Date(selectedArticle.pubDate).toLocaleDateString('es-AR') : ''
                         })}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md"
-                        title={isValidUrl(selectedArticle.link) ? "Compartir en Telegram con Vista Rápida (Instant View sin tiempos de carga)" : "Compartir en Telegram"}
+                        className="p-2.5 bg-sky-500/15 hover:bg-sky-600 text-sky-600 dark:text-sky-400 hover:text-white border border-sky-500/25 rounded-xl transition-all shadow-sm cursor-pointer active:scale-95"
+                        title={isValidUrl(selectedArticle.link) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
+                        aria-label="Compartir en Telegram"
                       >
-                        <Send className="w-4 h-4" /> Telegram
-                        {isValidUrl(selectedArticle.link) && (
-                          <span className="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded font-black tracking-normal">
-                            ⚡ Instant View
-                          </span>
-                        )}
+                        <Send className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => {
@@ -2611,17 +2597,13 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                             alert('Enlace copiado al portapapeles');
                           }
                         }}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-700 dark:text-gray-200 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
+                        className="p-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-700 dark:text-gray-200 border border-slate-200 dark:border-white/10 rounded-xl transition-all cursor-pointer active:scale-95"
+                        title="Copiar enlace"
+                        aria-label="Copiar enlace"
                       >
-                        <Share2 className="w-4 h-4" /> Copiar Enlace
+                        <Share2 className="w-4 h-4" />
                       </button>
                     </div>
-
-                    {isValidUrl(selectedArticle.link) && (
-                      <div className="flex justify-center -mt-2">
-                        <InstantViewExplainerBadge />
-                      </div>
-                    )}
 
                     <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center mt-2">Continúa leyendo la versión completa en el sitio oficial</p>
                     <a 

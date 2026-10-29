@@ -686,33 +686,29 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
                       {/* Compartir WhatsApp */}
                       <button
                         onClick={(e) => handleShareWhatsApp(art, e)}
-                        className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/25 transition-all text-[10px] font-bold flex items-center gap-1 cursor-pointer shadow-sm"
-                        title="Compartir noticia en WhatsApp"
+                        className="p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/25 transition-all flex items-center justify-center cursor-pointer shadow-sm"
+                        title="Compartir en WhatsApp"
+                        aria-label="Compartir en WhatsApp"
                       >
                         <WhatsAppIcon className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">WhatsApp</span>
                       </button>
 
-                      {/* Compartir Telegram con Instant View */}
+                      {/* Compartir Telegram */}
                       <button
                         onClick={(e) => handleShareTelegram(art, e)}
-                        className="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500 text-sky-600 dark:text-sky-400 hover:text-white border border-sky-500/25 transition-all text-[10px] font-bold flex items-center gap-1 cursor-pointer shadow-sm group/btn"
-                        title={isValidUrl(art.link) ? "Compartir en Telegram con Vista Rápida (⚡ Instant View) | instantview.telegram.org" : "Compartir noticia en Telegram"}
+                        className="p-1.5 rounded-lg bg-sky-500/10 hover:bg-sky-500 text-sky-600 dark:text-sky-400 hover:text-white border border-sky-500/25 transition-all flex items-center justify-center cursor-pointer shadow-sm"
+                        title={isValidUrl(art.link) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
+                        aria-label="Compartir en Telegram"
                       >
                         <TelegramIcon className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">Telegram</span>
-                        {isValidUrl(art.link) && (
-                          <span className="text-[9px] bg-sky-500/20 text-sky-500 dark:text-sky-300 px-1 py-0.2 rounded font-black group-hover/btn:bg-white/20 group-hover/btn:text-white transition-colors" title="Instant View disponible">
-                            ⚡ IV
-                          </span>
-                        )}
                       </button>
 
                       {/* Copiar Mensaje */}
                       <button
                         onClick={(e) => handleCopyMessage(art, e)}
-                        className="p-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10 transition-all cursor-pointer"
+                        className="p-1.5 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10 transition-all cursor-pointer"
                         title="Copiar texto de la noticia"
+                        aria-label="Copiar texto de la noticia"
                       >
                         {copiedId === art.id ? (
                           <Check className="w-3.5 h-3.5 text-emerald-500" />
@@ -811,21 +807,18 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
                     <button
                       onClick={(e) => handleShareWhatsApp(art, e)}
                       className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-colors"
-                      title="WhatsApp"
+                      title="Compartir en WhatsApp"
+                      aria-label="Compartir en WhatsApp"
                     >
                       <WhatsAppIcon className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={(e) => handleShareTelegram(art, e)}
-                      className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500 hover:bg-sky-500 hover:text-white transition-colors relative group/tg"
-                      title={isValidUrl(art.link) ? "Compartir en Telegram (⚡ Instant View) | instantview.telegram.org" : "Telegram"}
+                      className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500 hover:bg-sky-500 hover:text-white transition-colors"
+                      title={isValidUrl(art.link) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
+                      aria-label="Compartir en Telegram"
                     >
                       <TelegramIcon className="w-3.5 h-3.5" />
-                      {isValidUrl(art.link) && (
-                        <span className="absolute -top-1 -right-1 text-[8px] bg-amber-400 text-black px-0.5 rounded font-black leading-none" title="Instant View disponible">
-                          ⚡
-                        </span>
-                      )}
                     </button>
                   </div>
                 </div>
@@ -913,47 +906,34 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
                   {/* WhatsApp */}
                   <button
                     onClick={() => handleShareWhatsApp(expandedArticle)}
-                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-emerald-600/20 transition-all cursor-pointer active:scale-95"
+                    className="p-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-600 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/25 flex items-center justify-center shadow-sm transition-all cursor-pointer active:scale-95"
+                    title="Compartir en WhatsApp"
+                    aria-label="Compartir en WhatsApp"
                   >
                     <WhatsAppIcon className="w-4 h-4" />
-                    <span>Compartir en WhatsApp</span>
                   </button>
 
-                  {/* Telegram con Instant View */}
+                  {/* Telegram */}
                   <button
                     onClick={() => handleShareTelegram(expandedArticle)}
-                    className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-sky-600/20 transition-all cursor-pointer active:scale-95"
-                    title={isValidUrl(expandedArticle.link) ? "Compartir en Telegram con Vista Rápida (Instant View sin tiempos de carga)" : "Compartir en Telegram"}
+                    className="p-2.5 rounded-xl bg-sky-500/15 hover:bg-sky-600 text-sky-600 dark:text-sky-400 hover:text-white border border-sky-500/25 flex items-center justify-center shadow-sm transition-all cursor-pointer active:scale-95"
+                    title={isValidUrl(expandedArticle.link) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
+                    aria-label="Compartir en Telegram"
                   >
                     <TelegramIcon className="w-4 h-4" />
-                    <span>Compartir en Telegram</span>
-                    {isValidUrl(expandedArticle.link) && (
-                      <span className="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded font-black tracking-normal">
-                        ⚡ Instant View
-                      </span>
-                    )}
                   </button>
-
-                  {/* Enlace oficial Instant Views Explained si existe la URL */}
-                  {isValidUrl(expandedArticle.link) && (
-                    <InstantViewExplainerBadge />
-                  )}
 
                   {/* Copiar */}
                   <button
                     onClick={() => handleCopyMessage(expandedArticle)}
-                    className="px-3 py-2 rounded-xl bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 text-slate-700 dark:text-gray-200 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                    className="p-2.5 rounded-xl bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 text-slate-700 dark:text-gray-200 flex items-center justify-center transition-all cursor-pointer active:scale-95"
+                    title={copiedId === expandedArticle.id ? "Copiado" : "Copiar mensaje"}
+                    aria-label="Copiar mensaje"
                   >
                     {copiedId === expandedArticle.id ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>Copiado</span>
-                      </>
+                      <Check className="w-4 h-4 text-emerald-500" />
                     ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5" />
-                        <span>Copiar Mensaje</span>
-                      </>
+                      <Copy className="w-4 h-4" />
                     )}
                   </button>
                 </div>
