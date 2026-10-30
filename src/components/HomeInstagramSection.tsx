@@ -621,7 +621,7 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
                   </div>
 
                   {/* IMAGEN / MINIATURA 16:9 CON HOVER ZOOM */}
-                  <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-slate-900 relative border border-slate-200/60 dark:border-white/5 shrink-0 shadow-inner">
+                  <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-slate-100 relative border border-slate-200/80 shrink-0 shadow-inner">
                     {art.thumbnail ? (
                       <img
                         src={art.thumbnail}
@@ -633,9 +633,9 @@ export default function HomeInstagramSection({ articles, onViewFullFeed }: HomeI
                         }}
                       />
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-rose-950 text-slate-400 gap-2 p-3 text-center">
-                        <InstagramIcon className="w-8 h-8 text-rose-500/40" />
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-rose-50 text-slate-500 gap-2 p-3 text-center">
+                        <InstagramIcon className="w-8 h-8 text-rose-500/60" />
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-600">
                           @{username}
                         </span>
                       </div>

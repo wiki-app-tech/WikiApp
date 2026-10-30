@@ -1,7 +1,10 @@
 @import "tailwindcss";
 
+/* Modo claro único en toda la aplicación: desactiva variantes oscuras automáticas del navegador/SO */
+@custom-variant dark (&:where(.never-dark-mode));
+
 @theme inline {
-  /* Superficies semánticas de lectura cívica y territorial */
+  /* Superficies semánticas de lectura cívica y territorial (Modo Claro Único) */
   --color-surface-primary: #f8fafc;
   --color-surface-elevated: #ffffff;
   --color-surface-sunken: #f1f5f9;
@@ -53,44 +56,6 @@
   --shadow-glass: 0 2px 12px 0 rgba(15, 23, 42, 0.05);
 }
 
-[data-theme='dark'] {
-  --color-surface-primary: #0b0f17;
-  --color-surface-elevated: #111827;
-  --color-surface-sunken: #1e293b;
-
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #cbd5e1;
-  --color-text-tertiary: #94a3b8;
-
-  --color-brand-primary: #38bdf8;
-  --color-brand-hover: #0ea5e9;
-  --color-accent-primary: #38bdf8;
-  --color-accent-primary-hover: #0ea5e9;
-  --color-accent-secondary: #0284c7;
-
-  --color-alert-critical: #f87171;
-  --color-alert-critical-bg: rgba(220, 38, 38, 0.14);
-  --color-alert-critical-border: rgba(248, 113, 113, 0.4);
-
-  --color-alert-warning: #fbbf24;
-  --color-alert-warning-bg: rgba(217, 119, 6, 0.14);
-  --color-alert-warning-border: rgba(251, 191, 36, 0.4);
-
-  --color-alert-info: #38bdf8;
-  --color-alert-info-bg: rgba(2, 132, 199, 0.14);
-  --color-alert-info-border: rgba(56, 189, 248, 0.35);
-
-  --color-status-ok: #4ade80;
-  --color-status-ok-bg: rgba(22, 163, 74, 0.14);
-  --color-status-ok-border: rgba(74, 222, 128, 0.35);
-
-  --color-border-subtle: #1e293b;
-  --color-border-hover: #475569;
-
-  --shadow-premium: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
-  --shadow-glass: 0 4px 16px 0 rgba(0, 0, 0, 0.35);
-}
-
 /* ═══════════════════════════════════════
    BASE RESET & ESCALA TIPOGRÁFICA (24/20/16/14/12 px)
    ═══════════════════════════════════════ */
@@ -99,12 +64,15 @@
   box-sizing: border-box;
 }
 
+:root,
 html {
+  color-scheme: light;
   scroll-behavior: smooth;
   overflow-x: hidden;
 }
 
 body {
+  color-scheme: light;
   background-color: var(--color-surface-primary);
   color: var(--color-text-primary);
   font-family: var(--font-sans);

@@ -1209,7 +1209,7 @@ export default function Dashboard({ initialArticles, feeds }: { initialArticles:
                                             </div>
                                         </div>
 
-                                        <button className="mt-4 w-full py-4 bg-white text-black font-black uppercase tracking-widest text-[11px] rounded-2xl hover:bg-blue-500 hover:text-slate-900 dark:text-white transition-all shadow-xl shadow-blue-900/10 active:scale-95">
+                                        <button className="mt-4 w-full py-4 bg-[#0f4c81] text-white font-black uppercase tracking-widest text-[11px] rounded-2xl hover:bg-[#0c3d68] transition-all shadow-lg shadow-blue-900/10 active:scale-95">
                                             Generar Reporte Ahora
                                         </button>
                                     </div>

@@ -298,22 +298,22 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex flex-col bg-slate-950/95 dark:bg-black/95 backdrop-blur-xl text-white select-none overflow-hidden"
+          className="fixed inset-0 z-[100] flex flex-col bg-slate-50/98 backdrop-blur-xl text-slate-900 select-none overflow-hidden"
         >
           {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 py-3 md:px-6 md:py-4 border-b border-white/10 bg-black/40 backdrop-blur-md z-10 shrink-0 safe-top">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 py-3 md:px-6 md:py-4 border-b border-slate-200 bg-white/95 backdrop-blur-md z-10 shrink-0 safe-top shadow-xs">
             <div className="flex items-center gap-3 w-full sm:w-auto">
-              <span className="p-2 bg-blue-600/20 text-blue-400 rounded-xl border border-blue-500/20 shrink-0">
+              <span className="p-2 bg-[#0f4c81]/10 text-[#0f4c81] rounded-xl border border-[#0f4c81]/20 shrink-0">
                 <Globe className="w-5 h-5" />
               </span>
               <div className="min-w-0">
-                <h2 className="text-sm md:text-base font-black uppercase tracking-wider leading-none">Tapas de Diarios</h2>
-                <span className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5 block">Portadas del Día</span>
+                <h2 className="text-sm md:text-base font-black text-slate-900 uppercase tracking-wider leading-none">Tapas de Diarios</h2>
+                <span className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5 block">Portadas del Día</span>
               </div>
               {/* Close Button — mobile: top right */}
               <button
                 onClick={onClose}
-                className="ml-auto sm:hidden p-2 bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 rounded-full border border-white/5 transition-all"
+                className="ml-auto sm:hidden p-2 bg-slate-100 hover:bg-red-500/15 text-slate-600 hover:text-red-600 rounded-full border border-slate-200 transition-all"
                 title="Cerrar"
               >
                 <X className="w-5 h-5" />
@@ -322,7 +322,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
               {/* Category tabs */}
-              <div className="flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/5 flex-1 sm:flex-initial">
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-full border border-slate-200 flex-1 sm:flex-initial">
                 {[
                   { id: 'internacionales', label: 'Internacional', shortLabel: 'INT', icon: Globe },
                   { id: 'nacionales', label: 'Nacional', shortLabel: 'NAC', icon: Flag },
@@ -337,7 +337,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                         setActiveCategory(cat.id as any);
                         setSelectedItemIndex(null);
                       }}
-                      className={`flex items-center justify-center gap-1.5 px-2.5 md:px-4 py-1.5 rounded-full text-[10px] md:text-xs font-bold uppercase transition-all flex-1 sm:flex-initial ${active ? 'bg-blue-600 text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
+                      className={`flex items-center justify-center gap-1.5 px-2.5 md:px-4 py-1.5 rounded-full text-[10px] md:text-xs font-bold uppercase transition-all flex-1 sm:flex-initial ${active ? 'bg-[#0f4c81] text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
                     >
                       <Icon className="w-3 h-3 md:w-3.5 md:h-3.5" />
                       <span className="hidden sm:inline">{cat.label}</span>
@@ -350,7 +350,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
               {/* Close Button — desktop */}
               <button
                 onClick={onClose}
-                className="hidden sm:flex p-2.5 bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 rounded-full border border-white/5 transition-all"
+                className="hidden sm:flex p-2.5 bg-slate-100 hover:bg-red-500/15 text-slate-600 hover:text-red-600 rounded-full border border-slate-200 transition-all"
                 title="Cerrar Portadas (Esc)"
               >
                 <X className="w-5 h-5" />
@@ -362,14 +362,14 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
           <div className="flex-1 overflow-hidden relative flex flex-col items-center justify-center p-3 md:p-6">
             {loading ? (
               <div className="flex flex-col items-center justify-center gap-4 text-center">
-                <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+                <Loader2 className="w-10 h-10 text-[#0f4c81] animate-spin" />
                 <div>
-                  <h3 className="text-sm font-black uppercase tracking-widest text-gray-400">Escaneando Kioskos y Portales...</h3>
-                  <p className="text-xs text-gray-500 mt-1">Extrayendo las últimas ediciones impresas</p>
+                  <h3 className="text-sm font-black uppercase tracking-widest text-slate-700">Escaneando Kioskos y Portales...</h3>
+                  <p className="text-xs text-slate-500 mt-1">Extrayendo las últimas ediciones impresas</p>
                 </div>
               </div>
             ) : currentList.length === 0 ? (
-              <div className="text-gray-400 text-center py-10">
+              <div className="text-slate-500 text-center py-10">
                 <p className="text-sm">No se encontraron tapas disponibles.</p>
               </div>
             ) : (
@@ -384,7 +384,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                         const el = document.getElementById('tapas-carousel');
                         if (el) el.scrollBy({ left: -320, behavior: 'smooth' });
                       }}
-                      className="p-3 md:p-4 bg-black/60 hover:bg-blue-600 text-white rounded-full border border-white/10 hover:border-blue-500 shadow-2xl transition-all pointer-events-auto"
+                      className="p-3 md:p-4 bg-white hover:bg-[#0f4c81] text-slate-800 hover:text-white rounded-full border border-slate-200 shadow-lg transition-all pointer-events-auto"
                     >
                       <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
                     </button>
@@ -393,7 +393,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                         const el = document.getElementById('tapas-carousel');
                         if (el) el.scrollBy({ left: 320, behavior: 'smooth' });
                       }}
-                      className="p-3 md:p-4 bg-black/60 hover:bg-blue-600 text-white rounded-full border border-white/10 hover:border-blue-500 shadow-2xl transition-all pointer-events-auto"
+                      className="p-3 md:p-4 bg-white hover:bg-[#0f4c81] text-slate-800 hover:text-white rounded-full border border-slate-200 shadow-lg transition-all pointer-events-auto"
                     >
                       <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                     </button>
@@ -414,18 +414,16 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.05 }}
                         onClick={() => setSelectedItemIndex(idx)}
-                        className="flex-shrink-0 w-52 sm:w-60 md:w-72 bg-white/5 border border-white/10 rounded-2xl overflow-hidden cursor-pointer hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 snap-center transition-all group flex flex-col press-effect"
+                        className="flex-shrink-0 w-52 sm:w-60 md:w-72 bg-white border border-slate-200 rounded-2xl overflow-hidden cursor-pointer hover:border-[#0f4c81]/50 hover:shadow-xl snap-center transition-all group flex flex-col press-effect shadow-sm"
                       >
-                        <div className="aspect-[3/4] overflow-hidden bg-black relative">
+                        <div className="aspect-[3/4] overflow-hidden bg-slate-100 relative">
                           <img
                             src={item.coverUrl}
                             alt={item.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 opacity-90 group-hover:opacity-100"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
                             loading="lazy"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60"></div>
-                          
-                          <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md border border-white/10 rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-wider text-blue-400">
+                          <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md border border-slate-200 rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-wider text-[#0f4c81] shadow-xs">
                             {item.countryOrRegion}
                           </div>
                         </div>
@@ -436,10 +434,10 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                           }
                         }}>
                           <div>
-                            <h3 className="text-sm font-black text-white leading-tight group-hover:text-blue-400 transition-colors uppercase">
+                            <h3 className="text-sm font-black text-slate-900 leading-tight group-hover:text-[#0f4c81] transition-colors uppercase">
                               {item.name}
                             </h3>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1 block">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1 block">
                               Edición: {item.date}
                             </span>
                           </div>
@@ -450,7 +448,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                                 e.stopPropagation();
                                 handleQuickShare(item, 'whatsapp');
                               }}
-                              className="share-btn p-2 bg-emerald-500/15 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/25 rounded-xl transition-all flex items-center justify-center"
+                              className="share-btn p-2 bg-emerald-500/15 hover:bg-emerald-600 text-emerald-600 hover:text-white border border-emerald-500/25 rounded-xl transition-all flex items-center justify-center"
                               title="Compartir en WhatsApp"
                               aria-label="Compartir en WhatsApp"
                             >
@@ -461,7 +459,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                                 e.stopPropagation();
                                 handleQuickShare(item, 'telegram');
                               }}
-                              className="share-btn p-2 bg-sky-500/15 hover:bg-sky-600 text-sky-400 hover:text-white border border-sky-500/25 rounded-xl transition-all flex items-center justify-center"
+                              className="share-btn p-2 bg-sky-500/15 hover:bg-sky-600 text-sky-600 hover:text-white border border-sky-500/25 rounded-xl transition-all flex items-center justify-center"
                               title={isValidUrl(item.coverUrl) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
                               aria-label="Compartir en Telegram"
                             >
@@ -477,12 +475,12 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                   <div className="w-full h-full flex flex-col lg:flex-row gap-4 md:gap-6 relative overflow-y-auto lg:overflow-hidden">
                     
                     {/* Left Panel: Big Image Viewer with Pan & Zoom */}
-                    <div className="flex-1 bg-black/60 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden relative flex items-center justify-center min-h-[280px] md:min-h-[400px]">
+                    <div className="flex-1 bg-white border border-slate-200 rounded-2xl md:rounded-3xl overflow-hidden relative flex items-center justify-center min-h-[280px] md:min-h-[400px] shadow-sm">
                       
                       {/* Navigate Left */}
                       <button
                         onClick={() => setSelectedItemIndex(idx => (idx !== null && idx > 0) ? idx - 1 : currentList.length - 1)}
-                        className="absolute left-4 z-20 p-3 bg-black/60 hover:bg-blue-600 text-white rounded-full border border-white/10 hover:border-blue-500 shadow-xl transition-all"
+                        className="absolute left-4 z-20 p-3 bg-white/95 hover:bg-[#0f4c81] text-slate-800 hover:text-white rounded-full border border-slate-200 shadow-lg transition-all"
                         title="Anterior (Flechita Izquierda)"
                       >
                         <ChevronLeft className="w-5 h-5" />
@@ -491,38 +489,38 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                       {/* Navigate Right */}
                       <button
                         onClick={() => setSelectedItemIndex(idx => (idx !== null && idx < currentList.length - 1) ? idx + 1 : 0)}
-                        className="absolute right-4 z-20 p-3 bg-black/60 hover:bg-blue-600 text-white rounded-full border border-white/10 hover:border-blue-500 shadow-xl transition-all"
+                        className="absolute right-4 z-20 p-3 bg-white/95 hover:bg-[#0f4c81] text-slate-800 hover:text-white rounded-full border border-slate-200 shadow-lg transition-all"
                         title="Siguiente (Flechita Derecha)"
                       >
                         <ChevronRight className="w-5 h-5" />
                       </button>
 
                       {/* Zoom Controls Overlay */}
-                      <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 md:gap-1.5 bg-black/80 backdrop-blur-xl border border-white/10 px-3 md:px-4 py-2 md:py-2.5 rounded-full shadow-2xl">
+                      <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 md:gap-1.5 bg-white/95 backdrop-blur-xl border border-slate-200 px-3 md:px-4 py-2 md:py-2.5 rounded-full shadow-lg">
                         <button
                           onClick={handleZoomOut}
                           disabled={zoom <= 1}
-                          className="p-1.5 hover:bg-white/10 text-white disabled:text-gray-600 rounded-lg transition-colors"
+                          className="p-1.5 hover:bg-slate-100 text-slate-800 disabled:text-slate-300 rounded-lg transition-colors"
                           title="Zoom Menos (-)"
                         >
                           <ZoomOut className="w-4 h-4" />
                         </button>
-                        <span className="text-[10px] font-black font-mono w-12 text-center text-blue-400">
+                        <span className="text-[10px] font-black font-mono w-12 text-center text-[#0f4c81]">
                           {Math.round(zoom * 100)}%
                         </span>
                         <button
                           onClick={handleZoomIn}
                           disabled={zoom >= 4}
-                          className="p-1.5 hover:bg-white/10 text-white disabled:text-gray-600 rounded-lg transition-colors"
+                          className="p-1.5 hover:bg-slate-100 text-slate-800 disabled:text-slate-300 rounded-lg transition-colors"
                           title="Zoom Mas (+)"
                         >
                           <ZoomIn className="w-4 h-4" />
                         </button>
-                        <div className="w-px h-4 bg-white/10 mx-1"></div>
+                        <div className="w-px h-4 bg-slate-200 mx-1"></div>
                         <button
                           onClick={handleResetZoom}
                           disabled={zoom === 1 && pan.x === 0 && pan.y === 0}
-                          className="p-1.5 hover:bg-white/10 text-white disabled:text-gray-600 rounded-lg transition-colors"
+                          className="p-1.5 hover:bg-slate-100 text-slate-800 disabled:text-slate-300 rounded-lg transition-colors"
                           title="Resetear Vista"
                         >
                           <RotateCcw className="w-4 h-4" />
@@ -545,7 +543,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                           ref={imageRef}
                           src={selectedItem?.coverUrl}
                           alt={selectedItem?.name}
-                          className="max-w-full max-h-[55vh] md:max-h-[80vh] object-contain shadow-2xl select-none"
+                          className="max-w-full max-h-[55vh] md:max-h-[80vh] object-contain shadow-xl select-none"
                           style={{
                             transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
                             transition: isDragging ? 'none' : 'transform 0.15s ease-out'
@@ -557,57 +555,57 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                     </div>
 
                     {/* Right Panel: Information & Controls */}
-                    <div className="w-full lg:w-72 xl:w-80 bg-white/5 border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6 flex flex-col justify-between shrink-0 shadow-2xl">
+                    <div className="w-full lg:w-72 xl:w-80 bg-white border border-slate-200 rounded-2xl md:rounded-3xl p-4 md:p-6 flex flex-col justify-between shrink-0 shadow-sm">
                       <div className="space-y-6">
                         {/* Newspaper Metadata */}
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded text-[9px] font-black uppercase border border-blue-500/20">
+                            <span className="bg-[#0f4c81]/10 text-[#0f4c81] px-2 py-0.5 rounded text-[9px] font-black uppercase border border-[#0f4c81]/20">
                               {selectedItem?.countryOrRegion}
                             </span>
-                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
                               {selectedItem?.category}
                             </span>
                           </div>
                           
-                          <h3 className="text-xl font-black mt-2 leading-tight uppercase text-white">
+                          <h3 className="text-xl font-black mt-2 leading-tight uppercase text-slate-900">
                             {selectedItem?.name}
                           </h3>
-                          <p className="text-xs text-gray-400 mt-1">
+                          <p className="text-xs text-slate-500 mt-1">
                             Edición del {selectedItem?.date}
                           </p>
                         </div>
 
                         {/* Compartir Portada */}
-                        <div className="bg-white/5 border border-white/10 p-3.5 rounded-2xl flex flex-col gap-3">
-                          <span className="text-[9px] font-black uppercase text-blue-400 tracking-wider">Compartir Portada</span>
+                        <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-2xl flex flex-col gap-3">
+                          <span className="text-[9px] font-black uppercase text-[#0f4c81] tracking-wider">Compartir Portada</span>
                           
                           <div className="flex flex-col gap-1">
-                            <label className="text-[8px] font-black uppercase text-gray-400 tracking-wider">Titular Principal</label>
+                            <label className="text-[8px] font-black uppercase text-slate-500 tracking-wider">Titular Principal</label>
                             <input 
                               type="text" 
                               value={headline} 
                               onChange={(e) => setHeadline(e.target.value)} 
                               placeholder="Titular destacado..." 
-                              className="w-full bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                              className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f4c81] transition-colors"
                             />
                           </div>
                           
                           <div className="flex flex-col gap-1">
-                            <label className="text-[8px] font-black uppercase text-gray-400 tracking-wider">Breve Frase / Comentario</label>
+                            <label className="text-[8px] font-black uppercase text-slate-500 tracking-wider">Breve Frase / Comentario</label>
                             <textarea 
                               value={summary} 
                               onChange={(e) => setSummary(e.target.value)} 
                               placeholder="Breve comentario..." 
                               rows={2}
-                              className="w-full bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                              className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f4c81] transition-colors resize-none"
                             />
                           </div>
                           
                           <div className="flex items-center justify-center gap-2.5 mt-1">
                             <button
                               onClick={() => handleShare('whatsapp')}
-                              className="p-2.5 bg-emerald-500/15 hover:bg-emerald-600 active:scale-95 transition-all text-emerald-400 hover:text-white border border-emerald-500/25 rounded-xl flex items-center justify-center shadow"
+                              className="p-2.5 bg-emerald-500/15 hover:bg-emerald-600 active:scale-95 transition-all text-emerald-600 hover:text-white border border-emerald-500/25 rounded-xl flex items-center justify-center shadow-xs"
                               title="Compartir en WhatsApp"
                               aria-label="Compartir en WhatsApp"
                             >
@@ -615,7 +613,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                             </button>
                             <button
                               onClick={() => handleShare('telegram')}
-                              className="p-2.5 bg-sky-500/15 hover:bg-sky-600 active:scale-95 transition-all text-sky-400 hover:text-white border border-sky-500/25 rounded-xl flex items-center justify-center shadow"
+                              className="p-2.5 bg-sky-500/15 hover:bg-sky-600 active:scale-95 transition-all text-sky-600 hover:text-white border border-sky-500/25 rounded-xl flex items-center justify-center shadow-xs"
                               title={selectedItem && isValidUrl(selectedItem.coverUrl) ? "Compartir en Telegram (Instant View)" : "Compartir en Telegram"}
                               aria-label="Compartir en Telegram"
                             >
@@ -625,19 +623,19 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                         </div>
 
                         {/* Reading Advice */}
-                        <div className="bg-white/5 border border-white/5 p-3 md:p-4 rounded-2xl flex flex-col gap-1.5 hidden md:flex">
-                          <span className="text-[9px] font-black uppercase text-blue-400 tracking-wider">Modo Lectura Activo</span>
-                          <p className="text-[11px] text-gray-400 leading-relaxed">
+                        <div className="bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-2xl flex flex-col gap-1.5 hidden md:flex">
+                          <span className="text-[9px] font-black uppercase text-[#0f4c81] tracking-wider">Modo Lectura Activo</span>
+                          <p className="text-[11px] text-slate-500 leading-relaxed">
                             Arrastre para desplazarse cuando el zoom esté activo.
                           </p>
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="flex flex-col sm:flex-row lg:flex-col gap-2 pt-4 md:pt-6 border-t border-white/10">
+                      <div className="flex flex-col sm:flex-row lg:flex-col gap-2 pt-4 md:pt-6 border-t border-slate-200">
                         <button
                           onClick={() => handleDownload(selectedItem?.coverUrl || '', `${selectedItem?.id}-tapa-${selectedItem?.date.replace(/\//g, '-')}.jpg`)}
-                          className="flex-1 py-2.5 md:py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all"
+                          className="flex-1 py-2.5 md:py-3 bg-[#0f4c81] hover:bg-[#0c3b66] text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all"
                         >
                           <Download className="w-4 h-4" />
                           <span>Descargar</span>
@@ -647,7 +645,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
                           href={selectedItem?.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 py-2.5 md:py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
+                          className="flex-1 py-2.5 md:py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
                         >
                           <ExternalLink className="w-4 h-4" />
                           <span>Sitio Web</span>
@@ -655,7 +653,7 @@ export default function TapasModal({ isOpen, onClose }: TapasModalProps) {
 
                         <button
                           onClick={() => setSelectedItemIndex(null)}
-                          className="flex-1 py-2.5 md:py-3 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all"
+                          className="flex-1 py-2.5 md:py-3 bg-transparent hover:bg-slate-100 text-slate-600 hover:text-slate-900 rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all"
                         >
                           Volver
                         </button>
